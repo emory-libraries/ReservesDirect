@@ -1578,6 +1578,9 @@ class classDisplayer
 	
 	function displaySearchForClass($instructorList, $deptList)
 	{
+		global $u;
+        global $g_permission;
+		
 		echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">';
 		echo '	<tr>';
 		echo '    	<td width="100%"><img src=images/spacer.gif" width="1" height="5"></td>';
@@ -1626,9 +1629,19 @@ class classDisplayer
         echo '</form>';
         echo '              	</div></td>';
         echo '			</tr>';
+        if ($u->getDefaultRole() >= $g_permission['instructor']) {
+			echo '<tr><td colspan="2">&nbsp;</td></tr>';
+			echo '<tr><td colspan="2"><blockquote><strong>Instructors:</strong> Adding a class through this page will only allow you to see that class as a student would. Classes that you are teaching show up automatically in your MyReserves list with a pencil icon next to them. If you do not see your class under your MyReserves list you may:<br>';
+			echo "				&gt;&gt; <a href=\"index.php?cmd=reactivateClass\">Reactivate a class you have used in the past.</a><br>\n";
+			echo "				&gt;&gt;<a href=\"index.php?cmd=createClass\"> Create a new class</a></blockquote>\n";
+			echo "</td></tr>\n";
+		} else {
+			echo '<tr><td>&nbsp;</td></tr>';
+		}
         echo '		</table>';
         echo '		</td>';
         echo '	</tr>';
+        
         echo '    <tr>';
         echo '    	<td><img src=images/spacer.gif" width="1" height="15"></td>';
         echo '	</tr>';
@@ -1640,6 +1653,7 @@ class classDisplayer
 	{
 		$terms = new terms();
         $currentTerm = $terms->getCurrentTerm();
+       
         
 		echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">';
 		echo '	<tr> ';
@@ -1685,6 +1699,7 @@ class classDisplayer
 		echo '		</table>';
 		echo '		</td>';
 		echo '	</tr>';
+			
 		echo '    <tr> ';
 		echo '    	<td colspan="2"><img src=images/spacer.gif" width="1" height="15"></td>';
 		echo '	</tr>';
