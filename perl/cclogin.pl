@@ -17,7 +17,7 @@ my $img = "";
 my $title = "";
 my $loginpath = "/reserves2.1/index.php";
 my $css = "/reserves2/css/ReservesStyles.css";
-my $imagepath = "../images";
+my $imagepath = "images";
 my $hostname = "biliku.library.emory.edu";
 
 my $reason = $r->prev->subprocess_env("AuthCookieReason");
@@ -42,22 +42,22 @@ my $form = <<HERE;
 <body onLoad="document.forms[0].credential_0.focus();">
 <FORM METHOD="POST" ACTION="https://$hostname/$action">
 <INPUT TYPE=hidden NAME=destination VALUE="$uri$args");
-<table width="60%" border="0" align="center" cellpadding="5" cellspacing="0">
+<table width="80%" border="0" align="center" cellpadding="5" cellspacing="0">
   <tr>
-    <td><div align="center">
+    <td colspan="2"><div align="center">
       <table width="100%" border="0" cellspacing="0" cellpadding="0">
         <tr valign="top">
-          <td valign="middle"><img src="$imagepath/logo_emorylibraries.gif" width="219" height="56"></td>
-          <td><div align="right"><img src="$imagepath/logo_reservesDirect.gif" width="105" height="80"></div></td>
+          <td valign="middle"><img src="$imagepath/logo-_emorylibraries-blue.jpg" ></td>
+          <td><div align="right"><img src="$imagepath/logo_rd-gold.gif"></div></td>
         </tr>
       </table>
     </div></td>
   </tr>
   <tr>
-    <td align="left" valign="top">&nbsp;</td>
+    <td colspan="2" align="left" valign="top">&nbsp;</td>
   </tr>
   <tr>
-    <td align="left" valign="top" bgcolor="#000099">
+    <td colspan="2" align="left" valign="top" bgcolor="#000099">
     	<div align="center">
     		<a href="http://www.library.emory.edu/">
     			<font color="#FFFFFF"><strong>EUCLID</strong></font>
@@ -69,7 +69,7 @@ my $form = <<HERE;
     </td>
   </tr>
   <tr>
-    <td width="50%" align="left" valign="top"><table width="75%" border="0" align="center" cellpadding="5" cellspacing="0" bgcolor="#CCCCCC" class="borders">
+    <td width="40%" align="left" valign="top"><table width="100%" border="0" align="center" cellpadding="5" cellspacing="0" bgcolor="#CCCCCC" class="borders">
         <td width="50%" align="right" valign="middle"><strong>Login:</strong></td>
         <td width="50%" align="left" valign="middle"><INPUT TYPE="text" NAME="credential_0" SIZE=10 MAXLENGTH=20 tabindex=0></td>
       </tr>
@@ -81,21 +81,52 @@ my $form = <<HERE;
       <tr bgcolor="#CCCCCC"><td colspan="2">&nbsp;</td></tr>
       <tr bgcolor="#CCCCCC"><td colspan="2" align="center"><INPUT TYPE="submit" VALUE="Sign In"></td></tr>
     </table></td>
+    <td width="60%" align="left" valign="top"><p><font color="#660000">Welcome
+          to the new ReservesDirect. Please note that <strong>all logins</strong> to
+          the system are now <strong>from this screen only</strong> for students
+          and instructors. The system looks different, but has all of the same
+          functionality as the previous version. </font></p>
+      <p><font color="#660000">For College and GSAS Instructors, TAs, and proxies:
+          get tips on navigating the new system with our <a href="http://web.library.emory.edu/services/circulation/reserves/tutorials.html"><font color="#000066">video
+      tutorials</font></a>.</font></p></td>
   </tr>
   <tr>
-    <td align="center" valign="top" bgcolor="#000099">&nbsp;$errorString</td>
+    <td colspan="2" align="center" valign="top" bgcolor="#000099">&nbsp;$errorString</td>
   </tr>
   <tr>
-    <td align="center" valign="top"><br>Enter your Emory Network (Eagle/Dooley) ID/password to sign in.<p><strong>Goizueta
-          Business School Faculty and Students: Use your Goizueta Network Account
-          (GBSNET) login. </strong><br>
-      (Don't know your GBSNET ? Call 404-727-0581 for assistance) </p>
-      <p>Help with passwords is available
+    <td colspan="2" align="center" valign="top"><br>Enter your Emory Network (Eagle/Dooley) ID/password to sign in.
+    <p>If you are having difficulty logging in, you may need to sync your passwords
+	  at<br>
+	  <a href="https://password.service.emory.edu/">https://password.service.emory.edu/</a><br>
+	  Further help with passwords is available
           from ITD (404-727-7777) during normal business hours Monday through
         Friday and limited hours on the weekend
     or check their web site: <a href="http://it.emory.edu/showdoc.cfm?docid=1079">http://it.emory.edu/showdoc.cfm?docid=1079</a></p>
-    <p>Problems logging in? <a href="http://$hostname/emailReservesDesk.php">Email the Reserves Desk</a>  </p></td>
+    </td>
+ </tr>
+ <tr>
+    <td colspan="2" align="left" valign="top"><hr></td>
+ </tr>
+ <tr>
+  	<td colspan="2">
+    <p><strong>Goizueta
+          Business School Faculty and Students <font color="FF0000">ONLY</font>: Use your Goizueta Network Account
+          (GBSNET) login. </strong><br>
+      Don't know your GBSNET password?
+      <ul>
+         <li>Call the Business School Support Desk 404-727-0581 between the hours of 8:00 am to 5:00 pm Monday through Friday for assistance, or</li>
+         <li>Come to room 400 or room 430 in the Business School with your Student ID or,</li>
+         <li>E-mail the Business School Suport Desk and we will e-mail your password to your First Class e-mail account.</li> </p>
+    </td>
+ </tr>
+      <tr>
+    <td colspan="2" align="left" valign="top"><hr></td>
   </tr>
+  <tr>
+  	<td colspan="2" align="center">
+    <p>Problems using the system? <a href="http://$hostname/emailReservesDesk.php">Email the Reserves Desk</a>  </p></td>
+    </td>
+ </tr>
 </table>
 </FORM>
 </body>
