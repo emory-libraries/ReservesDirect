@@ -376,6 +376,7 @@ class reserveItem extends item
 		global $g_dbConn;	
 		switch ($this->mimeTypeID)
 		{
+			case '7':
 			case 'text/html':
 			case null:
 				switch ($this->itemGroup)
