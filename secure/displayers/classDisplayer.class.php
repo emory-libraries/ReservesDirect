@@ -436,7 +436,7 @@ class classDisplayer
 		echo "          <td align=\"right\" valign=\"middle\">Section:</td>\n";
 		echo "          <td align=\"left\" valign=\"middle\"> <input name=\"primarySection\" type=\"text\" size=\"5\" maxlength=\"8\" value=\"".$ci->course->getSection()."\"></td>\n";
 		echo "          <td align=\"right\" valign=\"middle\">Title:</td>\n";
-		echo "          <td align=\"left\" valign=\"middle\"> <input name=\"primaryCourseName\" type=\"text\" size=\"25\" value=\"".addslashes($ci->course->getName())."\"></td>\n";
+		echo "          <td align=\"left\" valign=\"middle\"> <input name=\"primaryCourseName\" type=\"text\" size=\"25\" value=\"".$ci->course->getName()."\"></td>\n";
 		echo "          <td align=\"center\" valign=\"middle\"></td>\n";
 		echo "		</tr>\n";
 		$rowNumber = 0;
