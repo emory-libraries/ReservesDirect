@@ -169,8 +169,16 @@ class requestDisplayer
 	{	
 		global $g_documentURL;
 			
-		$terms = new terms();
-		list($y, $m, $d) = split("-", $terms->getCurrentTerm()->getBeginDate());
+		//Added by kawashi on 12.1.04 to replace commented out term logic below
+		//This is so the reserve activation date will match the course instance activation date
+		if (is_array($hidden_fields)){
+			$ci = new courseInstance($hidden_fields['ci']);
+			list($y, $m, $d) = split("-", $ci->getActivationDate());
+		}
+		//End of added code section
+		
+		//$terms = new terms();
+		//list($y, $m, $d) = split("-", $terms->getCurrentTerm()->getBeginDate());
 
 		echo "<script languge=\"JavaScript\">\n";
 		echo "	function setBarcode(frm) { if (frm.searchField.options[frm.searchField.selectedIndex] == 'barcode') { frm.barcode.value = frm.searchTerm.value; } }\n";
