@@ -198,21 +198,25 @@ class zQuery
 		}
 		$returnStatus = join($rs, "");
 		
-		if(ereg("Outcome=OK", $returnStatus)) 
+		if(ereg("Outcome=OK\n", $returnStatus)) 
 		{		
 			list($devnull, $holdings) = split("Outcome=OK\n", $returnStatus);
 			
 			$thisCopies = split("\n", $holdings);
+
 			for($i = 0; $i < (count($thisCopies) - 1); $i++) 
 			{
 				//list($catKey, $sequence, $copy, $callnum, $loc, $type, $bar, $library) = split("\|", $thisCopies[$i]);							
 				list($devnull, $devnull, $copy, $callnum, $loc, $type, $bar, $library, $status, $reservesDesk) = split("\|", $thisCopies[$i]);							
+				if ($copy != "" && $callnum != "")
+				{
 					$tmpArray[$i]['copy']		= $copy;
 					$tmpArray[$i]['callNum']	= $callnum;
 					$tmpArray[$i]['loc']		= $loc;
 					$tmpArray[$i]['type']		= $type;
 					$tmpArray[$i]['bar']		= ltrim(rtrim($bar));
 					$tmpArray[$i]['library']	= $library;
+				}
  			}
 /*jbwhite we now want to display all holding info
  			if ($keyType == "barcode")

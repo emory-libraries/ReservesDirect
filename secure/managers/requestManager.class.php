@@ -96,7 +96,11 @@ class requestManager
 
 				if (!isset($request['request_id']))
 				{
-					$item->createNewItem();				
+					if (isset($_REQUEST['item_id']) && !is_null($_REQUEST['item_id']))
+						$item->getItemByID($_REQUEST['item_id']);
+					else
+						$item->createNewItem();				
+						
 					$reserve->createNewReserve($ci->getCourseInstanceID(), $item->getItemID());	
 					
 					$itemAudit = new itemAudit();
@@ -327,7 +331,29 @@ class requestManager
 					//$sXML = $zQry->getResults();
 
 					//parse results into array
-					$search_results = $zQry->parseToArray();					
+					$search_results = $zQry->parseToArray();
+
+					//look for existing item in DB
+					$item = new reserveItem();
+					$item->getItemByLocalControl($search_results['controlKey']);
+					if (!is_null($item->getItemID()))
+					{
+						$item_id = $item->getItemID();
+						$search_results = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'source'=>'', 'content_note'=>'', 'controlKey'=>'', 'personal_owner'=>null, 'physicalCopy'=>'');
+						$search_results['title'] = ($item->getTitle() <> "") ? $item->getTitle() : "";
+						$search_results['author'] = ($item->getAuthor() <> "") ? $item->getAuthor() : "";
+						$search_results['edition'] = ($item->getVolumeEdition() <> "") ? $item->getVolumeEdition() : "";
+						$search_results['performer'] = ($item->getPerformer() <> "") ? $item->getPerformer() : "";
+						$search_results['volume_title'] = ($item->getVolumeTitle() <> "") ? $item->getVolumeTitle() : "";
+						$search_results['times_pages'] = ($item->getPagesTimes() <> "") ? $item->getPagesTimes() : "";
+						$search_results['source'] = ($item->getSource() <> "") ? $item->getSource() : "";
+						$search_results['content_note'] = ($item->getContentNotes() <> "") ? $item->getContentNotes() : "";
+						$search_results['controlKey'] = $item->getLocalControlKey();
+						$search_results['personal_owner'] = $item->getPrivateUserID();						
+					} else {
+						$item_id = null;
+					}
+									
 					$search_results['physicalCopy'] = $zQry->getHoldings($_REQUEST['searchField'], $_REQUEST['searchTerm']);					
 				} else $search_results = null;
 				
@@ -342,7 +368,14 @@ class requestManager
 				//get all Libraries
 				$lib_list = $user->getLibraries();
 				$this->displayFunction = 'addItem';
-				$this->argList = array($user, $cmd, $search_results, $owner_list, $lib_list, null, $_REQUEST, array('cmd'=>$cmd, 'previous_cmd'=>$cmd, 'ci'=>$_REQUEST['ci'], 'selected_instr'=>$_REQUEST['selected_instr']));
+				
+				//print_r($item);
+				//echo "<hr>";
+				//print_r($search_results);
+				//exit;
+				
+				//when form is sumbit for save cmd is set to storeRequest its ugly but it works
+				$this->argList = array($user, $cmd, $search_results, $owner_list, $lib_list, null, $_REQUEST, array('cmd'=>$cmd, 'previous_cmd'=>$cmd, 'ci'=>$_REQUEST['ci'], 'selected_instr'=>$_REQUEST['selected_instr'], 'item_id'=>$item_id));
 			break;
 		}
 	}

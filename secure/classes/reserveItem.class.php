@@ -107,6 +107,50 @@ class reserveItem extends item
 			$this->volumeTitle		= $row[17];
 			
 	}	
+
+	/**
+	* @return void
+	* @param string localControl
+	* @desc get item info from the database by localcontrolkey
+	*/
+	function getItemByLocalControl($local_control_key)
+	{
+		global $g_dbConn;
+		
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "SELECT item_id, title, item_group, author, source, content_notes, volume_edition, pages_times, performer, local_control_key, "
+					.     "creation_date, last_modified, url, mimeType, home_library, private_user_id, item_type, volume_title "
+					.  "FROM items "						  
+					.  "WHERE local_control_key = ?";
+		}
+		
+		$rs = $g_dbConn->query($sql, $local_control_key);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+				
+		$row = $rs->fetchRow();
+			$this->itemID			= $row[0];
+			$this->title			= $row[1];
+			$this->itemGroup		= $row[2];	
+			$this->author			= $row[3];
+			$this->source			= $row[4];
+			$this->contentNotes		= $row[5];
+			$this->volumeEdition	= $row[6];
+			$this->pagesTimes		= $row[7];
+			$this->performer		= $row[8];
+			$this->localControlKey	= $row[9];
+			$this->creationDate		= $row[10];
+			$this->lastModDate		= $row[11];
+			$this->URL				= $row[12];
+			$this->mimeTypeID		= $row[13];
+			$this->homeLibraryID	= $row[14];
+			$this->privateUserID	= $row[15];
+			$this->itemType			= $row[16];
+			$this->volumeTitle		= $row[17];
+			
+	}	
+
 	
 	/**
 	* @return void
