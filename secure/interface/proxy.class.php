@@ -318,34 +318,4 @@ class proxy extends student
 		return $tmpArray;
 	}
 
-	/**
-	* @return return array of classes
-	* @desc return classes for a given course
-	*/
-	function getCourseInstancesByCourse($courseID)
-	{ 
-		global $g_dbConn;
-			
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql = "SELECT DISTINCT course_instance_id "
-				.	   "FROM course_aliases  "
-				.	   "WHERE course_id = !";
-					   
-		}
-
-		$rs = $g_dbConn->query($sql, array($courseID));				
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		
-		$tmpArray = array();
-		while($row = $rs->fetchRow())
-		{
-			$ci = new courseInstance($row[0]);
-			$ci->getPrimaryCourse();
-			$ci->getInstructors();
-			$tmpArray[] = $ci;
-		}
-		return $tmpArray;
-	}
 }
