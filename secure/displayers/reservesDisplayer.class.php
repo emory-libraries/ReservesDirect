@@ -661,6 +661,8 @@ function displaySearchItemMenu($ci)
 		for ($ndx=0;$ndx<count($search->items);$ndx++)
 		{
 			$item = $search->items[$ndx];
+			$physicalCopy = new physicalCopy();
+			$physicalCopy->getByItemID($item->getItemID());
 			$cnt++; 			
 			$rowClass = ($i++ % 2) ? "evenRow" : "oddRow";
 			
@@ -675,7 +677,15 @@ function displaySearchItemMenu($ci)
         	echo "					        <td width=\"4%\" valign=\"top\">\n";
         	echo "								<img src=\"". $item->getitemIcon() ."\" width=\"24\" height=\"20\"></td>\n";
         	echo "							</td>\n";
-        	echo "							<td width=\"88%\"><font class=\"titlelink\">" . $item->getTitle() . ". " . $item->getAuthor() . "</font></td>\n";
+        	echo "							<td width=\"88%\"><font class=\"titlelink\">" . $item->getTitle() . ". " . $item->getAuthor() . "</font>";
+        	
+        				if ($physicalCopy->getCallNumber()) {
+            				echo '<br>Call Number: '.$physicalCopy->getCallNumber();
+            				//if ($this->itemGroup == 'MULTIMEDIA' || $this->itemGroup == 'MONOGRAPH')
+            			}
+        	
+            echo "							</td>\n";
+            
             echo "						    <td width=\"8%\" valign=\"top\" class=\"borders\" align=\"center\">\n";
             
             if ($item->getItemGroup() == "ELECTRONIC"){
