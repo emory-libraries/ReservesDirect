@@ -174,10 +174,7 @@ class requestManager
 						}
 																	
 						$instr->getInstructorAttributes();
-				
-						if (is_null($instr->getILSUserID()))
-							trigger_error("ILS USERID not set for " . $instr->getName() . "userID=" . $instr->getUserID(), E_USER_ERROR); 
-						
+									
 						for($i=0;$i<count($request['physical_copy']);$i++)
 						{	
 							list($type, $library, $callNumber, $location, $barcode, $copyNo) = split("::", $request['physical_copy'][$i]);														
