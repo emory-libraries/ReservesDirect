@@ -129,13 +129,13 @@ class classDisplayer
 	
 		echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">';
 		echo '<tr>';
-		echo "<td width =\"140%\" align=\"right\" valign=\"middle\" class=\"small\" align=\"right\"><a href=\"javascript:openWindow('&cmd=previewReservesList&ci=".$ci->courseInstanceID . "','width=800,height=600');\">Preview Student View</a> | <a href=\"index.php\">Exit class</a></td>\n";
+		echo "<td width =\"100%\" align=\"right\" valign=\"middle\" class=\"small\" align=\"right\"><a href=\"javascript:openWindow('&cmd=previewReservesList&ci=".$ci->courseInstanceID . "','width=800,height=600');\">Preview Student View</a> | <a href=\"index.php\">Exit class</a></td>\n";
 		echo '</tr>';
 		echo	'<tr>'
-		.	'	<td width="140%" colspan="2"><img src=images/spacer.gif" width="1" height="5"> </td>'
+		.	'	<td width="100%" colspan="2"><img src=images/spacer.gif" width="1" height="5"> </td>'
 		.	'</tr>'
 		.	'<tr>'
-		.   ' 	<td width="75%" height="79" align="left" valign="top" >'
+		.   ' 	<td width="75%" align="left" valign="top" >'
 		.   ' 		<table width="100%" border="0" cellspacing="0" cellpadding="2">'
 		.  	'		<tr>'
 		.   '         	<td width="80%" align="left" valign="top" class="courseTitle">'.$ci->course->displayCourseNo() . " " . $ci->course->getName().'</td>'
@@ -386,6 +386,7 @@ class classDisplayer
 		echo " <tr>\n";
 		echo " 	<td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td>\n";
 		echo " </tr>\n";
+		echo "	<tr><td colspan=\"3\" align=\"right\"> <a href=\"index.php?cmd=editClass&ci=".$ci->courseInstanceID."\">Return to Edit Class</a></div></td></tr>\n";		
 		echo " <tr>\n";
 		echo " 	<td>\n";
 		echo " 	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
@@ -435,7 +436,7 @@ class classDisplayer
 		echo "          <td align=\"right\" valign=\"middle\">Section:</td>\n";
 		echo "          <td align=\"left\" valign=\"middle\"> <input name=\"primarySection\" type=\"text\" size=\"5\" maxlength=\"8\" value=\"".$ci->course->getSection()."\"></td>\n";
 		echo "          <td align=\"right\" valign=\"middle\">Title:</td>\n";
-		echo "          <td align=\"left\" valign=\"middle\"> <input name=\"primaryCourseName\" type=\"text\" size=\"50\" value=\"".addslashes($ci->course->getName())."\"></td>\n";
+		echo "          <td align=\"left\" valign=\"middle\"> <input name=\"primaryCourseName\" type=\"text\" size=\"25\" value=\"".addslashes($ci->course->getName())."\"></td>\n";
 		echo "          <td align=\"center\" valign=\"middle\"></td>\n";
 		echo "		</tr>\n";
 		$rowNumber = 0;
@@ -463,13 +464,12 @@ class classDisplayer
 		echo "			<td align=\"right\" valign=\"middle\">Section:</td>\n";
 		echo "			<td align=\"left\" valign=\"middle\"> <input name=\"cross_listings[".$ci->crossListings[$i]->courseAliasID."][section]\" type=\"text\" size=\"5\" maxlength=\"8\" value=\"".$ci->crossListings[$i]->section."\"></td>\n";
 		echo "			<td align=\"right\" valign=\"middle\">Title:</td>\n";
-		echo "			<td align=\"left\" valign=\"middle\"> <input name=\"cross_listings[".$ci->crossListings[$i]->courseAliasID."][courseName]\" type=\"text\" size=\"50\" value=\"".$ci->crossListings[$i]->getName()."\"></td>\n";
+		echo "			<td align=\"left\" valign=\"middle\"> <input name=\"cross_listings[".$ci->crossListings[$i]->courseAliasID."][courseName]\" type=\"text\" size=\"25\" value=\"".$ci->crossListings[$i]->getName()."\"></td>\n";
 		echo "			<td align=\"center\" valign=\"middle\"><input type=\"checkbox\" name=\"deleteCrossListing[".$ci->crossListings[$i]->courseAliasID."]\" value=\"".$ci->crossListings[$i]->courseAliasID."\"></td>\n";
 		echo "		</tr>\n";
 		}
 		echo "		<tr class=\"headingCell1\">\n";
-		echo "			<td colspan=\"2\" align=\"left\" valign=\"top\"><div align=\"left\"><input type=\"submit\" name=\"updateCrossListing\" value=\"Update Course Info\"></div></td>\n";
-		echo "			<td align=\"left\" valign=\"top\">&nbsp;</td>\n";
+		echo "			<td colspan=\"3\" align=\"left\" valign=\"top\"><div align=\"left\"><input type=\"submit\" name=\"updateCrossListing\" value=\"Update Course Info\"></div></td>\n";
 		echo "			<td align=\"left\" valign=\"top\">&nbsp;</td>\n";
 		echo "			<td align=\"left\" valign=\"top\">&nbsp;</td>\n";
 		echo "			<td align=\"left\" valign=\"top\">&nbsp;</td>\n";
@@ -505,14 +505,14 @@ class classDisplayer
 		."    	<td align=\"left\" valign=\"top\" class=\"borders\">\n"
 		."    	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\">\n"
 		."      	<tr class=\"headingCell1\">"
-		."          	<td align=\"left\" valign=\"middle\">&nbsp;</td>\n"
-		."              <td align=\"left\" valign=\"middle\">&nbsp;</td>\n"
-		."              <td align=\"left\" valign=\"middle\">&nbsp;</td>\n"
-		."              <td align=\"left\" valign=\"middle\">&nbsp;</td>\n"
-		."              <td align=\"left\" valign=\"middle\">&nbsp;</td>\n"
-		."              <td align=\"left\" valign=\"middle\">&nbsp;</td>\n"
-		."              <td align=\"left\" valign=\"middle\">&nbsp;</td>\n"
-		."              <td align=\"left\" valign=\"middle\">&nbsp;</td>\n"
+		."          	<td width=\"10%\" align=\"left\" valign=\"middle\">&nbsp;</td>\n"
+		."              <td width=\"10%\" align=\"left\" valign=\"middle\">&nbsp;</td>\n"
+		."              <td width=\"10%\" align=\"left\" valign=\"middle\">&nbsp;</td>\n"
+		."              <td width=\"5%\" align=\"left\" valign=\"middle\">&nbsp;</td>\n"
+		."              <td width=\"10%\" align=\"left\" valign=\"middle\">&nbsp;</td>\n"
+		."              <td width=\"5%\" align=\"left\" valign=\"middle\">&nbsp;</td>\n"
+		."              <td width=\"5%\" align=\"left\" valign=\"middle\">&nbsp;</td>\n"
+		."              <td width=\"55%\" align=\"left\" valign=\"middle\">&nbsp;</td>\n"
 		."			</tr>\n"
 		."          <tr> "
 		."          	<td align=\"left\" valign=\"middle\" class=\"strong\"><div align=\"center\">Department:</div></td>\n"
@@ -530,7 +530,7 @@ class classDisplayer
 		."              <td align=\"left\" valign=\"middle\" class=\"strong\"><div align=\"center\">Section:</div></td>\n"
 		."              <td align=\"left\" valign=\"middle\"> <div align=\"left\"><input name=\"newSection\" type=\"text\" size=\"4\" maxlength=\"6\"></div></td>\n"
 		."              <td align=\"left\" valign=\"middle\" class=\"strong\"><div align=\"center\">Title:</div></td>\n"
-		."          	<td align=\"left\" valign=\"middle\"> <div align=\"left\"><input name=\"newCourseName\" type=\"text\" size=\"40\"></div></td>\n"
+		."          	<td align=\"left\" valign=\"middle\"> <div align=\"left\"><input name=\"newCourseName\" type=\"text\" size=\"30\"></div></td>\n"
 		."			</tr>\n"
 		."           <tr class=\"headingCell1\"> "
 		."                <td align=\"left\" valign=\"middle\">&nbsp;</td>\n"
