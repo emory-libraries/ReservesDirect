@@ -55,7 +55,7 @@ class classManager
 	{
 		global $g_permission, $page, $loc, $ci;
 		
-//echo "classManager($cmd, $user, $adminUser)<P>";
+//echo "classManager($cmd, $user, $adminUser)<P>"; //classManager
 		
 		$this->displayClass = "classDisplayer";
 
