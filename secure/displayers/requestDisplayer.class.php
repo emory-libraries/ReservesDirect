@@ -34,7 +34,7 @@ require_once("secure/classes/terms.class.php");
 
 class requestDisplayer 
 {
-	function displayAllRequest($requestList, $libList, $request, $msg="")
+	function displayAllRequest($requestList, $libList, $request, $user, $msg="")
 	{
 		
 	
@@ -142,7 +142,7 @@ class requestDisplayer
 				echo "					        <td align=\"left\" valign=\"top\">Not Implemeted</td>\n";
 				echo "					      </tr>\n";
 				*/
-					
+				
 				echo "					      <tr>\n";
 				echo "					        <td width=\"12\" valign=\"top\">&nbsp;</td>\n";
 				echo "					        <td width=\"98\" align=\"right\" valign=\"top\" class=\"strong\">Activate By:</td>\n";

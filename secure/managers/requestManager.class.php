@@ -76,7 +76,7 @@ class requestManager
 				}			
 				
 				$this->displayFunction = 'displayAllRequest';
-				$this->argList = array($requestList, $user->getLibraries(), $request);
+				$this->argList = array($requestList, $user->getLibraries(), $request, $user);
 			break;
 						
 			case 'storeRequest':
@@ -218,7 +218,7 @@ class requestManager
 						$requestObj->setDateProcessed(null);  //clear processed flag
 					} else {
 						$this->displayFunction = 'displayAllRequest';
-						$this->argList = array($requestList, $user->getLibraries(), $request, "Request Processed");
+						$this->argList = array($requestList, $user->getLibraries(), $request, $user, "Request Processed");
 						break;
 					}
 				} else {					
