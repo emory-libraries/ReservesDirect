@@ -133,18 +133,18 @@ class zQuery
 			   				$search_results['author'] .= (string)$subfield;
 						   	
 			   		case '245': //Title
+			   			$search_results['title'] = "";
 			   			foreach ($field->subfield as $subfield)
 			   			{
-			   				if ($subfield[@type] == 'a')
-			   					$search_results['title'] = (string)$subfield;
+			   					$search_results['title'] .= " ".(string)$subfield;
 			   			}
 			   		break;
 			   					   		
 			   		case '260':
+			   			$search_results['source'] = "";
 			   			foreach ($field->subfield as $subfield)
 			   			{
-			   				if ($subfield[@type] == 'a')
-			   					$search_results['source'] = (string)$subfield;
+			   					$search_results['source'] .= " ".(string)$subfield;
 			   			}
 			   		break;
 
