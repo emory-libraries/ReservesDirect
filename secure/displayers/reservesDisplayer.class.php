@@ -285,9 +285,13 @@ class reservesDisplayer
 	            	}
 	            	if ($itemNotes) 
 	            	{
+	            		
 	            		for ($n=0; $n<count($itemNotes); $n++)
 	            		{
-            				echo '<span class="noteType">'.$itemNotes[$n]->getType().' Note:</span>&nbsp;<span class="noteText">'.$itemNotes[$n]->getText().'</span><br>';
+            				$type = strtolower($itemNotes[$n]->getType());
+            				if ($type == "content") {
+	            				echo '<span class="noteType">'.ucfirst($type).' Note:</span>&nbsp;<span class="noteText">'.$itemNotes[$n]->getText().'</span><br>';
+            				}
 	            		}
 	            	}
 	            	if ($instructorNotes)
@@ -298,14 +302,6 @@ class reservesDisplayer
 	            			echo '<span class="noteType">Instructor Note:</span>&nbsp;<span class="noteText">'.$instructorNotes[$n]->getText().'</span><br>';
 	            		}
 	            	}
-	            	/*
-	            	<span class="noteType">
-	            		Content Note:</span>&nbsp;<span class="noteText">This is the only existing recording of this piece by an Armenian string ensemble.
-	            	</span><br>
-					<span class="noteType">
-						Instructor Note:</span>&nbsp;<span class="noteText">Please listen to this piece and analyze it for Thursday, 10/25.
-					</span>
-	            	*/
 	            	echo '</td></tr>';
 			}
 		}
@@ -672,9 +668,23 @@ function displaySearchItemMenu($ci)
 		$i = 0;
 		for ($ndx=0;$ndx<count($search->items);$ndx++)
 		{
+			
 			$item = $search->items[$ndx];
 			$physicalCopy = new physicalCopy();
 			$physicalCopy->getByItemID($item->getItemID());
+			$callNumber = $physicalCopy->getCallNumber();
+			
+			$title = $item->getTitle();
+			$author = $item->getAuthor();
+			$url = $item->getURL();
+			$performer = $item->getPerformer();
+			$volTitle = $item->getVolumeTitle();
+			$volEdition = $item->getVolumeEdition();
+			$pagesTimes = $item->getPagesTimes();
+			$source = $item->getSource();
+			$contentNotes = $item->getContentNotes();
+			$itemNotes = $item->getNotes();
+			
 			$cnt++; 			
 			$rowClass = ($i++ % 2) ? "evenRow" : "oddRow";
 			
@@ -689,13 +699,67 @@ function displaySearchItemMenu($ci)
         	echo "					        <td width=\"4%\" valign=\"top\">\n";
         	echo "								<img src=\"". $item->getitemIcon() ."\" width=\"24\" height=\"20\"></td>\n";
         	echo "							</td>\n";
-        	echo "							<td width=\"88%\"><font class=\"titlelink\">" . $item->getTitle() . ". " . $item->getAuthor() . "</font>";
+        	echo "							<td width=\"88%\"><font class=\"titlelink\">" . $title . ". " . $author . "</font>";
         	
-        				if ($physicalCopy->getCallNumber()) {
-            				echo '<br>Call Number: '.$physicalCopy->getCallNumber();
+        	/*
+        	$viewReserveURL = "reservesViewer.php?viewer=" . $user->getUserID() . "&reserve=" . $ci->reserveList[$i]->getReserveID();// . "&location=" . $ci->reserveList[$i]->item->getURL();
+				if ($reserveItem->isPhysicalItem()) {
+					//move to config file
+					$viewReserveURL = "http://libcat1.cc.emory.edu/uhtbin/cgisirsi/x/0/5?searchdata1=" . $ci->reserveList[$i]->item->getLocalControlKey();
+				}
+				echo '<tr align="left" valign="middle" class="'.$rowClass.'">'
+	            .    '	<td width="4%" valign="top"><img src="'.$itemIcon.'" alt="text" width="24" height="20"></td>'
+	            .    '	<td width="72%">'.$ci->reserveList[$i]->item->getAuthor().'&nbsp;';
+	            if (!$reserveItem->isPhysicalItem()) {
+	            	echo '<a href="'.$viewReserveURL.'" target="_blank">'.$ci->reserveList[$i]->item->getTitle().'</a>';
+	            } else {
+	            	echo '<em>'.$ci->reserveList[$i]->item->getTitle().'</em>.';
+	            	if ($callNumber) {echo '<br>'.$callNumber;}
+	            	echo '<br>On Reserve At: '.$reserveDesk.' (<a href="'.$viewReserveURL.'" target="_blank">more info</a>)';
+	            }
+        	*/
+        	
+        				if ($callNumber) {
+            				echo '<br>Call Number: '.$callNumber;
             				//if ($this->itemGroup == 'MULTIMEDIA' || $this->itemGroup == 'MONOGRAPH')
             			}
-        	
+            			
+           		if ($performer)
+	            {
+	            	echo '<br><span class="itemMetaPre">Performed by:</span><span class="itemMeta"> '.$performer.'</span>';
+	            }
+	            if ($volTitle)
+	            {
+	            	echo '<br><span class="itemMetaPre">From:</span><span class="itemMeta"> '.$volTitle.'</span>';
+	            }
+	            if ($volEdition)
+	            {
+	            	echo '<br><span class="itemMetaPre">Volume/Edition:</span><span class="itemMeta"> '.$volEdition.'</span>';
+	            }
+	            if ($pagesTimes)
+	            {
+	            	echo '<br><span class="itemMetaPre">Pages/Time:</span><span class="itemMeta"> '.$pagesTimes.'</span>';
+	            }
+	            if ($source)
+	            {
+	            	echo '<br><span class="itemMetaPre">Source/Year:</span><span class="itemMeta"> '.$source.'</span>';
+	            }
+	            
+	            if ($contentNotes)
+	            {
+	            	echo '<br><span class="noteType">Content Note:</span>&nbsp;<span class="noteText">'.$contentNotes.'</span>';
+	            }
+	            if ($itemNotes) 
+	            {
+	            	for ($n=0; $n<count($itemNotes); $n++)
+	            	{
+	            		$type = strtolower($itemNotes[$n]->getType());
+	            		if ($user->dfltRole >= $g_permission['staff'] || $type == "content") {
+	            			echo '<br><span class="noteType">'.ucfirst($type).' Note:</span>&nbsp;<span class="noteText">'.$itemNotes[$n]->getText().'</span>';
+	            		}
+	            	}
+	            }
+
             echo "							</td>\n";
             
             echo "						    <td width=\"8%\" valign=\"top\" class=\"borders\" align=\"center\">\n";
