@@ -76,11 +76,11 @@ class student extends user
 		}
 		
 		$rs = $g_dbConn->query($sql, array($this->userID, $courseAliasID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_SQL_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
 		if ($rs->numRows() == 0) {
 			$rs = $g_dbConn->query($sql2, array($this->userID, $courseAliasID));
-			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_SQL_ERROR); }
+			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		} 
 	}
 	
@@ -95,7 +95,7 @@ class student extends user
 		}
 		
 		$rs = $g_dbConn->query($sql, array($this->userID, $courseAliasID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_SQL_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 	
 	/**
@@ -120,7 +120,7 @@ class student extends user
 		
 		//$rs = $g_dbConn->query($sql, array($targetID, $targetTable));
 		$rs = $g_dbConn->query($sql, $this->userID);
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_SQL_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
 		$tmpArray = array();
 		while ($row = $rs->fetchRow()) {
@@ -154,7 +154,7 @@ class student extends user
 		
 		$rs = $g_dbConn->query($sql, array($this->getUserID(), $d, $d));	
 
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_SQL_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
 		unset($this->courseInstances);  // clean array
 		while ($row = $rs->fetchRow()) {
@@ -189,7 +189,7 @@ class student extends user
 		
 		$rs = $g_dbConn->query($sql, array($this->getUserID(), $d, $d));	
 
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_SQL_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
 		unset($this->courseInstances);  // clean array
 		while ($row = $rs->fetchRow()) {
@@ -234,7 +234,7 @@ class student extends user
 		}
 		
 		$rs = $g_dbConn->query($sql, array($courseInstanceID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_SQL_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
 		$tmpArray = array();
 		while ($row = $rs->fetchRow()) {
@@ -293,7 +293,7 @@ class student extends user
 		
 		$rs = $g_dbConn->query($sql, $deptID);	
 
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_SQL_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
 		unset($this->courseList);  // clean array
 		while ($row = $rs->fetchRow()) {

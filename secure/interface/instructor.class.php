@@ -178,14 +178,14 @@ class instructor extends proxy
 				;				
 		}
 		$rs = $g_dbConn->query($sql, array($proxyID, $courseInstanceID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_SQL_ERROR); }		
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }		
 		
 		while($row = $rs->fetchRow())
 		{
 			$aliasID = $row[0];
 		
 			$rs2 = $g_dbConn->query($sql1, $aliasID);			
-			if (DB::isError($rs2)) { trigger_error($rs2->getMessage(), E_SQL_ERROR); }		
+			if (DB::isError($rs2)) { trigger_error($rs2->getMessage(), E_USER_ERROR); }		
 		}
 	}
 	
@@ -226,12 +226,12 @@ class instructor extends proxy
 		
 		//Update default permission to proxy if current permssion level < proxy
 		$rs = $g_dbConn->query($sql, array($proxyID));		
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_SQL_ERROR);}
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR);}
 		
 		/* commented out by kawashi on 11.12.2004 - No longer adding proxies to crosslistings, just to primary course
 		//Get all course aliases for the given course instance id
 		$rs = $g_dbConn->query($sql1, array($courseInstanceID));		
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_SQL_ERROR);}	
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR);}	
 		
 		//Loop through all course aliases
 		while($row = $rs->fetchRow())
@@ -240,14 +240,14 @@ class instructor extends proxy
 			
 			//Check to see if proxy already has access to this alias in the access table
 			$rs2 = $g_dbConn->query($sql2, array($proxyID, $aliasID, $g_permission['proxy']));		
-			if (DB::isError($rs2)) { trigger_error($rs2->getMessage(), E_SQL_ERROR);}	
+			if (DB::isError($rs2)) { trigger_error($rs2->getMessage(), E_USER_ERROR);}	
 			
 			//If proxy doesn't have access...
 			if ($rs2->numRows() == 0) {
 
 				//Execute query to grant access for the proxy, to the couse alias, in the access table
 				$rs3 = $g_dbConn->query($sql3, array($proxyID, $aliasID, $g_permission['proxy']));		
-				if (DB::isError($rs3)) { trigger_error($rs3->getMessage(), E_SQL_ERROR);}	
+				if (DB::isError($rs3)) { trigger_error($rs3->getMessage(), E_USER_ERROR);}	
 
 			}
 		}
@@ -257,20 +257,20 @@ class instructor extends proxy
 
 		//Get primary course alias for the given course instance id
 		$rs = $g_dbConn->query($sql1, array($courseInstanceID));		
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_SQL_ERROR);}	
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR);}	
 		
 		$row = $rs->fetchRow();
 		$aliasID = $row[0];
 			
 		//Check to see if proxy already has access to this alias in the access table
 		$rs2 = $g_dbConn->query($sql2, array($proxyID, $aliasID, $g_permission['proxy']));		
-		if (DB::isError($rs2)) { trigger_error($rs2->getMessage(), E_SQL_ERROR);}	
+		if (DB::isError($rs2)) { trigger_error($rs2->getMessage(), E_USER_ERROR);}	
 			
 		//If proxy doesn't have access...
 		if ($rs2->numRows() == 0) {
 			//Execute query to grant access for the proxy, to the couse alias, in the access table
 			$rs3 = $g_dbConn->query($sql3, array($proxyID, $aliasID, $g_permission['proxy']));		
-			if (DB::isError($rs3)) { trigger_error($rs3->getMessage(), E_SQL_ERROR);}	
+			if (DB::isError($rs3)) { trigger_error($rs3->getMessage(), E_USER_ERROR);}	
 		}
 	}
 	

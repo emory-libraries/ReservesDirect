@@ -59,7 +59,7 @@ class department extends library
 			}
 	
 			$rs = $g_dbConn->query($sql, $this->deptID);
-			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_SQL_ERROR); }
+			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 				
 			$row = $rs->fetchRow();
 				$this->name 			= $row[0];
@@ -92,7 +92,7 @@ class department extends library
 		}
 
 		$rs = $g_dbConn->query($sql);	
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_SQL_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 			
 		$tmpArray = array();
 		while ($row = $rs->fetchRow()) {		

@@ -160,7 +160,7 @@ class users
 		}
 		
 		$rs = $g_dbConn->query($sql, array($g_permission[$strRole], $g_permission[$strRole]));		
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_SQL_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
 		$tmpArray = array();
 		while ($row = $rs->fetchRow()) {

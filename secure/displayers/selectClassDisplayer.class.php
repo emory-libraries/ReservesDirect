@@ -71,13 +71,16 @@ class selectClassDisplayer
 		echo "					<td colspan=\"4\">\n";
 		
 		//set selected
+		$username = "";
+		$last_name = "";
 		$selector = (isset($request['select_instr_by'])) ? $request['select_instr_by'] : "last_name";
 		$$selector = "selected";
 		
 		echo "						<select name=\"select_instr_by\">\n";
 		echo "							<option value=\"last_name\" $last_name>Last Name</option>\n";
 		echo "							<option value=\"username\" $username>User Name</option>\n";
-		echo "						</select> &nbsp; <input name=\"instr_qryTerm\" type=\"text\" value=\"".$request['instr_qryTerm']."\" size=\"15\"  onBlur=\"this.form.submit();\">\n";
+		$instr_qryTerm = isset($request['instr_qryTerm']) ? $request['instr_qryTerm'] : "";
+		echo "						</select> &nbsp; <input name=\"instr_qryTerm\" type=\"text\" value=\"".$instr_qryTerm."\" size=\"15\"  onBlur=\"this.form.submit();\">\n";
 		echo "						&nbsp;\n";
 		echo "						<input type=\"submit\" name=\"instr_search\" value=\"Search\" onClick=\"this.form.select_course.selectedIndex=-1; this.form.selected_instr.selectedIndex=-1;\">\n"; //by setting selectedIndex to -1 we can clear the selectbox or previous values
 		echo "						&nbsp;\n";
@@ -92,7 +95,7 @@ class selectClassDisplayer
 		
 		for($i=0;$i<count($instr_list);$i++)
 		{
-			$inst_selector = ($request['selected_instr'] == $instr_list[$i]->getUserID()) ? "selected" : "";
+			$inst_selector = (isset($request['selected_instr']) && $request['selected_instr'] == $instr_list[$i]->getUserID()) ? "selected" : "";
 			echo "							<option value=\"". $instr_list[$i]->getUserID() ."\" $inst_selector>". $instr_list[$i]->getName() ."</option>\n";
 		}
 		
@@ -117,11 +120,11 @@ class selectClassDisplayer
 		$course_DISABLED = (is_null($course_list)) ? "DISABLED" : "";		
 	
 		echo "						<select name=\"select_course\" $course_DISABLED onChange=\"this.form.submit();\">\n";
-		echo "							<option value=\"null\" $course_selector>-- Select a Course -- </option>\n";
+		echo "							<option value=\"null\">-- Select a Course -- </option>\n";
 		
 		for ($i=0;$i<count($course_list);$i++)
 		{
-			$course_selector = ($request['select_course'] == $course_list[$i]->getCourseID()) ? "selected" : "";
+			$course_selector = (isset($request['select_course']) && $request['select_course'] == $course_list[$i]->getCourseID()) ? "selected" : "";
 			echo "							<option value=\"". $course_list[$i]->getCourseID() ."\" $course_selector>". $course_list[$i]->displayCourseNo() . " " . $course_list[$i]->getName() ."</option>\n";
 		}
 		

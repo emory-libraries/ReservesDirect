@@ -106,7 +106,7 @@ class proxy extends student
 		}
 		
 		$rs = $g_dbConn->query($sql, array($this->getUserID(), $d));			
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_SQL_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
 		unset($this->courseInstances);  // clean array
 		while ($row = $rs->fetchRow()) {
@@ -185,7 +185,7 @@ class proxy extends student
 		
 		$rs = $g_dbConn->query($sql, array($this->getUserID(), $d, $d, $permissionLvl));	
 
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_SQL_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
 		unset($this->courseInstances);  // clean array
 		while ($row = $rs->fetchRow()) {

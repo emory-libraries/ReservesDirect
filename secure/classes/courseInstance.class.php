@@ -634,7 +634,7 @@ class courseInstance
 		}
 		
 		$rs = $g_dbConn->query($sql, array($instructorID, $courseAliasID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_SQL_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
 		if ($rs->numRows() == 0) {
 			$rs = $g_dbConn->query($sql2, array($instructorID, $courseAliasID, '3'));		
@@ -655,7 +655,7 @@ class courseInstance
 		}
 		
 		$rs = $g_dbConn->query($sql, array($proxyID, $courseAliasID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_SQL_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
 		if ($rs->numRows() == 0) {
 			$rs = $g_dbConn->query($sql2, array($proxyID, $courseAliasID, '2'));		
@@ -675,7 +675,7 @@ class courseInstance
 		}
 		
 		$rs = $g_dbConn->query($sql, array($instructorID, $courseAliasID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_SQL_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 	
 	function displayInstructors()

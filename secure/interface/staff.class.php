@@ -299,8 +299,8 @@ class staff extends instructor
 
         $returnStatus = ereg_replace("<!.*\">", "", $returnStatus);
         $returnStatus = ereg_replace("\n", "", $returnStatus);
-        if($returnStatus != "outcome=OK reason: successful") {
-        	//trigger_error("There was a problem setting the location and circ-rule in EUCLID.  EUCLID returned:  $returnStatus.", E_USER_ERROR);
+        
+        if(!ereg("outcome=OK", $returnStatus)){
         	return "There was a problem setting the location and circ-rule in EUCLID. <BR>EUCLID returned:  $returnStatus.";
         } else 
         	return "Location and circ-rule have been successfully set in EUCLID";

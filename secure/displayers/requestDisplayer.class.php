@@ -273,6 +273,10 @@ class requestDisplayer
 			echo "	</tr>\n";
 		} else {
 			
+			$PERSONAL = "";
+			$EUCLID_ITEM = "";
+			$MANUAL = "";
+			
 			$search_selector = (isset($request['addType'])) ? $request['addType'] : 'EUCLID_ITEM';
 			$$search_selector = "checked";
 			echo "			<table width=\"100%\" border=\"0\" cellpadding=\"3\" cellspacing=\"0\" class=\"borders\">\n";
@@ -291,11 +295,15 @@ class requestDisplayer
 			echo "						<span class=\"strong\">Enter Item Manually (no EUCLID lookup)</span>\n";
 			echo "					</td>\n";
 			echo "				</tr>\n";
+			
+			$searchTerm = isset($request['searchTerm']) ? $request['searchTerm'] : "";
 			echo "				<tr bgcolor=\"#CCCCCC\">\n";
 			echo "					<td colspan=\"2\" align=\"left\" valign=\"middle\" bgcolor=\"#FFFFFF\">\n";
-			echo "						<input name=\"searchTerm\" type=\"text\" size=\"15\" value=\"".$request['searchTerm']."\">\n";
+			echo "						<input name=\"searchTerm\" type=\"text\" size=\"15\" value=\"".$searchTerm."\">\n";
 			
 			//set selected
+			$barcode = "";
+			$local_control = "";
 			$selector = (isset($request['searchField'])) ? $request['searchField'] : "barcode";
 			$$selector = "selected";
 					
@@ -338,7 +346,9 @@ class requestDisplayer
 			echo "						</select>\n";
 			echo "					</td>\n";
 			echo "				</tr>\n";
-						
+
+			$MULTIMEDIA = "";
+			$MONOGRAPH = "";
 			$itemType_selector = (isset($request['item_type'])) ? $request['item_type'] : "MONOGRAPH";
 			$$itemType_selector = "checked";
 			echo "				<tr bgcolor=\"#CCCCCC\">\n";
@@ -452,8 +462,9 @@ class requestDisplayer
 		echo "					<td><textarea name=\"content_note\" cols=\"50\" rows=\"3\">".$search_results['content_note']."</textarea></td>\n";
 		echo "				</tr>\n";
 
-		echo "				<input type=\"hidden\" name=\"personal_item\" value=\"".$request['personal_item']."\">\n";
-		if (isset($request['personal_item']) && ($request['personal_item'] == "yes" || !is_null($search_results['personal_owner']))) 
+		$personal_item = isset($request['personal_item']) ? $request['personal_item'] : "";
+		echo "				<input type=\"hidden\" name=\"personal_item\" value=\"".$personal_item."\">\n";
+		if (isset($request['personal_item']) && ($request['personal_item'] == "yes") || !is_null($search_results['personal_owner'])) 
 		{
 			echo "				<tr align=\"left\" valign=\"middle\">\n";
 			echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">\n";
@@ -462,15 +473,19 @@ class requestDisplayer
 			
 						
 			//set selected
+			$username = "";
+			$last_name = "";
 			$selector = (isset($request['select_owner_by'])) ? $request['select_owner_by'] : "last_name";
 			$$selector = "selected";
+			
+			$owner_qryTerm = (isset($request['owner_qryTerm'])) ? $request['owner_qryTerm'] : "";
 			
 			echo "					</td>\n";
 			echo "					<td>\n";
 			echo "						<select name=\"select_owner_by\">\n";
 			echo "							<option value=\"last_name\" $last_name>Last Name</option>\n";
 			echo "							<option value=\"username\" $username>User Name</option>\n";
-			echo "						</select> &nbsp; <input name=\"owner_qryTerm\" type=\"text\" value=\"".$request['owner_qryTerm']."\" size=\"15\"  onBlur=\"this.form.submit();\">\n";
+			echo "						</select> &nbsp; <input name=\"owner_qryTerm\" type=\"text\" value=\"".$owner_qryTerm."\" size=\"15\"  onBlur=\"this.form.submit();\">\n";
 			echo "						&nbsp;\n";
 			echo "						<input type=\"submit\" name=\"owner_search\" value=\"Search\">\n";
 			echo "						&nbsp;\n";
@@ -495,7 +510,7 @@ class requestDisplayer
 
 		
 		
-		$barcode_value = (isset($barcode) && $request['searchTerm'] != "") ? $request['searchTerm'] : $search_results['barcode'];
+		$barcode_value = (isset($barcode) && (isset($request['searchTerm']) && $request['searchTerm'] != "")) ? $request['searchTerm'] : $search_results['barcode'];
 		
 		echo "				<tr align=\"left\" valign=\"middle\">\n";
 		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">Barcode:</td>\n";

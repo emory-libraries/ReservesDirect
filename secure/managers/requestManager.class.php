@@ -98,7 +98,9 @@ class requestManager
 									
 					$requestObj->setDateProcessed(date('Y-m-d'));
 					//set ci so it will be displayed for user
+					echo "here";
 					$ci = new courseInstance($reserve->getCourseInstanceID());
+					echo "here";
 				}
 				
 				$reserve->setActivationDate($request['hide_year'].'-'.$request['hide_month'].'-'.$request['hide_day']);
@@ -236,15 +238,15 @@ class requestManager
 
 				$page = "manageClasses";			
 				$loc  = "process request";
-							
+				$msg = "";			
+				
 				$requestObj	= new request($_REQUEST['request_id']);
 				$item = new reserveItem($requestObj->requestedItemID);				
 				$reserve = new reserve($requestObj->reserveID);
 
 				//set ci so it will be displayed for user								
-				$ci = new courseInstance($reserve->getCourseInstanceID());
+				$ci = new courseInstance($requestObj->courseInstanceID);
 				$ci->getPrimaryCourse();
-				
 				if (isset($_REQUEST['searchField']) && (isset($_REQUEST['searchTerm']) && ltrim(rtrim($_REQUEST['searchTerm'])) != ""))
 				{				
 					$zQry = new zQuery($_REQUEST['searchTerm'], $_REQUEST['searchField']);
@@ -272,8 +274,8 @@ class requestManager
 
 				//we will pull item values from db if they exist otherwise default to searched values
 			
+				$pre_value = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'source'=>'', 'content_note'=>'', 'controlKey'=>'', 'personal_owner'=>null, 'physicalCopy'=>'');
 				$pre_values['title'] = ($item->getTitle() <> "") ? $item->getTitle() : $search_results['title'];
-				$pre_values['author'] = ($item->getAuthor() <> "") ? $item->getAuthor() : $search_results['author'];
 				$pre_values['author'] = ($item->getAuthor() <> "") ? $item->getAuthor() : $search_results['author'];
 				$pre_values['edition'] = ($item->getVolumeEdition() <> "") ? $item->getVolumeEdition() : $search_results['edition'];
 				$pre_values['performer'] = ($item->getPerformer() <> "") ? $item->getPerformer() : $search_results['performer'];
@@ -287,7 +289,7 @@ class requestManager
 				$pre_values['physicalCopy'] = $search_results['physicalCopy'];				
 
 				//populate personal owners
-				if (!is_null($pre_values['personal_owner']) || (($_REQUEST['personal_item'] == "yes") && (isset($_REQUEST['select_owner_by']) && isset($_REQUEST['owner_qryTerm'])))) //user is searching for an owner
+				if (isset($pre_values['personal_owner']) || ((isset($_REQUEST['personal_item']) && $_REQUEST['personal_item'] == "yes") && (isset($_REQUEST['select_owner_by']) && isset($_REQUEST['owner_qryTerm'])))) //user is searching for an owner
 				{				
 					$users = new users();
 					$users->search($_REQUEST['select_owner_by'], $_REQUEST['owner_qryTerm'], 'student'); //any registered user could own an item

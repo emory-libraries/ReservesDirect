@@ -85,6 +85,7 @@ class zQuery
 		global $g_zhost, $g_zport, $g_zdb, $g_zReflector;
 		//echo "$g_zReflector?host=$g_zhost&port=$g_zport&db=$g_zdb&query=" . urlencode($query) . "&start=$start&limit=$limit<br>";
 
+		$xmlresults = "";
 		if (ereg('ocm[0-9]+', $query)) // until corrected we can only search for non-personal items
 		{
 			$fp = fopen("$g_zReflector?host=$g_zhost&port=$g_zport&db=$g_zdb&query=" . urlencode($query) . "&start=$start&limit=$limit", "r");
@@ -112,7 +113,7 @@ class zQuery
 	
 	function parseToArray()
 	{
-		$search_results = array();
+		$search_results = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'volume_title'=>'', 'source'=>'', 'content_note'=>'', 'controlKey'=>'', 'personal_owner'=>null, 'physicalCopy'=>'');
 		$sXML = simplexml_load_string(rtrim(ltrim($this->xmlResults)));
 		
 		//if (is_array($sXML->record->field) && !empty($sXML->record->field))
@@ -129,7 +130,7 @@ class zQuery
 			   		case '110':
 			   		case '111':
 			   			foreach ($field->subfield as $subfield)
-			   			$search_results['author'] .= (string)$subfield;
+			   				$search_results['author'] .= (string)$subfield;
 						   	
 			   		case '245': //Title
 			   			foreach ($field->subfield as $subfield)
