@@ -72,12 +72,13 @@ class userDisplayer
 		echo"</table>";
 	}
 	
-	function displayCustodianHome()
+	function displayCustodianHome($msg=null)
 	{
 		echo"<table width=\"60%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">";
 		echo"	<tr> ";
 		echo"		<td width=\"140%\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"></td>";
 		echo"	</tr>";
+		echo "	<tr><td align=\"center\" valign=\"top\" class=\"successText\">$msg&nbsp;</td></tr>\n";
 		echo"	<tr> ";
 		echo"		<td align=\"left\" valign=\"top\">";
 		echo"			<p><a href=\"index.php?cmd=editProfile\" class=\"titlelink\">Edit My Profile</a><br>";

@@ -139,8 +139,13 @@ class userManager
 					else 
 						$sp->resetPassword($userToEdit->getUsername());
 						
-					$this->displayFunction = 'displayStaffHome';
-					$this->argList = array('Override Password Reset');						
+					if ($user->getDefaultRole() == $g_permission['custodian']) {
+						$this->displayFunction = 'displayCustodianHome';
+						$this->argList = array('Override Password Reset');
+					} else {
+						$this->displayFunction = 'displayStaffHome';
+						$this->argList = array('Override Password Reset');						
+					}
 				} else {				
 					$this->displayFunction = 'displayEditUser';
 					$this->argList = array($cmd, 'storeUser', $userToEdit, $user, null, $users, $_REQUEST);
@@ -261,8 +266,13 @@ class userManager
 					$msg = "Invalid Email Format";
 				}
 				
-				$this->displayFunction = 'displayStaffHome';
-				$this->argList = array($msg);					
+				if ($user->getDefaultRole() == $g_permission['custodian']) {
+					$this->displayFunction = 'displayCustodianHome';
+					$this->argList = array("User Password Successfully Changed");
+				} else {
+					$this->displayFunction = 'displayStaffHome';
+					$this->argList = array($msg);
+				}
 			break;
 			
 			case 'addProxy':
@@ -293,8 +303,13 @@ class userManager
 						$sp->destroy();
 					}	
 													
-					$this->displayFunction = 'displayStaffHome';
-					$this->argList = array('Override Password Removed');				
+					if ($user->getDefaultRole() == $g_permission['custodian']) {
+						$this->displayFunction = 'displayCustodianHome';
+						$this->argList = array('Override Password Removed');
+					} else {
+						$this->displayFunction = 'displayStaffHome';
+						$this->argList = array('Override Password Removed');				
+					}
 				} else {
 					$this->displayFunction = 'displayAssignUser';
 					$this->argList = array($cmd, $nextCmd, $userToEdit, null, $users, 'Remove Override Password', $_REQUEST);

@@ -206,7 +206,7 @@ class classManager
 				
 				$ci = new courseInstance($_REQUEST['ci']);
 			
-				if ($_REQUEST['deleteCrossListings']) 
+				if (isset($_REQUEST['deleteCrossListings'])) 
 				{
 					$courses = $_REQUEST['deleteCrossListing'];
 					if (is_array($courses) && !empty($courses)){
@@ -219,7 +219,7 @@ class classManager
 				}
 				
 				
-				if ($_REQUEST['addCrossListing']) 
+				if (isset($_REQUEST['addCrossListing'])) 
 				{
 					
 					$dept = $_REQUEST['newDept'];
@@ -237,28 +237,34 @@ class classManager
 					
 				}
 				
-				if ($_REQUEST['updateCrossListing']) {
+				if (isset($_REQUEST['updateCrossListing'])) {
 					/* commented out by kawashi on 11.12.04 - No longer able to change primary course
 					$oldPrimaryCourse = new course($_REQUEST['oldPrimaryCourse']);
-					$oldPrimaryCourse->setDepartmentID($_REQUEST[primaryDept]);
-					$oldPrimaryCourse->setCourseNo($_REQUEST[primaryCourseNo]);
-					$oldPrimaryCourse->setSection($_REQUEST[primarySection]);
-					$oldPrimaryCourse->setName($_REQUEST[primaryCourseName]);
+					$oldPrimaryCourse->setDepartmentID($_REQUEST['primaryDept']);
+					$oldPrimaryCourse->setCourseNo($_REQUEST['primaryCourseNo']);
+					$oldPrimaryCourse->setSection($_REQUEST['primarySection']);
+					$oldPrimaryCourse->setName($_REQUEST['primaryCourseName']);
 			
 					//Set New Primary Course
 					$ci->setPrimaryCourseAliasID($_REQUEST['primaryCourse']);
 					*/
 					
-					if ($_REQUEST[cross_listings])
+					$primaryCourse = new course($_REQUEST['primaryCourse']);
+					$primaryCourse->setDepartmentID($_REQUEST['primaryDept']);
+					$primaryCourse->setCourseNo($_REQUEST['primaryCourseNo']);
+					$primaryCourse->setSection($_REQUEST['primarySection']);
+					$primaryCourse->setName($_REQUEST['primaryCourseName']);
+					
+					if ($_REQUEST['cross_listings'])
 					{
-						$cross_listings = array_keys($_REQUEST[cross_listings]);
+						$cross_listings = array_keys($_REQUEST['cross_listings']);
 						foreach ($cross_listings as $cross_listing)
 						{
 							$updateCourse = new course($cross_listing);
-							$updateCourse->setDepartmentID($_REQUEST[cross_listings][$cross_listing]['dept']);
-							$updateCourse->setCourseNo($_REQUEST[cross_listings][$cross_listing]['courseNo']);
-							$updateCourse->setSection($_REQUEST[cross_listings][$cross_listing]['section']);
-							$updateCourse->setName($_REQUEST[cross_listings][$cross_listing]['courseName']);
+							$updateCourse->setDepartmentID($_REQUEST['cross_listings'][$cross_listing]['dept']);
+							$updateCourse->setCourseNo($_REQUEST['cross_listings'][$cross_listing]['courseNo']);
+							$updateCourse->setSection($_REQUEST['cross_listings'][$cross_listing]['section']);
+							$updateCourse->setName($_REQUEST['cross_listings'][$cross_listing]['courseName']);
 						}
 					}
 				}	
