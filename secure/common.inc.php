@@ -205,6 +205,7 @@ function common_getDepartments()
 		default: //'mysql'
 			$sql =	"SELECT department_id, `abbreviation` "
 				.	"FROM `departments` "
+				.	"WHERE name IS NOT NULL "
 				.	"ORDER BY abbreviation";
 	}
 	
