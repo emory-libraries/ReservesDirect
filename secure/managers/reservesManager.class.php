@@ -257,8 +257,8 @@ class reservesManager
 			case 'storeReserve':
 				$page = "addReserve";
 				
-				$requests = $_REQUEST['request'];
-				$reserves = $_REQUEST['reserve'];
+				$requests = (isset($_REQUEST['request'])) ? $_REQUEST['request'] : null;
+				$reserves = (isset($_REQUEST['reserve'])) ? $_REQUEST['reserve'] : null;
 
 				$ci = new courseInstance($_REQUEST['ci']);
 		
@@ -277,15 +277,18 @@ class reservesManager
 				if (is_array($requests) && !empty($requests)){
 					foreach($requests as $r)
 					{
-						$request = new request();				
-						$request->createNewRequest($ci->getCourseInstanceID(), $r);
-				
-						//also store reserve with status processing	
+						//store reserve with status processing	
 						$reserve = new reserve();
 						$reserve->createNewReserve($ci->getCourseInstanceID(), $r);	
 						$reserve->setStatus("IN PROCESS");
 						$reserve->setActivationDate($ci->getActivationDate());	
 						$reserve->setExpirationDate($ci->getExpirationDate());
+						
+						//create request
+						$request = new request();				
+						$request->createNewRequest($ci->getCourseInstanceID(), $r);
+						$request->setRequestingUser($user->getUserID());
+						$request->setReserveID($reserve->getReserveID());
 					}
 				}
 				$this->displayFunction = "displayReserveAdded";
