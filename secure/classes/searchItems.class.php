@@ -162,7 +162,7 @@ class searchItems
 				      	
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "	<tbody>\n";
-		echo "		<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
+		echo "		<tr><td width=\"140%\"><img src=\"../images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
 		echo "		<tr>\n";
         echo "			<td align=\"left\" valign=\"top\">\n";
         echo "				<table border=\"0\" align=\"center\" cellpadding=\"10\" cellspacing=\"0\">\n";

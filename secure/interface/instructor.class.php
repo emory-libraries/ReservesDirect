@@ -388,7 +388,7 @@ class instructor extends proxy
 	function copyCourseInstance($oldCI, $newTerm, $newYear, $newActivation, $newExpiration, $status="ACTIVE", $section="", $instructorList, $proxyList, $crossList, $reserveList)
 	{
 		global $g_dbConn, $g_permission;
-		
+				
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'			

@@ -334,7 +334,7 @@ class classDisplayer
 	            echo '</td>';
 	            echo    '  <td width="11%" valign="middle" class="borders"><div align="center"><font color="'.$statusColor.'"><strong>'.$status.'</strong></font></div></td>'
 	            .    '	<td width="6%" valign="middle" class="borders"><div align="center">';
-	            if (!$physicalItem || $user->getDefaultRole() >= $g_permission[staff]) {
+	            if (!isset($physicalItem) || $user->getDefaultRole() >= $g_permission[staff]) {
 	            	echo '<a href="index.php?cmd=editItem&reserveID='.$ci->reserveList[$i]->getReserveID().'">edit</a>';
 	            } else {
 	            	echo '&nbsp;';
@@ -771,7 +771,7 @@ class classDisplayer
 		
 		$terms = new terms();
 		
-	    echo "<form action=\"index.php\" method=\"get\">\n";
+	    echo "<form action=\"index.php\" method=\"get\" name=\"reactivate\">\n";
 	
 		if (is_array($hidden_fields)){
 			$keys = array_keys($hidden_fields);
@@ -829,7 +829,7 @@ class classDisplayer
 			echo "							<option>-- Select --</option>\n";
 			
 			foreach ($userList as $aUser){
-				$SELECTED = ($aUser['user_id'] == $request['instructor']) ? " SELECTED " : "";
+				$SELECTED = (isset($request['instructor']) && $aUser['user_id'] == $request['instructor']) ? " SELECTED " : "";
 				echo "							<option $SELECTED value=\"". $aUser['user_id'] ."\">". $aUser['full_name'] ."</option>\n";
 			}
 			echo "						</select>\n";
@@ -849,7 +849,7 @@ class classDisplayer
 				if (is_array($courses) && !empty($courses)){  //and classes have been found allow slection of class
 					foreach($courses as $c)
 					{
-						$SELECTED = ($c->getCourseID() == $request['course']) ? " SELECTED " : "";
+						$SELECTED = (isset($request['course']) && $c->getCourseID() == $request['course']) ? " SELECTED " : "";
 						echo "							<option $SELECTED value=\"". $c->getCourseID() ."\">". $c->displayCourseNo() ." ". $c->getName() ."</option>\n";
 					}
 					echo "						</select>\n";
@@ -891,7 +891,7 @@ class classDisplayer
 			echo "								<td>". $ci->course->getName() ."</td>\n";
 			echo "								<td width=\"20%\"><div align=\"center\">". $ci->displayTerm() ."</div></td>\n";
 			echo "								<td width=\"20%\" align=\"center\"><a href=\"javascript:openWindow('&cmd=previewReservesList&ci=". $ci->getCourseInstanceID() ."');\">preview</a></td>\n";
-			echo "								<td width=\"10%\" align=\"center\"><input type=\"radio\" name=\"ci\" value=\"". $ci->getCourseInstanceID() ."\"></td>\n";
+			echo "								<td width=\"10%\" align=\"center\"><input type=\"radio\" name=\"ci\" value=\"". $ci->getCourseInstanceID() ."\" onClick=\"setSubmit(this.form);\"></td>\n";
 			echo "							</tr>\n";
 		}
 	
@@ -920,7 +920,7 @@ class classDisplayer
 		foreach($terms->getTerms() as $t)
 		{
 			echo "								<td>\n";
-			echo "									<input type=\"radio\" name=\"term\" value=\"". $t->getTermID() ."\" onClick=\"this.form.Submit.disabled=false;\">". $t->getTerm() ."\n";
+			echo "									<input type=\"radio\" name=\"term\" value=\"". $t->getTermID() ."\" onClick=\"setSubmit(this.form);\">". $t->getTerm() ."\n";
 			echo "								</td>\n";
 		}	
 		echo "							</tr>\n";
@@ -935,7 +935,28 @@ class classDisplayer
 		echo "	<tr><td align=\"left\" valign=\"top\" align=\"center\"><input type=\"submit\" name=\"Submit\" value=\"Re-activate Class\" DISABLED onClick=\"this.form.cmd.value='$nextPage';\"></td></tr>\n";
 		echo "	<tr><td align=\"left\" valign=\"top\"><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "</table>\n";
+		
+		echo "<script language=\"javaScript\">
+			function setSubmit(frm)
+			{
+				var termSelected   = false;
+				var ciSelected     = false;	
+			
+				for(i=0; i<frm.elements.length; i++) {
+					var e = frm.elements[i];
+					if (e.type == 'radio') {
+						if (e.name == 'term' && e.checked) termSelected = true;
+			 			if (e.name == 'ci' && e.checked)   ciSelected = true;
+					}
+				}
+				frm.Submit.disabled = !(termSelected && ciSelected);
+			} 
+			setSubmit(this.document.forms[0]); //onLoad set submit
+		</script>";
+		
 		echo "</form>\n";
+		
+		////if (this.form.cithis.form.Submit.disabled=false
 	}
 	
 	
@@ -1153,7 +1174,7 @@ class classDisplayer
 	            		echo '<span class="itemMetaPre">Source/Year:</span><span class="itemMeta"> '.$source.'</span><br>';
 	            	}	            	
 	            	echo '</td>';
-	            	echo "<td align=\"right\"><input type=\"checkbox\" name=\"carryReserveItem[]\" value=\"".$reserveItem->getItemID()."\" checked></td></tr>";
+	            	echo "<td align=\"right\"><input type=\"checkbox\" name=\"carryReserve[]\" value=\"".$ci->reserveList[$i]->getReserveID()."\" checked></td></tr>";
 			}
 		}
 		//End Loop through Records

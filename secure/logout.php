@@ -1,5 +1,8 @@
 <? include("destroySession.inc.php"); ?>
+<? header("Location: index.php"); /* Redirect browser */ ?>
 
+<?
+/*
 <html>
 <head><title>Thank you for using Reserves Direct</TITLE></head>
 <link rel="stylesheet" href="css/ReservesStyles.css" type="text/css">
@@ -45,3 +48,5 @@
 
 </body>
 </html>
+*/
+?>

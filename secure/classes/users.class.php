@@ -201,9 +201,9 @@ class users
 		echo "<input type=\"hidden\" name=\"cmd\" value=\"$cmd\">\n";
 		
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "	<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
+		echo "	<tr><td width=\"140%\"><img src=\"../images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
 		echo "	<tr><td align=\"center\" valign=\"top\" class=\"helperText\">$msg&nbsp;</td></tr>\n";
-		echo "	<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
+		echo "	<tr><td width=\"140%\"><img src=\"../images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
 
 		if ($allowAddUser)
 			echo "	<tr><td align=\"left\" valign=\"top\" class=\"helperText\"><a href=\"index.php?page=manageUser&subpage=addUser\">Create New User</a>&nbsp;</td></tr>\n";

@@ -474,7 +474,7 @@ class courseInstance
 	{ 
 		global $g_dbConn;
 
-		$this->status = $status; 
+		$this->enrollment = $enrollment;
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'

@@ -69,7 +69,6 @@ class reserve
 	function createNewReserve($courseInstanceID, $itemID)
 	{
 		global $g_dbConn;
-		
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'

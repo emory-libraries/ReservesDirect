@@ -134,12 +134,12 @@ class classManager
 					$srcCI->getPrimaryCourse();
 					$srcCI->getProxies();
 					
-					$proxyList = ($request['restoreProxies'] == "on") ? $srcCI->proxyIDs : null;
+					$proxyList = (isset($request['restoreProxies']) && $request['restoreProxies'] == "on") ? $srcCI->proxyIDs : null;
 					
 					$instructorList = $_REQUEST['carryInstructor'];
 					if (isset($_REQUEST['additionalInstructor']) && $_REQUEST['additionalInstructor'] != "") array_push($instructorList, $_REQUEST['additionalInstructor']);			
-			
-					$newCI = $user->copyCourseInstance($srcCI, $term->getTermName(), $term->getTermYear(), $term->getBeginDate(), $term->getEndDate(), $srcCI->getStatus(), $srcCI->course->getSection(), $instructorList, $proxyList, $_REQUEST['carryCrossListing'], $_REQUEST['carryReserveItem']);
+
+					$newCI = $user->copyCourseInstance($srcCI, $term->getTermName(), $term->getTermYear(), $term->getBeginDate(), $term->getEndDate(), $srcCI->getStatus(), $srcCI->course->getSection(), $instructorList, $proxyList, $_REQUEST['carryCrossListing'], $_REQUEST['carryReserve']);
 			
 					$this->displayFunction = 'displaySuccess';
 					$this->argList = array($page, $newCI);
@@ -149,39 +149,41 @@ class classManager
 				$page = "manageClasses";
 				$loc  = "home";
 				
-				$reserves = $_REQUEST['reserve'];
-				switch ($_REQUEST['reserveListAction'])
-				{
-					case 'deleteAll':
-						if (is_array($reserves) && !empty($reserves)){
-							foreach($reserves as $r)
-							{
-								$reserve = new reserve($r);
-								$reserve->destroy();
+				$reserves = (isset($_REQUEST['reserve'])) ? $_REQUEST['reserve'] : null;
+				
+				if (isset($_REQUEST['reserveListAction']))
+					switch ($_REQUEST['reserveListAction'])
+					{
+						case 'deleteAll':
+							if (is_array($reserves) && !empty($reserves)){
+								foreach($reserves as $r)
+								{
+									$reserve = new reserve($r);
+									$reserve->destroy();
+								}
 							}
-						}
-					break;
-					
-					case 'activateAll':
-						if (is_array($reserves) && !empty($reserves)){
-							foreach($reserves as $r)
-							{
-								$reserve = new reserve($r);
-								$reserve->setStatus('ACTIVE');
-							}
-						}	
-					break;
-					
-					case 'deactivateAll':
-						if (is_array($reserves) && !empty($reserves)){
-							foreach($reserves as $r)
-							{
-								$reserve = new reserve($r);
-								$reserve->setStatus('INACTIVE');
-							}
-						}	
-					break;					
-				}			
+						break;
+						
+						case 'activateAll':
+							if (is_array($reserves) && !empty($reserves)){
+								foreach($reserves as $r)
+								{
+									$reserve = new reserve($r);
+									$reserve->setStatus('ACTIVE');
+								}
+							}	
+						break;
+						
+						case 'deactivateAll':
+							if (is_array($reserves) && !empty($reserves)){
+								foreach($reserves as $r)
+								{
+									$reserve = new reserve($r);
+									$reserve->setStatus('INACTIVE');
+								}
+							}	
+						break;					
+					}			
 									
 				$ci = new courseInstance($_REQUEST['ci']);
 				//$ci->getCourseForInstructor($user->getUserID());

@@ -44,6 +44,8 @@ require_once("interface/instructor.class.php");
 require_once("interface/staff.class.php");
 require_once("interface/admin.class.php");
 
+include("session.inc.php");
+
 // we will do our own error handling
 if (isset($_SESSION['debug']))
 {
@@ -53,7 +55,6 @@ if (isset($_SESSION['debug']))
 	$old_error_handler = set_error_handler("common_ErrorHandler");
 }
 
-include("session.inc.php");
 
 $userName = $_SESSION['username'];
 $userClass = $_SESSION['userClass'];

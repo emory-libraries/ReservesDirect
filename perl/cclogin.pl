@@ -30,7 +30,7 @@ my $form = <<HERE;
 <head>
 <title>$title Login</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="/reserves2/css/ReservesStyles.css" rel="stylesheet" type="text/css">
+<link href="../../css/ReservesStyles.css" rel="stylesheet" type="text/css">
 </head>
 
 <body onLoad="document.forms[0].credential_0.focus();">
@@ -40,9 +40,13 @@ my $form = <<HERE;
   <tr>
     <td><div align="center">
       <table width="100%" border="0" cellspacing="0" cellpadding="0">
-        <tr valign="top">
-          <td valign="middle"><img src="../images/logo_emorylibraries.gif" width="219" height="56"></td>
-          <td><div align="right"><img src="../images/logo_reservesDirect.gif" width="105" height="80"></div></td>
+        <tr valign="top">        
+          <td valign="middle"><img src="../../images/logo_emorylibraries.gif" width="219" height="56"></td>
+          <td><div align="right"><img src="../../images/logo_reservesDirect.gif" width="105" height="80"></div></td>
+<!--        
+			<td width=25% class="brandUpperLeft">&nbsp;</td>
+			<td width=75% class="brandUpperRight">&nbsp;</td>  
+-->			
         </tr>
       </table>
     </div></td>
@@ -80,14 +84,16 @@ my $form = <<HERE;
     <td align="center" valign="top" bgcolor="#000099">&nbsp;$errorString</td>
   </tr>
   <tr>
-    <td align="center" valign="top"><br>      Enter your Emory Network (Eagle/Dooley) ID/password to sign in.<p><strong>Goizueta
-          Business School Faculty and Students: Use your Goizueta Network Account
-          (GBSNET) login. </strong><br>
+    <td align="center" valign="top"><br>      Enter your Emory Network (Eagle/Dooley) ID/password to sign in.<p>
+    
+      <strong>Goizueta Business School Faculty and Students:
+      <BR> Use your Goizueta Network Account (GBSNET) or OPUS login. </strong><br>
       (Don't know your GBSNET ? Call 404-727-0581 for assistance) </p>
+      <p>If you are having difficulty logging into the system, try syncrhonizing your passwords at <a href="https://password.service.emory.edu" target="_blank">https://password.service.emory.edu</a>/</p>
       <p>Help with passwords is available
           from ITD (404-727-7777) during normal business hours Monday through
         Friday and limited hours on the weekend
-    or check their web site: <a href="http://it.emory.edu/showdoc.cfm?docid=1079">http://it.emory.edu/showdoc.cfm?docid=1079</a></p>
+    or check their web site: <a href="http://it.emory.edu/showdoc.cfm?docid=1079"  target="_blank">http://it.emory.edu/showdoc.cfm?docid=1079</a></p>
     <p>Problems logging in? <a href="http://biliku/emailReservesDesk.php">Email the Reserves Desk</a>  </p></td>
   </tr>
 </table>
