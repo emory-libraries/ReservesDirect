@@ -338,8 +338,12 @@ class classDisplayer
 	            	echo '&nbsp;';
 	            }
 	            echo '		</div></td>';
-	            echo    '	<td width="7%" valign="middle" class="borders"><div align="center"><input type="checkbox" name="reserve['.$ci->reserveList[$i]->getReserveID().']" value="'.$ci->reserveList[$i]->getReserveID().'"></div></td>'
-	            .	 '</tr>';
+	            if (!$reserveItem->isPhysicalItem() || $user->getDefaultRole() >= $g_permission['staff']) {
+	            	echo    '	<td width="7%" valign="middle" class="borders"><div align="center"><input type="checkbox" name="reserve['.$ci->reserveList[$i]->getReserveID().']" value="'.$ci->reserveList[$i]->getReserveID().'"></div></td>';
+	            } else {
+	            	echo    '	<td width="7%" valign="middle" class="borders">&nbsp;</td>';
+	            }
+	            echo '</tr>';
 			}
 		}
 	
