@@ -52,7 +52,6 @@ class request
 	public $priority;
 	public $courseInstanceID;
 	public $courseInstance;
-	public $physicalCopy;
 	public $notes = array();
 	
 	/**
