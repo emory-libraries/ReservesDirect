@@ -160,8 +160,11 @@ class request
 					;
 		}
 		
-		$rs = $g_dbConn->query($sql, $this->requestID);
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }		
+		if (!is_null($this->requestID))
+		{
+			$rs = $g_dbConn->query($sql, $this->requestID);
+			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }		
+		}
 	}
 	
 	/**

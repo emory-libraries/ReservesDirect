@@ -147,8 +147,11 @@ class reserve
 					;
 		}
 		
-		$rs = $g_dbConn->query($sql, $this->reserveID);
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }		
+		if (!is_null($this->reserveID))
+		{
+			$rs = $g_dbConn->query($sql, $this->reserveID);
+			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }		
+		}
 	}
 	
 	
