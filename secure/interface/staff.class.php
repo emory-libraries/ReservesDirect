@@ -140,6 +140,7 @@ class staff extends instructor
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		unset($this->courseInstances);
+		$this->courseInstances = array();
 		while ($row = $rs->fetchRow()) {	
 			$this->courseInstances[] = new courseInstance($row[0]);
 		}	
