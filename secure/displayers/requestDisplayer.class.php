@@ -342,7 +342,7 @@ class requestDisplayer
 			echo "					<td width=\"50%\" align=\"left\" valign=\"middle\" class=\"strong\">Loan Period:&nbsp;&nbsp;\n";
 			echo "						<select name=\"circRule\">\n";
 			//echo "							<option value=\"-1\" selected>Not Applicable</option>\n";
-											include_once("circRules.inc.php");
+											include_once("secure/circRules.inc.php");
 			echo "						</select>\n";
 			echo "					</td>\n";
 			echo "				</tr>\n";
