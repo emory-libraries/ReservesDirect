@@ -58,7 +58,7 @@ class classDisplayer
 		echo "							<!--<li><a href=\"index.php?cmd=deleteClass\">Delete Class</a>--?<!--Goes to staff-mngClass-deleteClass.html --></li>\n";
 		echo "							<li><a href=\"index.php?cmd=reactivateClass\" align=\"center\">Reactivate Course</a></li>\n";
 		echo "							<!--<li><a href=\"index.php?cmd=copyCourse\">Copy Reserve List or Merge Classes</a>--><!--Links to staff-mngClass-CopyList1.html --></li>\n";
-		echo "							<!--<li><a href=\"index.php?cmd=exportClass\">Export a Class to Blackboard, etc.</a>--><!--Same screens as faculty use for exporting a class--></li>\n";
+		echo "							<li><a href=\"index.php?cmd=exportClass\">Export a Class to Blackboard, etc.</a><!--Same screens as faculty use for exporting a class--></li>\n";
 		echo "						</ul>\n";
 		echo "					</td>\n";
 		//echo "					<td width=\"33%\" class=\"borders\">\n";
