@@ -114,7 +114,7 @@ class proxy extends student
 		}
 	}
 	*/
-	function getCourseInstances($aDate=null, $eDate=null)
+	function getCourseInstances($aDate=null, $eDate=null, $editableOnly=null)
 	{
 		global $g_dbConn, $g_permission;
 		
@@ -155,13 +155,14 @@ class proxy extends student
 			$this->courseInstances[] = new courseInstance($row[0]);
 		}	
 		
-		$rs = $g_dbConn->query($sql_student, array($this->getUserID(),$d,$d));		
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		if (is_null($editableOnly)) {
+			$rs = $g_dbConn->query($sql_student, array($this->getUserID(),$d,$d));		
+			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
-		while ($row = $rs->fetchRow()) {	
-			$this->courseInstances[] = new courseInstance($row[0]);
-		}	
-		
+			while ($row = $rs->fetchRow()) {	
+				$this->courseInstances[] = new courseInstance($row[0]);
+			}	
+		}
 		return $this->courseInstances;
 	}	
 	
