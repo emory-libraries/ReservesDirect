@@ -86,6 +86,7 @@ class department extends library
 			default: //'mysql'
 				$sql  = "SELECT d.department_id, d.abbreviation, d.name "
 					  . "FROM departments d "
+					  .	"WHERE d.name IS NOT NULL "
 					  . "ORDER BY d.abbreviation"
 					  ;
 					 
