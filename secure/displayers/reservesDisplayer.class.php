@@ -55,7 +55,7 @@ class reservesDisplayer
 		.	 '		<td>&nbsp;</td>'
 		.	 '	</tr>'
 	    .    '  <tr>'
-	    .    '      <td class="borders"><table width="100%" border="0" cellspacing="0" cellpadding="0">'
+	    .    '      <td><table width="100%" border="0" cellspacing="0" cellpadding="0">'
 	    .    '      	<tr align="left" valign="top">'
 	    .    '          	<td class="headingCell1"><div align="center">YOUR CLASSES</div></td>'
 	    .    '          	<td width="75%">&nbsp;</td>'
@@ -108,6 +108,10 @@ class reservesDisplayer
 			echo "<tr><td align=\"center\">No active classes have been added</td></tr>";
 		}
 		
+		echo "	</tbody>\n"
+		.	 "</table>\n"
+		;
+		
 		echo '<tr>'
 		.	'	<td height="14"><img src="images/spacer.gif" width="1" height="15"></td>'
 		.	'</tr>';
@@ -119,10 +123,6 @@ class reservesDisplayer
 	    echo '<tr>'
 	    .   	'<td><img src="images/spacer.gif" width="1" height="15"></td>'
 	    .   '</tr>'
-		;
-		
-		echo "	</tbody>\n"
-		.	 "</table>\n"
 		;
 	}
 	
