@@ -186,13 +186,14 @@ class userDisplayer
 			echo "<input type=\"hidden\" name=\"selectedUser\" value=\"" . $userToEdit->getUserID() . "\">";
 	    	
 			echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-			echo "	<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
-	
+			//echo "	<tr><td width=\"100%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
 			echo "	<tr><td align=\"center\" valign=\"top\" class=\"helperText\">$msg&nbsp;</td></tr>\n";
 	
 			echo "	<tr>\n";
 			echo "		<td align=\"left\" valign=\"top\">\n";
-			echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
+			echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";			
+			echo "			<tr><td colspan=\"3\" align=\"right\">[ <a href=\"index.php?cmd=manageUser\">Exit</a> ]</div></td></tr>\n";
+			
 			
 			if ($cmd == "addUser")
 				echo "				<tr align=\"left\" valign=\"top\"><td height=\"14\" class=\"headingCell1\" align=\"center\">CREATE NEW USER</td><td width=\"75%\">&nbsp;</td></tr>\n";
