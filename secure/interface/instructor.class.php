@@ -344,36 +344,41 @@ class instructor extends proxy
 		return $tmpArray;		
 	}
 	
-	function getCourseInstancesByCourseID($courseID)
-	{
-		global $g_dbConn;
+	/**
+	* @return return array of classes
+	* @param $courseID - course to retrieve course instances for
+	* @desc return all of an instructor's classes for a given courseID
+	*/
+	function getMyCourseInstancesByCourseID($courseID)
+	{ 
+		global $g_dbConn, $g_permission;
 		
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				/*
-				$sql  = "SELECT ci.course_instance_id "
-					  . "FROM  course_aliases as ca "
-					  . "	JOIN course_instances as ci ON ca.course_instance_id = ci.course_instance_id "
-					  . "WHERE ca.course_id = !"
-					  ;
-				*/
-				$sql  = "SELECT ca.course_instance_id "
-					  . "FROM  course_aliases as ca "
-					  . "WHERE ca.course_id = !"
-					  ;
+				$sql = "SELECT DISTINCT ca.course_instance_id "
+				.	   "FROM course_aliases as ca  "
+				.	   "JOIN access as a ON ca.course_alias_id = a.alias_id "
+				.	   "WHERE ca.course_id = ! "
+				.	   "AND a.user_id = ! "
+				.	   "AND a.permission_level = ".$g_permission['instructor']." ";
+				   
 		}
 
-		$rs = $g_dbConn->query($sql, $courseID);			
+		$rs = $g_dbConn->query($sql, array($courseID, $this->userID));				
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-			
-		$tmpArray = array();
-		while ($row = $rs->fetchRow())
-			$tmpArray[] = new courseInstance($row[0]);
 		
+		$tmpArray = array();
+		while($row = $rs->fetchRow())
+		{
+			$ci = new courseInstance($row[0]);
+			$ci->getPrimaryCourse();
+			$ci->getInstructors();
+			$tmpArray[] = $ci;
+		}
 		return $tmpArray;
 	}
-	
+
 	/**
 	* @return courseInstance
 	* @param courseInstance $oldCI
