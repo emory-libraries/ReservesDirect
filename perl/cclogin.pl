@@ -5,24 +5,30 @@ my $r = Apache->request;
 
 $r->status(200);
 my $uri = $r->prev->uri;
+# if there are args, append that to the uri
 my $args = $r->prev->args;
-my $skin = "";
-my $docs = "";
 if($args) {
 	$args = "?" . $args;
 }
 
+my $skin = "";
+my $docs = "";
 my $img = "";
 my $title = "";
+my $loginpath = "/reserves2.1/index.php";
+my $css = "/reserves2/css/ReservesStyles.css";
+my $imagepath = "../images";
+my $hostname = "biliku.library.emory.edu";
+
 my $reason = $r->prev->subprocess_env("AuthCookieReason");
 my $errorString = "";
-if ($reason eq "bad_credentials") {
-	$errorString = "<TR><TD ALIGN=CENTER>\n<P><FONT COLOR=\"#FF0000\">Sorry, you entered an invalid Username or Password</P></TD></TR>";
-}
-my $action = $r->prev->dir_config('FormAction');
 
-$title = "Reserves Direct";
-
+if ($reason eq "no_cookie")
+{
+       $errorString = "";
+#	$errorString = "<TR><TD ALIGN=CENTER>\n<P><FONT COLOR=\"#FF0000\">You don't have a cookie yet. Sign in and you get one!</P></TD></TD></TR>";
+	my $action = $r->prev->dir_config('FormAction');
+	$title = "Reserves Direct";
 
 my $form = <<HERE;
 
@@ -30,23 +36,19 @@ my $form = <<HERE;
 <head>
 <title>$title Login</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link href="../../css/ReservesStyles.css" rel="stylesheet" type="text/css">
+<link href="$css" rel="stylesheet" type="text/css">
 </head>
 
 <body onLoad="document.forms[0].credential_0.focus();">
-<FORM METHOD="POST" ACTION="https://biliku.library.emory.edu/$action">
+<FORM METHOD="POST" ACTION="https://$hostname/$action">
 <INPUT TYPE=hidden NAME=destination VALUE="$uri$args");
 <table width="60%" border="0" align="center" cellpadding="5" cellspacing="0">
   <tr>
     <td><div align="center">
       <table width="100%" border="0" cellspacing="0" cellpadding="0">
-        <tr valign="top">        
-          <td valign="middle"><img src="../../images/logo_emorylibraries.gif" width="219" height="56"></td>
-          <td><div align="right"><img src="../../images/logo_reservesDirect.gif" width="105" height="80"></div></td>
-<!--        
-			<td width=25% class="brandUpperLeft">&nbsp;</td>
-			<td width=75% class="brandUpperRight">&nbsp;</td>  
--->			
+        <tr valign="top">
+          <td valign="middle"><img src="$imagepath/logo_emorylibraries.gif" width="219" height="56"></td>
+          <td><div align="right"><img src="$imagepath/logo_reservesDirect.gif" width="105" height="80"></div></td>
         </tr>
       </table>
     </div></td>
@@ -84,17 +86,15 @@ my $form = <<HERE;
     <td align="center" valign="top" bgcolor="#000099">&nbsp;$errorString</td>
   </tr>
   <tr>
-    <td align="center" valign="top"><br>      Enter your Emory Network (Eagle/Dooley) ID/password to sign in.<p>
-    
-      <strong>Goizueta Business School Faculty and Students:
-      <BR> Use your Goizueta Network Account (GBSNET) or OPUS login. </strong><br>
+    <td align="center" valign="top"><br>Enter your Emory Network (Eagle/Dooley) ID/password to sign in.<p><strong>Goizueta
+          Business School Faculty and Students: Use your Goizueta Network Account
+          (GBSNET) login. </strong><br>
       (Don't know your GBSNET ? Call 404-727-0581 for assistance) </p>
-      <p>If you are having difficulty logging into the system, try syncrhonizing your passwords at <a href="https://password.service.emory.edu" target="_blank">https://password.service.emory.edu</a>/</p>
       <p>Help with passwords is available
           from ITD (404-727-7777) during normal business hours Monday through
         Friday and limited hours on the weekend
-    or check their web site: <a href="http://it.emory.edu/showdoc.cfm?docid=1079"  target="_blank">http://it.emory.edu/showdoc.cfm?docid=1079</a></p>
-    <p>Problems logging in? <a href="http://biliku/emailReservesDesk.php">Email the Reserves Desk</a>  </p></td>
+    or check their web site: <a href="http://it.emory.edu/showdoc.cfm?docid=1079">http://it.emory.edu/showdoc.cfm?docid=1079</a></p>
+    <p>Problems logging in? <a href="http://$hostname/emailReservesDesk.php">Email the Reserves Desk</a>  </p></td>
   </tr>
 </table>
 </FORM>
@@ -103,12 +103,27 @@ my $form = <<HERE;
 
 HERE
 
-$form = $form . $skin;
-$r->no_cache(1);
-my $x = length($form);
-$r->content_type("text/html");
-$r->header_out("Content-length","$x");
-$r->header_out("Pragma", "no-cache");
-$r->send_http_header;
+	
+	$form = $form . $skin;
+	$r->no_cache(1);
+	my $x = length($form);
+	$r->content_type("text/html");
+	$r->header_out("Content-length","$x");
+	$r->header_out("Pragma", "no-cache");
+	$r->send_http_header;
+	
+	$r->print ($form);
+}
 
-$r->print ($form);
+if ($reason eq "bad_credentials") 
+{
+	$errorString = "<TR><TD ALIGN=CENTER><P><FONT COLOR=\"#FF0000\">Sorry, you entered an invalid Username or Password, please try again in 4 seconds ...</FONT></P></TD></TR>";
+	$errorString = $errorString . "<TR><TD ALIGN=CENTER><A HREF=\"$loginpath\">(If you are not returned, click here)</A></TD></TR>";
+        $r->no_cache(1);
+	$r->content_type("text/html");
+	$r->header_out("Pragma", "no-cache");
+	$r->send_http_header;
+	$r->print ("<html><head><META HTTP-EQUIV=\"Refresh\" CONTENT=\"4;URL=$loginpath\"></head><body><br /><br /><table width=50% align=center>$errorString</table></body></html>");
+
+}
+
