@@ -261,6 +261,12 @@ class classDisplayer
 				$volEdition = $reserveItem->getVolumeEdition();
 				$pagesTimes = $reserveItem->getPagesTimes();
 				$source = $reserveItem->getSource();
+				
+				if ($reserveItem->isPhysicalItem()) {
+					$reserveItem->getPhysicalCopy();
+					$callNumber = $reserveItem->physicalCopy->getCallNumber();
+					$reserveDesk = $reserveItem->physicalCopy->getOwningLibrary();
+				}
 
 				$contentNotes = $reserveItem->getContentNotes();
 				$itemNotes = $reserveItem->getNotes();
@@ -280,7 +286,9 @@ class classDisplayer
 	            if (!$reserveItem->isPhysicalItem()) {
 	            	echo '<a href="'.$viewReserveURL.'" target="_blank">'.$ci->reserveList[$i]->item->getTitle().'</a>';
 	            } else {
-	            	echo $ci->reserveList[$i]->item->getTitle().' <a href="'.$viewReserveURL.'" target="_blank">(more info)</a>';
+	            	echo '<em>'.$ci->reserveList[$i]->item->getTitle().'</em>.';
+	            	if ($callNumber) {echo '<br>'.$callNumber;}
+	            	echo '<br>On Reserve At: '.$reserveDesk.' (<a href="'.$viewReserveURL.'" target="_blank">more info</a>)';
 	            }
 	            
 	            /*
