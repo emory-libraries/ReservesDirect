@@ -48,7 +48,6 @@ class faxReader
 			while (false !== ($file = readdir($handle))) {
 				if(eregi("\.pdf", $file)) {
 					$this->faxes[] = $this->parseFaxName($file);
-					$i++;
 				}
 			}
 			closedir($handle);
