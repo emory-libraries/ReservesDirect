@@ -34,14 +34,34 @@ require_once("secure/classes/terms.class.php");
 
 class requestDisplayer 
 {
-	function displayAllRequest($requestList, $msg="")
+	function displayAllRequest($requestList, $libList, $request, $msg="")
 	{
+		
+	
+	
+		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+		echo "	<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
+		echo "	<tr><td width=\"100%\" class=\"failedText\" align=\"center\">$msg<br></td></tr>\n";
+
+		echo "	<form action=\"index.php?cmd=displayRequest\" method=\"POST\">\n";
+		echo "	<tr><td colspan=\"2\">";
+		echo "		<font color=\"#666666\"><strong><a href=\"index.php?cmd=displayRequest&unit=all\">View all Requests</a></strong></font> | ";
+		echo "		<font color=\"#666666\"><strong>View Requests for </strong></font>";
+		echo "			<select name=\"unit\">";
+		
+		$currentUnit = isset($request['unit']) ? $request['unit'] : $user->getStaffLibrary();
+		foreach ($libList as $lib)
+		{
+			$lib_select = ($currentUnit == $lib->getLibraryID()) ? " selected " : "";						
+			echo "				<option $lib_select value=\"" . $lib->getLibraryID() . "\">" . $lib->getLibraryNickname() . "</option>";
+		}
+		echo "			</select>";
+		echo "			<input type=\"submit\" value=\"Go\">"; 
+		echo "	</td></tr>\n";
+		echo "	</form>\n";
+		
 		if (is_array($requestList) && !empty($requestList))
-		{	
-			echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-			echo "	<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
-			echo "	<tr><td width=\"100%\" class=\"failedText\" align=\"center\">$msg<br></td></tr>\n";
-			//echo "	<tr><td><font color=\"#666666\"><strong>View all Requests</strong></font> | <font color=\"#666666\"><strong>View Requests for your Unit</strong></font></td></tr>\n";
+		{
 			echo "	<tr><td>&nbsp;</td></tr>\n";
 			
 			echo "	<tr>\n";
@@ -151,10 +171,12 @@ class requestDisplayer
 				echo " 				<tr align=\"left\" valign=\"middle\" class=\"$rowClass\"><td width=\"85%\" valign=\"top\">&nbsp;</td><td valign=\"top\">&nbsp;</td></tr>\n";
 				
 				echo " 				<tr align=\"left\" valign=\"middle\" class=\"$rowClass\"><td width=\"85%\" valign=\"top\">&nbsp;</td><td valign=\"top\">&nbsp;</td></tr>\n";
-				echo " 			</table>\n";
+				
 			}
-		} else echo "No Request to process";
-		 			
+		} else echo "<tr><td>No Request to process for this unit.</td></tr>";
+		 		
+		
+		echo " 			</table>\n";	
 		echo "		</td>\n";
 		echo "	</tr>\n";
 		echo "	<tr><td>&nbsp;</td></tr>\n";

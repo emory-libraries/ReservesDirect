@@ -66,7 +66,7 @@ class requestManager
 				
 				$loc  = "process request";
 				
-				$unit = (!isset($request['processingUnit'])) ? $user->getStaffLibrary() : $request['processingUnit'];
+				$unit = (!isset($request['unit'])) ? $user->getStaffLibrary() : $request['unit'];
 				$requestList = $user->getRequests($unit);
 
 				for($i=0;$i<count($requestList);$i++)
@@ -76,7 +76,7 @@ class requestManager
 				}			
 				
 				$this->displayFunction = 'displayAllRequest';
-				$this->argList = array($requestList);
+				$this->argList = array($requestList, $user->getLibraries(), $request);
 			break;
 						
 			case 'storeRequest':
@@ -218,7 +218,7 @@ class requestManager
 						$requestObj->setDateProcessed(null);  //clear processed flag
 					} else {
 						$this->displayFunction = 'displayAllRequest';
-						$this->argList = array($requestList, "Request Processed");
+						$this->argList = array($requestList, $user->getLibraries(), $request, "Request Processed");
 						break;
 					}
 				} else {					

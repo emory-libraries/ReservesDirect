@@ -464,7 +464,6 @@ class instructor extends proxy
 				$rListing = new reserve($srcReserve);
 				
 				$r = new reserve();
-				
 				$r->createNewReserve($newCI->getCourseInstanceID(), $rListing->getItemID());
 				$r->setActivationDate($newActivation);
 				$r->setExpirationDate($newExpiration);
@@ -473,7 +472,8 @@ class instructor extends proxy
 				
 				//When reactivating a class, the default status of the reserve should be "IN PROCESS" if physical item
 				//and "ACTIVE" if an electronic item
-				$rListing->getItem();
+
+				$rListing->getItem();				
 				if ($rListing->item->getItemGroup() == 'MULTIMEDIA' || $rListing->item->getItemGroup() == 'MONOGRAPH') {
 					$r->setStatus('IN PROCESS');
 				} else {
@@ -482,13 +482,16 @@ class instructor extends proxy
 				//End of changes made by kawashi on 12.1.2004
 				
 				$r->getItem();
-				if ($r->item->getItemGroup() == 'ELECTRONIC')
+
+				if ($r->item->getItemGroup() != 'ELECTRONIC')
 				{
 					$req = new request();
 					$req->createNewRequest($newCI->getCourseInstanceID(), $r->getItemID());
 					$req->setDateRequested(date('Y-m-d'));
-					$req->setRequestingUser($instructor);
+					$req->setRequestingUser($instructorList[0]);
 					$req->setReserveID($r->getReserveID());
+					
+					$r->setStatus("IN PROCESS");
 				}
 			}
 		}
