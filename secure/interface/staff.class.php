@@ -252,7 +252,8 @@ class staff extends instructor
 			{
 				$sql = "SELECT request_id "
 					.  "FROM requests "						  
-					.  "WHERE date_processed is null"
+					.  "WHERE date_processed is null "
+					.  "ORDER BY request_id"
 					;
 			} else {
 				$sql = "SELECT r.request_id "
@@ -267,7 +268,8 @@ class staff extends instructor
 					.  	"CASE "
 					.  		"WHEN i.item_group = 'MONOGRAPH'  THEN l.monograph_library_id  = $unit "
 					.  		"WHEN i.item_group = 'MULTIMEDIA' THEN l.multimedia_library_id = $unit "
-					.	"END"
+					.	"END "
+					.  "ORDER BY r.request_id"
 					;
 			}
 		}
