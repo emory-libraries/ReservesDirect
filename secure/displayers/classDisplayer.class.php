@@ -973,7 +973,11 @@ class classDisplayer
 	function displaySelectReservesToReactivate($ci, $user, $instructor_list, $hidden_fields=null)
 	{
 		global $g_permission;		
-		echo "<form action=\"index.php\" method=\"POST\">\n";
+		echo "<form action=\"index.php\" method=\"POST\" name=\"reactivateList\">\n";
+		
+		if (isset($_REQUEST['term'])) {
+			$term = new term($_REQUEST['term']);
+		}
 		
 		if (is_array($hidden_fields)){
 			$keys = array_keys($hidden_fields);
@@ -995,7 +999,8 @@ class classDisplayer
 		echo "			<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n";
 		echo "				<tr>\n";
 		echo "					<td colspan=\"3\" align=\"left\" valign=\"top\" class=\"helperText\">\n";
-		echo "						You have chosen the following class to reactivate for <span class=\"strong\">FALL 2004</span>.\n";
+		if (isset($term))
+			echo "						You have chosen the following class to reactivate for <span class=\"strong\">".$term->getTermName()." ".$term->getTermYear()."</span>.\n";
 		echo "						Choose what options and readings you would like to retain for the new class:\n";
 		echo "					</td>\n";
 		echo "				</tr>\n";
@@ -1104,7 +1109,7 @@ class classDisplayer
 		echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
 		echo "				<tr align=\"left\" valign=\"top\">\n";
 		echo "					<td class=\"headingCell1\"><div align=\"center\">COURSE MATERIALS</div></td>\n";
-		echo "					<td width=\"75%\" align=\"right\"><!--[ <a href=\"link\" class=\"editlinks\">Hide/Unhide Readings</a> ]--></td>\n";
+		echo "					<td width=\"75%\" align=\"right\"><div align=\"right\" class=\"small\"><a href=\"javascript:checkAll2(document.forms.reactivateList, 1)\">check all</a> | <a href=\"javascript:checkAll2(document.forms.reactivateList, 0)\">uncheck all</a></div></td>\n";
 		echo "				</tr>\n";
 		echo "			</table>\n";
 		echo "		</td>\n";
@@ -1123,6 +1128,7 @@ class classDisplayer
 		for($i=0;$i<count($ci->reserveList);$i++)
 		{
 			$ci->reserveList[$i]->getItem();
+			$ci->reserveList[$i]->item->getPhysicalCopy();
 			$title = $ci->reserveList[$i]->item->getTitle();
 			$author = $ci->reserveList[$i]->item->getAuthor();
 			$url = $ci->reserveList[$i]->item->getURL();
@@ -1134,6 +1140,9 @@ class classDisplayer
 			$contentNotes = $ci->reserveList[$i]->item->getContentNotes();
 			$itemNotes = $ci->reserveList[$i]->item->getNotes();
 			$instructorNotes = $ci->reserveList[$i]->getNotes();
+			
+			$callNumber = $ci->reserveList[$i]->item->physicalCopy->getCallNumber();
+			$reserveDesk = $ci->reserveList[$i]->item->physicalCopy->getOwningLibrary();
 			
 			if ($ci->reserveList[$i]->item->isHeading())
 			{
@@ -1158,11 +1167,14 @@ class classDisplayer
 	            .    '			<td width="96%">';
 	            if (!$reserveItem->isPhysicalItem()) {
 	            	echo '<a href="'.$viewReserveURL.'" target="_blank" class="itemTitle">'.$title.'</a><br>';
-	            	echo '<span class="itemAuthor">'.$author.'</span><br>';
+	            	if ($author) {echo '<span class="itemAuthor">'.$author.'</span><br>';}
 	            } else {
 	            	echo '<span class="itemTitleNoLink">'.$title.'</span><br>'; 
-	            	echo '<span class="itemAuthor">'.$author.'</span><br>';
+	            	if ($author) {echo '<span class="itemAuthor">'.$author.'</span><br>';}
+                	if ($callNumber) {echo '<span class="itemMeta">'.$callNumber.'</span><br>';}
+					echo '<span class="itemMetaPre">On Reserve at:</span> <span class="itemMeta"> '.$reserveDesk.'</span> &gt;&gt; <a href="'.$viewReserveURL.'" target="_blank" class="strong">more info</a><br>';
 	            }
+	            
 	            	if ($performer)
 	            	{
 	            		echo '<span class="itemMetaPre">Performed by:</span><span class="itemMeta"> '.$performer.'</span><br>';
@@ -1182,6 +1194,25 @@ class classDisplayer
 	            	if ($source)
 	            	{
 	            		echo '<span class="itemMetaPre">Source/Year:</span><span class="itemMeta"> '.$source.'</span><br>';
+	            	}
+	            	if ($contentNotes)
+	            	{
+	            		echo '<span class="noteType">Content Note:</span>&nbsp;<span class="noteText">'.$contentNotes.'</span><br>';
+	            	}
+	            	if ($itemNotes) 
+	            	{
+	            		for ($n=0; $n<count($itemNotes); $n++)
+	            		{
+	            			echo '<span class="noteType">'.$itemNotes[$n]->getType().' Note:</span>&nbsp;<span class="noteText">'.$itemNotes[$n]->getText().'</span><br>';
+	            		}
+	            	}
+	            	if ($instructorNotes)
+	            	{
+	            		
+	            		for ($n=0; $n<count($instructorNotes); $n++)
+	            		{
+	            			echo '<span class="noteType">Instructor Note:</span>&nbsp;<span class="noteText">'.$instructorNotes[$n]->getText().'</span><br>';
+	            		}
 	            	}	            	
 	            	echo '</td>';
 	            	echo "<td align=\"right\"><input type=\"checkbox\" name=\"carryReserve[]\" value=\"".$ci->reserveList[$i]->getReserveID()."\" checked></td></tr>";
@@ -1196,7 +1227,18 @@ class classDisplayer
 		echo "	<tr><td colspan=\"2\" align=\"center\" class=\"strong\"><input type=\"submit\" name=\"Submit\" value=\"Reactivate Class\"></td></tr>\n";
 		echo "	<tr><td colspan=\"2\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "</table>\n";
-
+		
+		echo "<script language=\"javaScript\">
+			function checkAll2(form, theState)
+			{
+				for (var i=0; i < form.elements.length; i++) {
+					if (form.elements[i].type == 'checkbox' && form.elements[i].name == 'carryReserve[]') {
+						form.elements[i].checked = theState;
+					}
+				}
+			} 
+		</script>";
+		
 		echo "</form>\n";
 	}
 	
