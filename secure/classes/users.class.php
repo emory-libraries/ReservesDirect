@@ -166,7 +166,7 @@ class users
 		while ($row = $rs->fetchRow()) {
 			
 			$name = is_null($row[1]) ? $row[2] : $row[1];
-			$tmpArray[] = array('user_id' => $row[0], 'full_name' => $name, 'username' => $row[3]);
+			$tmpArray[] = array('user_id' => $row[0], 'full_name' => stripslashes($name), 'username' => $row[3]);
 		}
 		
 		return $tmpArray;
