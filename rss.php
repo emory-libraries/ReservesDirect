@@ -74,7 +74,7 @@ if (!isset($_REQUEST['ci']))
     echo "<rss version=\"2.0\">\n";
     echo "	<channel>\n";
     
-    echo "		<title>" . htmlentities($ci->course->displayCourseNo() . " " . $ci->course->name . $ci->displayTerm()) . " Reserve List</title>\n";
+    echo "		<title>" . htmlentities($ci->course->displayCourseNo() . " " . $ci->course->name . " " . $ci->displayTerm()) . " Reserve List</title>\n";
     echo "		<link>".htmlentities($g_siteURL)."</link>\n";
     
     foreach($ci->instructorList as $instr)
@@ -83,7 +83,7 @@ if (!isset($_REQUEST['ci']))
     echo "		<webMaster>reservesdesk@listserv.cc.emory.edu (Reserves Desk)</webMaster>\n";
     
     echo "		<description>";
-    echo 		"Course Reserves for" . htmlentities($ci->course->displayCourseNo() . " " . $ci->course->name . $ci->displayTerm()) . "<br/>";
+    echo 		"Course Reserves for" . htmlentities($ci->course->displayCourseNo() . " " . $ci->course->name . " " . $ci->displayTerm()) . "<br/>";
     echo 		"taught by: ";
     foreach($ci->instructorList as $instr)
     	echo htmlentities($instr->getEmail() . " (" . $instr->getName()) . ")<br/>";
