@@ -126,8 +126,10 @@ class zQuery
 			   		break;
 			   		
 			   		case '100':
-			   			//if ($subfield[@type] == 'c')
-			   			$search_results['author'] = (string)$subfield;
+			   		case '110':
+			   		case '111':
+			   			foreach ($field->subfield as $subfield)
+			   			$search_results['author'] .= (string)$subfield;
 						   	
 			   		case '245': //Title
 			   			foreach ($field->subfield as $subfield)
@@ -136,16 +138,15 @@ class zQuery
 			   					$search_results['title'] = (string)$subfield;
 			   			}
 			   		break;
-			   		
-			   		/*
-			   		case '250':
+			   					   		
+			   		case '260':
 			   			foreach ($field->subfield as $subfield)
 			   			{
 			   				if ($subfield[@type] == 'a')
-			   					$search_results['edition'] = (string)$subfield;
+			   					$search_results['source'] = (string)$subfield;
 			   			}
 			   		break;
-					*/
+
 	
 					/* replaced by getHoldings jbwhite 10/25/04
 			   		case '926':	
