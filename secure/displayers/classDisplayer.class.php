@@ -5,8 +5,8 @@ Reserves Direct 2.0
 Copyright (c) 2004 Emory University General Libraries
 
 Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
+a copy of this software and associated docum[ <a href="link" class="editlinks">edit enrollment</a> ] </div></td>';
+ction, including
 without limitation the rights to use, copy, modify, merge, publish,
 distribute, sublicense, and/or sell copies of the Software, and to
 permit persons to whom the Software is furnished to do so, subject to
@@ -190,9 +190,17 @@ class classDisplayer
 		.	 '			<td colspan="2"><div align="center">'
 		.	 '				<table width="40%" border="0" cellpadding="5" cellspacing="0" class="borders">'
 		.	 '              <tr align="left" valign="middle">'
-		.	 '					<td width="50%" bgcolor="#CCCCCC"><span class="strong">Enrollment:</span> <strong><font color="'.common_getStatusDisplayColor($ci->getEnrollment()).'">'.strtoupper($ci->getEnrollment()).'</font></strong></td>'
-		.	 '					<td bgcolor="#CCCCCC"><!--<div align="right">[ <a href="index.php?cmd=editEnrollment&ci='.$ci->getCourseInstanceID().'" class="editlinks">edit enrollment</a> ]</div>--></td>'
-		.	 '				</tr>'
+		.	 '					<td width="50%" valign="top" bgcolor="#CCCCCC" class="borders"><div align="center"><span class="strong">Enrollment:</span> <strong><font color="'.common_getStatusDisplayColor($ci->getEnrollment()).'">'.strtoupper($ci->getEnrollment()).'</font></strong><br>'
+		.	 '						<!--[ <a href="link" class="editlinks">edit enrollment</a> ]--> </div></td>';
+            if ($user->dfltRole >= $g_permission['staff']) {
+            	echo '<td valign="top" bgcolor="#CCCCCC" class="borders"> <div align="center" class="strong">Class Active Dates: </div>';
+                echo '<div align="center">';
+                echo '<input name="activation" type="text" size="8" value="'.$ci->getActivationDate().'"> to <input name="expiration" type="text" size="8" value="'.$ci->getExpirationDate().'">&nbsp;'; 
+                echo '<input type="submit" name="updateClassDates" value="Change Dates"><!--This cell should show only for staff or better -->';
+                echo '</div></td>';
+            }
+		echo '				</tr>'
+
 		.	 '				</table>'
 		.	 '			</div></td>'
 		.	 '		</tr>'
@@ -316,8 +324,9 @@ class classDisplayer
 	            {
 	            	for ($n=0; $n<count($itemNotes); $n++)
 	            	{
-	            		if ($user->dfltRole >= $g_permission['staff'] || $itemNotes[$n]->getType() == "Instructor" || $itemNotes[$n]->getType() == "Content") {
-	            			echo '<br><span class="noteType">'.$itemNotes[$n]->getType().' Note:</span>&nbsp;<span class="noteText">'.$itemNotes[$n]->getText().'</span>';
+	            		$type = strtolower($itemNotes[$n]->getType());
+	            		if ($user->dfltRole >= $g_permission['staff'] || $type == "content") {
+	            			echo '<br><span class="noteType">'.ucfirst($type).' Note:</span>&nbsp;<span class="noteText">'.$itemNotes[$n]->getText().'</span>';
 	            		}
 	            	}
 	            }

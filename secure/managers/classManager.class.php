@@ -154,6 +154,7 @@ class classManager
 				
 				$reserves = (isset($_REQUEST['reserve'])) ? $_REQUEST['reserve'] : null;
 				
+			
 				if (isset($_REQUEST['reserveListAction']))
 					switch ($_REQUEST['reserveListAction'])
 					{
@@ -162,6 +163,14 @@ class classManager
 								foreach($reserves as $r)
 								{
 									$reserve = new reserve($r);
+									$reserve->getItem();
+									if ($reserve->item->isPhysicalItem()) {
+										$reqst = new request();
+										$reqst->getRequestByReserveID($r);
+										if (!$reqst->getProcessedDate()) {
+											$reqst->destroy();
+										}
+									}
 									$reserve->destroy();
 								}
 							}
@@ -186,10 +195,14 @@ class classManager
 								}
 							}	
 						break;					
-					}			
+					}
 									
 				$ci = new courseInstance($_REQUEST['ci']);
 				//$ci->getCourseForInstructor($user->getUserID());
+				if (isset($_REQUEST['updateClassDates'])) {
+					$ci->setActivationDate($_REQUEST['activation']);
+					$ci->setExpirationDate($_REQUEST['expiration']);
+				}
 				$ci->getReserves();
 				$ci->getInstructors();
 				$ci->getCrossListings();
