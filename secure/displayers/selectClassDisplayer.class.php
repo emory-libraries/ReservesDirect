@@ -80,7 +80,7 @@ class selectClassDisplayer
 		echo "							<option value=\"last_name\" $last_name>Last Name</option>\n";
 		echo "							<option value=\"username\" $username>User Name</option>\n";
 		$instr_qryTerm = isset($request['instr_qryTerm']) ? $request['instr_qryTerm'] : "";
-		echo "						</select> &nbsp; <input name=\"instr_qryTerm\" type=\"text\" value=\"".$instr_qryTerm."\" size=\"15\"  onBlur=\"this.form.submit();\">\n";
+		echo "						</select> &nbsp; <input name=\"instr_qryTerm\" type=\"text\" value=\"".stripslashes($instr_qryTerm)."\" size=\"15\"  onBlur=\"this.form.submit();\">\n";
 		echo "						&nbsp;\n";
 		echo "						<input type=\"submit\" name=\"instr_search\" value=\"Search\" onClick=\"this.form.select_course.selectedIndex=-1; this.form.selected_instr.selectedIndex=-1;\">\n"; //by setting selectedIndex to -1 we can clear the selectbox or previous values
 		echo "						&nbsp;\n";
