@@ -88,13 +88,13 @@ if (!empty($_REQUEST['ci']))
 //set cmd default to viewCourseList
 $cmd = (isset($_REQUEST['cmd'])) ? $_REQUEST['cmd'] : 'viewCourseList';
 	$ci = null;
-/*
 
-if ($u->getEmail() == "") //direct user to edit profile
+
+//Force user to update email address
 if (($u->getEmail() == "" || $u->getLastName() == "") && $cmd!="storeUser") //direct user to edit profile
 	 $cmd = 'editProfile';
 	 $cmd = 'newProfile';
-*/
+}
 }
 switch ($cmd) 
 switch ($cmd)

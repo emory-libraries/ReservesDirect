@@ -263,15 +263,19 @@ class userManager
 					
 					$msg = "User Record Successfully Saved";
 				} else {
-					$msg = "Invalid Email Format";
+					$msg = "Invalid Email Format - Changes Not Saved";
 				}
 				
 				if ($user->getDefaultRole() == $g_permission['custodian']) {
 					$this->displayFunction = 'displayCustodianHome';
 					$this->argList = array("User Password Successfully Changed");
-				} else {
+				} elseif ($user->getDefaultRole() >= $g_permission['staff']) {
 					$this->displayFunction = 'displayStaffHome';
 					$this->argList = array($msg);
+				} else {
+					require_once("secure/managers/reservesManager.class.php");
+					reservesManager::reservesManager('viewCourseList', $user);
+					break;
 				}
 			break;
 			

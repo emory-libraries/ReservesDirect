@@ -180,7 +180,7 @@ class userDisplayer
 		if (!is_null($userToEdit))
 		{
 			echo "<form action=\"index.php\" method=\"post\" name=\"editUser\">\n";
-	    	echo "<input type=\"hidden\" name=\"cmd\" value=\"$cmd\">\n";
+	    	echo "<input type=\"hidden\" name=\"cmd\" value=\"$nextCmd\">\n";
 	    	echo "<input type=\"hidden\" name=\"previous_cmd\" value=\"$cmd\">\n";
 			echo "<input type=\"hidden\" name=\"user[userID]\" value=\"". $userToEdit->getUserID() ."\">\n";    			
 			echo "<input type=\"hidden\" name=\"selectedUser\" value=\"" . $userToEdit->getUserID() . "\">";
@@ -310,9 +310,49 @@ class userDisplayer
 			echo "			</table>\n";
 			echo "		</td>\n";
 			echo "	</tr>\n";
-			echo "	<tr><td>&nbsp;</td></tr><tr><td align=\"center\"><input type=\"submit\" name=\"Submit\" value=\"Save Changes\" onClick=\"this.form.cmd.value='$nextCmd';\"></td></tr>\n";
+			echo "	<tr><td>&nbsp;</td></tr><tr><td align=\"center\"><input type=\"submit\" name=\"Submit\" value=\"Save Changes\" onClick=\"javascript:return validate(document.forms.editUser);\"></td></tr>\n";
 			echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 			echo "</table>\n";
+			echo "<script language=\"javaScript\">
+			function trim(strText) { 
+    			// this will get rid of leading spaces 
+    			while (strText.substring(0,1) == ' ') 
+        			strText = strText.substring(1, strText.length);
+
+    			// this will get rid of trailing spaces 
+    			while (strText.substring(strText.length-1,strText.length) == ' ')
+        			strText = strText.substring(0, strText.length-1);
+
+   				return strText;
+			} 
+			
+			function validate(form)
+			{
+				var lastName;
+				var email;
+
+				for (var i=0; i < form.elements.length; i++) {
+					if (form.elements[i].name == 'user[last_name]') {
+						lastName = trim(form.elements[i].value);
+					}
+					if (form.elements[i].name == 'user[email]') {
+						email = trim(form.elements[i].value);
+					}
+				}
+
+				var errorMsg = '';
+				if (lastName == '' || email == '')
+					errorMsg = 'You are required to enter your last name and a valid e-mail address';
+			
+				if (errorMsg) {
+					alert (errorMsg);
+					return false;
+				} else {
+					return true;
+				}		
+			} 
+		</script>";
+			
 			echo "</form>\n";
 		}
 	}
