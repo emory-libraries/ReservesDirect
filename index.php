@@ -168,6 +168,7 @@ switch ($cmd)
 
 	case 'processRequest':	
 	case 'processRequest':
+	case 'storeRequest':
 	case 'printRequest':
 		require_once("secure/managers/requestManager.class.php");
 	break;	

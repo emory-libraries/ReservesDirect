@@ -131,12 +131,12 @@ class request
 		{
 			default: //'mysql'
 				$sql = "DELETE "
-					.  "FROM request "						  
+					.  "FROM requests "						  
 					.  "WHERE request_id = !"
 					;
 		}
 		
-		$rs = $g_dbConn->query($sql, $requestID);
+		$rs = $g_dbConn->query($sql, $this->requestID);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }		
 	}
 	

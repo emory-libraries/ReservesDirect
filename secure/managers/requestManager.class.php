@@ -61,6 +61,12 @@ class requestManager
 
 		switch ($cmd)
 		{
+			case 'deleteRequest':
+				$requestObj = new request($request['request_id']);
+				$reserve = new reserve($requestObj->getReserveID());
+				$reserve->destroy();
+				$requestObj->destroy();
+			
 			case 'displayRequest':			
 				$page = "manageClasses";
 				
@@ -102,9 +108,7 @@ class requestManager
 									
 					$requestObj->setDateProcessed(date('Y-m-d'));
 					//set ci so it will be displayed for user
-					echo "here";
 					$ci = new courseInstance($reserve->getCourseInstanceID());
-					echo "here";
 				}
 				
 				$reserve->setActivationDate($request['hide_year'].'-'.$request['hide_month'].'-'.$request['hide_day']);

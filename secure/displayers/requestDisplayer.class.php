@@ -125,7 +125,7 @@ class requestDisplayer
 				echo "					      <tr>\n";
 				echo "					        <td width=\"12\" valign=\"top\">&nbsp;</td>\n";
 				echo "					        <td width=\"98\" align=\"right\" valign=\"top\" class=\"strong\">Location:</td>\n";
-				echo "					        <td align=\"left\" valign=\"top\">". $pCopy->getLocation() . " " . $pCopy->getStatus() ." ". $pCopy->getCallNumber() ."</td>\n";
+				echo "					        <td align=\"left\" valign=\"top\">". $pCopy->getOwningLibrary() . " " . $pCopy->getStatus() ." ". $pCopy->getCallNumber() ."</td>\n";
 				echo "					      </tr>\n";
 					
 
@@ -161,6 +161,7 @@ class requestDisplayer
 				echo "							<input type=\"hidden\" name=\"request_id\" value=\"". $r->requestID ."\">\n";
 				echo "							<input type=\"submit\" value=\"Process this Item\">\n";
 				echo "						</form>\n";
+				echo "						&nbsp;<a href=\"index.php?cmd=deleteRequest&request_id=".$r->requestID."\">Delete Request</a>&nbsp;";
 				echo "					</td>\n";
 				echo " 				</tr>\n";
 				  				
