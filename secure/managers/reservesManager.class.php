@@ -124,6 +124,21 @@ class reservesManager
 				
 				$ci = new courseInstance($_REQUEST['ci']);
 		
+				$ci->getReserves();
+				$ci->getInstructors();
+				$ci->getCrossListings();
+				$ci->getPrimaryCourse();
+				
+				$this->displayFunction = "displayReserves";
+				$this->argList = array($user, $ci, 'no_exit');
+			break;			
+
+			case 'previewStudentView':
+				$page = "myReserves";
+				$loc  = "home";	
+				
+				$ci = new courseInstance($_REQUEST['ci']);
+		
 				$ci->getActiveReserves();
 				$ci->getInstructors();
 				$ci->getCrossListings();
@@ -132,6 +147,7 @@ class reservesManager
 				$this->displayFunction = "displayReserves";
 				$this->argList = array($user, $ci, 'no_exit');
 			break;			
+
 			
 			case 'sortReserves':
 				$page = "myReserves";

@@ -129,7 +129,7 @@ class classDisplayer
 	
 		echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">';
 		echo '<tr>';
-		echo "<td width=\"100%\" align=\"right\" valign=\"middle\" class=\"small\" align=\"right\"><a href=\"javascript:openWindow('&cmd=previewReservesList&ci=".$ci->courseInstanceID . "','width=800,height=600');\">Preview Student View</a> | <a href=\"index.php\">Exit class</a></td>\n";
+		echo "<td width=\"100%\" align=\"right\" valign=\"middle\" class=\"small\" align=\"right\"><a href=\"javascript:openWindow('&cmd=previewStudentView&ci=".$ci->courseInstanceID . "','width=800,height=600');\">Preview Student View</a> | <a href=\"index.php\">Exit class</a></td>\n";
 		echo '</tr>';
 		echo	'<tr>'
 		.	'	<td width="100%" colspan="2"><img src=images/spacer.gif" width="1" height="5"> </td>'

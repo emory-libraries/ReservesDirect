@@ -61,8 +61,6 @@ if (isset($_SESSION['debug']))
 $userName = $_SESSION['username'];
 $userClass = $_SESSION['userClass'];
 
-//print_r ($_REQUEST);echo "<hr>";
-
 //init user based on type
 $usersObject = new users();
 $u = $usersObject->initUser($userClass, $userName);
@@ -103,6 +101,7 @@ switch ($cmd)
 	case 'viewCourseList':  // myReserves Course List
 {
 	case 'viewReservesList': // myReserves Reserve List
+	case 'previewReservesList':
 	case 'previewStudentView';
 	case 'sortReserves':
 	case 'selectInstructor': //addReserve Staff Interface - Search for Class by Instructor or Dept				
