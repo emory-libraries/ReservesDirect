@@ -1287,6 +1287,76 @@ class classDisplayer
 		echo "		frm.activation_date.value = activateDate;\n";
 		echo "		frm.expiration_date.value = expirationDate;\n";
 		echo "	}\n";
+		echo "function validate(form)";
+		echo "	{";
+		
+		echo "		var fieldCount = 0;";
+		echo "		var requiredFields=true;";
+		echo "		var errorMsg='The following fields are required: ';";
+
+		echo "		if (!(form.department.value)) {";
+		echo "			requiredFields=false;";
+		echo "			errorMsg = errorMsg + 'Department';";
+		echo "			fieldCount++;";
+		echo "		}";
+		
+		echo "		if (!(form.course_number.value)) {";
+		echo "			requiredFields=false;";
+		echo "			if (fieldCount>0) errorMsg = errorMsg + ', ';";
+		echo "			errorMsg = errorMsg + 'Course Number';";
+		echo "			fieldCount++;";
+		echo "		}";
+		
+		echo "		if (!(form.course_name.value)) {";
+		echo "			requiredFields=false;";
+		echo "			if (fieldCount>0) errorMsg = errorMsg + ', ';";
+		echo "			errorMsg = errorMsg + 'Course Name';";
+		echo "			fieldCount++;";
+		echo "		}";
+		
+		echo "		var term_choice = false;";
+		echo "		for (counter = 0; counter < form.term.length; counter++)";
+		echo "		{";
+		echo "			if (form.term[counter].checked)";
+		echo "				term_choice = true; ";
+		echo "		}";
+		echo "		if (!term_choice) {";
+		echo "			requiredFields=false;";
+		echo "			if (fieldCount>0) errorMsg = errorMsg + ', ';";
+		echo "			errorMsg = errorMsg + 'Semester';";
+		echo "			fieldCount++;";
+		echo "		}";
+		
+		echo "		if (!(form.instructor.value)) {";
+		echo "			requiredFields=false;";
+		echo "			if (fieldCount>0) errorMsg = errorMsg + ', ';";
+		echo "			errorMsg = errorMsg + 'Instructor';";
+		echo "			fieldCount++;";
+		echo "		}";
+		
+		echo "		if (!(form.activation_date.value)) {";
+		echo "			requiredFields=false;";
+		echo "			if (fieldCount>0) errorMsg = errorMsg + ', ';";
+		echo "			errorMsg = errorMsg + 'Activation Date';";
+		echo "			fieldCount++;";
+		echo "		}";
+		
+		echo "		if (!(form.expiration_date.value)) {";
+		echo "			requiredFields=false;";
+		echo "			if (fieldCount>0) errorMsg = errorMsg + ', ';";
+		echo "			errorMsg = errorMsg + 'Expiration Date';";
+		echo "			fieldCount++;";
+		echo "		}";
+		
+		echo "		if (requiredFields) {";
+		echo "			return true;";
+		echo "		} else {";
+		echo "			alert (errorMsg);";
+		echo "			return false;";
+		echo "		}		";
+		
+		echo "	}";
+		
 		echo "</script>\n";
 		
 	    echo "<form action=\"index.php\" method=\"post\" name=\"frmClass\">\n";
@@ -1328,7 +1398,7 @@ class classDisplayer
 		echo "					<td width=\"35%\" height=\"30\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\" class=\"strong\">Department:</td>\n";
 		echo "						<td align=\"left\">\n";
 		echo "							<select name=\"department\">\n";
-		echo "								<option>-- Select a Department --</option>\n";
+		echo "								<option value=''>-- Select a Department --</option>\n";
 		foreach ($departments as $dept) { echo "								<option value=\"". $dept[0] ."\">". $dept[1] ." " . $dept[2] ."</option>\n"; }
 		echo "							</select>\n";
 		echo "						</td>\n";
@@ -1368,7 +1438,7 @@ class classDisplayer
 			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\" class=\"strong\">Instructor:</td>\n";
 			echo "					<td align=\"left\">\n";
 			echo "						<select name=\"instructor\">\n";
-			echo "							<option selected>-- Select an Instructor --</option>\n";
+			echo "							<option value='' selected>-- Select an Instructor --</option>\n";
 			foreach ($instructors as $inst) { echo "								<option value=\"". $inst['user_id'] ."\">". $inst['full_name'] ."</option>\n"; }
 			echo "						</select>\n";
 			echo "					</td>\n";
@@ -1399,7 +1469,7 @@ class classDisplayer
 		echo "			</table>\n";
 		echo "		</td>\n";
 		echo "	</tr>\n";
-		echo "	<tr><td align=\"center\"><input type=\"submit\" name=\"Submit\" value=\"Create Course\"></td></tr>\n";
+		echo "	<tr><td align=\"center\"><input type=\"submit\" name=\"Submit\" value=\"Create Course\" onClick=\"javascript:return validate(document.forms.frmClass);\"></td></tr>\n";
 		echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "</table>\n";
 		echo "</form>\n";
