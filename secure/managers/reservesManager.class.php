@@ -322,7 +322,7 @@ class reservesManager
 				if ($p != " - ") $item->setPagesTimes($p);
 				elseif ($t != " - ") $item->setPagesTimes($t);
 			
-				if ($_REQUEST[personal] == "on") $item->setprivateUserID($user->getUserID());
+				if ($_REQUEST['personal'] == "on") $item->setprivateUserID($user->getUserID());
 			
 				$item->setGroup('ELECTRONIC');
 				$item->setType('ITEM');
@@ -357,7 +357,7 @@ class reservesManager
 				$page="addReserve";
 				$faxReader = new faxReader();
 
-				$claims =& $_REQUEST[claimFax];
+				$claims =& $_REQUEST['claimFax'];
 		
 				$claimedFaxes = array();
 				if (is_array($claims) && !empty($claims))
@@ -371,7 +371,7 @@ class reservesManager
 			break;
 			case 'storeFaxMetadata':
 				$page="addReserve";
-				$files = array_keys($_REQUEST[file]);
+				$files = array_keys($_REQUEST['file']);
 		
 				$items = array();
 				foreach ($files as $file)
@@ -381,23 +381,23 @@ class reservesManager
 					$item = new reserveItem();							
 					$item->createNewItem();
 				
-					$item->setTitle($_REQUEST[$file][title]);
-					$item->setAuthor($_REQUEST[$file][author]);
-					$item->setVolumeTitle($_REQUEST[$file][volumetitle]);
-					$item->setvolumeEdition($_REQUEST[$file][volume]);
-					$item->setContentNotes($_REQUEST[$file][contents]);
+					$item->setTitle($_REQUEST[$file]['title']);
+					$item->setAuthor($_REQUEST[$file]['author']);
+					$item->setVolumeTitle($_REQUEST[$file]['volumetitle']);
+					$item->setvolumeEdition($_REQUEST[$file]['volume']);
+					$item->setContentNotes($_REQUEST[$file]['contents']);
 				
 					//move file and store new location
-					$newFileName = str_replace(" ", "_", $item->getItemID()."-".$_REQUEST[file][$file]);
+					$newFileName = str_replace(" ", "_", $item->getItemID()."-".$_REQUEST['file'][$file]);
 				
-					common_moveFile($g_faxDirectory.$_REQUEST[file][$file], $newFileName);
+					common_moveFile($g_faxDirectory.$_REQUEST['file'][$file], $newFileName);
 					$item->setURL($g_documentURL . $newFileName);
 					$item->setMimeType('application/pdf');
 				
-					$p = $_REQUEST[$file][pagefrom] . "-" . $_REQUEST[$file][pageto];
+					$p = $_REQUEST[$file]['pagefrom'] . "-" . $_REQUEST[$file]['pageto'];
 					if ($p != "-") $item->setPagesTimes($p);
 					
-					if ($_REQUEST[$file][personal] == "on") $item->setprivateUserID($user->getUserID());
+					if ($_REQUEST[$file]['personal'] == "on") $item->setprivateUserID($user->getUserID());
 				
 					$item->setGroup('ELECTRONIC');
 					$item->setType('ITEM');

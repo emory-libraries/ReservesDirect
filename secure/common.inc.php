@@ -225,7 +225,7 @@ function common_moveFile($src, $dest)
 	exec("/usr/bin/sudo -u coursecontrol /usr/local/bin/reserveMover $src $dest", $stat);
 
 	//if the new file is not readable something went wrong
-	if (!is_readable($g_documentDirectory.$dest)) trigger_error("file $src could not be moved to $desc" . $stat, E_USER_ERROR);
+	if (!is_readable($g_documentDirectory.$dest)) trigger_error("file $src could not be moved to $dest" . $stat, E_USER_ERROR);
 }
 
 

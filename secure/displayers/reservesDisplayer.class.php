@@ -931,11 +931,11 @@ function claimFax($faxReader, $ci)
 			$rowClass = ($i % 2) ? "evenRow" : "oddRow";
 			
 			echo "				<tr align=\"left\" valign=\"middle\" class=\"$rowClass\">\n";
-			echo "					<td width=\"20%\" valign=\"top\" class=\"$rowClass\" align=\"center\">" . $fax[phone] . "</td>\n";
-			echo "					<td width=\"40%\" class=\"$rowClass\" align=\"center\">" . $fax[time] . "</td>\n";
-			echo "					<td width=\"15%\" valign=\"top\" class=\"$rowClass\" align=\"center\">" . $fax[pages] . "</td>\n";
-			echo "					<td width=\"10%\" valign=\"top\" class=\"$rowClass\" align=\"center\"><a href=\"" . $g_faxURL . $fax[file] . "\">preview</a></td>\n";
-			echo "					<td width=\"15%\" valign=\"top\" class=\"$rowClass\" align=\"center\"><input type=\"checkbox\" name=\"claimFax[$i]\" value=\"" . $fax[file] . "\"></td>\n";
+			echo "					<td width=\"20%\" valign=\"top\" class=\"$rowClass\" align=\"center\">" . $fax['phone'] . "</td>\n";
+			echo "					<td width=\"40%\" class=\"$rowClass\" align=\"center\">" . $fax['time'] . "</td>\n";
+			echo "					<td width=\"15%\" valign=\"top\" class=\"$rowClass\" align=\"center\">" . $fax['pages'] . "</td>\n";
+			echo "					<td width=\"10%\" valign=\"top\" class=\"$rowClass\" align=\"center\"><a href=\"" . $g_faxURL . $fax['file'] . "\">preview</a></td>\n";
+			echo "					<td width=\"15%\" valign=\"top\" class=\"$rowClass\" align=\"center\"><input type=\"checkbox\" name=\"claimFax[$i]\" value=\"" . $fax['file'] . "\"></td>\n";
 			echo "				</tr>\n";
 			
 		}
@@ -990,10 +990,10 @@ function displayFaxMetadataForm($faxes, $ci)
 			echo "		<td colspan=\"2\" align=\"left\" valign=\"top\" class=\"borders\">\n";
 			echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
 			echo "				<tr align=\"center\" valign=\"top\" class=\"#CCCCCC\" class=\"displayList\">\n";
-			echo "					<td width=\"25%\"><div align=\"center\">" . $fax[phone] . "</div></td>\n";
-			echo "					<td width=\"25%\"><div align=\"center\">" . $fax[time] . "</div></td>\n";
-			echo "					<td width=\"25%\"><div align=\"center\">" . $fax[pages] . " page(s)</div></td>\n";
-			echo "					<td width=\"25%\"><div align=\"center\"><a href=\"" . $g_faxURL . $fax[file] . "\" target=\"preview\">preview document</a></div></td>\n";
+			echo "					<td width=\"25%\"><div align=\"center\">" . $fax['phone'] . "</div></td>\n";
+			echo "					<td width=\"25%\"><div align=\"center\">" . $fax['time'] . "</div></td>\n";
+			echo "					<td width=\"25%\"><div align=\"center\">" . $fax['pages'] . " page(s)</div></td>\n";
+			echo "					<td width=\"25%\"><div align=\"center\"><a href=\"" . $g_faxURL . $fax['file'] . "\" target=\"preview\">preview document</a></div></td>\n";
 			echo "				</tr>\n";
 			echo "			</table>\n";
 			echo "		</td>\n";
@@ -1007,34 +1007,34 @@ function displayFaxMetadataForm($faxes, $ci)
 			echo "		</td>\n";
 			echo "	</tr>\n";
 	
-			echo "	<INPUT TYPE=\"HIDDEN\" NAME=\"file[" . str_replace('.', '_',$fax[file]) . "]\" value=\"" . $fax[file] ."\" >\n";
+			echo "	<INPUT TYPE=\"HIDDEN\" NAME=\"file[" . str_replace('.', '_',$fax['file']) . "]\" value=\"" . $fax['file'] ."\" >\n";
 			
 			echo "	<tr>\n";
 			echo "		<td colspan=\"2\" align=\"left\" valign=\"top\" class=\"borders\">\n";
 			echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
 			echo "				<tr valign=\"middle\">\n";
 			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\" class=\"strong\">Title:</td>\n";
-			echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"" . $fax[file] . "[title]\" SIZE=50></td>\n";
+			echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"" . $fax['file'] . "[title]\" SIZE=50></td>\n";
 			echo "				</tr>\n";
 		
 			echo "				<tr valign=\"middle\">\n";
 			echo "					<td width=\"35%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\" class=\"strong\">Author</td>\n";
-			echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"" . $fax[file] . "[author]\" SIZE=50></td>\n";
+			echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"" . $fax['file'] . "[author]\" SIZE=50></td>\n";
 			echo "				</tr>\n";
 			
 			echo "				<tr valign=\"middle\">\n";
 			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\"><span class=\"strong\">Book/Journal/Work Title</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
-			echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"" . $fax[file] . "[volumetitle]\" SIZE=50></td>\n";
+			echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"" . $fax['file'] . "[volumetitle]\" SIZE=50></td>\n";
 			echo "				</tr>\n";
 			
 			echo "				<tr valign=\"middle\">\n";
 			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Volume / Edition</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
-			echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"" . $fax[file] . "[volume]\" SIZE=50></td>\n";
+			echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"" . $fax['file'] . "[volume]\" SIZE=50></td>\n";
 			echo "				</tr>\n";
 			
 			echo "				<tr valign=\"middle\">\n";
 			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Pages</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
-			echo "					<td align=\"left\">From:  <INPUT TYPE=\"text\" NAME=\"" . $fax[file] . "[pagefrom]\" SIZE=3> To: <INPUT TYPE=\"text\" NAME=\"" . $fax[file] . "[pageto]\" SIZE=3></td>\n";
+			echo "					<td align=\"left\">From:  <INPUT TYPE=\"text\" NAME=\"" . $fax['file'] . "[pagefrom]\" SIZE=3> To: <INPUT TYPE=\"text\" NAME=\"" . $fax['file'] . "[pageto]\" SIZE=3></td>\n";
 			echo "				</tr>\n";
 /* Not implemented in database			
 			echo "				<tr valign=\"middle\">\n";
@@ -1044,14 +1044,14 @@ function displayFaxMetadataForm($faxes, $ci)
 */			
 			echo "				<tr valign=\"middle\">\n";
 			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Contents</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
-			echo "					<td align=\"left\"><textarea NAME=\"" . $fax[file] . "[contents]\" cols=\"50\" rows=\"3\"></textarea></td>\n";
+			echo "					<td align=\"left\"><textarea NAME=\"" . $fax['file'] . "[contents]\" cols=\"50\" rows=\"3\"></textarea></td>\n";
 			echo "				</tr>\n";
 		
 			echo "				<tr valign=\"middle\">\n";
 			echo "					<td align=\"right\" bgcolor=\"#CCCCCC\">&nbsp;</td>\n";
 			echo "					<td align=\"left\" align=\"center\" class=\"strong\">\n";
 			echo "						This Document is from my Personal Collection: \n";
-			echo "						<INPUT TYPE=\"checkbox\" NAME=\"" . $fax[file] . "[personal]\" CHECKED>\n";
+			echo "						<INPUT TYPE=\"checkbox\" NAME=\"" . $fax['file'] . "[personal]\" CHECKED>\n";
 			echo "					</td>\n";
 			echo "				</tr>\n";
 			echo "			</table>\n";

@@ -458,7 +458,7 @@ class reserveItem extends item
 	{
 		global $g_dbConn;
 
-		$this->privateUserID = $privateUserIDID; 
+		$this->privateUserID = $privateUserID; 
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
