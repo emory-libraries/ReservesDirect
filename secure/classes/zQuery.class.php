@@ -136,7 +136,10 @@ class zQuery
 			   			$search_results['title'] = "";
 			   			foreach ($field->subfield as $subfield)
 			   			{
-			   					$search_results['title'] .= " ".(string)$subfield;
+			   					if($search_results['title'] == "")
+			   						$search_results['title'] = (string)$subfield;
+			   					else
+			   						$search_results['title'] .= " ".(string)$subfield;
 			   			}
 			   		break;
 			   					   		
@@ -144,7 +147,10 @@ class zQuery
 			   			$search_results['source'] = "";
 			   			foreach ($field->subfield as $subfield)
 			   			{
-			   					$search_results['source'] .= " ".(string)$subfield;
+			   					if($search_results['source'] == "")
+			   						$search_results['source'] = (string)$subfield;
+			   					else
+			   						$search_results['source'] .= " ".(string)$subfield;
 			   			}
 			   		break;
 
