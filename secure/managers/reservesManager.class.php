@@ -330,10 +330,12 @@ class reservesManager
 	        		//position uploaded file so that common_move and move it
 	        		move_uploaded_file($_FILES['userfile']['tmp_name'], $_FILES['userfile']['tmp_name'] . "." . $type);
 	        		chmod($_FILES['userfile']['tmp_name'] . "." . $type, 0644);   	       	     	
-	        	
-	        		$newFileName = str_replace("&", "_", $filename); 											//remove & in filenames
+
+	        		$newFileName = ereg_replace('[^A-Za-z0-9]*','',$filename); //strip any non A-z or 0-9 characters
+	        		//$newFileName = str_replace("&", "_", $filename); 											//remove & in filenames
+	        		//$newFileName = str_replace(".", "", $newFileName); 											//remove . in filenames
 					$newFileName = $item->getItemID() ."-". str_replace(" ", "_", $newFileName . "." . $type); 	//remove spaces in filenames
-	        		
+
 	        		common_moveFile($_FILES['userfile']['tmp_name'] . "." . $type,  $newFileName );
 	        		$item->setURL($g_documentURL . $newFileName);
 	    		} else {
