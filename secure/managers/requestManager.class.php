@@ -336,7 +336,8 @@ class requestManager
 					//look for existing item in DB
 					$item = new reserveItem();
 					$item->getItemByLocalControl($search_results['controlKey']);
-					if (!is_null($item->getItemID()))
+
+					if ($item->getItemID() != "")
 					{
 						$item_id = $item->getItemID();
 						$search_results = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'source'=>'', 'content_note'=>'', 'controlKey'=>'', 'personal_owner'=>null, 'physicalCopy'=>'');

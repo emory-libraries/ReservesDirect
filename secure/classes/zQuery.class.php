@@ -83,7 +83,9 @@ class zQuery
 		*/
 		
 		global $g_zhost, $g_zport, $g_zdb, $g_zReflector;
-		//echo "$g_zReflector?host=$g_zhost&port=$g_zport&db=$g_zdb&query=" . urlencode($query) . "&start=$start&limit=$limit<br>";
+
+		if (isset($_SESSION['debug']))
+			echo "$g_zReflector?host=$g_zhost&port=$g_zport&db=$g_zdb&query=" . urlencode($query) . "&start=$start&limit=$limit<br>";
 
 		$xmlresults = "";
 		if (ereg('ocm[0-9]+', $query)) // until corrected we can only search for non-personal items
@@ -188,7 +190,10 @@ class zQuery
 		global $g_holdingsScript;
 
 		$rs = array();
-		//echo $g_holdingsScript . "?key=" . $key . "&key_type=$keyType<P>";
+		
+		if (isset($_SESSION['debug']))
+			echo $g_holdingsScript . "?key=" . $key . "&key_type=$keyType<P>";
+			
 		$fp = fopen($g_holdingsScript . "?key=" . $key . "&key_type=$keyType", "rb");
 		if(!$fp) {
 			trigger_error("zQuery could not get holdings", E_USER_ERROR);
@@ -204,18 +209,20 @@ class zQuery
 			
 			$thisCopies = split("\n", $holdings);
 
+			$j = 0;
 			for($i = 0; $i < (count($thisCopies) - 1); $i++) 
 			{
 				//list($catKey, $sequence, $copy, $callnum, $loc, $type, $bar, $library) = split("\|", $thisCopies[$i]);							
 				list($devnull, $devnull, $copy, $callnum, $loc, $type, $bar, $library, $status, $reservesDesk) = split("\|", $thisCopies[$i]);							
 				if ($copy != "" && $callnum != "")
 				{
-					$tmpArray[$i]['copy']		= $copy;
-					$tmpArray[$i]['callNum']	= $callnum;
-					$tmpArray[$i]['loc']		= $loc;
-					$tmpArray[$i]['type']		= $type;
-					$tmpArray[$i]['bar']		= ltrim(rtrim($bar));
-					$tmpArray[$i]['library']	= $library;
+					$tmpArray[$j]['copy']		= $copy;
+					$tmpArray[$j]['callNum']	= $callnum;
+					$tmpArray[$j]['loc']		= $loc;
+					$tmpArray[$j]['type']		= $type;
+					$tmpArray[$j]['bar']		= ltrim(rtrim($bar));
+					$tmpArray[$j]['library']	= $library;
+					$j++;
 				}
  			}
 /*jbwhite we now want to display all holding info

@@ -125,11 +125,12 @@ class reserveItem extends item
 					.  "FROM items "						  
 					.  "WHERE local_control_key = ?";
 		}
-		
+
 		$rs = $g_dbConn->query($sql, $local_control_key);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-				
-		$row = $rs->fetchRow();
+			
+		while ($row = $rs->fetchRow())
+		{
 			$this->itemID			= $row[0];
 			$this->title			= $row[1];
 			$this->itemGroup		= $row[2];	
@@ -148,7 +149,7 @@ class reserveItem extends item
 			$this->privateUserID	= $row[15];
 			$this->itemType			= $row[16];
 			$this->volumeTitle		= $row[17];
-			
+		} 
 	}	
 
 	
