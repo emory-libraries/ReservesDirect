@@ -88,6 +88,7 @@ class classDisplayer
         echo "			<p><a href=\"index.php?cmd=myReserves\" class=\"titlelink\">Edit an Existing Course</a><br>";
         echo "			Advanced management of your classes. Edit class title, crosslistings, proxies, reserve materials, enrollment, and much more.</p>";
         echo "		</td>";
+        /*
         echo "		<td width=\"30%\" align=\"left\" valign=\"top\">";
 		echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">";
         echo "				<tr>";
@@ -122,6 +123,7 @@ class classDisplayer
        	echo "       		</tr>";
       	echo "			</table>";
         echo "		</td>";
+        */
       	echo "	</tr>";
         echo "	<tr> ";
      	echo "		<td colspan=\"2\"><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td>";
