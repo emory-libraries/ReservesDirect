@@ -153,6 +153,8 @@ switch ($cmd)
 	case 'setPwd':
 	case 'resetPwd':
 	case 'removePwd':
+	case 'addProxy':
+	case 'removeProxy':
 		require_once("managers/userManager.class.php");		
 		$mgr = new userManager($cmd, $u, $adminUser);	
 	break;
