@@ -365,7 +365,7 @@ class userDisplayer
 		echo "	<tr>\n";
 		echo "		<td align=\"center\" valign=\"top\" class=\"borders\">\n";
 		echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
-		echo "				<tr class=\"headingCell1\"><td width=\"33%\">Create</td><td width=\"33%\">Edit</td><td width=\"33%\">Assign</td></tr>\n";
+		echo "				<tr class=\"headingCell1\"><td width=\"33%\">Create</td><td width=\"33%\">Edit</td><!--<td width=\"33%\">Assign</td>--></tr>\n";
 		echo "				<tr align=\"left\" valign=\"top\">\n";
 		
 		echo "					<td width=\"33%\" class=\"borders\">\n";
@@ -385,12 +385,12 @@ class userDisplayer
 		echo "						</ul>\n";
 		echo "					</td>\n";
 		
-		echo "					<td width=\"33%\" class=\"borders\">\n";
+		echo "					<!--<td width=\"33%\" class=\"borders\">\n";
 		echo "						<ul>\n";
 		echo "							<li><a href=\"index.php?cmd=assignProxy\">Assign a Proxy to a Class</a></li>\n";
 		echo "							<li><a href=\"index.php?cmd=assignInstr\">Assign an Instructor to a Class</a></li>\n";
 		echo "						</ul>\n";
-		echo "					</td>\n";
+		echo "					</td>-->\n";
 		
 		echo "				</tr>\n";
 		echo "			</table>\n";
