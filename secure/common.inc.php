@@ -263,14 +263,15 @@ function common_getSkin($skin)
 
 function common_formatDate($d, $format)
 {
-	if (is_array($d)){	
-		list ($Y, $M, $D) = split('-', $d);
-		switch ($format)
+		$D = split('-', $d);
+		if (is_array($D) && count($D) > 2)
 		{
-			case "MM-DD-YYYY":
-			default:
-				return "$M-$D-$Y";
-		}
-	} else return "";
+			switch ($format)
+			{
+				case "MM-DD-YYYY":
+				default:
+					return $D[1].'-'.$D[2].'-'.$D[0];
+			}
+		} else return '';
 }
 ?>

@@ -695,7 +695,7 @@ class courseInstance
 		{
 			$retValue .=  $this->crossListings[$i]->getName() . " ";
 		}
-		return ($retValue == "" ? "CrossListing None" : $retValue);
+		return ($retValue == "" ? "No Crosslistings" : $retValue);
 	}
 	
 	function displayInstructorList()

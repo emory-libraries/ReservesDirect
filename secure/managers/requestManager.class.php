@@ -73,6 +73,9 @@ class requestManager
 				{
 					$item = $requestList[$i]->requestedItem;
 					$item->getPhysicalCopy();
+					
+					$requestList[$i]->courseInstance->getInstructors();
+					$requestList[$i]->courseInstance->getCrossListings();
 				}			
 				
 				$this->displayFunction = 'displayAllRequest';

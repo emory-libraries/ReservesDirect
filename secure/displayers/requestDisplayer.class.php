@@ -45,7 +45,6 @@ class requestDisplayer
 
 		echo "	<form action=\"index.php?cmd=displayRequest\" method=\"POST\">\n";
 		echo "	<tr><td colspan=\"2\">";
-		//echo "		<font color=\"#666666\"><strong><a href=\"index.php?cmd=displayRequest&unit=all\">View all Requests</a></strong></font> | ";
 		echo "		<font color=\"#666666\"><strong>View Requests for </strong></font>";
 		echo "			<select name=\"unit\">";
 		echo "				<option value=\"all\">Show All Requests</option>";
@@ -126,7 +125,7 @@ class requestDisplayer
 				echo "					      <tr>\n";
 				echo "					        <td width=\"12\" valign=\"top\">&nbsp;</td>\n";
 				echo "					        <td width=\"98\" align=\"right\" valign=\"top\" class=\"strong\">Location:</td>\n";
-				echo "					        <td align=\"left\" valign=\"top\">". $pCopy->getOwningLibrary() . " " . $pCopy->getStatus() ." ". $pCopy->getCallNumber() ."</td>\n";
+				echo "					        <td align=\"left\" valign=\"top\">". $pCopy->getLocation() . " " . $pCopy->getStatus() ." ". $pCopy->getCallNumber() ."</td>\n";
 				echo "					      </tr>\n";
 					
 
@@ -159,7 +158,7 @@ class requestDisplayer
 				echo "    				</td>\n";
 				echo "    				<td align=\"right\" valign=\"top\">\n";
 				echo "						<form action=\"index.php?cmd=processRequest\" method=\"POST\">\n";
-				echo "							<input type=\"text\" name=\"request_id\" value=\"". $r->requestID ."\">\n";
+				echo "							<input type=\"hidden\" name=\"request_id\" value=\"". $r->requestID ."\">\n";
 				echo "							<input type=\"submit\" value=\"Process this Item\">\n";
 				echo "						</form>\n";
 				echo "					</td>\n";
