@@ -66,7 +66,8 @@ class requestManager
 				
 				$loc  = "process request";
 				
-				$requestList = $user->getRequests();
+				$unit = (!isset($request['processingUnit'])) ? $user->getStaffLibrary() : $request['processingUnit'];
+				$requestList = $user->getRequests($unit);
 
 				for($i=0;$i<count($requestList);$i++)
 				{

@@ -92,6 +92,8 @@ class reserve
 		$this->reserveID = $row[0];	
 		$this->creationDate = $d;
 		$this->lastModDate = $d;
+		
+		$this->getReserveByID($this->reserveID);
 	}
 	
 	/**
@@ -275,7 +277,7 @@ class reserve
 	function getItemID() { return $this->itemID; }
 	function getActivationDate() { return $this->activationDate; }
 	function getExpirationDate() { return $this->expirationDate; }
-	function getStatus() { return $this->status; echo "I'm in the getStatus method! ".$this->status."<br>";}
+	function getStatus() { return $this->status;}
 	function getSortOrder() { return $this->sortOrder; }
 	function getCreationDate() { return $this->creationDate; }
 	function getModificationDate() { return $this->lastModDate; }
