@@ -174,9 +174,11 @@ class userManager
 
 				$users = new users();				
 
+				//determine if search has been issued and if so search
 				if (isset($_REQUEST['select_user_by']) && isset($_REQUEST['user_qryTerm']))
 					$users->search($_REQUEST['select_user_by'], $_REQUEST['user_qryTerm']);	
 
+				//if user to be editted has been selected create object and get data
 				if (!isset($userToEdit))
 				{
 					if (isset($_REQUEST['selectedUser']))
