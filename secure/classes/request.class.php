@@ -123,6 +123,30 @@ class request
 		list($this->requestID, $this->reserveID, $this->requestedItemID, $this->requestingUserID, $this->requestedDate, $this->processedDate, $this->desiredDate, $this->priority, $this->courseInstanceID) = $rs->fetchRow();	
 	}
 	
+	/**
+	* @return void
+	* @param id $reserveID
+	* @desc get data by id
+	*/
+	function getRequestByReserveID($reserveID)
+	{
+		global $g_dbConn;
+		
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "SELECT request_id, reserve_id, item_id, user_id, date_requested, date_processed, date_desired, priority, course_instance_id "
+					.  "FROM requests "						  
+					.  "WHERE reserve_id = !"
+					;
+		}
+		
+		$rs = $g_dbConn->query($sql, $reserveID);						
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		list($this->requestID, $this->reserveID, $this->requestedItemID, $this->requestingUserID, $this->requestedDate, $this->processedDate, $this->desiredDate, $this->priority, $this->courseInstanceID) = $rs->fetchRow();	
+	}
+	
 	function destroy()
 	{
 		global $g_dbConn;
