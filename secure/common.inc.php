@@ -257,23 +257,8 @@ function common_getStatusDisplayColor($status)
 
 function common_getSkin($skin)
 {
-	global $g_dbConn;
-	$skin = (!is_null($skin) &&  $skin != "") ? $skin : 'general';
-	
-	switch ($g_dbConn->phptype)
-	{
-		default: //'mysql'
-			$sql =	"SELECT css "
-				.	"FROM libraries "
-				.	"WHERE nickname=?"
-				;
-	}
-	
-	$rs = $g_dbConn->query($sql, $skin);	
-	if (DB::isError($rs))  trigger_error($rs->getMessage(), E_USER_ERROR) ; 
-		
-	$row = $rs->fetchRow();
-	return $row[0];
+	global $g_skins;
+	return (key_exists($skin, $g_skins)) ? $g_skins[$skin] : $g_skins['default'];
 }
 
 function common_formatDate($d, $format)

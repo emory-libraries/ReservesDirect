@@ -44,6 +44,7 @@ require_once("secure/interface/instructor.class.php");
 require_once("secure/interface/staff.class.php");
 require_once("secure/interface/admin.class.php");
 
+include("secure/skins_config.inc");
 include("secure/session.inc.php");
 
 // we will do our own error handling
