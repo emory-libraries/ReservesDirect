@@ -44,7 +44,7 @@ class reservesDisplayer
 		global $g_permission;
 		echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">'
 		.    '	<tr>'
-	    .    '  	<td width="140%"><img src=images/spacer.gif" width="1" height="5"> </td>'
+	    .    '  	<td width="140%"><img src="images/spacer.gif" width="1" height="5"> </td>'
 	    .    '  </tr>'
 		.	 '	<tr>'
 		.	 '		<td>[ <a href="index.php?cmd=searchForClass" class="editlinks">Add a class</a> ] <span class="small">Enroll as a student in a class and add it to your list.</span><br>'
@@ -79,7 +79,7 @@ class reservesDisplayer
 				echo '<tr align="left" valign="middle" class="'.$rowClass.'">';
 				echo '<td width="2%">';
 				if ($permissionLvl >= $g_permission['proxy']) {
-					echo '<img src=images/pencil.gif" width="24" height="20"></td>';
+					echo '<img src="images/pencil.gif" width="24" height="20"></td>';
 				}else {
 					echo '&nbsp;</td>';
 				}
@@ -109,15 +109,15 @@ class reservesDisplayer
 		}
 		
 		echo '<tr>'
-		.	'	<td height="14"><img src=images/spacer.gif" width="1" height="15"></td>'
+		.	'	<td height="14"><img src="images/spacer.gif" width="1" height="15"></td>'
 		.	'</tr>';
 		if ($permissionLvl >= $g_permission['proxy']) {
 	    	echo '<tr>'
-	    	.   '	<td height="14" align="left" valign="middle" colspan="4"><img src=images/pencil.gif" alt="Edit" width="24" height="20"><span class="small"> = classes you may edit</span></td>'
+	    	.   '	<td height="14" align="left" valign="middle" colspan="4"><img src="images/pencil.gif" alt="Edit" width="24" height="20"><span class="small"> = classes you may edit</span></td>'
 	    	.   '</tr>';
 		}
 	    echo '<tr>'
-	    .   	'<td><img src=images/spacer.gif" width="1" height="15"></td>'
+	    .   	'<td><img src="images/spacer.gif" width="1" height="15"></td>'
 	    .   '</tr>'
 		;
 		
@@ -144,7 +144,7 @@ class reservesDisplayer
 			
 		echo '	</tr>';
 		echo	'<tr>'
-		.	'		<td width="140%" colspan="2"><img src=images/spacer.gif" width="1" height="5"> </td>'
+		.	'		<td width="140%" colspan="2"><img src="images/spacer.gif" width="1" height="5"> </td>'
 		.	'	</tr>'
 		.	'	<tr>'
 		.	'		<td width="75%" align="left" valign="top" >'
@@ -315,7 +315,7 @@ class reservesDisplayer
 		echo "		</td>\n";
 		echo "	</tr>\n";
 		echo "	<tr>\n";
-		echo "		<td colspan=\"2\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td>\n";
+		echo "		<td colspan=\"2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td>\n";
 		echo "	</tr>\n";
 		echo "	<tr>\n";
 		
@@ -326,7 +326,7 @@ class reservesDisplayer
 		
 		echo "	</tr>\n";
 		echo "	<tr>\n";
-		echo "		<td colspan=\"2\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td>\n";
+		echo "		<td colspan=\"2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td>\n";
 		echo "	</tr>\n";
 		echo "</table>\n";
 		echo "</form>\n";;
@@ -347,7 +347,7 @@ function displaySelectClasses($courseInstances,$user)
 	
 	echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 	echo "	<tbody>\n";
-	echo "		<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
+	echo "		<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
 	
 	if (is_array($courseInstances) && !empty($courseInstances))
 	{
@@ -403,7 +403,7 @@ function displaySelectClasses($courseInstances,$user)
 		echo "		<tr><td>You have no associated classes.  Please select the Manage Classes tab.</td></tr>\n";
 	}
 	
-	echo "		<tr><td align=\"left\" valign=\"top\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";		
+	echo "		<tr><td align=\"left\" valign=\"top\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";		
 	echo "	</tbody>\n";
 	echo "</table>\n";
 }
@@ -413,7 +413,7 @@ function displaySelectInstructor($user, $page, $cmd)
 				      	
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "	<tbody>\n";
-		echo "		<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
+		echo "		<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
 		echo "		<tr>\n";
         echo "			<td align=\"left\" valign=\"top\">\n";
         echo "				<table border=\"0\" align=\"center\" cellpadding=\"10\" cellspacing=\"0\">\n";
@@ -475,7 +475,7 @@ function displaySearchItemMenu($ci)
 	
 	echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n"
 	.	 "	<tbody>\n"
-	.	 "		<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n"
+	.	 "		<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n"
 	.	 "		<tr>\n"
     .	 "			<td align=\"left\" valign=\"top\" class=\"borders\">\n"
     .	 "				<table width=\"50%\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"5\">\n"
@@ -490,7 +490,7 @@ function displaySearchItemMenu($ci)
 	.	 "				</table>\n"
 	.	 "			</td>\n"
 	.	 "		</tr>\n"
-	.	 "		<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n"
+	.	 "		<tr><td><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n"
 	.	 "	</tbody>\n"
 	.	 "</table>\n"
 	;
@@ -512,7 +512,7 @@ function displaySearchItemMenu($ci)
 				      	
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "	<tbody>\n";
-		echo "		<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
+		echo "		<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
 		echo "		<tr>\n";
         echo "			<td align=\"left\" valign=\"top\">\n";
         echo "				<table border=\"0\" align=\"center\" cellpadding=\"10\" cellspacing=\"0\">\n";
@@ -612,7 +612,7 @@ function displaySearchItemMenu($ci)
 		
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "		<tbody>\n";
-		echo "			<tr><td width=\"140%\" colspan=\"2\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
+		echo "			<tr><td width=\"140%\" colspan=\"2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
 		echo "			<form name=\"searchResults\"method=\"post\" action=\"index.php\">\n";
 
 		if (is_array($hidden_reserves) && !empty($hidden_reserves)){
@@ -696,17 +696,17 @@ function displaySearchItemMenu($ci)
         if ($showNextLink || $showPrevLink) {
         	echo "			<tr><td colspan=\"2\" align='right'>";
         	if ($showPrevLink) {
-        		echo "<img src=\images/getPrevious.gif\" onClick=\"javaScript:document.forms.searchResults.cmd.value='searchResults';document.forms.searchResults.f.value=".$fPrev.";document.forms.searchResults.submit();\">&nbsp;&nbsp;";
+        		echo "<img src=\"images/getPrevious.gif\" onClick=\"javaScript:document.forms.searchResults.cmd.value='searchResults';document.forms.searchResults.f.value=".$fPrev.";document.forms.searchResults.submit();\">&nbsp;&nbsp;";
         	}
         	if ($showNextLink) {
-        		echo "<img src=\images/getNext.gif\" onClick=\"javaScript:document.forms.searchResults.cmd.value='searchResults';document.forms.searchResults.f.value=".$fNext.";document.forms.searchResults.submit();\">";
+        		echo "<img src=\"images/getNext.gif\" onClick=\"javaScript:document.forms.searchResults.cmd.value='searchResults';document.forms.searchResults.f.value=".$fNext.";document.forms.searchResults.submit();\">";
         	}
         	echo "</td></tr>\n";
         }
         
 		echo "			<tr><td colspan=\"2\">&nbsp;</td></tr>\n";
 		echo "			<tr><td colspan=\"2\" align=\"right\"><input type=\"submit\" name=\"Submit2\" value=\"Add Selected Materials\"></td></tr>\n";
-		echo "			<tr><td colspan=\"2\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+		echo "			<tr><td colspan=\"2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "		</tbody>\n";
 		echo "</table>\n";
 		
@@ -726,7 +726,7 @@ function displayReserveAdded($ci)
 {
 		
 	echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-    echo "	<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\">&nbsp;</td></tr>\n";
+    echo "	<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\">&nbsp;</td></tr>\n";
     echo "	<tr>\n";
     echo "		<td align=\"left\" valign=\"top\" class=\"borders\">\n";
     echo "			<table width=\"50%\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"5\">\n";
@@ -742,7 +742,7 @@ function displayReserveAdded($ci)
     echo "			</table>\n";
     echo "		</td>\n";
 	echo "	</tr>\n";
-    echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+    echo "	<tr><td><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
     echo "</table>\n";
 }
 
@@ -757,7 +757,7 @@ function displayUploadForm($ci, $type)
 	echo "<input type=\"hidden\" name=\"ci\" value=\"$ci\">\n";	
 	echo "<input type=\"hidden\" name=\"type\" value=\"$type\">\n";	
 	echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-	echo "	<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
+	echo "	<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
 	echo "	<tr>\n";
 	echo "		<td align=\"left\" valign=\"top\">\n";
 	echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
@@ -846,7 +846,7 @@ function displayUploadForm($ci, $type)
 	echo "			</table>\n";
 	echo "		</td>\n";
 	echo "	</tr>\n";
-	echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+	echo "	<tr><td><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 	echo "</table>\n";
 	echo "</form>\n";
 }
@@ -855,7 +855,7 @@ function displayFaxInfo($ci)
 {
 	
 	echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-    echo "	<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
+    echo "	<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
     echo "	<tr>\n";
     echo "		<td align=\"left\" valign=\"top\">\n";
     echo "			<table width=\"100%\" border=\"0\" align=\"left\" cellpadding=\"3\" cellspacing=\"0\" class=\"borders\">\n";
@@ -883,7 +883,7 @@ function displayFaxInfo($ci)
     echo "			<p align=\"center\">Unclaimed faxes are deleted at midnight.</p>\n";
     echo "		</td>\n";
     echo "	</tr>\n";
-    echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+    echo "	<tr><td><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
     echo "</table>\n";
 }
 
@@ -895,7 +895,7 @@ function claimFax($faxReader, $ci)
 	echo "<input type=\"hidden\" name=\"cmd\" value=\"addFaxMetadata\">\n";
 	echo "<input type=\"hidden\" name=\"ci\" value=\"$ci\">\n";	
 	echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-    echo "	<tr><td width=\"140%\" colspan=\"2\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
+    echo "	<tr><td width=\"140%\" colspan=\"2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
     echo "	<tr>\n";
 	echo "		<td width=\"50%\" align=\"left\" valign=\"top\" class=\"helperText\">Claim your fax.</td>\n";
 	echo "		<td width=\"50%\" align=\"left\" valign=\"top\" align=\"right\"><a href=\"link\">Return to Previous Page</a></td>\n";
@@ -949,7 +949,7 @@ function claimFax($faxReader, $ci)
 	} else {
 		echo "	<tr><td colspan=\"2\" align=\"center\"><b>No faxes have been received.  Remember unclaimed faxes are deleted at midnight.</td></tr>\n";
 	}
-	echo "	<tr><td colspan=\"2\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+	echo "	<tr><td colspan=\"2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 	echo "</table>\n";
 	echo "</form>\n";
 }
@@ -963,7 +963,7 @@ function displayFaxMetadataForm($faxes, $ci)
 	echo "	<INPUT TYPE=\"HIDDEN\" NAME=\"ci\" VALUE=\"$ci\">\n";	
 	
 	echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-	echo "	<tr><td width=\"140%\" colspan=\"2\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
+	echo "	<tr><td width=\"140%\" colspan=\"2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
 	echo "	<tr>\n";
 	echo "		<td width=\"50%\" align=\"left\" valign=\"top\" class=\"helperText\">Add information about your fax(es).</td>\n";
 	echo "		<td width=\"50%\" align=\"left\" valign=\"top\" align=\"right\"><a href=\"link\">Return to previous page</a></td>\n";
@@ -1067,7 +1067,7 @@ function displayFaxMetadataForm($faxes, $ci)
 	echo "			</table>\n";
 	echo "		</td>\n";
 	echo "	</tr>\n";
-	echo "	<tr><td colspan=\"2\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+	echo "	<tr><td colspan=\"2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 	echo "</table>\n";
 	echo "</form>\n";
 }
@@ -1082,7 +1082,7 @@ echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="cente
 .	 '<INPUT TYPE="HIDDEN" NAME="ci" VALUE="'.$ci->getCourseInstanceID().'">'
 .	 '<INPUT TYPE="HIDDEN" NAME="sortBy" VALUE="'.$_REQUEST['sortBy'].'">'
 .    '	<tr>'
-.    '		<td width="140%" colspan="2"><img src=images/spacer.gif" width="1" height="5"> </td>'
+.    '		<td width="140%" colspan="2"><img src="images/spacer.gif" width="1" height="5"> </td>'
 .	 '	</tr>';
 echo '			<tr>';
 echo '				<td colspan="2" width ="100%" align="center" valign="middle" class="small"><a href="index.php?cmd=editClass&ci='.$ci->getCourseInstanceID().'">Return to Edit Class</a></td>';
@@ -1187,7 +1187,7 @@ echo '			<tr>';
 echo '				<td colspan="2" width ="100%" align="center" valign="middle" class="small"><a href="index.php?cmd=editClass&ci='.$ci->getCourseInstanceID().'">Return to Edit Class</a></td>';
 echo '        </tr>';
 echo	 '	<tr>'
-.    '		<td colspan="2"><img src=images/spacer.gif" width="1" height="15"></td>'
+.    '		<td colspan="2"><img src="images/spacer.gif" width="1" height="15"></td>'
 .	 '	</tr>'
 .	 '	</form>'
 .	 '	</table>';
@@ -1198,7 +1198,7 @@ function displayCustomSort($user,$ci)
 {
 echo '      <table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">';
 echo '        <tr>';
-echo '          <td width="140%" colspan="2"><img src=images/spacer.gif" width="1" height="5"> </td>';
+echo '          <td width="140%" colspan="2"><img src="images/spacer.gif" width="1" height="5"> </td>';
 echo '        </tr>';
 echo'			<FORM METHOD=POST NAME="customSortScreen" ACTION="index.php">';
 echo'			<INPUT TYPE="HIDDEN" NAME="cmd" VALUE="customSort">'
@@ -1326,7 +1326,7 @@ echo '			<tr>';
 echo '				<td colspan="2" width ="100%" align="center" valign="middle" class="small"><a href="index.php?cmd=editClass&ci='.$ci->getCourseInstanceID().'">Return to Edit Class</a></td>';
 echo '        </tr>';
 echo '        <tr>';
-echo '          <td colspan="2"><img src=images/spacer.gif" width="1" height="15"></td>';
+echo '          <td colspan="2"><img src="images/spacer.gif" width="1" height="15"></td>';
 echo '        </tr>';
 echo '			</FORM>';
 echo '      </table>';
