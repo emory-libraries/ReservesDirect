@@ -104,12 +104,13 @@ class itemDisplayer
 				echo "<span class=\"small\"> (hidden until ".$month."/".$day."/".$year.")</span>\n";
 			}
 			echo " | <input type=\"checkbox\" name=\"deactivateReserve\" value=\"".$reserve->getReserveID()."\"> Deactivate?";
-		} elseif ($status == "INACTIVE" || $status == "IN PROCESS") {
+			echo "						<td width=\"100%\"><span class=\"strong\">Activation Date:</span><strong></strong>&nbsp;<input name=\"month\" type=\"text\" size=\"2\" maxlength=\"2\" value=\"".$month."\"> / <input name=\"day\" type=\"text\" size=\"2\" maxlength=\"2\" value=\"".$day."\"> / <input name=\"year\" type=\"text\" size=\"4\" maxlength=\"4\" value=\"".$year."\"></td>\n";
+		} elseif ($status == "INACTIVE") {
+			echo " | <input type=\"checkbox\" name=\"activateReserve\" value=\"".$reserve->getReserveID()."\"> Activate?";
+		} elseif (($status == "IN PROCESS") && ($user->dfltRole >= $g_permission['staff'])) { //only staff can change an in-process status
 			echo " | <input type=\"checkbox\" name=\"activateReserve\" value=\"".$reserve->getReserveID()."\"> Activate?";
 		}
 		
-		
-		echo "						<td width=\"100%\"><span class=\"strong\">Activation Date:</span><strong></strong>&nbsp;<input name=\"month\" type=\"text\" size=\"2\" maxlength=\"2\" value=\"".$month."\"> / <input name=\"day\" type=\"text\" size=\"2\" maxlength=\"2\" value=\"".$day."\"> / <input name=\"year\" type=\"text\" size=\"4\" maxlength=\"4\" value=\"".$year."\"></td>\n";
 		echo "					</tr>\n";
 		echo "              	</table>\n";
 		echo "              	</td>\n";
