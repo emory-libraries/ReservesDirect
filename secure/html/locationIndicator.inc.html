@@ -156,7 +156,9 @@ if (isset($progress) && is_array($progress))
 if ($ci instanceof courseInstance)
 {
 	if (!$ci->course instanceof course) $ci->getCourseForUser($u->getUserID());
-	$currentClass = $ci->course->displayCourseNo() . " " . $ci->course->getName();
+	if (isset($ci->course)) $currentClass = $ci->course->displayCourseNo() . " " . $ci->course->getName();
+} else {
+	$currentClass = "";
 }
 
 echo "<tr>\n";
