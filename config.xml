@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?> 
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
 /*******************************************************************************
 config.xml
@@ -34,8 +34,6 @@ http://coursecontrol.sourceforge.net/
 
 *******************************************************************************/
 -->
-
-
 <configuration>
 	<database>
 		<dbtype>mysql</dbtype>
@@ -86,5 +84,9 @@ http://coursecontrol.sourceforge.net/
 	<EmailRegExp>^(.+)@(.+)$</EmailRegExp>
 	
 	<no_javascript_msg>A scan of your computer shows that javascript is disabled, some features of Reserves2.1 require javascript.<br/> Please contact ITD support at 7-8888 or 78888@emory.edu if you require assistance to enable javascript.</no_javascript_msg>
+	
+	<request_notifier>
+		<last_run>2004-12-17</last_run>
+	</request_notifier>
 	
 </configuration>
