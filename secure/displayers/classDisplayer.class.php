@@ -679,8 +679,16 @@ class classDisplayer
 
 	function displayEditProxies($ci, $proxyList, $request)
 	{
+		$ci->getPrimaryCourse();
+		
 		echo "<form action=\"index.php?cmd=editProxies&ci=".$ci->getCourseInstanceID()."\" method=\"POST\">\n";
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+		echo "	<tr>\n";
+		echo "		<td colspan=\"3\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"> </td>\n";
+		echo "	</tr>\n";
+		echo "	<tr>";
+		echo '	<td colspan="3" align="left" valign="top" class="courseTitle">'.$ci->course->displayCourseNo() . " " . $ci->course->getName().'</td>';
+		echo "	</tr>";
 		echo "	<tr>\n";
 		echo "		<td colspan=\"3\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"> </td>\n";
 		echo "	</tr>\n";

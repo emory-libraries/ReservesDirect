@@ -78,6 +78,8 @@ class specialUser extends user
 		$msg = ereg_replace("\?", $username, $g_specialUserEmail['msg']);
 		$msg = ereg_replace("\?", $pwd, $msg);
 		
+		$email="";
+		
 		if (!mail($email, $g_specialUserEmail['subject'], $msg, md5($pwd))) 
 			$this->response['msg'] = "Special User set but email was not sent.  email:$email";
 			

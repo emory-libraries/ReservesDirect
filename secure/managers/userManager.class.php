@@ -67,11 +67,17 @@ class userManager
 					
 					$this->displayFunction = 'displayStaffHome';
 					$this->argList = array(null);
-				} else {
+				} elseif ($user->getDefaultRole() == $g_permission['instructor']) {
 
 					$loc  = "home";
 
 					$this->displayFunction = 'displayInstructorHome';
+					$this->argList = "";
+				} elseif ($user->getDefaultRole() == $g_permission['custodian']) {
+
+					$loc  = "home";
+
+					$this->displayFunction = 'displayCustodianHome';
 					$this->argList = "";
 				}
 			break;
@@ -197,7 +203,7 @@ class userManager
 				$this->displayFunction = 'displayEditUser';
 				$this->argList = array($cmd, 'storeUser', $userToEdit, $user, null, $users, $_REQUEST);
 				
-				if (is_null($ci)) { // user has been seleced so chose class
+				if (is_null($ci)) { // user has been seleced so choose class
 					require_once("managers/selectClassManager.class.php");			
 					selectClassManager::selectClassManager('lookupClass', $cmd, $cmd, 'Assign User', $user, $_REQUEST, null);
 				} else { // show proxy screen
@@ -257,6 +263,16 @@ class userManager
 				
 				$this->displayFunction = 'displayStaffHome';
 				$this->argList = array($msg);					
+			break;
+			
+			case 'addProxy':
+			case 'removeProxy':
+				$page = "manageUser";				
+
+				$courseInstances = $user->getCourseInstances($aDate=null,$eDate=null,$editableOnly=true);
+
+				$this->displayFunction = 'displayEditProxy';
+				$this->argList = array($courseInstances,'editProxies');
 			break;
 			
 			case 'removePwd':

@@ -49,7 +49,7 @@ class userDisplayer
 		echo"		<td align=\"left\" valign=\"top\">";
 		echo"			<p><a href=\"index.php?cmd=editProfile\" class=\"titlelink\">Edit My Profile</a><br>";
 		echo"           Edit your name and email address</p>";
-		echo"           <p><a href=\"link\" class=\"titlelink\">Add a Proxy</a><br>";
+		echo"           <p><a href=\"index.php?cmd=addProxy\" class=\"titlelink\">Add a Proxy</a><br>";
 		echo"           Add a proxy to one of your classes. Proxies:</p>";
 		echo"           <ul>";
 		echo"           	<li> <span class=\"small\">Must have signed in to ReservesDirect at ";
@@ -62,7 +62,7 @@ class userDisplayer
 		echo"              	<li class=\"small\">Expire at the end of the semester, or when you ";
 		echo"               	remove them manually, whichever comes first</li>";
 		echo"			</ul>";
-		echo"           <p><a href=\"link\" class=\"titlelink\">Delete a Proxy</a><br>";
+		echo"           <p><a href=\"index.php?cmd=removeProxy\" class=\"titlelink\">Delete a Proxy</a><br>";
 		echo"           <!--This link should take the user to a list of their current and future classes, ask them to select one, then present them with the \"Edit Proxies\" screen. -->";
 		echo"           Remove a proxy from one of your classes.</p></td>";
 		echo"	</tr>";
@@ -70,6 +70,103 @@ class userDisplayer
 		echo"		<td><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td>";
 		echo"	</tr>";
 		echo"</table>";
+	}
+	
+	function displayCustodianHome()
+	{
+		echo"<table width=\"60%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">";
+		echo"	<tr> ";
+		echo"		<td width=\"140%\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"></td>";
+		echo"	</tr>";
+		echo"	<tr> ";
+		echo"		<td align=\"left\" valign=\"top\">";
+		echo"			<p><a href=\"index.php?cmd=editProfile\" class=\"titlelink\">Edit My Profile</a><br>";
+		echo"           Edit your name and email address</p>";
+		echo"           <p><a href=\"index.php?cmd=setPwd\" class=\"titlelink\">Create an override password</a><br>";
+		echo"           Create a temporary user passwrod, for example, for someone who has forgotten their Emory Network password or who is having trouble with their Emory NetID or GBSNet login.</p>";
+		echo"           <p><a href=\"index.php?cmd=resetPwd\" class=\"titlelink\">Reset an Override Password</a><br>";
+		echo"           Resets a user's override password to the system default</p>";
+        echo"           <p><a href=\"index.php?cmd=removePwd\" class=\"titlelink\">Remove an Override Password</a><br>";
+		echo"           Deletes a user's override password so that they log in using their regular Emory NetID password or GBSNet password</p></td>";
+		echo"	</tr>";
+		echo"	<tr> ";
+		echo"		<td><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td>";
+		echo"	</tr>";
+		echo"</table>";
+	}
+	
+	function displayEditProxy($courseInstances,$nextCmd)
+	{
+		echo "<form action=\"index.php\" method=\"post\" name=\"editUser\">\n";
+	    echo "<input type=\"hidden\" name=\"cmd\" value=\"$nextCmd\">\n";
+		echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">';
+        echo 	'<tr>';
+        echo 		'<td width="140%"><img src="../images/spacer.gif" width="1" height="5"> </td>';
+        echo 	'</tr>';
+        echo 	'<tr>';
+        echo 	'  <td align="left" valign="top" class="helperText">Select which classes ';
+        echo 		'to add your proxy to. Note that you may only add one individual at ';
+        echo 		'a time, but you may add them to ';
+        echo 		'as many classes as you wish. You may only add users who have logged ';
+        echo 		'into Reserves Direct at least once to register in the database.</td>';
+        echo 	'</tr>';
+        echo 	'<tr>';
+        echo 		'<td height="14">&nbsp;</td>';
+        echo 	'</tr>';
+        echo 	'<tr>';
+        echo 		'<td height="14">';
+        echo 			'<table width="100%" border="0" cellspacing="0" cellpadding="0">';
+        echo 				'<tr align="left" valign="top">';
+        echo 					'<td height="14" class="headingCell1"><div align="center">YOUR CLASSES</div></td>';
+        echo 					'<td width="75%"><div align="center"></div></td>';
+        echo 				'</tr>';
+        echo 			'</table>';
+        echo 		'</td>';
+        echo 	'</tr>';
+        echo 	'<tr>';
+        echo 		'<td align="left" valign="top" class="borders">';
+        echo 			'<table width="100%" border="0" cellpadding="5" cellspacing="0" class="displayList">';
+        echo 				'<tr align="left" valign="middle" bgcolor="#CCCCCC" class="headingCell1">';
+        echo 					'<td width="15%">&nbsp;</td>';
+        echo 					'<td width="65%">&nbsp;</td>';
+        echo 					'<td>&nbsp;</td>';
+        echo 					'<td width="10%">Select</td>';
+        echo				'</tr>';
+        
+        $rowNumber = 0;
+        for ($i=0; $i<count($courseInstances); $i++)
+        {
+        	$rowClass = ($rowNumber++ % 2) ? $rowClass = "evenRow" : "oddRow";
+        	$courseInstances[$i]->getPrimaryCourse();
+
+        echo				'<tr align="left" valign="middle" bgcolor="#CCCCCC" class="'.$rowClass.'">';
+        echo 					'<td width="15%">'.$courseInstances[$i]->course->displayCourseNo().'</td>';
+        echo 					'<td width="65%">'.$courseInstances[$i]->course->getName().'</td>';
+        echo 					'<td width="20%">'.$courseInstances[$i]->displayTerm().'</td>';
+        echo 					'<td width="10%" align="center"><input type="radio" name="ci" value="'.$courseInstances[$i]->getCourseInstanceID().'"></td>';
+        echo 				'</tr>';
+        
+        }
+
+        echo 				'<tr align="left" valign="middle" bgcolor="#CCCCCC" class="headingCell1">';
+        echo 					'<td width="15%">&nbsp;</td>';
+        echo 					'<td width="65%">&nbsp;</td>';
+        echo 					'<td>&nbsp;</td>';
+        echo 					'<td width="10%">&nbsp;</td>';
+        echo 				'</tr>';
+        echo 			'</table>';
+        echo		'</td>';
+        echo 	'</tr>';
+        echo 	'<tr>';
+        echo 		'<td align="left" valign="top">&nbsp;</td>';
+        echo 	'</tr>';
+        echo 	'<tr>';
+        echo 		'<td align="left" valign="top"><div align="center"><input type="submit" name="Submit" value="Continue"></div></td>';
+        echo 	'</tr>';
+        echo 	'<tr>';
+        echo 		'<td align="left" valign="top"><img src="../images/spacer.gif" width="1" height="15"></td>';
+        echo 	'</tr>';
+      	echo '</table>';
 	}
 	
 	function displayEditUser($cmd, $nextCmd, $userToEdit, $user, $msg=null, $usersObj=null, $request)
@@ -181,9 +278,10 @@ class userDisplayer
 			
 			
 			//edit password 
+			//If special user, allow user to override password, otherwise give them a button
 			if ($userToEdit->isSpecialUser())
 			{			
-				if ($user->getDefaultRole() >= $g_permission['staff'] || $user->getUserID() == $userToEdit->getUserID())
+				if ($user->getDefaultRole() >= $g_permission['staff'] || $user->getUserID() == $userToEdit->getUserID() || $user->getDefaultRole() == $g_permission['custodian'])
 				{			
 					echo "				<tr>\n";
 					echo "					<td class=\"strong\" align=\"right\">Password:</td>\n";
@@ -195,7 +293,7 @@ class userDisplayer
 					echo "				</tr>\n";	
 				} 
 			}
-			elseif ($user->getDefaultRole() >= $g_permission['staff'] && $user->getUserID() != $userToEdit->getUserID())
+			elseif (($user->getDefaultRole() >= $g_permission['staff']  || $user->getDefaultRole() == $g_permission['custodian'])&& $user->getUserID() != $userToEdit->getUserID())
 			{
 				
 				$addPwd_disabled = (is_null($userToEdit->getUserID())) ? "disabled" : "";

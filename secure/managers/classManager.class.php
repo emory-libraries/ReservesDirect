@@ -314,7 +314,7 @@ class classManager
 				$ci = new courseInstance($_REQUEST['ci']);
 				$ci->getCrossListings();  //load cross listings
 				
-				if ($_REQUEST['addProxy']) {
+				if (isset($_REQUEST['addProxy'])) {
 					$user->makeProxy($_REQUEST['proxy'],$ci->courseInstanceID);
 					/*
 					$ci->addProxy($ci->primaryCourseAliasID,$_REQUEST['prof']); //Add proxy to primary course alias
@@ -324,7 +324,7 @@ class classManager
 					*/		
 				}
 				
-				if ($_REQUEST['removeProxy']) {
+				if (isset($_REQUEST['removeProxy'])) {
 					$proxies = $_REQUEST['proxies'];
 					
 					if (is_array($proxies) && !empty($proxies)){
@@ -343,7 +343,7 @@ class classManager
 				
 				$ci->getProxies(); //load current proxies
 				
-				if ($_REQUEST['queryText'] != "")
+				if (isset($_REQUEST['queryText']) &&  $_REQUEST['queryText'] != "")
 				{
 					$usersObj = new users();
 					$usersObj->search($_REQUEST['queryTerm'], $_REQUEST['queryText']);  //populate userList
