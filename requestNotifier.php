@@ -66,6 +66,7 @@ switch ($g_dbConn->phptype)
 
 foreach ($libraries as $library)
 {
+	echo "process ".$library->getLibraryID()." .... ";
 	$rs = $g_dbConn->query($sql, array($library->getLibraryID(), $library->getLibraryID()));		
 
 	if (DB::isError($rs)) {
@@ -88,6 +89,7 @@ foreach ($libraries as $library)
 			}
 		}
 	}
+	echo " done\n\n";
 }	
 
 //update last run date
