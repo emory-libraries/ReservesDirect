@@ -139,7 +139,10 @@ class classManager
 					$instructorList = $_REQUEST['carryInstructor'];
 					if (isset($_REQUEST['additionalInstructor']) && $_REQUEST['additionalInstructor'] != "") array_push($instructorList, $_REQUEST['additionalInstructor']);			
 
-					$newCI = $user->copyCourseInstance($srcCI, $term->getTermName(), $term->getTermYear(), $term->getBeginDate(), $term->getEndDate(), $srcCI->getStatus(), $srcCI->course->getSection(), $instructorList, $proxyList, $_REQUEST['carryCrossListing'], $_REQUEST['carryReserve']);
+					$carryXListing = (isset($_REQUEST['carryCrossListing'])) ? $_REQUEST['carryCrossListing'] : null;
+					$carryReserves = (isset($_REQUEST['carryReserve'])) ? $_REQUEST['carryReserve'] : null;
+					
+					$newCI = $user->copyCourseInstance($srcCI, $term->getTermName(), $term->getTermYear(), $term->getBeginDate(), $term->getEndDate(), $srcCI->getStatus(), $srcCI->course->getSection(), $instructorList, $proxyList, $carryXListing, $carryReserves);
 			
 					$this->displayFunction = 'displaySuccess';
 					$this->argList = array($page, $newCI);
