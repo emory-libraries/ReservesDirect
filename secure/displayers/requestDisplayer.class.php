@@ -596,7 +596,7 @@ class requestDisplayer
 	}
 	
 	function addSuccessful($ci, $selected_instr, $msg=null)
-	{
+	{	
 		echo "<table width=\"60%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "	<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
 		echo "	<tr>\n";
@@ -617,5 +617,27 @@ class requestDisplayer
 		echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "</table>\n";
 	}
+	
+	function processSuccessful($ci, $msg=null)
+	{	
+		echo "<table width=\"60%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+		echo "	<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
+		echo "	<tr>\n";
+		echo "		<td align=\"left\" valign=\"top\">\n";
+		echo "			<p class=\"successText\">Item was successfully processed for ". $ci->course->displayCourseNo() . " " . $ci->course->getName() .".</p>\n";
+		
+		if (isset($msg) && !is_null($msg))
+			echo "			<p class=\"successText\">$msg</p>\n";		
+		
+		echo "          <p>&gt;&gt;<a href=\"index.php?cmd=editClass&ci=".$ci->getCourseInstanceID()."\"> Go to class</a></p>\n";   
+		
+		echo "			&gt;&gt; <a href=\"index.php?cmd=displayRequest\">Return to the Requests Queue</a></p>\n";
+		echo "		</td>\n";
+		echo "	</tr>\n";
+		echo "	<tr><td align=\"center\"></td></tr>\n";
+		echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+		echo "</table>\n";
+	}
+	
 }
 ?>

@@ -170,6 +170,7 @@ class requestManager
 								$pCopy->setOwnerUserID($item->getPrivateUserID());						
 					}
 
+					$opacResult = "";
 					if (isset($request['euclid_record']) && $request['euclid_record'] == 'yes') 
 					{
 						if (isset($requestObj) && $requestObj instanceof request) //get instructor from request
@@ -218,25 +219,22 @@ class requestManager
 					$loc  = "process request";
 				
 					$requestList = $user->getRequests();
+
+					$ci->getPrimaryCourse();
 					
-					if (isset($opacResult) && $opacResult != "outcome=OK reason: successful")
-					{
-						$msg = $opacResult;
-						$requestObj->setDateProcessed(null);  //clear processed flag
-					} else {
-						$this->displayFunction = 'displayAllRequest';
-						$this->argList = array($requestList, $user->getLibraries(), $request, $user, "Request Processed");
-						break;
-					}
+					$this->displayFunction = 'processSuccessful';				
+					$this->argList = array($ci, $opacResult);
+//					$this->displayFunction = 'displayAllRequest';
+//					$this->argList = array($requestList, $user->getLibraries(), $request, $user, "Request Processed");
+					break;					
 				} else {					
+				
 					$loc  = "add an item";				
-					
 					$this->displayFunction = 'addSuccessful';				
 					$this->argList = array($ci, $request['selected_instr'], $opacResult);
-					break;
+					echo "arglist <br>";print_r($this->argList);echo "<hr>";
 				}
-				
-			
+				break;
 			
 			case 'processRequest':
 				global $ci;
