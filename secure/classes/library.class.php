@@ -39,6 +39,8 @@ class library
 	public $libraryID;
 	public $library;
 	public $libraryNickname;
+	public $ilsPrefix;
+	public $reserveDesk;
 	public $libraryURL;
 	public $contactEmail;
 	
@@ -51,7 +53,7 @@ class library
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql  = "SELECT l.library_id, l.name, l.nickname, l.url, l.contact_email "
+				$sql  = "SELECT l.library_id, l.name, l.nickname, l.ils_prefix, l.reserve_desk, l.url, l.contact_email "
 					  . "FROM libraries as l "
 					  . "WHERE l.library_id = !";
 					 
@@ -60,7 +62,7 @@ class library
 		$rs = $g_dbConn->query($sql, $libraryID);		
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 			
-		list($this->libraryID, $this->library, $this->libraryNickname, $this->libraryURL, $this->contactEmail) = $rs->fetchRow();
+		list($this->libraryID, $this->library, $this->libraryNickname, $this->ilsPrefix, $this->reserveDesk, $this->libraryURL, $this->contactEmail) = $rs->fetchRow();
 	}
 /*	
 	function getAllLibraries()
@@ -86,6 +88,8 @@ class library
 	function getLibraryID() { return $this->libraryID; }
 	function getLibrary() { return $this->library; }
 	function getLibraryNickname() { return $this->libraryNickname; }
+	function getILS_prefix() { return $this->ilsPrefix; }
+	function getReserveDesk() { return $this->reserveDesk; }
 	function getLibraryURL() { return $this->libraryURL; }
 	function getContactEmail() { return $this->contactEmail; }
 }	

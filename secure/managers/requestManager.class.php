@@ -150,7 +150,11 @@ class requestManager
 							$pCopy->setCallNumber($callNumber);
 							$pCopy->setStatus($location);
 							$pCopy->setItemType($type);
-							$pCopy->setOwningLibrary($lib);
+							
+							$reserveDesk = new library($request['home_library']);
+							//this should be reserveDesk							
+							$pCopy->setOwningLibrary($reserveDesk->getReserveDesk());
+							
 							$pCopy->setBarcode($barcode);
 							
 							if (!is_null($item->getPrivateUserID()))
@@ -170,7 +174,7 @@ class requestManager
 								$pCopy->setOwnerUserID($item->getPrivateUserID());						
 					}
 
-					$opacResult = "";
+					$ilsResult = "";
 					if (isset($request['euclid_record']) && $request['euclid_record'] == 'yes') 
 					{
 						if (isset($requestObj) && $requestObj instanceof request) //get instructor from request
@@ -187,7 +191,10 @@ class requestManager
 						for($i=0;$i<count($request['physical_copy']);$i++)
 						{	
 							list($type, $library, $callNumber, $location, $barcode, $copyNo) = split("::", $request['physical_copy'][$i]);														
-							$opacResult = $user->createOPAC_record($barcode,$copyNo,$instr->getILSUserID(), $library, $ci->getTerm(), $request['circRule'], $request['circRule'], $ci->getExpirationDate());
+							
+							list($cRule, $alt_cRule) = split("::", $request['circRule']);
+							
+							$ilsResult = $user->createILS_record($barcode,$copyNo,$instr->getILSUserID(), $request['home_library'], $ci->getTerm(), $cRule, $alt_cRule, $ci->getExpirationDate());
 						}
 					}
 				} else {
@@ -223,16 +230,13 @@ class requestManager
 					$ci->getPrimaryCourse();
 					
 					$this->displayFunction = 'processSuccessful';				
-					$this->argList = array($ci, $opacResult);
-//					$this->displayFunction = 'displayAllRequest';
-//					$this->argList = array($requestList, $user->getLibraries(), $request, $user, "Request Processed");
+					$this->argList = array($ci, $ilsResult);
 					break;					
 				} else {					
 				
 					$loc  = "add an item";				
 					$this->displayFunction = 'addSuccessful';				
-					$this->argList = array($ci, $request['selected_instr'], $opacResult);
-					echo "arglist <br>";print_r($this->argList);echo "<hr>";
+					$this->argList = array($ci, $request['selected_instr'], $ilsResult);
 				}
 				break;
 			

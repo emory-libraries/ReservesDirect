@@ -31,6 +31,7 @@ http://coursecontrol.sourceforge.net/
 *******************************************************************************/
 require_once("secure/common.inc.php");
 require_once("secure/classes/terms.class.php");
+require_once("secure/classes/circRules.class.php");
 
 class requestDisplayer 
 {
@@ -192,7 +193,9 @@ class requestDisplayer
 	function addItem($user, $cmd, $search_results, $owner_list, $lib_list, $request_id=null, $request, $hidden_fields, $isActive=true, $buttonValue="Add Item", $msg="")
 	{	
 		global $g_documentURL;
-			
+
+		$circRules = new circRules();	
+		
 		//Added by kawashi on 12.1.04 to replace commented out term logic below
 		//This is so the reserve activation date will match the course instance activation date
 		if (is_array($hidden_fields)){
@@ -373,8 +376,15 @@ class requestDisplayer
 			echo "					</td>\n";
 			echo "					<td width=\"50%\" align=\"left\" valign=\"middle\" class=\"strong\">Loan Period:&nbsp;&nbsp;\n";
 			echo "						<select name=\"circRule\">\n";
-			//echo "							<option value=\"-1\" selected>Not Applicable</option>\n";
-											include_once("secure/circRules.inc.php");
+			
+			foreach ($circRules->getCircRules() as $circRule)
+			{
+				$rule = $circRule['circRule'] . "::" . $circRule['alt_circRule'];
+				$display_rule = $circRule['circRule'];
+				$selected = $circRule['default'];
+				echo "							<option value=\"$rule\" $selected>$display_rule</option>\n";	
+			}
+			
 			echo "						</select>\n";
 			echo "					</td>\n";
 			echo "				</tr>\n";

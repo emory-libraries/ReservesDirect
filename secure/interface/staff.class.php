@@ -295,18 +295,23 @@ class staff extends instructor
 	/**
 	* @return void
 	* @param $barcode, $copy, $borrowerID, $courseID, $reservesDesk, $circRule, $altCirc, $expiration
-	* @desc create the OPAC record
+	* @desc create the ILS record
 	*/
-	function createOPAC_record($barcode, $copy, $borrowerID, $desk, $term, $circRule, $altCirc, $expiration)
+	function createILS_record($barcode, $copy, $borrowerID, $libraryID, $term, $circRule, $altCirc, $expiration)
 	{
-		global $g_reserveScript, $g_desks;
+		global $g_reserveScript;
 		
-		$course = strtoupper($g_desks[$desk] . $term);
+		$reservesDesk = new library($libraryID);
+		
+		$desk = $reservesDesk->getReserveDesk();		
+		$course = strtoupper($reservesDesk->getILS_prefix() . $term);
 		
 		list($Y,$M,$D) = split("-", $expiration);
 		$eDate = "$M/$D/$Y";
 		//echo $g_reserveScript . "?itemID=$barcode&borrowerID=$borrowerID&courseID=$course&reserve_desk=$desk&circ_rule=$circRule&alt_circ=$altCirc&expiration=$eDate&cpy=$copy<BR>";
-        $fp = fopen($g_reserveScript . "?itemID=$barcode&borrowerID=$borrowerID&courseID=$course&reserve_desk=$desk&circ_rule=$circRule&alt_circ=$altCirc&expiration=$eDate&cpy=$copy", "r");
+        
+		
+		$fp = fopen($g_reserveScript . "?itemID=$barcode&borrowerID=$borrowerID&courseID=$course&reserve_desk=$desk&circ_rule=$circRule&alt_circ=$altCirc&expiration=$eDate&cpy=$copy", "r");
 		
         $rs = array();
         while (!feof ($fp)) {
