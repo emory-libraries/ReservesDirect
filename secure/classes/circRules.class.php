@@ -44,7 +44,7 @@ class circRules
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = 	"SELECT circ_rule, alt_circ_rule, default_selected FROM circ_rules";
+				$sql = 	"SELECT circ_rule, alt_circ_rule, default_selected FROM circ_rules ORDER BY circ_rule";
 		}
 
 		$rs = $g_dbConn->query($sql);		

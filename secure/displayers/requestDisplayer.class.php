@@ -386,7 +386,7 @@ class requestDisplayer
 			foreach ($circRules->getCircRules() as $circRule)
 			{
 				$rule = $circRule['circRule'] . "::" . $circRule['alt_circRule'];
-				$display_rule = $circRule['circRule'];
+				$display_rule = $circRule['circRule']." -- " . $circRule['alt_circRule'];
 				$selected = $circRule['default'];
 				echo "							<option value=\"$rule\" $selected>$display_rule</option>\n";	
 			}
@@ -509,7 +509,7 @@ class requestDisplayer
 		echo "					<td align=\"right\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"strong\">Content Notes:</td>\n";
 		echo "					<td><textarea name=\"content_note\" cols=\"50\" rows=\"3\">".$search_results['content_note']."</textarea></td>\n";
 		echo "				</tr>\n";
-
+		
 		$personal_item = isset($request['personal_item']) ? $request['personal_item'] : "";
 		echo "				<input type=\"hidden\" name=\"personal_item\" value=\"".$personal_item."\">\n";
 		if (isset($request['personal_item']) && ($request['personal_item'] == "yes") || !is_null($search_results['personal_owner'])) 
