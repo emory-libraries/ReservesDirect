@@ -56,7 +56,7 @@ switch ($g_dbConn->phptype)
 			.  	"JOIN courses AS c ON ca.course_id = c.course_id "
 			.  	"JOIN departments AS d ON c.department_id = d.department_id AND d.status IS NULL "
 			.  	"JOIN libraries AS l ON d.library_id = l.library_id "
-			.  "WHERE r.date_requested >= ? AND r.date_processed is null "
+			.  "WHERE r.date_requested >= '".$g_request_notifier_lastrun."' AND r.date_processed is null AND "
 			.  	"CASE "
 			.  		"WHEN i.item_group = 'MONOGRAPH'  THEN l.monograph_library_id  = ! "
 			.  		"WHEN i.item_group = 'MULTIMEDIA' THEN l.multimedia_library_id = ! "
@@ -66,26 +66,43 @@ switch ($g_dbConn->phptype)
 
 foreach ($libraries as $library)
 {
-	$rs = $g_dbConn->query($sql, array($g_request_notifier_lastrun, $library->getLibraryID(), $library->getLibraryID()));		
+	$rs = $g_dbConn->query($sql, array($library->getLibraryID(), $library->getLibraryID()));		
 
-	if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+	if (DB::isError($rs)) {
+		report_error($sql . " arg[" . implode("] arg[", array($library->getLibraryID(), $library->getLibraryID()))."]");
+		exit;
+	}
 
 	$tmpArray = array();
 	while ($row = $rs->fetchRow())
 	{
-		if ($row[0] > 0)
+		if ($row[0] > 0) //if count of requests is greater than 0
 		{
-			$msg = "There are " . $row[0] . " new request(s) generated for " .$library->getLibrary(). " since $g_request_notifier_lastrun".
-			mail($library->getContactEmail(), 'Reserves Direct Requests Notification', $msg);
+			$msg = "There are " . $row[0] . " new request(s) generated for " .$library->getLibrary(). " since $g_request_notifier_lastrun\n";
+			$msg .= "Please login to Reserves Direct and check your requests queue <a href=\"https://ereserves.library.emory.edu/reserves2/index.php\">https://ereserves.library.emory.edu/reserves2/index.php</a>";
+			
+			if (!mail($library->getContactEmail(), 'Reserves Direct Requests Notification', $msg))
+			{
+				$err = "Notification Email not sent for " . $library->getContactEmail() . "\n";
+				report_error($err);
+			}
 		}
 	}
-	
-	//update last run date
-	$configure->request_notifier->last_run = $d;
-	
-	//write out new xml file
-	$xmlDOM = new DomDocument();
-	$xmlDOM->loadXML($configure->asXML());	 
-	$xmlDOM->save($xmlConfig);
 }	
+
+//update last run date
+$configure->request_notifier->last_run = $d;
+
+//write out new xml file
+$xmlDOM = new DomDocument();
+$xmlDOM->loadXML($configure->asXML());	 
+$xmlDOM->save($xmlConfig);
+
+function report_error($err)
+{
+	global $g_error_log, $g_errorEmail;
+	error_log($err, 3, $g_error_log);
+	mail($g_errorEmail, "Reserves Direct Notifications Error", $err);
+}
+
 ?>
