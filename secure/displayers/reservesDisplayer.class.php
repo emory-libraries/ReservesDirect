@@ -699,25 +699,23 @@ function displaySearchItemMenu($ci)
         	echo "					        <td width=\"4%\" valign=\"top\">\n";
         	echo "								<img src=\"". $item->getitemIcon() ."\" width=\"24\" height=\"20\"></td>\n";
         	echo "							</td>\n";
-        	echo "							<td width=\"88%\"><font class=\"titlelink\">" . $title . ". " . $author . "</font>";
+        	//echo "							<td width=\"88%\"><font class=\"titlelink\">" . $title . ". " . $author . "</font>";
         	
-        	/*
-        	$viewReserveURL = "reservesViewer.php?viewer=" . $user->getUserID() . "&reserve=" . $ci->reserveList[$i]->getReserveID();// . "&location=" . $ci->reserveList[$i]->item->getURL();
-				if ($reserveItem->isPhysicalItem()) {
+        	$viewReserveURL = "reservesViewer.php?item=" . $item->getItemID();
+				if ($item->isPhysicalItem()) {
 					//move to config file
-					$viewReserveURL = "http://libcat1.cc.emory.edu/uhtbin/cgisirsi/x/0/5?searchdata1=" . $ci->reserveList[$i]->item->getLocalControlKey();
+					$viewReserveURL = "http://libcat1.cc.emory.edu/uhtbin/cgisirsi/x/0/5?searchdata1=" . $item->getLocalControlKey();
 				}
-				echo '<tr align="left" valign="middle" class="'.$rowClass.'">'
-	            .    '	<td width="4%" valign="top"><img src="'.$itemIcon.'" alt="text" width="24" height="20"></td>'
-	            .    '	<td width="72%">'.$ci->reserveList[$i]->item->getAuthor().'&nbsp;';
-	            if (!$reserveItem->isPhysicalItem()) {
-	            	echo '<a href="'.$viewReserveURL.'" target="_blank">'.$ci->reserveList[$i]->item->getTitle().'</a>';
+				echo '<td width="88%">';
+	            if (!$item->isPhysicalItem()) {
+	            	echo '<a href="'.$viewReserveURL.'" target="_blank" class="titlelink">'.$title.'</a>';
 	            } else {
-	            	echo '<em>'.$ci->reserveList[$i]->item->getTitle().'</em>.';
-	            	if ($callNumber) {echo '<br>'.$callNumber;}
-	            	echo '<br>On Reserve At: '.$reserveDesk.' (<a href="'.$viewReserveURL.'" target="_blank">more info</a>)';
+	            	echo '<em>'.$title.'</em>.';
+	            	if ($item->getLocalControlKey()) echo ' (<a href="'.$viewReserveURL.'" target="_blank">more info</a>)';
 	            }
-        	*/
+	            if ($author)
+	            	echo '<br><font class="titlelink"> '. $author . '</font>';
+        	
         	
         				if ($callNumber) {
             				echo '<br>Call Number: '.$callNumber;

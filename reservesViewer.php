@@ -43,17 +43,25 @@ http://coursecontrol.sourceforge.net/
 
     import_request_variables("g", "in_");
     
-	$reserve = new reserve($in_reserve);
-	$reserve->getItem();
-	
-	//$helper = new helpApplication($item->getMimeType());
+	if (isset($in_item)) {
+		$reserveItem = new reserveItem($in_item);
+		// Redirect the user to where they want to go and continue processing
+    	header("Content-Type: " . $reserveItem->getMimeType());
+    	header("Location:  " . $reserveItem->getURL());
+	} else {
     
-    // Redirect the user to where they want to go and continue processing
-    header("Content-Type: " . $reserve->item->getMimeType());
-    header("Location:  " . $reserve->item->getURL());
+    	$reserve = new reserve($in_reserve);
+		$reserve->getItem();
+	
+		//$helper = new helpApplication($item->getMimeType());
+    
+    	// Redirect the user to where they want to go and continue processing
+    	header("Content-Type: " . $reserve->item->getMimeType());
+    	header("Location:  " . $reserve->item->getURL());
        
-    // Log the user, instruct_id and access time into the reserves_viewed table
-    $reserve->addUserView($in_viewer);
+    	// Log the user, instruct_id and access time into the reserves_viewed table
+    	$reserve->addUserView($in_viewer);
+	}
 
     exit(0);
 ?>
