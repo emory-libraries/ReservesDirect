@@ -85,22 +85,22 @@ class itemManager
 						if ($_REQUEST['deactivateReserve']) $reserve->setStatus('INACTIVE');					
 						if ($_REQUEST['activateReserve']) $reserve->setStatus('ACTIVE');
 						if ($_REQUEST['month'] || $_REQUEST['day'] || $_REQUEST['year']) $reserve->setActivationDate($_REQUEST['year'] . '-' . $_REQUEST['month'] . '-' . $_REQUEST['day']);							
-						if ($_REQUEST['title']) $reserve->item->setTitle($_REQUEST['title']);							
-						if ($_REQUEST['author']) $reserve->item->setAuthor($_REQUEST['author']);
-						if ($_REQUEST['url']) $reserve->item->setURL($_REQUEST['url']);
-						if ($_REQUEST['performer']) $reserve->item->setPerformer($_REQUEST['performer']);							
-						if ($_REQUEST['volumeTitle']) $reserve->item->setVolumeTitle($_REQUEST['volumeTitle']);
-						if ($_REQUEST['volumeEdition']) $reserve->item->setVolumeEdition($_REQUEST['volumeEdition']);
-						if ($_REQUEST['pagesTimes']) $reserve->item->setPagesTimes($_REQUEST['pagesTimes']);
-						if ($_REQUEST['source']) $reserve->item->setSource($_REQUEST['source']);
-						if ($_REQUEST['contentNotes']) $reserve->item->setContentNotes($_REQUEST['contentNotes']);
+						if ($_REQUEST['title']) $reserve->item->setTitle($_REQUEST['title']);
+						if ($_REQUEST['author']) $reserve->item->setAuthor($_REQUEST['author']); else $reserve->item->setAuthor("");
+						if ($_REQUEST['url']) $reserve->item->setURL($_REQUEST['url']); else $reserve->item->setURL("");
+						if ($_REQUEST['performer']) $reserve->item->setPerformer($_REQUEST['performer']); else $reserve->item->setPerformer("");
+						if ($_REQUEST['volumeTitle']) $reserve->item->setVolumeTitle($_REQUEST['volumeTitle']); else $reserve->item->setVolumeTitle("");
+						if ($_REQUEST['volumeEdition']) $reserve->item->setVolumeEdition($_REQUEST['volumeEdition']); else $reserve->item->setVolumeEdition("");
+						if ($_REQUEST['pagesTimes']) $reserve->item->setPagesTimes($_REQUEST['pagesTimes']); else $reserve->item->setPagesTimes("");
+						if ($_REQUEST['source']) $reserve->item->setSource($_REQUEST['source']); else $reserve->item->setSource("");
+						if ($_REQUEST['contentNotes']) $reserve->item->setContentNotes($_REQUEST['contentNotes']); else $reserve->item->setContentNotes("");
 
 						if ($_REQUEST['itemNotes']) {
 							$itemNotes = array_keys($_REQUEST['itemNotes']);
 							foreach ($itemNotes as $itemNote)
 							{
 									$note = new note($itemNote);
-								$note->setText($_REQUEST['itemNotes'][$itemNote]);
+									$note->setText($_REQUEST['itemNotes'][$itemNote]);
 							}
 						}
 						
