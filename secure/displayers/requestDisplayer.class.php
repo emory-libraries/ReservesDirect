@@ -45,9 +45,10 @@ class requestDisplayer
 
 		echo "	<form action=\"index.php?cmd=displayRequest\" method=\"POST\">\n";
 		echo "	<tr><td colspan=\"2\">";
-		echo "		<font color=\"#666666\"><strong><a href=\"index.php?cmd=displayRequest&unit=all\">View all Requests</a></strong></font> | ";
+		//echo "		<font color=\"#666666\"><strong><a href=\"index.php?cmd=displayRequest&unit=all\">View all Requests</a></strong></font> | ";
 		echo "		<font color=\"#666666\"><strong>View Requests for </strong></font>";
 		echo "			<select name=\"unit\">";
+		echo "				<option value=\"all\">Show All Requests</option>";
 		
 		$currentUnit = isset($request['unit']) ? $request['unit'] : $user->getStaffLibrary();
 		foreach ($libList as $lib)
@@ -158,7 +159,7 @@ class requestDisplayer
 				echo "    				</td>\n";
 				echo "    				<td align=\"right\" valign=\"top\">\n";
 				echo "						<form action=\"index.php?cmd=processRequest\" method=\"POST\">\n";
-				echo "							<input type=\"hidden\" name=\"request_id\" value=\"". $r->requestID ."\">\n";
+				echo "							<input type=\"text\" name=\"request_id\" value=\"". $r->requestID ."\">\n";
 				echo "							<input type=\"submit\" value=\"Process this Item\">\n";
 				echo "						</form>\n";
 				echo "					</td>\n";
@@ -171,6 +172,7 @@ class requestDisplayer
 				echo " 				<tr align=\"left\" valign=\"middle\" class=\"$rowClass\"><td width=\"85%\" valign=\"top\">&nbsp;</td><td valign=\"top\">&nbsp;</td></tr>\n";
 				
 				echo " 				<tr align=\"left\" valign=\"middle\" class=\"$rowClass\"><td width=\"85%\" valign=\"top\">&nbsp;</td><td valign=\"top\">&nbsp;</td></tr>\n";
+				echo " 			</table>\n";	
 				
 			}
 		} else echo "<tr><td>No Request to process for this unit.</td></tr>";
@@ -540,7 +542,7 @@ class requestDisplayer
 
 		
 		
-		$barcode_value = (isset($barcode) && (isset($request['searchTerm']) && $request['searchTerm'] != "")) ? $request['searchTerm'] : $search_results['barcode'];
+		$barcode_value = (isset($barcode) && (isset($request['searchTerm']) && $request['searchTerm'] != "")) ? $request['searchTerm'] : $search_results['physicalCopy'][0]['bar'];
 		
 		echo "				<tr align=\"left\" valign=\"middle\">\n";
 		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">Barcode:</td>\n";

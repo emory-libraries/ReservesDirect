@@ -259,10 +259,10 @@ class requestManager
 					$pCopy->getByItemID($item->getItemID());
 					
 					list($qryValue, $qryField) = ($pCopy->getBarcode() != "" && !is_null($pCopy->getBarcode())) ? array($pCopy->getBarcode(), 'barcode') : array($item->getLocalControlKey(), 'control');
-					
+
 					$zQry = new zQuery($qryValue, $qryField);
-					$search_results = $zQry->parseToArray();
-					$search_results['physicalCopy'] = $zQry->getHoldings('control', $item->getLocalControlKey());
+					$search_results = $zQry->parseToArray();					
+					$search_results['physicalCopy'] = $zQry->getHoldings('control', $item->getLocalControlKey());					
 					
 //				} else ($item->getLocalControlKey() <> "") {
 //					$zQry = new zQuery($item->getLocalControlKey(), 'control');
