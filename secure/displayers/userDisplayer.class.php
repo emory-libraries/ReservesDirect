@@ -29,7 +29,7 @@ Reserves Direct 2.0 is located at:
 http://coursecontrol.sourceforge.net/
 
 *******************************************************************************/
-require_once("common.inc.php");
+require_once("secure/common.inc.php");
 
 class userDisplayer 
 {
@@ -43,7 +43,7 @@ class userDisplayer
 	{
 		echo"<table width=\"60%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">";
 		echo"	<tr> ";
-		echo"		<td width=\"140%\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"></td>";
+		echo"		<td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td>";
 		echo"	</tr>";
 		echo"	<tr> ";
 		echo"		<td align=\"left\" valign=\"top\">";
@@ -67,7 +67,7 @@ class userDisplayer
 		echo"           Remove a proxy from one of your classes.</p></td>";
 		echo"	</tr>";
 		echo"	<tr> ";
-		echo"		<td><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td>";
+		echo"		<td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td>";
 		echo"	</tr>";
 		echo"</table>";
 	}
@@ -76,7 +76,7 @@ class userDisplayer
 	{
 		echo"<table width=\"60%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">";
 		echo"	<tr> ";
-		echo"		<td width=\"140%\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"></td>";
+		echo"		<td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td>";
 		echo"	</tr>";
 		echo "	<tr><td align=\"center\" valign=\"top\" class=\"successText\">$msg&nbsp;</td></tr>\n";
 		echo"	<tr> ";
@@ -91,7 +91,7 @@ class userDisplayer
 		echo"           Deletes a user's override password so that they log in using their regular Emory NetID password or GBSNet password</p></td>";
 		echo"	</tr>";
 		echo"	<tr> ";
-		echo"		<td><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td>";
+		echo"		<td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td>";
 		echo"	</tr>";
 		echo"</table>";
 	}
@@ -102,7 +102,7 @@ class userDisplayer
 	    echo "<input type=\"hidden\" name=\"cmd\" value=\"$nextCmd\">\n";
 		echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">';
         echo 	'<tr>';
-        echo 		'<td width="140%"><img src="../images/spacer.gif" width="1" height="5"> </td>';
+        echo 		'<td width="140%"><img src="images/spacer.gif" width="1" height="5"> </td>';
         echo 	'</tr>';
         echo 	'<tr>';
         echo 	'  <td align="left" valign="top" class="helperText">Select which classes ';
@@ -165,7 +165,7 @@ class userDisplayer
         echo 		'<td align="left" valign="top"><div align="center"><input type="submit" name="Submit" value="Continue"></div></td>';
         echo 	'</tr>';
         echo 	'<tr>';
-        echo 		'<td align="left" valign="top"><img src="../images/spacer.gif" width="1" height="15"></td>';
+        echo 		'<td align="left" valign="top"><img src="images/spacer.gif" width="1" height="15"></td>';
         echo 	'</tr>';
       	echo '</table>';
 	}
@@ -186,7 +186,7 @@ class userDisplayer
 			echo "<input type=\"hidden\" name=\"selectedUser\" value=\"" . $userToEdit->getUserID() . "\">";
 	    	
 			echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-			echo "	<tr><td width=\"140%\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
+			echo "	<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
 	
 			echo "	<tr><td align=\"center\" valign=\"top\" class=\"helperText\">$msg&nbsp;</td></tr>\n";
 	
@@ -261,7 +261,7 @@ class userDisplayer
 	
 			if ($user->getDefaultRole() >= $g_permission['staff'] && 
 			   ($userToEdit->getDefaultRole() >= $g_permission['instructor'] || isset($request['user']['defaultRole'])) && 
-			   ($request['user']['defaultRole'] >= $g_permission['instructor']))
+			   (isset($request['user']['defaultRole']) && $request['user']['defaultRole'] >= $g_permission['instructor']))
 			{
 				echo "				<tr>\n";
 				echo "					<td class=\"strong\" align=\"right\">ILS User ID:</td>\n";
@@ -311,7 +311,7 @@ class userDisplayer
 			echo "		</td>\n";
 			echo "	</tr>\n";
 			echo "	<tr><td>&nbsp;</td></tr><tr><td align=\"center\"><input type=\"submit\" name=\"Submit\" value=\"Save Changes\" onClick=\"this.form.cmd.value='$nextCmd';\"></td></tr>\n";
-			echo "	<tr><td><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+			echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 			echo "</table>\n";
 			echo "</form>\n";
 		}
@@ -320,7 +320,7 @@ class userDisplayer
 	function displayStaffHome($msg=null)
 	{
 		echo "<table width=\"66%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "	<tr><td width=\"140%\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
+		echo "	<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
 		echo "	<tr><td align=\"center\" valign=\"top\" class=\"helperText\">$msg&nbsp;</td></tr>\n";
 		echo "	<tr>\n";
 		echo "		<td align=\"center\" valign=\"top\" class=\"borders\">\n";
@@ -356,7 +356,7 @@ class userDisplayer
 		echo "			</table>\n";
 		echo "		</td>\n";
 		echo "	</tr>\n";
-		echo "	<tr><td><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+		echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "</table>\n";
 	}
 	

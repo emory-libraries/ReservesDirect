@@ -4,6 +4,7 @@ session_start();
 
 //find AuthCookieHandler
 $keys = array_keys($_REQUEST);
+
 for($ndx=0;$ndx<count($keys);$ndx++){
 	if (eregi("AuthCookieHandler", $keys[$ndx])){ 	break;	}
 }

@@ -32,9 +32,9 @@ Reserves Direct 2.0 is located at:
 http://coursecontrol.sourceforge.net/
 
 *******************************************************************************/
-require_once("common.inc.php");
-require_once("interface/student.class.php");
-require_once("classes/specialUser.class.php");
+require_once("secure/common.inc.php");
+require_once("secure/interface/student.class.php");
+require_once("secure/classes/specialUser.class.php");
 
 class custodian extends student 
 {

@@ -29,7 +29,7 @@ Reserves Direct 2.0 is located at:
 http://coursecontrol.sourceforge.net/
 
 *******************************************************************************/
-require_once("common.inc.php");
+require_once("secure/common.inc.php");
 //require_once("classes/reserves.class.php");
 
 class selectClassDisplayer 
@@ -53,7 +53,7 @@ class selectClassDisplayer
 		}
 		
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "	<tr><td width=\"140%\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
+		echo "	<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
 		echo "	<tr>\n";
 		echo "		<td height=\"14\" align=\"left\" valign=\"top\">\n";
 		echo "			<table width=\"100%\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\">\n";
@@ -166,7 +166,7 @@ class selectClassDisplayer
 		echo "	</tr>\n";
 		echo "	<tr><td align=\"left\" valign=\"top\">&nbsp;</td></tr>\n";
 		echo "	<tr><td valign=\"top\" align=\"center\"><input type=\"submit\" name=\"performAction\" value=\"$performAction\" DISABLED></td></tr>\n";
-		echo "	<tr><td align=\"left\" valign=\"top\"><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+		echo "	<tr><td align=\"left\" valign=\"top\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "</table>\n";		
 		echo "</form>\n";
 	}

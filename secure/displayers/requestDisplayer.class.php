@@ -29,8 +29,8 @@ Reserves Direct 2.0 is located at:
 http://coursecontrol.sourceforge.net/
 
 *******************************************************************************/
-require_once("common.inc.php");
-require_once("classes/terms.class.php");
+require_once("secure/common.inc.php");
+require_once("secure/classes/terms.class.php");
 
 class requestDisplayer 
 {
@@ -39,7 +39,7 @@ class requestDisplayer
 		if (is_array($requestList) && !empty($requestList))
 		{	
 			echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-			echo "	<tr><td width=\"140%\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
+			echo "	<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
 			echo "	<tr><td width=\"100%\" class=\"failedText\" align=\"center\">$msg<br></td></tr>\n";
 			//echo "	<tr><td><font color=\"#666666\"><strong>View all Requests</strong></font> | <font color=\"#666666\"><strong>View Requests for your Unit</strong></font></td></tr>\n";
 			echo "	<tr><td>&nbsp;</td></tr>\n";
@@ -160,7 +160,7 @@ class requestDisplayer
 		echo "	<tr><td>&nbsp;</td></tr>\n";
 		echo "	<tr>\n";
 		echo "		<td align=\"right\">\n";
-		echo "			<img src=\../images/spacer.gif\" width=\"1\" height=\"15\">[ <a href=\"index.php\">EXIT &quot;PROCESS REQUESTS&quot;</a> ]</td>\n";
+		echo "			<img src=\images/spacer.gif\" width=\"1\" height=\"15\">[ <a href=\"index.php\">EXIT &quot;PROCESS REQUESTS&quot;</a> ]</td>\n";
 		echo "	</tr>\n";
 		echo "</table>\n";	
 	}
@@ -213,7 +213,7 @@ class requestDisplayer
 		echo "</script>\n";
 		
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "	<tr><td width=\"100%\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
+		echo "	<tr><td width=\"100%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
 		
 		echo "	<tr><td width=\"100%\" class=\"failedText\" align=\"center\">$msg<br></td></tr>\n";
 		
@@ -559,14 +559,14 @@ class requestDisplayer
 		echo "	<tr><td><strong><font color=\"#FF0000\">* </font></strong><span class=\"helperText\">= required fields</span></td></tr>\n";		
 		echo "	<tr><td align=\"center\"><input type=\"button\" name=\"store_request\" value=\"$buttonValue\" onClick=\"checkForm(this.form);\"></td></tr>\n";
 		echo "</form\n";
-		echo "	<tr><td><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+		echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "</table>\n";
 	}
 	
 	function addSuccessful($ci, $selected_instr, $msg=null)
 	{
 		echo "<table width=\"60%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "	<tr><td width=\"140%\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
+		echo "	<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
 		echo "	<tr>\n";
 		echo "		<td align=\"left\" valign=\"top\">\n";
 		echo "			<p class=\"successText\">Item was successfully added to ". $ci->course->displayCourseNo() . " " . $ci->course->getName() .".</p>\n";
@@ -581,7 +581,7 @@ class requestDisplayer
 		echo "		</td>\n";
 		echo "	</tr>\n";
 		echo "	<tr><td align=\"center\"></td></tr>\n";
-		echo "	<tr><td><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+		echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "</table>\n";
 	}
 }

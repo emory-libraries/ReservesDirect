@@ -33,7 +33,7 @@ http://coursecontrol.sourceforge.net/
 
 *******************************************************************************/
 
-require_once("department.class.php");
+require_once("secure/classes/department.class.php");
 
 class course
 {

@@ -33,11 +33,11 @@ http://coursecontrol.sourceforge.net/
 
 *******************************************************************************/
 
-require_once("classes/course.class.php");
-require_once("classes/department.class.php");
-require_once("classes/note.class.php");
-require_once("classes/reserveItem.class.php");
-require_once("classes/reserves.class.php");
+require_once("secure/classes/course.class.php");
+require_once("secure/classes/department.class.php");
+require_once("secure/classes/note.class.php");
+require_once("secure/classes/reserveItem.class.php");
+require_once("secure/classes/reserves.class.php");
 
 class courseInstance
 {

@@ -1,5 +1,5 @@
 <? include("destroySession.inc.php"); ?>
-<? header("Location: index.php"); /* Redirect browser */ ?>
+<? header("Location: ../index.php"); /* Redirect browser */ ?>
 
 <?
 /*
@@ -19,7 +19,7 @@
     </td>
   </tr>
   <tr>
-    <td align="left" valign="top" height="10" background=../images/backgrnd-mainnav.gif">
+    <td align="left" valign="top" height="10" background=images/backgrnd-mainnav.gif">
     	&nbsp;
     </td>
   </tr>
@@ -29,7 +29,7 @@
     </td>
   </tr>
   <tr>
-    <td background=../images/backgrnd-redline.gif" align="left" valign="top" height="5"><img src=../images/backgrnd-redline.gif" width="1" height="9"></td>
+    <td background=images/backgrnd-redline.gif" align="left" valign="top" height="5"><img src=images/backgrnd-redline.gif" width="1" height="9"></td>
   </tr>  
   <tr><td>&nbsp;</td></tr>
   <tr>

@@ -29,15 +29,15 @@ Reserves Direct 2.0 is located at:
 http://coursecontrol.sourceforge.net/
 
 *******************************************************************************/
-require_once("common.inc.php");
-require_once("classes/terms.class.php");
+require_once("secure/common.inc.php");
+require_once("secure/classes/terms.class.php");
 
 class classDisplayer 
 {
 	function displayStaffHome($user)
 	{
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "	<tr><td width=\"140%\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
+		echo "	<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
 		echo "	<tr>\n";
 		echo "		<td align=\"center\" valign=\"top\">\n";
 		echo "			<table width=\"66%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
@@ -78,7 +78,7 @@ class classDisplayer
 	function displayInstructorHome()
 	{
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\" align=\"center\">";
-        echo "	<tr><td width=\"140%\" colspan=\"2\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>";
+        echo "	<tr><td width=\"140%\" colspan=\"2\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>";
         echo "	<tr> ";
         echo "		<td width=\"70%\" align=\"left\" valign=\"top\"> ";
         echo "			<p><a href=\"index.php?cmd=reactivateClass\" class=\"titlelink\">Reactivate Reserve Materials </a><br>";
@@ -88,7 +88,7 @@ class classDisplayer
         echo "			<p><a href=\"index.php?cmd=myReserves\" class=\"titlelink\">Edit an Existing Course</a><br>";
         echo "			Advanced management of your classes. Edit class title, crosslistings, proxies, reserve materials, enrollment, and much more.</p>";
         echo "		</td>";
-        /*
+        
         echo "		<td width=\"30%\" align=\"left\" valign=\"top\">";
 		echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">";
         echo "				<tr>";
@@ -97,24 +97,12 @@ class classDisplayer
         echo "				<tr> ";
         echo "					<td align=\"left\" valign=\"top\" class=\"borders\">";
         echo "						<ul>";
-        echo "						<li class=\"small\"><a href=\"link\">Sort my Reserves</a></li>";
-        echo "			            	<!-- This should send them to a class selection screen that includes current and future";
-		echo "							classes, then straight to the \"sort reserves\" screen (myReserves/staff-myReserves-sort.html -->";
-        echo "            			<li class=\"small\"><a href=\"link\">Annotate my Reserves</a></li>";
-        echo "            				<!--This should send them to a course select screen with current and future classes,";
-		echo "							then to a screen with all reserve readings listed with note fields. -->";
-        echo "            			<li class=\"small\"><a href=\"link\">View my Reserves lists</a></li>";
-        echo "            				<!-- This goes to course select screen with all courses past, current, and future,";
-		echo "							with current and future on top. Clicking into class goes to basic student view of class,";
-		echo "							no edit features available. -->";
-        echo "            			<li class=\"small\"><a href=\"link\">Export my Reserves to Courseware class (Blackboard, Learnlink, etc.)</a></li>";
-		echo "			  				<!-- This goes to mockup page instr-mngClasses-Export1.html, which gives instructions";
-		echo "			  				on how to export readings to Courseware. -->";
-        echo "            			<li class=\"small\"><a href=\"link\">Get my URLs</a></li>";
-		echo "							<!-- This goes to course select, then displays a simple list of readings with the URLs";
-		echo "							showing underneath them (inst-manageClasses-getURLs.html). For use with Courseware, learnlink, etc. -->";
-        echo "            			<li class=\"small\"><a href=\"link\">Manage Enrollment for my classes</a></li>";
-		echo "							<!-- This goes to course select, then straight to Enrollment queue for that class. -->";
+        //echo "						<li class=\"small\"><a href=\"link\">Sort my Reserves</a></li>";        
+        //echo "            			<li class=\"small\"><a href=\"link\">Annotate my Reserves</a></li>";        
+        echo "            			<li class=\"small\"><a href=\"index.php\">View my Reserves lists</a></li>";
+        echo "            			<li class=\"small\"><a href=\"index.php?cmd=exportClass\">Export my Reserves to Courseware class (Blackboard, Learnlink, etc.)</a></li>";
+        //echo "            			<li class=\"small\"><a href=\"link\">Get my URLs</a></li>";
+        //echo "            			<li class=\"small\"><a href=\"link\">Manage Enrollment for my classes</a></li>";
         echo "         				</ul>";
         echo "					</td>";
         echo "    			</tr>";
@@ -123,10 +111,10 @@ class classDisplayer
        	echo "       		</tr>";
       	echo "			</table>";
         echo "		</td>";
-        */
+        
       	echo "	</tr>";
         echo "	<tr> ";
-     	echo "		<td colspan=\"2\"><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td>";
+     	echo "		<td colspan=\"2\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td>";
         echo "	</tr>";
       	echo "</table>";
 	}
@@ -144,7 +132,7 @@ class classDisplayer
 		echo "<td width =\"140%\" align=\"right\" valign=\"middle\" class=\"small\" align=\"right\"><a href=\"javascript:openWindow('&cmd=previewReservesList&ci=".$ci->courseInstanceID . "','width=800,height=600');\">Preview Student View</a> | <a href=\"index.php\">Exit class</a></td>\n";
 		echo '</tr>';
 		echo	'<tr>'
-		.	'	<td width="140%" colspan="2"><img src=../images/spacer.gif" width="1" height="5"> </td>'
+		.	'	<td width="140%" colspan="2"><img src=images/spacer.gif" width="1" height="5"> </td>'
 		.	'</tr>'
 		.	'<tr>'
 		.   ' 	<td width="75%" height="79" align="left" valign="top" >'
@@ -372,13 +360,13 @@ class classDisplayer
 		.    '    </td>'
 		.	 '</tr>'
 		.	 '<tr>'
-		.	 '	<td colspan="2"><img src=../images/spacer.gif" width="1" height="15"></td>'
+		.	 '	<td colspan="2"><img src=images/spacer.gif" width="1" height="15"></td>'
 		.	 '</tr>'
 		.	 '<tr>'
 		.	 '	<td colspan="2"><div align="center" class="strong"><a href="index.php">Exit Class</a></div></td>'
 		.	 '</tr>'
 		.	 '<tr>'
-		.	 '	<td colspan="2"><img src=../images/spacer.gif" width="1" height="15"></td>'
+		.	 '	<td colspan="2"><img src=images/spacer.gif" width="1" height="15"></td>'
 		.	 '</tr>'
 		.    '</table>'
 		.	 '</form>';
@@ -392,7 +380,7 @@ class classDisplayer
 		echo "</tr>\n";
 		echo " <form action=\"index.php?cmd=editTitle&ci=".$ci->getCourseInstanceID()."\" method=\"post\">\n";
 		echo " <tr>\n";
-		echo " 	<td width=\"140%\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"> </td>\n";
+		echo " 	<td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td>\n";
 		echo " </tr>\n";
 		echo " <tr>\n";
 		echo " 	<td>\n";
@@ -561,7 +549,7 @@ class classDisplayer
 		."          <td><div align=\"center\"><a href=\"index.php?cmd=editClass&ci=".$ci->courseInstanceID."\">Return to Edit Class</a></div></td>\n"
 		."        </tr>\n"
 		."        <tr>\n"
-		."          <td><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td>\n"
+		."          <td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td>\n"
 		."        </tr>\n"
 		." </table>\n";
 	}
@@ -581,7 +569,7 @@ class classDisplayer
 			}
 		*/	
 		echo " 	<tr>";
-		echo " 		<td colspan=\"3\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"> </td>";
+		echo " 		<td colspan=\"3\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td>";
 		echo " 	</tr>";
 		echo " 	<tr>";
 		echo " 		<td height=\"14\" colspan=\"3\" align=\"left\" valign=\"top\">";
@@ -626,7 +614,7 @@ class classDisplayer
 		echo " 			</tr>";
 		echo " 		</table>";
 		echo " 		</td>";
-		echo "         <td align=\"left\" valign=\"top\"><img src=\../images/spacer.gif\" width=\"15\" height=\"1\"></td>";
+		echo "         <td align=\"left\" valign=\"top\"><img src=\images/spacer.gif\" width=\"15\" height=\"1\"></td>";
 		echo "         <td width=\"50%\" align=\"left\" valign=\"top\">";
 		echo "         <table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"borders\">";
 		echo "         	<tr>";
@@ -671,7 +659,7 @@ class classDisplayer
 		echo "     	<td colspan=\"3\"><div align=\"center\"><a href=\"index.php?cmd=editClass&ci=".$ci->courseInstanceID."\">Return to Edit Class</a></div></td>";
 		echo " 	</tr>";
 		echo "     <tr>";
-		echo "     	<td colspan=\"3\"><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td>";
+		echo "     	<td colspan=\"3\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td>";
 		echo " 	</tr>";
 		echo " </form>";
 		echo " </table>";
@@ -684,13 +672,13 @@ class classDisplayer
 		echo "<form action=\"index.php?cmd=editProxies&ci=".$ci->getCourseInstanceID()."\" method=\"POST\">\n";
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "	<tr>\n";
-		echo "		<td colspan=\"3\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"> </td>\n";
+		echo "		<td colspan=\"3\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td>\n";
 		echo "	</tr>\n";
 		echo "	<tr>";
 		echo '	<td colspan="3" align="left" valign="top" class="courseTitle">'.$ci->course->displayCourseNo() . " " . $ci->course->getName().'</td>';
 		echo "	</tr>";
 		echo "	<tr>\n";
-		echo "		<td colspan=\"3\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"> </td>\n";
+		echo "		<td colspan=\"3\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td>\n";
 		echo "	</tr>\n";
 		echo "	<tr>\n";
 		echo "		<td height=\"14\" colspan=\"3\" align=\"left\" valign=\"top\">\n";
@@ -745,7 +733,7 @@ class classDisplayer
 		echo "				</tr>\n";
 		echo "			</table>\n";
 		echo "		</td>\n";
-		echo "		<td align=\"left\" valign=\"top\"><img src=\../images/spacer.gif\" width=\"15\" height=\"1\"></td>\n";
+		echo "		<td align=\"left\" valign=\"top\"><img src=\images/spacer.gif\" width=\"15\" height=\"1\"></td>\n";
 		echo "		<td width=\"50%\" align=\"left\" valign=\"top\">\n";
 		echo "			<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"borders\">\n";
 		echo "				<tr>\n";
@@ -777,7 +765,7 @@ class classDisplayer
 		echo "	</tr>\n";
 		echo "	<tr><td colspan=\"3\">&nbsp;</td></tr>\n";
 		echo "	<tr><td colspan=\"3\" align=\"center\"> <a href=\"index.php?cmd=editClass&ci=". $ci->getCourseInstanceID() ."\" class=\"strong\">Return to Class</a></div></td></tr>\n";
-		echo "	<tr><td colspan=\"3\"><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+		echo "	<tr><td colspan=\"3\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "</table>\n";
 		echo "</form>\n";
 	}
@@ -806,12 +794,12 @@ class classDisplayer
 		}
 	    
 	    echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "	<tr><td width=\"140%\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
+		echo "	<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
 	
 		if ($u->getUserClass() == 'instructor')
 		{
 			echo "<tr><td height=\"14\" align=\"left\" valign=\"top\" class=\"helperText\">The classes you have taught in the past are listed below. Choose which class you would like to reactivate.</td></tr>\n";
-			echo "	<tr><td width=\"140%\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
+			echo "	<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
 			echo "	<tr>\n";
 			echo "		<td height=\"14\" align=\"left\" valign=\"top\">\n";
 			echo "			<table width=\"100%\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\">\n";
@@ -951,7 +939,7 @@ class classDisplayer
 		echo "	</tr>\n";
 		echo "	<tr><td align=\"left\" valign=\"top\">&nbsp;</td></tr>\n";
 		echo "	<tr><td align=\"left\" valign=\"top\" align=\"center\"><input type=\"submit\" name=\"Submit\" value=\"Re-activate Class\" DISABLED onClick=\"this.form.cmd.value='$nextPage';\"></td></tr>\n";
-		echo "	<tr><td align=\"left\" valign=\"top\"><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+		echo "	<tr><td align=\"left\" valign=\"top\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "</table>\n";
 		
 		echo "<script language=\"javaScript\">
@@ -997,7 +985,7 @@ class classDisplayer
 		}
 
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "	<tr><td width=\"140%\" colspan=\"2\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
+		echo "	<tr><td width=\"140%\" colspan=\"2\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
 		echo "	<tr>\n";
 		echo "		<td width=\"75%\" align=\"left\" valign=\"top\">\n";
 		echo "			<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n";
@@ -1079,7 +1067,7 @@ class classDisplayer
 		echo "						</table>\n";
 		echo "					</td>\n";
 
-		echo "					<td width=\"15\"><img src=\../images/spacer.gif\" width=\"15\" height=\"1\"></td>\n";
+		echo "					<td width=\"15\"><img src=\images/spacer.gif\" width=\"15\" height=\"1\"></td>\n";
 		echo "					<td width=\"50%\">\n";
 		echo "						<table width=\"100%\" border=\"0\" cellpadding=\"2\" cellspacing=\"0\" class=\"borders\">\n";
 		echo "							<tr align=\"left\" valign=\"middle\">\n";
@@ -1200,9 +1188,9 @@ class classDisplayer
 		echo "		</td>\n";
 		echo "	</tr>\n";
 			
-		echo "	<tr><td colspan=\"2\"><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+		echo "	<tr><td colspan=\"2\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "	<tr><td colspan=\"2\" align=\"center\" class=\"strong\"><input type=\"submit\" name=\"Submit\" value=\"Reactivate Class\"></td></tr>\n";
-		echo "	<tr><td colspan=\"2\"><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+		echo "	<tr><td colspan=\"2\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "</table>\n";
 
 		echo "</form>\n";
@@ -1214,7 +1202,7 @@ class classDisplayer
 			
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n"
 		.	 "	<tbody>\n"
-		.	 "		<tr><td width=\"140%\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n"
+		.	 "		<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n"
 		.	 "		<tr>\n"
 	    .	 "			<td align=\"left\" valign=\"top\" class=\"borders\">\n"
 	    .	 "				<table width=\"50%\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"5\">\n"
@@ -1228,7 +1216,7 @@ class classDisplayer
 		.	 "				</table>\n"
 		.	 "			</td>\n"
 		.	 "		</tr>\n"
-		.	 "		<tr><td><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n"
+		.	 "		<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n"
 		.	 "	</tbody>\n"
 		.	 "</table>\n"
 		;
@@ -1262,7 +1250,7 @@ class classDisplayer
 		}
 	
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "	<tr><td width=\"140%\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
+		echo "	<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
 		echo "	<tr>\n";
 		echo "		<td>\n";
 		echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
@@ -1357,7 +1345,7 @@ class classDisplayer
 		echo "		</td>\n";
 		echo "	</tr>\n";
 		echo "	<tr><td align=\"center\"><input type=\"submit\" name=\"Submit\" value=\"Create Course\"></td></tr>\n";
-		echo "	<tr><td><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+		echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "</table>\n";
 		echo "</form>\n";
 		
@@ -1376,7 +1364,7 @@ class classDisplayer
 	{	
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "	<tbody>\n";
-		echo "		<tr><td width=\"140%\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
+		echo "		<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
 		
 		if (is_array($courseInstances) && !empty($courseInstances))
 		{
@@ -1428,7 +1416,7 @@ class classDisplayer
 			echo "		<tr><td>You have no associated classes.  Please select the Manage Classes tab.</td></tr>\n";
 		}
 		
-		echo "		<tr><td align=\"left\" valign=\"top\"><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";		
+		echo "		<tr><td align=\"left\" valign=\"top\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";		
 		echo "	</tbody>\n";
 		echo "</table>\n";
 	}	
@@ -1442,7 +1430,7 @@ class classDisplayer
 	{
 		echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">';
 		echo '	<tr>';
-		echo '    	<td width="140%"><img src=../images/spacer.gif" width="1" height="5"></td>';
+		echo '    	<td width="140%"><img src=images/spacer.gif" width="1" height="5"></td>';
 		echo '	</tr>';
 		echo '    <tr>';
 		echo '    	<td align="left" valign="top">';
@@ -1492,7 +1480,7 @@ class classDisplayer
         echo '		</td>';
         echo '	</tr>';
         echo '    <tr>';
-        echo '    	<td><img src=../images/spacer.gif" width="1" height="15"></td>';
+        echo '    	<td><img src=images/spacer.gif" width="1" height="15"></td>';
         echo '	</tr>';
         echo '</form>';
         echo '</table>';
@@ -1502,7 +1490,7 @@ class classDisplayer
 	{
 		echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">';
 		echo '	<tr> ';
-		echo '    	<td width="140%" colspan="2"><img src=../images/spacer.gif" width="1" height="5"></td>';
+		echo '    	<td width="140%" colspan="2"><img src=images/spacer.gif" width="1" height="5"></td>';
 		echo '	</tr>';
 		echo '    <tr> ';
 		echo '    	<td width="50%" c><span class="strong">';
@@ -1545,7 +1533,7 @@ class classDisplayer
 		echo '		</td>';
 		echo '	</tr>';
 		echo '    <tr> ';
-		echo '    	<td colspan="2"><img src=../images/spacer.gif" width="1" height="15"></td>';
+		echo '    	<td colspan="2"><img src=images/spacer.gif" width="1" height="15"></td>';
 		echo '	</tr>';
 		echo '</table>';
 	}
@@ -1558,7 +1546,7 @@ class classDisplayer
 		echo('<FORM METHOD=POST ACTION="index.php">');
 		echo('<INPUT TYPE="HIDDEN" NAME="cmd" VALUE="removeStudent">');
 		echo '	<tr> ';
-		echo '		<td width="190%"><img src=../images/spacer.gif" width="1" height="5"></td>';
+		echo '		<td width="190%"><img src=images/spacer.gif" width="1" height="5"></td>';
 		echo '	</tr>';
 		echo '    <tr> ';
 		echo '    	<td c>';
@@ -1607,7 +1595,7 @@ class classDisplayer
 		echo '    	<td>&nbsp;</td>';
 		echo '	</tr>';
 		echo '    <tr> ';
-		echo '    	<td><div align="center"><img src=../images/spacer.gif" width="1" height="15"><input type="submit" name="deleteAlias" value="Remove Selected Classes"></div></td>';
+		echo '    	<td><div align="center"><img src=images/spacer.gif" width="1" height="15"><input type="submit" name="deleteAlias" value="Remove Selected Classes"></div></td>';
 		echo '	</tr>';
 		echo '</form>';
 		echo '</table>';

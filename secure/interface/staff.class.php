@@ -32,10 +32,10 @@ Reserves Direct 2.0 is located at:
 http://coursecontrol.sourceforge.net/
 
 *******************************************************************************/
-require_once("interface/instructor.class.php");
-require_once("classes/request.class.php");
-require_once("classes/courseInstance.class.php");
-require_once("common.inc.php");
+require_once("secure/interface/instructor.class.php");
+require_once("secure/classes/request.class.php");
+require_once("secure/classes/courseInstance.class.php");
+require_once("secure/common.inc.php");
 
 class staff extends instructor
 {

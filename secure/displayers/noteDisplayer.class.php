@@ -29,7 +29,7 @@ Reserves Direct 2.0 is located at:
 http://coursecontrol.sourceforge.net/
 
 *******************************************************************************/
-require_once("common.inc.php");
+require_once("secure/common.inc.php");
 
 class noteDisplayer 
 {
@@ -139,11 +139,11 @@ class noteDisplayer
     	echo '		</td>';
   		echo '	</tr>';
   		
-  		echo "    <tr><td><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+  		echo "    <tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
   		echo "    <tr>\n";
 		echo "    	<td align=\"center\"><input type=\"submit\" value=\"Save Note\"></td>\n";
 		echo "	</tr>\n";
-		echo "    <tr><td><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+		echo "    <tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo '</table>';
 		
 		echo '</td>';
@@ -160,7 +160,7 @@ class noteDisplayer
 		
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n"
 		.	 "	<tbody>\n"
-		.	 "		<tr><td width=\"140%\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n"
+		.	 "		<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n"
 		.	 "		<tr>\n"
 	    .	 "			<td align=\"left\" valign=\"top\" class=\"borders\">\n"
 	    .	 "				<table width=\"50%\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"5\">\n"
@@ -172,7 +172,7 @@ class noteDisplayer
 		.	 "				</table>\n"
 		.	 "			</td>\n"
 		.	 "		</tr>\n"
-		.	 "		<tr><td><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n"
+		.	 "		<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n"
 		.	 "	</tbody>\n"
 		.	 "</table>\n"
 		;

@@ -29,7 +29,7 @@ Reserves Direct 2.0 is located at:
 http://coursecontrol.sourceforge.net/
 
 *******************************************************************************/
-require_once("common.inc.php");
+require_once("secure/common.inc.php");
 
 class itemDisplayer 
 {
@@ -73,7 +73,7 @@ class itemDisplayer
 		
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "	<tr>\n";
-		echo "    	<td width=\"140%\"><img src=\../images/spacer.gif\" width=\"1\" height=\"5\"></td>\n";
+		echo "    	<td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td>\n";
 		echo "	</tr>\n";
 		echo "    <tr>\n";
 		echo "    	<td>\n";
@@ -199,7 +199,7 @@ class itemDisplayer
 		echo "    	<td><div align=\"center\"><input type=\"submit\" name=\"Submit\" value=\"Save Changes\"></div></td>\n";
 		echo "	</tr>\n";
 		echo "    <tr>\n";
-		echo "    	<td><img src=\../images/spacer.gif\" width=\"1\" height=\"15\"></td>\n";
+		echo "    	<td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td>\n";
 		echo "	</tr>\n";
 		echo "</table>\n";
 		echo "</form>\n";

@@ -33,8 +33,8 @@ http://coursecontrol.sourceforge.net/
 
 *******************************************************************************/
 
-require_once("classes/item.class.php");
-require_once("classes/user.class.php");
+require_once("secure/classes/item.class.php");
+require_once("secure/classes/user.class.php");
 
 class request
 {

@@ -1,8 +1,5 @@
 <?
 /*******************************************************************************
-admin.class.php
-Admin Interface
-
 Reserves Direct 2.0
 
 Copyright (c) 2004 Emory University General Libraries
@@ -32,17 +29,52 @@ Reserves Direct 2.0 is located at:
 http://coursecontrol.sourceforge.net/
 
 *******************************************************************************/
-require_once("secure/interface/staff.class.php");
-require_once("secure/classes/courseInstance.class.php");
 require_once("secure/common.inc.php");
+require_once("secure/displayers/exportDisplayer.class.php");
 
-class admin extends staff 
+class exportManager
 {
-	//Attributes
+	public $user;
+	public $displayClass;
+	public $displayFunction;
+	public $argList;
 	
-	function admin($userName)
+	function display()
 	{
-		if (is_null($userName)) trigger_error($userName . " has not been authorized as Admin", E_ERROR);
-		else $this->getUserByUserName($userName);
+		//echo "attempting to call ". $this->displayClass ."->". $this->displayFunction . "<br>"; print_r($this->argList); echo "<br>";
+		
+		if (is_callable(array($this->displayClass, $this->displayFunction)))
+			call_user_func_array(array($this->displayClass, $this->displayFunction), $this->argList);
+			
 	}
+	
+	function exportManager($cmd, $u, $request)
+	{
+		global $g_permission, $page, $loc, $ci;
+			
+		$this->displayClass = "exportDisplayer";			
+		$loc = "export class";
+		$page = "manageClasses";
+				
+		
+		if (!isset($request['course_ware']) || !isset($request['ci']))
+		{
+			$classList = null;
+			if ($u instanceof instructor)
+			{
+				$classList = $u->getAllCourseInstances();
+				
+				for($i=0;$i<count($classList);$i++)
+					$classList[$i]->getPrimaryCourse();
+			}
+				
+			$this->displayFunction = 'displayExportSelectClass';
+			$this->argList = array($classList, array('cmd'=>'exportClass', 'selected_instr'=>$request['selected_instr']));
+		} else {
+			$this->displayFunction = 'displayExportInstructions_' . $request['course_ware'];
+			$this->argList = array($ci);
+		}
+		
+	}
+		
 }

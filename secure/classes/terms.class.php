@@ -32,7 +32,7 @@ Reserves Direct 2.0 is located at:
 http://coursecontrol.sourceforge.net/
 
 *******************************************************************************/
-require_once("classes/term.class.php");
+require_once("secure/classes/term.class.php");
 
 class terms
 {

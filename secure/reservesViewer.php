@@ -33,7 +33,7 @@ http://coursecontrol.sourceforge.net/
 
 *******************************************************************************/
 	require_once("config.inc.php");
-	require_once("common.inc.php");
+	require_once("secure/common.inc.php");
 	require_once("classes/reserves.class.php");
 	require_once("classes/reserveItem.class.php");
 	require_once("classes/user.class.php");

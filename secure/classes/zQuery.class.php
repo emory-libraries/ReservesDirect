@@ -32,8 +32,8 @@ Reserves Direct 2.0 is located at:
 http://coursecontrol.sourceforge.net/
 
 *******************************************************************************/
-require_once("common.inc.php");
-require_once("config.inc.php");
+require_once("secure/common.inc.php");
+require_once("secure/config.inc.php");
 
 class zQuery
 {

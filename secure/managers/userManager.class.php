@@ -32,8 +32,8 @@ Reserves Direct 2.0 is located at:
 http://coursecontrol.sourceforge.net/
 
 *******************************************************************************/
-require_once("common.inc.php");
-require_once("displayers/userDisplayer.class.php");
+require_once("secure/common.inc.php");
+require_once("secure/displayers/userDisplayer.class.php");
 
 class userManager
 {
@@ -255,7 +255,7 @@ class userManager
 						$sp->resetPassword($editUser->getUsername(), $_REQUEST['user']['pwd']);
 					}	
 					
-					if ($editUser->getDefaultRole() >= $g_permission['instructor'])
+					if ($editUser->getDefaultRole() >= $g_permission['instructor'] && isset($_REQUEST['user']['ils_user_id']))
 					{
 						$editUser = new instructor($editUser->getUsername());  //recreate as instructor						
 						$editUser->storeInstructorAttributes($_REQUEST['user']['ils_user_id'], $_REQUEST['user']['ils_user_name']);

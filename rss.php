@@ -32,20 +32,31 @@ Reserves Direct 2.0 is located at:
 http://coursecontrol.sourceforge.net/
 
 *******************************************************************************/
-require_once("config.inc.php");
-require_once("common.inc.php");
+error_reporting(0);
+require_once("secure/config.inc.php");
+require_once("secure/common.inc.php");
 
-require_once("classes/reserves.class.php");
-require_once("classes/course.class.php");
-require_once("classes/note.class.php");
-require_once("classes/courseInstance.class.php");
-require_once("classes/reserveItem.class.php");
-require_once("interface/instructor.class.php");
-require_once("interface/student.class.php");
+require_once("secure/classes/reserves.class.php");
+require_once("secure/classes/course.class.php");
+require_once("secure/classes/note.class.php");
+require_once("secure/classes/courseInstance.class.php");
+require_once("secure/classes/reserveItem.class.php");
+require_once("secure/interface/instructor.class.php");
+require_once("secure/interface/student.class.php");
 
 
 if (!isset($_REQUEST['ci']))
-	die ("<html><h1>Course Instacnce must be set</h1></html>");
+	{
+		flush;
+		echo "<?xml version=\"1.0\"?>\n";
+		echo "<!DOCTYPE rss ["; include('rss/ansel_unicode.ent');  echo "]>\n";
+    	echo "<rss version=\"2.0\">\n";
+    	echo "	<channel>\n";
+    	echo "		<error>Data could not be retrieved from rss.php ci not set. Please contact the systems administrator.</error>";
+    	echo "	</channel>\n";
+    	echo "</rss>\n";
+    	exit;
+	}
 	
 
 	//$i = new instructor();
@@ -58,7 +69,7 @@ if (!isset($_REQUEST['ci']))
 	//remove the follwoing
 	$c = new course();
 
-
+	flush;
 	
 	header("Content-Type: application/xml");
     echo "<?xml version=\"1.0\"?>\n";

@@ -32,9 +32,9 @@ Reserves Direct 2.0 is located at:
 http://coursecontrol.sourceforge.net/
 
 *******************************************************************************/
-require_once("classes/users.class.php");
-require_once("classes/note.class.php");
-require_once("classes/reserveItem.class.php");
+require_once("secure/classes/users.class.php");
+require_once("secure/classes/note.class.php");
+require_once("secure/classes/reserveItem.class.php");
 
 $g_permission = array("student"=>0, "custodian"=>1, "proxy"=>2, "instructor"=>3, "staff"=>4, "admin"=>5);
 
@@ -66,7 +66,7 @@ function common_ErrorHandler($errno, $errmsg, $filename, $linenum, $vars)
 	echo "E_USER_NOTICE=".E_USER_NOTICE."<br>";
 	echo "E_STRICT=".E_STRICT."<br>";
 	*/
-   //echo "common_ErrorHandler($errno, $errmsg, $filename, $linenum, $vars)<br>";
+   //echo "secure/common_ErrorHandler($errno, $errmsg, $filename, $linenum, $vars)<br>";
 
    if ($errno <> E_NOTICE && $errno <> E_STRICT && $errno <> E_WARNING)
    {
