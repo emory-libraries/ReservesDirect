@@ -1,0 +1,171 @@
+<?
+
+//$loc = null;
+//$progress = null;
+/*
+switch ($page)
+{
+	case 'addReserve':
+		switch ($subpage)
+		{
+			case 'selectClass':
+				$loc = "Select a class";
+				$progress = array ('total' => 4, 'full' => 1);
+			break;
+			
+			case 'searchResults':
+				$progress = array ('total' => 4, 'full' => 3);
+				$loc = "Search for Materials";
+			break;
+			
+			case 'searchScreen':
+				$loc = "Search for Materials";
+				$progress = array ('total' => 4, 'full' => 2);
+			break;
+			
+			case 'storeReserve':
+				$progress = array ('total' => 4, 'full' => 2);
+			break;
+			
+			default:
+				$progress = array ('total' => 4, 'full' => 0);
+		}
+	break;
+	
+	case 'manageClasses':	
+		switch ($subpage)
+		{
+			case 'viewRequest':
+				$loc = "process request";
+				//$progress = array ('total' => 2, 'full' => 2);
+			break;
+			
+			case 'createClass':
+				$loc = "Create Course";
+			break;
+			case 'createNewClass':
+			case 'reactivate':
+				$progress = array ('total' => 2, 'full' => 2);
+			break;			
+			case 'reactivateClass':
+			default:
+				$loc = "Reactivate a Class";
+				$progress = array ('total' => 2, 'full' => 1);
+		}
+		
+		if ($u->getDefaultRole() >= $g_permission['staff'] && !isset($subpage))
+		{
+			$progress = null;
+			$loc = "Staff Manage Classes";
+		}		
+	break;
+	
+	case 'manageUser':
+		switch ($subpage)
+		{
+			case 'storeNewUser':
+			case 'addUser':
+				$loc = "Create a User";
+			break;
+			
+			case 'editUser':
+			case 'storeUser':
+				$loc = "Edit a User";
+			break;
+			
+			case 'editProfile':
+				$loc = "Edit Your Profile";
+			break;
+			
+			default:
+				switch ($u->getUserClass())
+				{
+					case 'admin':
+					case 'staff';
+					case 'custodian':
+						$loc = "Manage Special Users";
+					break;
+		
+					case 'instructor':
+						$loc = "Manage Proxies";
+					break;
+		
+					case 'student':
+						$loc = "Edit Your Profile";
+				}
+		}
+	break;
+	
+	case 'myReserves':
+		switch ($subpage)
+		{
+			case 'add':
+			case 'add2':
+				$loc = "add a class to myReserves";
+			break;
+			case 'remove':
+				$loc = "remove a class from myReserves";
+			break;
+			case 'editClass':
+				$loc = "edit class";
+			break;
+			case 'editInstructors':
+				$loc = "edit instructors";
+			break;
+			case 'editTitle':
+			case 'editCrossListings':
+				$loc = "edit class title and crosslistings";
+			break;
+			default:
+				$loc = "home";
+		}
+	break;
+	
+}
+*/
+
+if (!is_null($loc))
+	$loc .= " &gt;&gt;";
+
+if (isset($progress) && is_array($progress))
+{	
+	echo "<tr>\n";
+	echo "	<td>\n";
+	echo "		<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
+	echo "			<tr>\n";
+	echo "				<td align=\"left\" valign=\"top\" width=\"12\"><img src=\"../images/spacer.gif\" width=\"12\" height=\"20\"></td>\n";
+	echo "				<td width=\"70\" align=\"left\" valign=\"middle\" class=\"locationIndicatorText\">progress:</td>\n";
+	echo "				<td width=\"5\" align=\"left\" valign=\"middle\"><img src=\"../images/spacer.gif\" width=\"5\"></td>\n";
+	
+	for ($p=0;$p<(int)$progress['total'];$p++)
+	{
+		if ($p<(int)$progress['full'])
+			echo "				<td width=\"5\" align=\"left\" valign=\"middle\"><img src=\"../images/progressBar_full.gif\"></td>\n";
+		else
+			echo "				<td width=\"5\" align=\"left\" valign=\"middle\"><img src=\"../images/progressBar_empty.gif\"></td>\n";		
+	}	
+	echo "				<td width=\"100%\" align=\"left\" valign=\"middle\">&nbsp;</td>\n";
+	echo "			</tr>\n";
+	echo "		</table>\n";
+	echo "	</td>\n";
+	echo "</tr>\n";
+}
+
+$currentClass = ($ci instanceof courseInstance && $ci->course instanceof course) ?  $ci->course->displayCourseNo() . " " . $ci->course->getName() : "";
+
+echo "<tr>\n";
+echo "	<td height=\"4\" colspan=\"2\">\n";
+echo "		<table width=\"100%\" border=\"0\" align=\"left\" cellpadding=\"0\" cellspacing=\"0\">\n";
+echo "			<tr>\n";
+echo "				<td align=\"left\" valign=\"top\" width=\"10\"><img src=\"../images/spacer.gif\" width=\"12\" height=\"20\"></td>\n";
+echo "				<td width=\"50%\" align=\"left\" valign=\"middle\" class=\"locationIndicatorText\">$loc</td>\n";
+echo "				<td width=\"67\" align=\"left\" valign=\"middle\">&nbsp;</td>\n";
+echo "				<td width=\"67\" align=\"left\" valign=\"middle\">&nbsp;</td>\n";
+echo "				<td width=\"67\" align=\"left\" valign=\"middle\">&nbsp;</td>\n";
+echo "				<td width=\"50%\" valign=\"middle\" align=\"right\" class=\"currentClass\">$currentClass</td>\n";          
+echo "			</tr>\n";
+echo "		</table>\n";
+echo "	</td>\n";
+echo "</tr>\n";
+
+?>

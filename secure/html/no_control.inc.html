@@ -1,0 +1,36 @@
+<html>
+<head>
+<title>Reserves Direct</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<? echo "<link rel=\"stylesheet\" href=\"" . $_SESSION['css'] ."\" type=\"text/css\">\n"; ?>
+
+<script language="JavaScript" src="javascript/jsFunctions.js"></script>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" align="left">
+  	<!--banner.inc-->
+	<?php include("html/banner.inc.html"); ?>
+    
+	<tr align="left" valign="top">
+		<td colspan="2" class="divider"><img src=../images/spacer.gif" width="1" height="10"></td>
+	</tr>    
+	
+	<!--locationIndicator.inc-->
+  	<?php include("html/locationIndicator.inc.html"); ?>
+  
+  <tr><td colspan="2">&nbsp;</td></tr>
+  <tr>
+    <td height="108" align="left" valign="top" colspan="2">
+    
+    <? $mgr->display() ?>
+    
+    </td>
+  </tr>
+  <tr><td colspan="2">&nbsp;</td></tr>
+  <tr><td colspan="2"><?php include("html/footer.inc.html"); ?></td></tr>
+  </table>
+
+</body>
+</html>

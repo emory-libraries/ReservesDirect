@@ -1,0 +1,166 @@
+function displaySearchScreen()
+{
+	global $u, $page, $subpage;
+
+	echo
+	"<table align=\"center\" cellspacing=\"0\" cellpadding=\"3\">
+		<tbody>
+			<tr><td><b>Search for Reserve Items</b></td></tr>
+			<tr>
+				<td>
+					<table>
+						<tbody>
+							<tr>
+								<td><font size=\"+2\">1:</font></td>
+								<td><a href=\"http://www.library.emory.edu/\" target=\"EUCLID\"><b>Search for items in EUCLID</b></a>&nbsp;&nbsp;<i>Note:  EUCLID will open in a new window</i></td>
+							</tr>
+						</tbody>
+					</table>
+				</td>
+			</tr>
+			<tr><td align=\"center\"><b>-- OR --</b></td></tr>
+			<tr>
+				<td>
+					<form method=\"post\" action=\"index.php\" name=\"frmCarryover\">
+						<input type=\"hidden\" name=\"page\" value=\"$page\">
+						<input type=\"hidden\" name=\"subpage\" value=\"searchResults\">
+						<input type=\"hidden\" name=\"searchType\" value=\"carryover\">
+						<table>
+							<tbody>
+								<tr>
+									<td rowspan=\"2\"><font size=\"+2\">2:</font></td>
+									<td colspan=\"2\"><b>Search the Carryover System:</b></td>
+								</tr>
+								<tr>
+									<td><input type=\"text\" name=\"query\" size=\"50\"></td>
+									<td>
+										<select name=\"field\">
+											<option value=\"title\">Title</option>
+											<option value=\"author\">Author</option>
+										</select>
+									</td>
+									<td><input type=\"submit\" value=\"Find Items\"></td>
+								</tr>
+							</tbody>
+						</table>
+					</FORM>
+				</td>
+			</tr>
+			<tr><td align=\"center\"><b>-- OR --</b></td></tr>
+			<tr>
+				<td>
+					<form method=\"post\" action=\"index.php\" name=\"frmReserveItem\">
+						<input type=\"hidden\" name=\"page\" value=\"$page\">
+						<input type=\"hidden\" name=\"subpage\" value=\"searchResults\">
+						<input type=\"hidden\" name=\"searchType\" value=\"reserveItem\">
+						<table>					
+							<tbody>
+								<tr>
+									<td rowspan=\"2\"><font size=\"+2\">3:</font></td>
+									<td colspan=\"3\"><b>Search for reserve items by Instructor name:</b></td>
+								</tr>
+								<tr>
+									<td align=\"right\"><b>Instructor's Name:</b></td>
+									<td>
+										<select name=\"prof_id\">
+											<option value=\"\">Choose an Instructor's Name</option>
+											<option value=\"999\"></option>
+											<option value=\"13\">ABRAHAM, JULIE</option>
+										</select>
+			
+									</td>				
+									<td><input type=\"submit\" value=\"Get Instructor's Reserves\"></td>
+								</tr>
+							</tbody>
+						</table>
+					</form>
+				</td>
+			</tr>
+		</tbody>
+	</table>"
+	;	
+}
+
+function displaySearchResults($items)
+{
+
+	echo	
+		"<table align=\"center\" cellspacing=\"0\" cellpadding=\"3\">
+			<tbody>
+				<tr class=\"heading\">
+					<td><b>elect Items to place on Reserve</b></td>
+					<td align=\"right\">
+						<a href=\"\" class=\"bluebox\">Return to previous page</a>
+					</td>
+				</tr>
+				<form method=\"post\" action=\"index.php\">
+				<tr>
+					<td colspan=\"2\">
+						<a href=\"\">New Search</a>
+						&nbsp;&nbsp;|&nbsp;&nbsp;
+						<a href=\"http://www.library.emory.edu/uhtbin/AU/Ross+Singer\" target=\"EUCLID\">Search EUCLID with this Query</a>
+	
+						<br><hr noshade=\"noshade\">
+					</td>
+				</tr>
+				<tr>
+					<td colspan=\"2\">
+						<table>
+							<tbody>
+								<tr><td colspan=\"3\" bgcolor=\"#f5d80a\"><b>Enter the new course information:</b></td></tr>
+								<tr><th>Course ID</th><th>Section</th><th>Course Name</th></tr>
+								<tr>
+									<td align=\"center\">
+										<select name=\"dept\">
+											<option>AAS</option>
+										</select>
+										<input type=\"text\" name=\"courseid\" size=\"4\">
+									</td>
+	
+									<td align=\"center\"><input type=\"text\" name=\"section\" size=\"4\"></td>
+									<td align=\"center\"><input type=\"text\" name=\"coursename\" size=\"30\"></td>
+								</tr>
+							</tbody>
+						</table>
+					</td>
+				</tr>"
+		;
+		
+		echo "		<tr><td><b>Electronic Reserves in the Carryover System:</b></td><td align=\"right\"><i>". count($items) . " items found</i></td></tr>
+				
+				<tr><td colspan=\"2\"><hr noshade=\"noshade\"></td></tr>
+				
+				<tr>
+					<td colspan=\"2\" align=\"right\">
+						<input type=\"submit\" value=\"Add any checked items to my class\">
+					</td>
+				</tr>"
+		;
+		
+		$cnt = 0;
+		foreach ($items as $item)
+		{
+			$cnt++; 
+				echo "<tr><td>$cnt&nbsp;&nbsp;<b>" . $item->getTitle() . "</b></td></tr>";
+				//.    "</b><br>&nbsp;&nbsp;" . $item->getAuthor() 
+				//.    "<br>&nbsp;&nbsp;" . $item->getURL() .  "-- (<a href=\"" . $item->getURL() .  "\" target=\"preview\">preview item</a>)</td>\n"
+				//.	 "<td nowrap=\"nowrap\"><input type=\"checkbox\" name=\"item[".$cnt-1."]\" value=\"" . $item->getItemID() ."\">&nbsp;&nbsp;Add this item</td></tr>\n";
+	
+				echo "<tr><td>&nbsp;</td></tr>\n";
+				
+				//echo "<tr><td><b>Other Reserves (books, cds, videos, etc.) in the Carryover System:</b></td><td align=\"right\"><i>2 items found</i></td></tr>\n";
+				
+				//echo "<tr><td colspan=\"2\"><hr noshade=\"noshade\"></td></tr>\n";
+		}
+						
+		echo		"<tr><td colspan=\"2\" align=\"right\"><input type=\"submit\" value=\"Add any checked items to my class\"></td></tr>
+				<tr><td>#6&nbsp;&nbsp;<b>ANother Test File</b><br>&nbsp;&nbsp;Ross Singer<br>&nbsp;&nbsp;ONLINE RESERVE</td><td nowrap=\"nowrap\"><input type=\"checkbox\" name=\"item[5]\" value=\"55748\">&nbsp;&nbsp;Request this item</td></tr>
+				<tr><td>&nbsp;</td></tr>
+	
+				<tr><td colspan=\"2\"><hr noshade=\"noshade\"></td></tr>
+				<tr><td colspan=\"2\" align=\"right\"><input type=\"submit\" value=\"Add any checked items to my class\"></td></tr>
+			</tbody>
+		</table>"
+	;
+	
+}
