@@ -1,14 +1,11 @@
 <?
-	
-	$tab_selector = "tab_".$page;
-	$$tab_selector = "id=\"current\"";
-
-	
 	$tab_addReserve    	= "";
 	$tab_manageClasses 	= "";
 	$tab_manageUser    	= "";
 	$tab_myReserves		= "";
-	$tab_reserves		= "";
+	$tab_reserves		= "";	
+	$tab_selector = "tab_".$page;
+	$$tab_selector = "id=\"current\"";
 	
 	$tabs = array();
 	$tabs['myReserves']		= "<li $tab_myReserves><a href=\"index.php\">MyReserves</a></li>\n";
@@ -23,6 +20,7 @@
 			$tabs['manageUser'] = "<li $tab_manageUser><a href=\"index.php?cmd=manageUser\">Manage Users</a></li>\n";
 			$tabs['addReserve']	= "<li $tab_addReserve><a href=\"index.php?cmd=selectInstructor\">Add a Reserve</a></li>\n";
 		case 'instructor':
+			$tabs['addReserve']	   = "<li $tab_addReserve><a href=\"index.php?cmd=selectInstructor\">Add a Reserve</a></li>\n";
 			$tabs['manageClasses'] = "<li $tab_manageClasses><a href=\"index.php?cmd=manageClasses\">Manage Classes</a></li>\n";
 			$tabs['manageUser']	   = "<li $tab_manageUser><a href=\"index.php?cmd=manageUser\">Manage Users</a></li>\n";
 		case 'proxy':
