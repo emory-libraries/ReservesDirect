@@ -197,7 +197,7 @@ class userDisplayer
 			if ($cmd == "addUser")
 				echo "				<tr align=\"left\" valign=\"top\"><td height=\"14\" class=\"headingCell1\" align=\"center\">CREATE NEW USER</td><td width=\"75%\">&nbsp;</td></tr>\n";
 			else
-				echo "				<tr align=\"left\" valign=\"top\"><td height=\"14\" class=\"headingCell1\" align=\"center\">USER PROFILE - " . $userToEdit->getUserID() . " - " . $userToEdit->getName() ."</td><td width=\"75%\">&nbsp;</td></tr>\n";
+				echo "				<tr align=\"left\" valign=\"top\"><td height=\"14\" class=\"headingCell1\" align=\"center\">USER PROFILE - " . $userToEdit->getUsername() . " - " . $userToEdit->getName() ."</td><td width=\"75%\">&nbsp;</td></tr>\n";
 			
 			echo "			</table>\n";
 			echo "		</td>\n";
@@ -259,9 +259,8 @@ class userDisplayer
 			}
 			echo "				</tr>\n";
 	
-			if ($user->getDefaultRole() >= $g_permission['staff'] && 
-			   ($userToEdit->getDefaultRole() >= $g_permission['instructor'] || isset($request['user']['defaultRole'])) && 
-			   (isset($request['user']['defaultRole']) && $request['user']['defaultRole'] >= $g_permission['instructor']))
+			if (($user->getDefaultRole() >= $g_permission['staff'] && $userToEdit->getDefaultRole() >= $g_permission['instructor']) || 
+				(isset($request['user']['defaultRole']) && $request['user']['defaultRole'] >= $g_permission['instructor']))
 			{
 				echo "				<tr>\n";
 				echo "					<td class=\"strong\" align=\"right\">ILS User ID:</td>\n";
