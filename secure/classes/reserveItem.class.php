@@ -513,10 +513,9 @@ class reserveItem extends item
 	
 	function getPrivateUserID() { return (!is_null($this->privateUserID) && $this->privateUserID != "") ? $this->privateUserID : null; }
 	
-	function getPhysicalCopy()
+	function getPhysicalCopy($reserveOnly)
 	{
-		$this->physicalCopy = new physicalCopy();
-		$this->physicalCopy->getByItemID($this->getItemID());
+		$this->physicalCopy = new physicalCopy($this->getLocalControlKey(), $reserveOnly);
 	}
 	
 	function isPhysicalItem()
@@ -526,5 +525,13 @@ class reserveItem extends item
 		} else {
 			return false;
 		}
+	}
+	
+	function isPersonalCopy()
+	{
+		if ($this->privateUserID != null)
+			return true;
+		else 
+			return false;
 	}
 }
