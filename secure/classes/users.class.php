@@ -228,7 +228,7 @@ class users
 		$selector = (isset($request['select_user_by'])) ? $request['select_user_by'] : "last_name";
 		$$selector = "selected";
 		
-		$qryTerm = isset($request['user_qryTerm']) ? $request['user_qryTerm'] : "";
+		$qryTerm = isset($request['user_qryTerm']) ? stripcslashes($request['user_qryTerm']) : "";
 		
 		echo "		<select name=\"select_user_by\">\n";
 		echo "			<option value=\"last_name\" $last_name>Last Name</option>\n";
