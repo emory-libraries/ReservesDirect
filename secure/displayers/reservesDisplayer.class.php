@@ -637,6 +637,19 @@ function displaySearchItemMenu($ci)
 	
 		echo "			<tr><td align=\"right\" colspan=\"2\"><input type=\"submit\" name=\"Submit\" value=\"Add Selected Materials\"></td></tr>\n";
 	    
+	    if ($showNextLink || $showPrevLink) {
+	   		echo "       	<tr><td colspan=\"2\">&nbsp;</td></tr>\n";
+        	echo "			<tr><td colspan=\"2\" align='right'>";
+        	if ($showPrevLink) {
+        		echo "<img src=\"images/getPrevious.gif\" onClick=\"javaScript:document.forms.searchResults.cmd.value='searchResults';document.forms.searchResults.f.value=".$fPrev.";document.forms.searchResults.submit();\">&nbsp;&nbsp;";
+        	}
+        	if ($showNextLink) {
+        		echo "<img src=\"images/getNext.gif\" onClick=\"javaScript:document.forms.searchResults.cmd.value='searchResults';document.forms.searchResults.f.value=".$fNext.";document.forms.searchResults.submit();\">";
+        	}
+        	echo "</td></tr>\n";
+        }
+	    
+	    
         echo "			<tr>\n";
         echo "				<td colspan=\"2\">\n";
         echo "					<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
@@ -739,6 +752,9 @@ function displayReserveAdded($ci)
     echo "		<td align=\"left\" valign=\"top\" class=\"borders\">\n";
     echo "			<table width=\"50%\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"5\">\n";
     echo "				<tr><td><strong>Your items have been added successfully.</strong></td></tr>\n";
+    echo "              <tr><td>\n";
+    echo "							<ul><li class=\"nobullet\"><a href=\"index.php?cmd=editClass&ci=$ci\">Go to class</a></li></ul>\n";
+    echo "						</td></tr>\n";
     echo "				<tr>\n";
 	echo "					<td align=\"left\" valign=\"top\"><p>Would you like to put more items on reserve?</p><ul>\n";
     echo "						<li><a href=\"index.php\">No</a></li>\n";
