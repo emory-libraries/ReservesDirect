@@ -334,7 +334,7 @@ class classDisplayer
 	            echo '</td>';
 	            echo    '  <td width="11%" valign="middle" class="borders"><div align="center"><font color="'.$statusColor.'"><strong>'.$status.'</strong></font></div></td>'
 	            .    '	<td width="6%" valign="middle" class="borders"><div align="center">';
-	            if (!isset($physicalItem) || $user->getDefaultRole() >= $g_permission[staff]) {
+	            if (!$reserveItem->isPhysicalItem() || $user->getDefaultRole() >= $g_permission['staff']) {
 	            	echo '<a href="index.php?cmd=editItem&reserveID='.$ci->reserveList[$i]->getReserveID().'">edit</a>';
 	            } else {
 	            	echo '&nbsp;';

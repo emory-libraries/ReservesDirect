@@ -245,11 +245,11 @@ class reservesDisplayer
 	            .    '			<td width="96%">';
 	            if (!$reserveItem->isPhysicalItem()) {
 	            	echo '<a href="'.$viewReserveURL.'" target="_blank" class="itemTitle">'.$title.'</a><br>';
-	            	echo '<span class="itemAuthor">'.$author.'</span><br>';
+	            	if ($author) {echo '<span class="itemAuthor">'.$author.'</span><br>';}
 	            } else {
 	            	echo '<span class="itemTitleNoLink">'.$title.'</span><br>'; 
-	            	echo '<span class="itemAuthor">'.$author.'</span><br>';
-                	echo '<span class="itemMeta">'.$callNumber.'</span><br>';
+	            	if ($author) {echo '<span class="itemAuthor">'.$author.'</span><br>';}
+                	if ($callNumber) {echo '<span class="itemMeta">'.$callNumber.'</span><br>';}
 					echo '<span class="itemMetaPre">On Reserve at:</span> <span class="itemMeta"> '.$reserveDesk.'</span> &gt;&gt; <a href="'.$viewReserveURL.'" target="_blank" class="strong">more info</a><br>';
 	            }
 	            /*
@@ -664,6 +664,13 @@ function displaySearchItemMenu($ci)
 			$cnt++; 			
 			$rowClass = ($i++ % 2) ? "evenRow" : "oddRow";
 			
+			 if ((is_array($hidden_requests) && in_array($item->getItemID(),$hidden_requests)) || (is_array($hidden_reserves) && in_array($item->getItemID(),$hidden_reserves)))
+			 {
+			 	$checked = 'checked';
+			 } else {
+			 	$checked = '';
+			 }
+			
 			echo "						<tr align=\"left\" valign=\"middle\" class=\"$rowClass\">\n";
         	echo "					        <td width=\"4%\" valign=\"top\">\n";
         	echo "								<img src=\"". $item->getitemIcon() ."\" width=\"24\" height=\"20\"></td>\n";
@@ -672,9 +679,9 @@ function displaySearchItemMenu($ci)
             echo "						    <td width=\"8%\" valign=\"top\" class=\"borders\" align=\"center\">\n";
             
             if ($item->getItemGroup() == "ELECTRONIC"){
-				echo "							<input type=\"checkbox\" name=\"reserve[" . $item->getItemID() ."]\" value=\"" . $item->getItemID() ."\">\n";
+				echo "                          <input type=\"checkbox\" name=\"reserve[" . $item->getItemID() ."]\" value=\"" . $item->getItemID() ."\" ".$checked.">\n";
 			} else {
-				echo "							<input type=\"checkbox\" name=\"request[" . $item->getItemID() ."]\" value=\"" . $item->getItemID() ."\">\n";
+				echo "                          <input type=\"checkbox\" name=\"request[" . $item->getItemID() ."]\" value=\"" . $item->getItemID() ."\" ".$checked.">\n";
 			}
             
             echo "				            </td>\n";
@@ -1073,7 +1080,7 @@ echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="cente
 .	 '<FORM METHOD=POST NAME="sortScreen" ACTION="index.php">'
 .	 '<INPUT TYPE="HIDDEN" NAME="cmd" VALUE="sortReserves">'
 .	 '<INPUT TYPE="HIDDEN" NAME="ci" VALUE="'.$ci->getCourseInstanceID().'">'
-.	 '<INPUT TYPE="HIDDEN" NAME="sortBy" VALUE="'.$_REQUEST[sortBy].'">'
+.	 '<INPUT TYPE="HIDDEN" NAME="sortBy" VALUE="'.$_REQUEST['sortBy'].'">'
 .    '	<tr>'
 .    '		<td width="140%" colspan="2"><img src=../images/spacer.gif" width="1" height="5"> </td>'
 .	 '	</tr>';
