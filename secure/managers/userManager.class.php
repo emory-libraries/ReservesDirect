@@ -89,23 +89,23 @@ class userManager
 			case 'addUser':
 				$page = "manageUser";				
 				
-				if ($_REQUEST[user][defaultRole] >= $g_permission['instructor']) //need to have access to intructor_attributes
+				if ($_REQUEST['user']['defaultRole'] >= $g_permission['instructor']) //need to have access to intructor_attributes
 					$userToEdit = new instructor();	
 				else
 					$userToEdit = new user();	
 					
-				if (isset($_REQUEST[user]))  // we do not want to store this to the db yet but should populate the object for display to the form
+				if (isset($_REQUEST['user']))  // we do not want to store this to the db yet but should populate the object for display to the form
 				{				
-					$userToEdit->userName  = $_REQUEST[user][username];
-					$userToEdit->firstName = $_REQUEST[user][first_name];
-					$userToEdit->lastName  = $_REQUEST[user][last_name];
-					$userToEdit->dfltRole  = $_REQUEST[user][defaultRole];
-					$userToEdit->email	   = $_REQUEST[user][email];
+					$userToEdit->userName  = $_REQUEST['user']['username'];
+					$userToEdit->firstName = $_REQUEST['user']['first_name'];
+					$userToEdit->lastName  = $_REQUEST['user']['last_name'];
+					$userToEdit->dfltRole  = $_REQUEST['user']['defaultRole'];
+					$userToEdit->email	   = $_REQUEST['user']['email'];
 					
-					if ($userToEdit->dfltRole >= $g_permission['instructor'] && isset($_REQUEST[user][ils_user_name]))
+					if ($userToEdit->dfltRole >= $g_permission['instructor'] && isset($_REQUEST['user']['ils_user_name']))
 					{
-						$userToEdit->ils_user_id = $_REQUEST[user][ils_user_id];
-						$userToEdit->ils_name = $_REQUEST[user][ils_user_name];
+						$userToEdit->ils_user_id = $_REQUEST['user']['ils_user_id'];
+						$userToEdit->ils_name = $_REQUEST['user']['ils_user_name'];
 					}
 						
 				}
@@ -148,7 +148,7 @@ class userManager
 				{
 					$userToEdit = new user();
 						
-					$userToEdit->createUser($_REQUEST[user][username], $_REQUEST[user][first_name], $_REQUEST[user][last_name], $_REQUEST[user][email], $_REQUEST[user][defaultRole]);
+					$userToEdit->createUser($_REQUEST['user']['username'], $_REQUEST['user']['first_name'], $_REQUEST['user']['last_name'], $_REQUEST['user']['email'], $_REQUEST['user']['defaultRole']);
 				} else
 					$userToEdit = (isset($_REQUEST['selectedUser'])) ? new user($_REQUEST['selectedUser']) : null;	
 					
@@ -216,14 +216,14 @@ class userManager
 				if ($_REQUEST['previous_cmd'] == 'addUser')							
 				{
 					$tmpUser = new user();
-					if (!$tmpUser->getUserByUserName($_REQUEST[user][username]))
+					if (!$tmpUser->getUserByUserName($_REQUEST['user']['username']))
 					{
-						$editUser->createUser($_REQUEST[user][username], '', '', '', 0);
+						$editUser->createUser($_REQUEST['user']['username'], '', '', '', 0);
 					} else {
-						//$editUser->setEmail($_REQUEST[user][email]);
-						//$editUser->setFirstName($_REQUEST[user][first_name]);
-						//$editUser->setLastName($_REQUEST[user][last_name]);					
-						//$editUser->setDefaultRole($_REQUEST[user][defaultRole]);						
+						//$editUser->setEmail($_REQUEST['user']['email']);
+						//$editUser->setFirstName($_REQUEST['user']['first_name']);
+						//$editUser->setLastName($_REQUEST['user']['last_name']);					
+						//$editUser->setDefaultRole($_REQUEST['user']['defaultRole']);						
 						
 						$this->displayFunction = 'displayEditUser';
 						$this->argList = array('addUser', 'storeUser', $editUser, $user, "This username is in use.  Please choose another.", $users, $_REQUEST);
@@ -232,22 +232,22 @@ class userManager
 				} else 
 					$editUser->getUserByID($_REQUEST['user']['userID']);
 
-				if ($editUser->setEmail($_REQUEST[user][email]))
+				if ($editUser->setEmail($_REQUEST['user']['email']))
 				{
-					$editUser->setFirstName($_REQUEST[user][first_name]);
-					$editUser->setLastName($_REQUEST[user][last_name]);					
-					$editUser->setDefaultRole($_REQUEST[user][defaultRole]);
+					$editUser->setFirstName($_REQUEST['user']['first_name']);
+					$editUser->setLastName($_REQUEST['user']['last_name']);					
+					$editUser->setDefaultRole($_REQUEST['user']['defaultRole']);
 					
-					if ($editUser->isSpecialUser() && isset($_REQUEST[user][pwd]))
+					if ($editUser->isSpecialUser() && isset($_REQUEST['user']['pwd']))
 					{
 						$sp = new specialUser($editUser->getUserID());
-						$sp->resetPassword($editUser->getUsername(), $_REQUEST[user][pwd]);
+						$sp->resetPassword($editUser->getUsername(), $_REQUEST['user']['pwd']);
 					}	
 					
 					if ($editUser->getDefaultRole() >= $g_permission['instructor'])
 					{
 						$editUser = new instructor($editUser->getUsername());  //recreate as instructor						
-						$editUser->storeInstructorAttributes($_REQUEST[user][ils_user_id], $_REQUEST[user][ils_user_name]);
+						$editUser->storeInstructorAttributes($_REQUEST['user']['ils_user_id'], $_REQUEST['user']['ils_user_name']);
 					}
 					
 					$msg = "User Record Successfully Saved";

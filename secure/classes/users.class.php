@@ -223,13 +223,17 @@ class users
 		echo "		<td>&nbsp;&nbsp;\n";
 		
 		//set selected
+		$last_name = "";
+		$username = "";
 		$selector = (isset($request['select_user_by'])) ? $request['select_user_by'] : "last_name";
 		$$selector = "selected";
+		
+		$qryTerm = isset($request['user_qryTerm']) ? $request['user_qryTerm'] : "";
 		
 		echo "		<select name=\"select_user_by\">\n";
 		echo "			<option value=\"last_name\" $last_name>Last Name</option>\n";
 		echo "			<option value=\"username\" $username>User Name</option>\n";
-		echo "		</select> &nbsp; <input name=\"user_qryTerm\" type=\"text\" value=\"".$request['user_qryTerm']."\" size=\"15\"  onBlur=\"this.form.submit();\">\n";
+		echo "		</select> &nbsp; <input name=\"user_qryTerm\" type=\"text\" value=\"".$qryTerm."\" size=\"15\"  onBlur=\"this.form.submit();\">\n";
 		echo "		&nbsp;\n";
 		echo "		<input type=\"submit\" name=\"user_search\" value=\"Search\" onClick=\"this.form.select_course.selectedIndex=-1; this.form.selected_user.selectedIndex=-1;\">\n"; //by setting selectedIndex to -1 we can clear the selectbox or previous values
 		echo "		&nbsp;\n";
@@ -239,7 +243,7 @@ class users
 			echo "		<select name=\"selectedUser\" onClick=\"this.form.butSubmit.disabled=false;\">\n";			
 			for($i=0;$i<count($selection_list);$i++)
 			{
-				$selector = ($request['selectedUser'] == $selection_list[$i]->getUserID()) ? "selected" : "";
+				$selector = (isset($request['selectedUser']) && $request['selectedUser'] == $selection_list[$i]->getUserID()) ? "selected" : "";
 				echo "		<option $selector value=\"". $selection_list[$i]->getUserID() ."\"> ". $selection_list[$i]->getName() . " - " . $selection_list[$i]->getUsername() ."</option>";
 			}
 			echo "		</select>\n";

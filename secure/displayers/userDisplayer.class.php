@@ -135,7 +135,14 @@ class userDisplayer
 	
 			if ($user->getUserID() != $userToEdit->getUserID() && $user->getDefaultRole() >= $g_permission['staff'])
 			{
-				$select = (isset($request[user][defaultRole])) ? "SELECT_" . $request[user][defaultRole] : "SELECT_" . $userToEdit->getDefaultRole();
+				$SELECT_0 = "";
+				$SELECT_1 = "";
+				$SELECT_2 = "";
+				$SELECT_3 = "";
+				$SELECT_4 = "";
+				$SELECT_5 = "";
+				
+				$select = (isset($request['user']['defaultRole'])) ? "SELECT_" . $request['user']['defaultRole'] : "SELECT_" . $userToEdit->getDefaultRole();
 				$$select = " SELECTED ";
 				
 				echo "					<td>\n";
@@ -154,7 +161,9 @@ class userDisplayer
 			}
 			echo "				</tr>\n";
 	
-			if ($user->getDefaultRole() >= $g_permission['staff'] && ($userToEdit->getDefaultRole() >= $g_permission['instructor'] || $request[user][defaultRole] >= $g_permission['instructor']))
+			if ($user->getDefaultRole() >= $g_permission['staff'] && 
+			   ($userToEdit->getDefaultRole() >= $g_permission['instructor'] || isset($request['user']['defaultRole'])) && 
+			   ($request['user']['defaultRole'] >= $g_permission['instructor']))
 			{
 				echo "				<tr>\n";
 				echo "					<td class=\"strong\" align=\"right\">ILS User ID:</td>\n";
