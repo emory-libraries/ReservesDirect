@@ -197,8 +197,8 @@ class requestManager
 						move_uploaded_file($_FILES['userFile']['tmp_name'], $_FILES['userFile']['tmp_name'] . "." . $type);
 						chmod($_FILES['userFile']['tmp_name'] . "." . $type, 0644);   	       	     	
 					
-
-						$newFileName = $item->getItemID() ."-". str_replace(" ", "_", $filename . "." . $type); //remove spaces in filenames
+						$newFileName = str_replace("&", "_", $filename); 											//remove & in filenames
+						$newFileName = $item->getItemID() ."-". str_replace(" ", "_", $newFileName . "." . $type); 	//remove spaces in filenames
 						common_moveFile($_FILES['userFile']['tmp_name'] . "." . $type,  $newFileName );
 						$item->setURL($g_documentURL . $newFileName);
 						$item->setMimeTypeByFileExt($type);

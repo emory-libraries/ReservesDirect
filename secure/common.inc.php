@@ -221,7 +221,7 @@ function common_getDepartments()
 */
 function common_moveFile($src, $dest)
 {
-	global $g_documentDirectory;
+	global $g_documentDirectory;	
 	exec("/usr/bin/sudo -u coursecontrol /usr/local/bin/reserveMover $src $dest", $stat);
 
 	//if the new file is not readable something went wrong

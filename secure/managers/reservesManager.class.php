@@ -328,7 +328,9 @@ class reservesManager
 	        		move_uploaded_file($_FILES['userfile']['tmp_name'], $_FILES['userfile']['tmp_name'] . "." . $type);
 	        		chmod($_FILES['userfile']['tmp_name'] . "." . $type, 0644);   	       	     	
 	        	
-	        		$newFileName = $item->getItemID() ."-". str_replace(" ", "_", $filename . "." . $type);
+	        		$newFileName = str_replace("&", "_", $filename); 											//remove & in filenames
+					$newFileName = $item->getItemID() ."-". str_replace(" ", "_", $newFileName . "." . $type); 	//remove spaces in filenames
+	        		
 	        		common_moveFile($_FILES['userfile']['tmp_name'] . "." . $type,  $newFileName );
 	        		$item->setURL($g_documentURL . $newFileName);
 	    		} else {
@@ -409,7 +411,8 @@ class reservesManager
 					$item->setContentNotes($_REQUEST[$file]['contents']);
 				
 					//move file and store new location
-					$newFileName = str_replace(" ", "_", $item->getItemID()."-".$_REQUEST['file'][$file]);
+					$newFileName = str_replace("&", "_", $filename); 											//remove & in filenames
+					$newFileName = $item->getItemID() ."-". str_replace(" ", "_", $newFileName . "." . $type); 	//remove spaces in filenames
 				
 					common_moveFile($g_faxDirectory.$_REQUEST['file'][$file], $newFileName);
 					$item->setURL($g_documentURL . $newFileName);
