@@ -286,9 +286,7 @@ class reservesDisplayer
 	            	{
 	            		for ($n=0; $n<count($itemNotes); $n++)
 	            		{
-	            			if ($itemNotes[$n]->getType() == "Instructor" || $itemNotes[$n]->getType() == "Content") {
-	            				echo '<span class="noteType">'.$itemNotes[$n]->getType().' Note:</span>&nbsp;<span class="noteText">'.$itemNotes[$n]->getText().'</span><br>';
-	            			}
+            				echo '<span class="noteType">'.$itemNotes[$n]->getType().' Note:</span>&nbsp;<span class="noteText">'.$itemNotes[$n]->getText().'</span><br>';
 	            		}
 	            	}
 	            	if ($instructorNotes)
