@@ -51,6 +51,7 @@ include("secure/session.inc.php");
 if (isset($_SESSION['debug']))
 {
 	error_reporting(E_ALL);
+	print_r($rs);echo "<hr>";
 } else {
 	error_reporting(0);
 	$old_error_handler = set_error_handler("common_ErrorHandler");
