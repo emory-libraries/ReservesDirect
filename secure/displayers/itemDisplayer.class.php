@@ -75,6 +75,7 @@ class itemDisplayer
 		echo "	<tr>\n";
 		echo "    	<td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td>\n";
 		echo "	</tr>\n";
+		echo "	<tr><td colspan=\"3\" align=\"right\"> <a href=\"index.php?cmd=editClass&ci=".$reserve->getCourseInstanceID()."\" class=\"strong\">Return to Class</a></div></td></tr>\n";		
 		echo "    <tr>\n";
 		echo "    	<td>\n";
 		echo "    	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
@@ -199,6 +200,9 @@ class itemDisplayer
 		echo "    <tr>\n";
 		echo "    	<td><div align=\"center\"><input type=\"submit\" name=\"Submit\" value=\"Save Changes\"></div></td>\n";
 		echo "	</tr>\n";
+		echo "	<tr><td colspan=\"3\">&nbsp;</td></tr>\n";
+		echo "	<tr><td colspan=\"3\" align=\"center\"> <a href=\"index.php?cmd=editClass&ci=".$reserve->getCourseInstanceID()."\" class=\"strong\">Return to Class</a></div></td></tr>\n";
+		echo "	<tr><td colspan=\"3\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "    <tr>\n";
 		echo "    	<td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td>\n";
 		echo "	</tr>\n";
