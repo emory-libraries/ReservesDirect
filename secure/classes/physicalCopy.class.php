@@ -99,7 +99,7 @@ class physicalCopy
 			default: //'mysql'
 				$sql = "SELECT physical_copy_id, reserve_id, item_id, status, call_number, barcode, owning_library, item_type, owner_user_id "
 					.  "FROM physical_copies "						  
-					.  "WHERE item_id = !";
+					.  "WHERE item_id = ! ORDER BY physical_copy_id DESC";
 		}
 		
 		$rs = $g_dbConn->query($sql, $itemID);
