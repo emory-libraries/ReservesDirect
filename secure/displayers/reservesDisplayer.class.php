@@ -67,6 +67,7 @@ class reservesDisplayer
 	    .    '  	<td align="left" valign="top" class="borders"><table width="100%" border="0" cellpadding="2" cellspacing="0" class="displayList">	'
 	    ;
 	
+	    $permissionLvl = 0; //default to student
 		if (is_array($user->courseInstances) && !empty($user->courseInstances))
 		{
 			for ($j=0; $j<count($user->courseInstances); $j++){ 
