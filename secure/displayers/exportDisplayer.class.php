@@ -115,7 +115,8 @@ class exportDisplayer
 		echo "	<tr>\n";
 		echo "		<td align=\"left\" valign=\"top\">\n";
 		echo "			<p><strong>Instructions:</strong></p>\n";
-		echo "			<p>Create a Folder in one of your Content Areas and call it &quot;Reserves&quot; or &quot;Course Readings&quot;. Create an Item in that Folder called &quot;Reserves List&quot;.</p>\n";
+		echo "			<p><strong>Please Note:</strong> These instructions will not work if you are using Internet Explorer 6. There is currently no way to export a class if you are logged into Blackboard using IE6. <strong>You must use a broswer other than IE6 (Netscape and Firefox are recommended) when following these instructions.</strong> Your reserves list will be viewable to students using any browser, but you must set it up using something other than IE6.</p>\n";		
+		echo "			<p>Create a Folder or Item in one of your Content Areas and call it &quot;Reserves List&quot; or &quot;Course Readings&quot;. </p>\n";
 		echo "			<p>In the Text area, cut and paste:</p>\n";
 		echo "		</td>\n";
 		echo "	</tr>\n";
@@ -126,7 +127,7 @@ class exportDisplayer
 		echo "	</tr>\n";
 		echo "	<tr>\n";
 		echo "		<td align=\"left\" valign=\"top\">\n";
-		echo "			<p>Make sure the &quot;Smart Text&quot; or &quot;HTML&quot; radio button is selected.</p>\n";
+		echo "			<p>Make sure the &quot;Smart Text&quot; radio button is selected.</p>\n";
 		echo "			<p>Choose any other options you wish and click on Submit.</p>\n";
 		echo "			<p>Your reserve list (both electronic and physical, circulating items) will appear on the page. Physical items will have links to EUCLID for their bibliographic and holdings information.</p>\n";
 		echo "	        <p align=\"center\"><a href=\"index.php?cmd=exportClass\">Export another class</a><br> <a href=\"index.php\">Return to Home </a> </p>\n";		
@@ -146,7 +147,7 @@ class exportDisplayer
 		echo "	<tr>\n";
 		echo "		<td align=\"left\" valign=\"top\">\n";
 		echo "			<p><strong>Instructions:</strong></p>\n";
-		echo "			<p>Click on the link below to download the html file needed to export to Learnlink. Save the file to your computer as &quot;reserves.html&quot;. Be sure to remember where you save the file.</p>\n";
+		echo "			<p>Right-click on the link below (control-click on a Mac) to download the html file needed to export to Learnlink. Save the file to your computer as &quot;reserves.html&quot;. Be sure to remember where you save the file.</p>\n";
 		echo "		</td>\n";
 		echo "	</tr>\n";
 		echo "	<tr>\n";

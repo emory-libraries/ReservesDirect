@@ -44,7 +44,7 @@ class reservesDisplayer
 		global $g_permission;
 		echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">'
 		.    '	<tr>'
-	    .    '  	<td width="140%"><img src="images/spacer.gif" width="1" height="5"> </td>'
+	    .    '  	<td width="100%"><img src="images/spacer.gif" width="1" height="5"> </td>'
 	    .    '  </tr>'
 		.	 '	<tr>'
 		.	 '		<td>[ <a href="index.php?cmd=searchForClass" class="editlinks">Add a class</a> ] <span class="small">Enroll as a student in a class and add it to your list.</span><br>'
@@ -91,18 +91,21 @@ class reservesDisplayer
 					//echo '			<td width="20%"><a href="index.php?cmd=viewReservesList&ci='.$ci->courseInstanceID . '&ca='.$ci->aliasID . '">' . $ci->course->displayCourseNo() . '</a></td>';
 				}
 				if ($permissionLvl >= $g_permission['proxy']) {
-					echo    '	<td width="50%"><a href="index.php?cmd=editClass&ci=' ;
+					echo    '	<td width="40%"><a href="index.php?cmd=editClass&ci=' ;
 				} else {
-					echo ' 		<td width="50%"><a href="index.php?cmd=viewReservesList&ci=' ;
+					echo ' 		<td width="40%"><a href="index.php?cmd=viewReservesList&ci=' ;
 				}
 				//echo 			$ci->courseInstanceID . '&ca='.$ci->aliasID . '">' . $ci->course->getName() . '</a></td>'
 				echo 			$ci->courseInstanceID . '">' . $ci->course->getName() . '</a></td>'
-				.   '			<td NOWRAP align="center" width="5%">' . $ci->displayTerm() . '</td>'
+				.   '			<td NOWRAP align="left" width="15%">' . $ci->displayTerm() . '</td>'
 				.   '			<td width="25%">'
 				; 
 				
-				for($i=0;$i<count($ci->instructorList);$i++) echo $ci->instructorList[$i]->getName() . "&nbsp;";	
-	
+				for($i=0;$i<count($ci->instructorList);$i++) {
+					if ($i>0)
+						echo ',&nbsp;';
+					echo $ci->instructorList[$i]->getFirstName() . "&nbsp;" .$ci->instructorList[$i]->getLastName() ;	
+				}
 				echo "</td>\n</tr>";
 			}
 		} else {
@@ -139,9 +142,9 @@ class reservesDisplayer
 		echo '	<tr>';
 		
 		if (is_null($no_control))
-			echo '		<td width ="140%" align="right" valign="middle" class="small" align="right"><a href="index.php">Exit class</a></td>';
+			echo '		<td width ="100%" align="right" valign="middle" class="small" align="right"><a href="index.php">Exit class</a></td>';
 		else
-			echo '		<td width ="140%" align="right" valign="middle" class="small" align="right"><a href="javascript:window.close();">Close Window</a></td>';
+			echo '		<td width ="100%" align="right" valign="middle" class="small" align="right"><a href="javascript:window.close();">Close Window</a></td>';
 			
 		echo '	</tr>';
 		echo	'<tr>'
@@ -154,9 +157,12 @@ class reservesDisplayer
 		.	'				<td align="left" valign="top" class="courseTitle">'.$ci->course->displayCourseNo() . " " . $ci->course->getName().'</td>'
 		.	'			</tr>'
 		.	'			<tr align="left" valign="top">'
+		.	'				<td class="courseHeaders">' . $ci->displayTerm() . '</td>'
+		.	'			</tr>'		
+		.	'			<tr align="left" valign="top">'
 		.	'				<td class="courseHeaders">Instructors: ';
 								for($i=0;$i<count($ci->instructorList);$i++) {
-									echo '<a href="mailto:'.$ci->instructorList[$i]->getEmail().'">'.$ci->instructorList[$i]->getName().'</a>&nbsp;';
+									echo '<a href="mailto:'.$ci->instructorList[$i]->getEmail().'">'.$ci->instructorList[$i]->getName().'</a>;&nbsp;';
 								}
 		echo '				</td>'
 		.	'			</tr>'
@@ -607,7 +613,7 @@ function displaySearchItemMenu($ci)
 		
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "		<tbody>\n";
-		echo "			<tr><td width=\"140%\" colspan=\"2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
+		echo "			<tr><td width=\"100%\" colspan=\"2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
 		echo "			<form name=\"searchResults\"method=\"post\" action=\"index.php\">\n";
 
 		if (is_array($hidden_reserves) && !empty($hidden_reserves)){
@@ -632,7 +638,10 @@ function displaySearchItemMenu($ci)
 		echo "			<input type=\"hidden\" name=\"field\" value=\"$search->field\">\n";
 		echo "			<input type=\"hidden\" name=\"query\" value=\"".urlencode($search->query)."\">\n";
 	
-		echo "			<tr><td align=\"right\" colspan=\"2\"><input type=\"submit\" name=\"Submit\" value=\"Add Selected Materials\"></td></tr>\n";
+		echo "			<tr>\n";
+		echo "					<td align=\"left\">[ <a href=\"index.php?cmd=searchScreen&ci=$ci\" class=\"editlinks\">New Search</a> ] &nbsp;[ <a href=\"index.php?cmd=editClass&ci=$ci\" class=\"editlinks\">Cancel Search</a> ]</td>\n";
+		echo "					<td align=\"right\"><input type=\"submit\" name=\"Submit\" value=\"Add Selected Materials\"></td>\n";
+		echo "			</tr>\n";
 	    
 	    if ($showNextLink || $showPrevLink) {
 	   		echo "       	<tr><td colspan=\"2\">&nbsp;</td></tr>\n";
@@ -644,6 +653,8 @@ function displaySearchItemMenu($ci)
         		echo "<img src=\"images/getNext.gif\" onClick=\"javaScript:document.forms.searchResults.cmd.value='searchResults';document.forms.searchResults.f.value=".$fNext.";document.forms.searchResults.submit();\">";
         	}
         	echo "</td></tr>\n";
+        } else {
+        	echo "<tr><td>&nbsp;</tr></td>\n";
         }
 	    
 	    
@@ -951,6 +962,7 @@ function displayFaxInfo($ci)
     echo "						<blockquote>\n";
     echo "							<p class=\"helperText\">Reserves Direct allows you to fax in a document and will automatically convert it to PDF. Please limit faxed documents to 25 clear, clean sheets to minimize downloading and printing time. To proceed, please fax each document individually (with no cover sheet!) to: </p>\n";
     echo "							<p><span class=\"strong\">(404) 727-9089</span> (On-campus may dial <span class=\"strong\">7-9089</span> )</p>\n";
+    echo "							<p class=\"helperText\">Please note that faxes make take up to a minute per page to process during peak times. For best results, wait for a confirmation sheet to print from your fax machine before faxing another document.</p>\n";    
     echo "						</blockquote>\n";
     echo "					</td>\n";
     echo "				</tr>\n";

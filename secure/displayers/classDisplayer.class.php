@@ -129,7 +129,7 @@ class classDisplayer
 	
 		echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">';
 		echo '<tr>';
-		echo "<td width =\"100%\" align=\"right\" valign=\"middle\" class=\"small\" align=\"right\"><a href=\"javascript:openWindow('&cmd=previewReservesList&ci=".$ci->courseInstanceID . "','width=800,height=600');\">Preview Student View</a> | <a href=\"index.php\">Exit class</a></td>\n";
+		echo "<td width=\"100%\" align=\"right\" valign=\"middle\" class=\"small\" align=\"right\"><a href=\"javascript:openWindow('&cmd=previewReservesList&ci=".$ci->courseInstanceID . "','width=800,height=600');\">Preview Student View</a> | <a href=\"index.php\">Exit class</a></td>\n";
 		echo '</tr>';
 		echo	'<tr>'
 		.	'	<td width="100%" colspan="2"><img src=images/spacer.gif" width="1" height="5"> </td>'
@@ -141,11 +141,16 @@ class classDisplayer
 		.   '         	<td width="80%" align="left" valign="top" class="courseTitle">'.$ci->course->displayCourseNo() . " " . $ci->course->getName().'</td>'
 		.   '          	<td align="left" valign="top">[ <a href="index.php?cmd=editTitle&ci='.$ci->getCourseInstanceID().'" class="editlinks">edit title</a> ]</td>'
 		.   '       </tr>'
+		.	'			<tr align="left" valign="top">'
+		.	'				<td class="courseHeaders">' . $ci->displayTerm() . '</td>'
+		.	'			</tr>'
 		.   '       <tr align="left" valign="top">'
 		.   '         <td width="80%" class="courseHeaders">Instructor(s): ';
 		
 		for($i=0;$i<count($ci->instructorList);$i++) {
-			echo '<a href="mailto:'.$ci->instructorList[$i]->getEmail().'">'.$ci->instructorList[$i]->getName().'</a>&nbsp;';
+			if ($i>0)
+				echo ',&nbsp;';
+			echo '<a href="mailto:'.$ci->instructorList[$i]->getEmail().'">'.$ci->instructorList[$i]->getFirstName().'&nbsp;'.$ci->instructorList[$i]->getLastName().'</a>';
 		}
 		echo '		  </td>';
 		echo '        <td>[ <a href="index.php?cmd=editInstructors&ci='.$ci->getCourseInstanceID().'" class="editlinks">edit instructors</a> ]</td>'
@@ -389,11 +394,11 @@ class classDisplayer
 	{
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "<tr>\n";
-		echo "<td width =\"140%\" align=\"right\" valign=\"middle\"><!--<div align=\"right\" class=\"currentClass\">".$ci->course->displayCourseNo()."&nbsp;".$ci->course->getName()."</div>--></td>\n";
+		echo "<td width =\"100%\" align=\"right\" valign=\"middle\"><!--<div align=\"right\" class=\"currentClass\">".$ci->course->displayCourseNo()."&nbsp;".$ci->course->getName()."</div>--></td>\n";
 		echo "</tr>\n";
 		echo " <form action=\"index.php?cmd=editTitle&ci=".$ci->getCourseInstanceID()."\" method=\"post\">\n";
 		echo " <tr>\n";
-		echo " 	<td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td>\n";
+		echo " 	<td width=\"100%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td>\n";
 		echo " </tr>\n";
 		echo "	<tr><td colspan=\"3\" align=\"right\"> <a href=\"index.php?cmd=editClass&ci=".$ci->courseInstanceID."\">Return to Edit Class</a></div></td></tr>\n";		
 		echo " <tr>\n";
@@ -478,13 +483,14 @@ class classDisplayer
 		echo "		</tr>\n";
 		}
 		echo "		<tr class=\"headingCell1\">\n";
-		echo "			<td colspan=\"3\" align=\"left\" valign=\"top\"><div align=\"left\"><input type=\"submit\" name=\"updateCrossListing\" value=\"Update Course Info\"></div></td>\n";
 		echo "			<td align=\"left\" valign=\"top\">&nbsp;</td>\n";
 		echo "			<td align=\"left\" valign=\"top\">&nbsp;</td>\n";
 		echo "			<td align=\"left\" valign=\"top\">&nbsp;</td>\n";
 		echo "			<td align=\"left\" valign=\"top\">&nbsp;</td>\n";
 		echo "			<td align=\"left\" valign=\"top\">&nbsp;</td>\n";
-		echo "			<td colspan=\"2\" align=\"left\" valign=\"top\"><div align=\"right\"><input type=\"submit\" name=\"deleteCrossListings\" value=\"Delete Selected\"></div></td>\n";
+		echo "			<td align=\"left\" valign=\"top\">&nbsp;</td>\n";
+		echo "			<td colspan=\"4\" align=\"left\" valign=\"top\"><div align=\"right\"><input type=\"submit\" name=\"updateCrossListing\" value=\"Update Course Info\">&nbsp;<input type=\"submit\" name=\"deleteCrossListings\" value=\"Delete Selected\"></div></td>\n";
+		//echo "				<br>\n";
 		echo "		</tr>\n";
 		echo "  </table>\n";
 		echo " </td>\n";
@@ -572,7 +578,7 @@ class classDisplayer
 		echo " <table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">";
 		echo "<form name=\"editInstructors\" action=\"index.php?cmd=editInstructors&ci=".$ci->courseInstanceID."\" method=\"post\">";
 		echo "<tr>";
-		echo "<td colspan=\"3\" align=\"right\" valign=\"middle\"><!--<div align=\"right\" class=\"currentClass\">".$ci->course->displayCourseNo()."</div>--</td>";
+		echo "<td colspan=\"3\" align=\"right\" valign=\"middle\"><!--<div align=\"right\" class=\"currentClass\">".$ci->course->displayCourseNo()."</div>--></td>";
 		echo " 	</tr>";
 		/* Use this logic if we decide to display the course numbers for the cross listings
 			for ($i=0; $i<count($ci->crossListings); $i++) {
@@ -688,7 +694,6 @@ class classDisplayer
 		echo "		<td colspan=\"3\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td>\n";
 		echo "	</tr>\n";
 		echo "	<tr>";
-		echo '	<td colspan="3" align="left" valign="top" class="courseTitle">'.$ci->course->displayCourseNo() . " " . $ci->course->getName().'</td>';
 		echo "	</tr>";
 		echo "	<tr>\n";
 		echo "		<td colspan=\"3\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td>\n";
@@ -721,12 +726,13 @@ class classDisplayer
 		echo "							</tr>\n";
 		echo "							<tr align=\"left\" valign=\"middle\">\n";
 		echo "								<td width=\"88%\" height=\"68\" valign=\"top\" bgcolor=\"#CCCCCC\" align=\"center\">\n";
-		echo "									<hr align=\"center\" width=\"150\">\n";
-		echo "									<span class=\"strong\">Search Results:</span>\n";
+
 		
 		$addProxyDisabled = "DISABLED";
 		if (is_array($proxyList) && !empty($proxyList)){
 			$addProxyDisabled = "";
+			echo "									<hr align=\"center\" width=\"150\">\n";
+			echo "									<span class=\"strong\">Search Results:</span>\n";
 			echo "									<select name=\"proxy\" onChange='this.form.addProxy.disabled=false;'>\n";
 			foreach($proxyList as $proxy)
 			{					
@@ -752,30 +758,47 @@ class classDisplayer
 		echo "				<tr>\n";
 		echo "					<td align=\"right\" valign=\"top\">\n";
 		echo "						<table width=\"100%\" border=\"0\" cellpadding=\"2\" cellspacing=\"0\" class=\"displayList\">\n";
-		echo "							<tr align=\"left\" valign=\"middle\"><td bgcolor=\"#FFFFFF\" class=\"headingCell1\">&nbsp;</td><td class=\"headingCell1\">Remove</td></tr>\n";
+//		echo "							<tr align=\"left\" valign=\"middle\"><td bgcolor=\"#FFFFFF\" class=\"headingCell1\">&nbsp;</td><td class=\"headingCell1\">Remove</td></tr>\n";
 
 		if (is_array($ci->proxies) && !empty($ci->proxies))
 		{
 			foreach($ci->proxies as $proxy)
 			{
+				echo "							<tr align=\"left\" valign=\"middle\"><td bgcolor=\"#FFFFFF\" class=\"headingCell1\">&nbsp;</td><td class=\"headingCell1\">Remove</td></tr>\n";
 				echo "							<tr align=\"left\" valign=\"middle\">\n";
 				echo "								<td bgcolor=\"#CCCCCC\">". $proxy->getName() ."</td>\n";
 				echo "								<td width=\"8%\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"borders\" align=\"center\">\n";
 				echo "									<input type=\"checkbox\" name=\"proxies[]\" value=\"".$proxy->getUserID()."\">\n";
 				echo "								</td>\n";
 				echo "							</tr>\n";
+				echo "							<tr align=\"left\" valign=\"middle\"><td colspan=\"2\"  class=\"headingCell1\">&nbsp;</td></tr>\n";
+				echo "							<tr align=\"left\" valign=\"middle\"><td colspan=\"2\" align=\"center\"><input type=\"submit\" name=\"removeProxy\" value=\"Remove Selected Proxies\"></td></tr>\n";
 			}
 		} else {
-			echo "							<tr align=\"left\" valign=\"middle\"><td bgcolor=\"#CCCCCC\">&nbsp;</td><td width=\"8%\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"borders\" align=\"center\">&nbsp;</td></tr>\n";
+			echo "							<tr align=\"left\" valign=\"middle\"><td bgcolor=\"#FFFFFF\" class=\"headingCell1\">&nbsp;</td><td class=\"headingCell1\">&nbsp;</td></tr>\n";
+			echo "							<tr align=\"left\" valign=\"middle\"><td bgcolor=\"#CCCCCC\">This class currently has no proxies.</td><td width=\"8%\" valign=\"top\" bgcolor=\"#CCCCCC\" align=\"center\">&nbsp;</td></tr>\n";
+			echo "							<tr align=\"left\" valign=\"middle\"><td colspan=\"2\"  class=\"headingCell1\">&nbsp;</td></tr>\n";
 		}
-		echo "							<tr align=\"left\" valign=\"middle\"><td colspan=\"2\"  class=\"headingCell1\">&nbsp;</td></tr>\n";
-		echo "							<tr align=\"left\" valign=\"middle\"><td colspan=\"2\" align=\"center\"><input type=\"submit\" name=\"removeProxy\" value=\"Remove Selected Proxies\"></td></tr>\n";
+//		echo "							<tr align=\"left\" valign=\"middle\"><td colspan=\"2\"  class=\"headingCell1\">&nbsp;</td></tr>\n";
+//		echo "							<tr align=\"left\" valign=\"middle\"><td colspan=\"2\" align=\"center\"><input type=\"submit\" name=\"removeProxy\" value=\"Remove Selected Proxies\"></td></tr>\n";
 		echo "						</table>\n";
 		echo "					</td>\n";
 		echo "				</tr>\n";
 		echo "			</table>\n";
 		echo "		</td>\n";
 		echo "	</tr>\n";
+		echo "	<tr><td colspan=\"3\">&nbsp;</td></tr>\n";
+		echo "	<tr><td colspan=\"3\"><strong>To Add a Proxy:</strong><br>\n";
+		echo "			<ol><li>Type the last name of the person you would like to add into the search box and click \"Search\".</li>\n";
+		echo "				<li>A drop-down menu will appear with names that match your search. Choose a name from the menu and click the \"Add Proxy\" button.</li>\n";
+		echo "				<li>The name of your proxy will appear on the right under \"Current Proxies\".</li>\n";
+		echo "			</ol>\n";
+		echo "	<tr><td colspan=\"3\">&nbsp;</td></tr>\n";
+		echo "	<tr><td colspan=\"3\"><strong>To Remove a Proxy:</strong><br>\n";
+		echo "			<ol><li>Under the \"Current Proxies\" list, check the box next to the name of the proxy you wish to remove.</li>\n";
+		echo "				<li>Click the \"Delete Proxy\" button.</li>\n";
+		echo "			</ol>\n";		
+		echo "		</td></tr>\n";
 		echo "	<tr><td colspan=\"3\">&nbsp;</td></tr>\n";
 		echo "	<tr><td colspan=\"3\" align=\"center\"> <a href=\"index.php?cmd=editClass&ci=". $ci->getCourseInstanceID() ."\" class=\"strong\">Return to Class</a></div></td></tr>\n";
 		echo "	<tr><td colspan=\"3\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
@@ -1263,7 +1286,9 @@ class classDisplayer
 	    .	 "				<table width=\"50%\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"5\">\n"
 		.	 "					<tr><td><strong>You have successfully added a class.  You May now:</strong></td></tr>\n"
 		.	 "					<tr><td>\n"
-		.	 "						<ul><li><a href=\"index.php?cmd=editClass&ci=". $ci->getCourseInstanceID() ."\">Edit Reserves for this class.</a></li>\n"
+		.	 "				<ul><li><a href=\"index.php?cmd=displaySearchItemMenu&ci=". $ci->getCourseInstanceID() ."\">Add materials to this class</a>		<br>\n"
+		.	 "							<br>\n"
+		.	 "						    <li><a href=\"index.php?cmd=editClass&ci=". $ci->getCourseInstanceID() ."\">Go to this class.</a></li>\n"
 		.	 "							<li><a href=\"index.php?cmd=reactivateClass\">Reactivate another class.</a></li>\n"
 		.	 "							<li><a href=\"index.php?cmd=createClass\">Create a New Class.</a></li>\n"
 		.	 "						</ul>\n"
@@ -1555,7 +1580,7 @@ class classDisplayer
 	{
 		echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">';
 		echo '	<tr>';
-		echo '    	<td width="140%"><img src=images/spacer.gif" width="1" height="5"></td>';
+		echo '    	<td width="100%"><img src=images/spacer.gif" width="1" height="5"></td>';
 		echo '	</tr>';
 		echo '    <tr>';
 		echo '    	<td align="left" valign="top">';
@@ -1613,9 +1638,12 @@ class classDisplayer
 
 	function displayAddClass($courseList, $searchParam) 
 	{
+		$terms = new terms();
+        $currentTerm = $terms->getCurrentTerm();
+        
 		echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">';
 		echo '	<tr> ';
-		echo '    	<td width="140%" colspan="2"><img src=images/spacer.gif" width="1" height="5"></td>';
+		echo '    	<td width="100%" colspan="2"><img src=images/spacer.gif" width="1" height="5"></td>';
 		echo '	</tr>';
 		echo '    <tr> ';
 		echo '    	<td width="50%" c><span class="strong">';
@@ -1625,7 +1653,7 @@ class classDisplayer
 			echo 'Department: '.$searchParam->getAbbr();
 		}
 		echo '</span></td>';
-		echo '		<td width="50%" c><div align="right" class="strong">FALL 2004</div></td>';
+		echo '		<td width="50%" c><div align="right" class="strong">'.$currentTerm->term_name . " " . $currentTerm->term_year.'</div></td>';
 		echo '	</tr>';
 		echo '    <tr> ';
 		echo '    	<td colspan="2" c>&nbsp;</td>';
@@ -1663,10 +1691,12 @@ class classDisplayer
 		echo '</table>';
 	}
 
-	function displayRemoveClass()
+	function displayRemoveClass($user)
 	{
 		global $u;
-	
+        global $g_permission;
+	    
+	    
 		echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">';
 		echo('<FORM METHOD=POST ACTION="index.php">');
 		echo('<INPUT TYPE="HIDDEN" NAME="cmd" VALUE="removeStudent">');
@@ -1716,6 +1746,16 @@ class classDisplayer
 		echo '		</table>';
 		echo '		</td>';
 		echo '	</tr>';
+		if ($u->getDefaultRole() >= $g_permission['proxy']) {
+			echo '<tr><td>&nbsp;</td></tr>';
+			echo '<tr><td><strong>Please note:</strong> If you are a proxy or instructor in a class, you may not remove it from your MyReserves list.';
+			if ($u->getDefaultRole() >= $g_permission['instructor']) {
+						echo '<br>If you would like to completely remove a class from ReservesDirect, please contact your reserves staff.';
+			}
+			echo '</td></tr>';
+		} else {
+			echo '<tr><td>&nbsp;</td></tr>';
+		}		
 		echo '    <tr>';
 		echo '    	<td>&nbsp;</td>';
 		echo '	</tr>';
