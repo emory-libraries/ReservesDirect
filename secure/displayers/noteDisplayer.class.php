@@ -42,8 +42,8 @@ class noteDisplayer
 	{
 		global $g_permission;
 		
-		$reserve = new reserve($reserveID);
-		$reserve->getItem();
+		//$reserve = new reserve($reserveID);
+		//$reserve->getItem();
 		
 		echo "<form name=\"addNote\" action=\"index.php?cmd=addNote\" method=\"post\">\n";
 

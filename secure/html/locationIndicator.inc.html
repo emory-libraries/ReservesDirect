@@ -124,8 +124,10 @@ switch ($page)
 }
 */
 
-if (!is_null($loc))
-	$loc .= " &gt;&gt;";
+if (isset($loc)) {
+	if (!is_null($loc))
+		$loc .= " &gt;&gt;";
+}
 
 if (isset($progress) && is_array($progress))
 {	

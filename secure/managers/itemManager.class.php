@@ -64,8 +64,8 @@ class itemManager
 					$page = "manageClasses";
 					$loc  = "home";
 					
-					if ($_REQUEST[deleteNote]) {
-						$note = new note($_REQUEST[deleteNote]);
+					if (isset($_REQUEST['deleteNote'])) {
+						$note = new note($_REQUEST['deleteNote']);
 						if ($note->getID()) {
 							$note->destroy();
 						}
@@ -95,21 +95,21 @@ class itemManager
 						if ($_REQUEST['source']) $reserve->item->setSource($_REQUEST['source']);
 						if ($_REQUEST['contentNotes']) $reserve->item->setContentNotes($_REQUEST['contentNotes']);
 
-						if ($_REQUEST[itemNotes]) {
-							$itemNotes = array_keys($_REQUEST[itemNotes]);
+						if ($_REQUEST['itemNotes']) {
+							$itemNotes = array_keys($_REQUEST['itemNotes']);
 							foreach ($itemNotes as $itemNote)
 							{
 									$note = new note($itemNote);
-								$note->setText($_REQUEST[itemNotes][$itemNote]);
+								$note->setText($_REQUEST['itemNotes'][$itemNote]);
 							}
 						}
 						
-						if ($_REQUEST[instructorNotes]) {
-							$instructorNotes = array_keys($_REQUEST[instructorNotes]);
+						if ($_REQUEST['instructorNotes']) {
+							$instructorNotes = array_keys($_REQUEST['instructorNotes']);
 							foreach ($instructorNotes as $instructorNote)
 							{
 									$note = new note($instructorNote);
-									$note->setText($_REQUEST[instructorNotes][$instructorNote]);
+									$note->setText($_REQUEST['instructorNotes'][$instructorNote]);
 							}
 						}
 					} 

@@ -225,10 +225,31 @@ class reservesManager
 			case 'searchResults':
 				$page = "addReserve";	
 				$search = new searchItems();	
-				$search->search($_REQUEST['field'], urldecode($_REQUEST['query']), $_REQUEST['f'], $_REQUEST['e']);		
 				
-				$HiddenRequests = $_REQUEST['request'];
-				$HiddenReserves = $_REQUEST['reserve'];
+				if (isset($_REQUEST['f'])) {
+					$f = $_REQUEST['f'];
+				} else {
+					$f = "";
+				}
+				
+				if (isset($_REQUEST['e'])) {
+					$e = $_REQUEST['e'];
+				} else {
+					$e = "";
+				}
+				
+				$search->search($_REQUEST['field'], urldecode($_REQUEST['query']), $f, $e);		
+				
+				if (isset($_REQUEST['request'])) {
+					$HiddenRequests = $_REQUEST['request'];
+				} else {
+					$HiddenRequests = "";
+				}
+				if (isset($_REQUEST['reserve'])) {
+					$HiddenReserves = $_REQUEST['reserve'];
+				} else {
+					$HiddenReserves = "";
+				}
 				
 				$this->displayFunction = "displaySearchResults";
 				$this->argList = array($search, 'storeReserve', $_REQUEST['ci'], $HiddenRequests, $HiddenReserves);
