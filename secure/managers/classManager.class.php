@@ -101,8 +101,9 @@ class classManager
 				
 					if (isset($request['course']))
 					{
-						$courseInstances = $i->getCourseInstancesByCourseID($request['course']);
-						for($i=0;$i<count($courseInstances);$i++) { $courseInstances[$i]->getPrimaryCourse(); }
+						$courseInstances = $user->getCourseInstancesByCourse($request['course'], $request['instructor']);
+						//As an option, this call would return the same as statement above: 
+						//$courseInstances = $i->getMyCourseInstancesByCourseID($request['course']);
 					} else
 						$courseInstances = null;
 				}

@@ -77,7 +77,7 @@ class selectClassManager
 				
 				if (isset($request['select_course'])) // user has selected a course look of course instances
 				{
-					$ci_list = $user->getCourseInstancesByCourse($request['select_course']);
+					$ci_list = $user->getCourseInstancesByCourse($request['select_course'], $request['selected_instr']);
 				} else $ci_list = null;
 				
 				$this->displayFunction = 'classLookup';
