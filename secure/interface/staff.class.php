@@ -147,6 +147,59 @@ class staff extends instructor
 		return $this->courseInstances;
 	}	
 	
+	/**
+	* @return return array of classes
+	* @param $courseID - courseID to retrieve course instances for
+	* @param $instructorID (optional) - instructor to retrieve course instances for
+	* @desc return all classes for a given course, or given course and instructor
+	*/
+	function getCourseInstancesByCourse($courseID,$instructorID=null)
+	{ 
+		global $g_dbConn, $g_permission;
+			
+		
+		if (!$instructorID) {
+			switch ($g_dbConn->phptype)
+			{
+				default: //'mysql'
+					$sql = "SELECT DISTINCT course_instance_id "
+					.	   "FROM course_aliases  "
+					.	   "WHERE course_id = !";
+						   
+			}
+			
+			$rs = $g_dbConn->query($sql, array($courseID));				
+			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+			
+		} else {
+		
+			switch ($g_dbConn->phptype)
+			{
+				default: //'mysql'
+					$sql = "SELECT DISTINCT ca.course_instance_id "
+					.	   "FROM course_aliases as ca  "
+					.	   "JOIN access as a ON ca.course_alias_id = a.alias_id "
+					.	   "WHERE ca.course_id = ! "
+					.	   "AND a.user_id = ! "
+					.      "AND a.permission_level = ".$g_permission['instructor']." ";
+					   
+			}
+
+			$rs = $g_dbConn->query($sql, array($courseID, $instructorID));				
+			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		}
+		
+		$tmpArray = array();
+		while($row = $rs->fetchRow())
+		{
+			$ci = new courseInstance($row[0]);
+			$ci->getPrimaryCourse();
+			$ci->getInstructors();
+			$tmpArray[] = $ci;
+		}
+		return $tmpArray;
+	}
+	
 	function selectUserForAdmin($userClass, $cmd)
 	{
 		$subordinates = common_getUsers('instructor');
