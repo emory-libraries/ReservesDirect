@@ -94,7 +94,7 @@ class requestDisplayer
 				echo "					      <tr>\n";
 				echo "					        <td width=\"12\" valign=\"top\">$cnt)</td>\n";
 				echo "					        <td width=\"98\" valign=\"top\" class=\"strong\">". $ci->course->getName() ."</td>\n";
-				echo "					        <td width=\"359\"><span class=\"strong\">". $ci->course->displayCourseNo() ."</span> | <a href=\"link\">Display All Class Requests for Print</a></td>\n";
+				echo "					        <td width=\"359\"><span class=\"strong\">". $ci->course->displayCourseNo() ."</span> <!--| <a href=\"link\">Display All Class Requests for Print</a>--></td>\n";
 				echo "					      </tr>\n";
 									      
 				echo "					      <tr>\n";
