@@ -75,25 +75,25 @@ HEADER DEFINITIONS
 **************************************************
 */
 
-/* "brand" classes are for branding logos. UpperLeft would
+/* 'brand' classes are for branding logos. UpperLeft would
 generally be for the institution logo, UpperRight for the
-program logo (default is "ReservesDirect" logo). */
+program logo (default is 'ReservesDirect' logo). */
 .brandUpperLeft {
-	background-image:  url("../images/skins/bus/header-leftslice.gif");
+	background-image:  url('../images/skins/bus/header-leftslice.gif');
 	background-repeat: no-repeat;
 	background-position: 0px 0;
 	padding-bottom:10px;
 	height: 95px;
 }
 .brandUpperRight {
-	background-image:  url("../images/skins/bus/header-rtslice.gif");
+	background-image:  url('../images/skins/bus/header-rtslice.gif');
 	background-repeat: no-repeat;
 	background-position: right 0px;
 	padding-bottom:10px;
 }
 
 /* mainNav defines the navigational tabs.
-Tabs are created using the "Sliding Doors" CSS tabs technique
+Tabs are created using the 'Sliding Doors' CSS tabs technique
 by Douglas Bowman at http://www.alistapart.com/articles/slidingdoors/
 This technique can be used to create many different types of tabs;
 the commented guidelines below are for creating standard tabs. */
@@ -103,7 +103,7 @@ the commented guidelines below are for creating standard tabs. */
 	font:x-small/1.5em Verdana, Arial, Helvetica, sans-serif;
 	font-size:x-small;
 	background-color: #79A77D;
-	background-image:  url("../images/skins/bus/navtab-default-bg.gif");
+	background-image:  url('../images/skins/bus/navtab-default-bg.gif');
 	background-repeat: repeat-x;
 	background-position: bottom;
     } 
@@ -116,7 +116,7 @@ the commented guidelines below are for creating standard tabs. */
     }
 #mainNav li {
     float:left;
-	background: url("../images/skins/bus/navtab-default-left-up.gif") 
+	background: url('../images/skins/bus/navtab-default-left-up.gif') 
       no-repeat left top; /* left-hand tab image for inactive tabs */
     margin:0;
     padding:0 0 0 10px; /* top|right|bottom|left padding. left padding=px width of left image */
@@ -124,7 +124,7 @@ the commented guidelines below are for creating standard tabs. */
 #mainNav a {
 	float:left;
 	display:block;
-	background: url("../images/skins/bus/navtab-default-right-up.gif") 
+	background: url('../images/skins/bus/navtab-default-right-up.gif') 
       no-repeat right top;  /* right-hand tab image for inactive tabs */
 	padding:5px 15px 4px 5px; /* left padding=right padding - pixel width of left image
 								bottom padding=desired overall bottom padding-pixel 
@@ -142,10 +142,10 @@ the commented guidelines below are for creating standard tabs. */
       color:#99cc99;
 	  }	
 #mainNav #current {
-	background-image:url("../images/skins/bus/navtab-default-left-down.gif"); /* left-hand tab image for active tabs */
+	background-image:url('../images/skins/bus/navtab-default-left-down.gif'); /* left-hand tab image for active tabs */
     }
 #mainNav #current a {
-	background-image:url("../images/skins/bus/navtab-default-right-down.gif"); /* right-hand tab image for active tabs */
+	background-image:url('../images/skins/bus/navtab-default-right-down.gif'); /* right-hand tab image for active tabs */
 	padding-bottom:5px; /* bottom padding=top padding of mainNav a */
 	color: #006600;
     }
@@ -169,8 +169,8 @@ LINK DEFINITIONS
 ************************************************* 
 */
 
-/* "editlinks" define the appearance of links that perform editing functions on all edit 
- screens, including "Edit Class", "Edit Item", and "Edit User". */
+/* 'editlinks' define the appearance of links that perform editing functions on all edit 
+ screens, including 'Edit Class', 'Edit Item', and 'Edit User'. */
  
 a.editlinks:hover {
 	
@@ -201,7 +201,7 @@ a.editlinks:hover {
 	font-weight: bold;
 }
 
-/* "helptab" defines the appearance of top navigation links in the help file. */
+/* 'helptab' defines the appearance of top navigation links in the help file. */
 a.helptab:link {
 	
 	color: #333333;
@@ -231,7 +231,7 @@ a.helptab:active {
 	font-weight: bold;
 }
 
-/* "helptopic" defines the appearance of topical headers in the helpfile navigation menu. */
+/* 'helptopic' defines the appearance of topical headers in the helpfile navigation menu. */
 a.helptopic:link {
 	
 	color: #333399;
@@ -261,7 +261,7 @@ a.helptopic:active {
 	font-weight: bold;
 }
 
-/* "helpsubtopic" defines the appearance of subtopic headers in the helpfile navigation menu. */
+/* 'helpsubtopic' defines the appearance of subtopic headers in the helpfile navigation menu. */
 a.helpsubtopic:link {
 	
 	color: #996633;
@@ -295,7 +295,7 @@ a.helpsubtopic:active {
 	text-indent: 8px;
 }
 
-/* "itemTitle" defines how reserve item title links are listed. */
+/* 'itemTitle' defines how reserve item title links are listed. */
 
 a.itemTitle:link {
 	
@@ -319,7 +319,7 @@ a.itemTitle:hover {
 	font-weight: bold;
 }
 
-/* "subnav" defines the appearance and links that appear
+/* 'subnav' defines the appearance and links that appear
 in the subnavigation bar just below the main navigation tabs. */
 a.subnav:link {
 	
@@ -378,7 +378,7 @@ PAGE REGION DEFINITIONS
 ************************************************* 
 */
 
-/* "functionlinks" describe the links to site-wide functions like help, sign off, and edit profile
+/* 'functionlinks' describe the links to site-wide functions like help, sign off, and edit profile
 that appear on every screen. In ReservesDirect 2.x, these links appear at the top right
 under the ReservesDirect logo.  */
 #functionlinks {
@@ -499,7 +499,7 @@ FORMATTING DEFINITIONS
 /* The following group of tags define how reserve items are listed, along with a.itemTitle 
 itemTitle defines the appearance of item titles for materials that do not have live links 
 (like physical items) and for reserve item lists that do not show items as hot links (like the sort screen)
-itemMetaPre defines how some prefixes to metadata information appear, for example "from" x journal or book.*/
+itemMetaPre defines how some prefixes to metadata information appear, for example 'from' x journal or book.*/
 
 .itemTitleNoLink {
 	font-size: small;
@@ -511,8 +511,6 @@ itemMetaPre defines how some prefixes to metadata information appear, for exampl
 .itemAuthor {
 	font-size: x-small;
 	font-style: normal;
-	text-transform: uppercase;
-
 }
 
 .itemMeta {
@@ -604,4 +602,158 @@ itemMetaPre defines how some prefixes to metadata information appear, for exampl
 	font-weight: bold;
 	color: #333333;
 	padding-right: 10px;
+}
+
+/*
+****************************************
+Help Screen Definitions
+****************************************
+*/
+
+#helpTabs {
+    float:left;
+    width:100%;
+    background-color:#FFFFFF;
+	font:Arial, Helvetica, sans-serif;
+	font-size:small;
+    } 
+	
+#helpTabs ul {
+    margin:0;
+    padding:0;
+	padding:0; /* padding to top|right and left|bottom of ul, creates space around whole nav bar */
+    list-style:none;
+    }
+#helpTabs li {
+    float:left;
+    margin:3px 3px 0 3px;
+    padding:0; 
+    border-right: 1px solid #666666;
+	border-left: 1px solid #666666;
+	border-top: 1px solid #666666;
+	}
+#helpTabs a {
+	float:left;
+	display:block;
+	background-color: #CCCCCC;
+	padding:4px 20px 4px 20px; /* left padding=right padding - pixel width of left image
+								bottom padding=desired overall bottom padding-pixel 
+								width of bottom border, if any */
+	color: #333333;
+	text-decoration: none;
+	font-weight: bold;
+    }
+	/* Commented Backslash Hack
+     hides rule from IE5-Mac \*/
+  #helpTabs a {float:none;}
+  /* End IE5-Mac hack */ 
+#helpTabs a:hover {
+     color: #000066;
+	text-decoration: underline;
+	  }	
+#helpTabs #current {
+	border-right: 1px solid #666666;
+	border-left: 1px solid #666666;
+	border-top: 1px solid #666666;
+    }
+#helpTabs #current a {
+	background-color: #000066;
+	color: #FFFFFF;
+	text-decoration: none;
+	padding-bottom:4px; /* bottom padding=top padding of mainNav a */
+    }
+
+/* 'helptopic' defines the appearance of topical headers in the helpfile navigation menu. */
+a.helptopic:link {
+	
+	color: #333399;
+	text-decoration: none;
+	font-size: small;
+	font-weight: bold;
+}
+a.helptopic:visited {
+	
+	color: #333399;
+	text-decoration: none;
+	font-size: small;
+	font-weight: bold;
+}
+a.helptopic:hover {
+	
+	color: #999999;
+	text-decoration: none;
+	font-size: small;
+	font-weight: bold;
+}
+a.helptopic:active {
+	
+	color: #993333;
+	text-decoration: none;
+	font-size: small;
+	font-weight: bold;
+}
+
+/* 'helpsubtopic' defines the appearance of subtopic headers in the helpfile navigation menu. */
+a.helpsubtopic:link {
+	
+	color: #996633;
+	text-decoration: none;
+	font-size: x-small;
+	font-weight: bolder;
+	left: 8px;
+}
+a.helpsubtopic:visited {
+	
+	color: #996633;
+	text-decoration: none;
+	font-size: x-small;
+	font-weight: bold;
+	text-indent: 8px;
+}
+a.helpsubtopic:hover {
+	
+	color: #999999;
+	text-decoration: none;
+	font-size: x-small;
+	font-weight: bold;
+	text-indent: 8px;
+}
+a.helpsubtopic:active {
+	
+	color: #993333;
+	text-decoration: none;
+	font-size: x-small;
+	font-weight: bold;
+	text-indent: 8px;
+}
+.border-helpfile {
+	border: 1px solid #000066;
+}
+
+#index {
+	font-size: small;
+	font:Arial, Helvetica, sans-serif;
+	list-style: none;
+}
+#index #broadTopic a {
+	color: #000066;
+	font-weight: bold;
+	text-decoration: none;
+}
+#index #broadTopic a:hover {
+	color: #003399;
+	font-weight: bold;
+	text-decoration: underline;
+}
+#index #narrowTopic a {
+	font-weight: bold;
+	color: #333333;
+	text-decoration: none;
+	text-indent: 8px;
+}
+#index #narrowTopic a:hover {
+	font-weight: bold;
+	color: #999999;
+	text-decoration: underline;
+	text-indent: 8px;
 }
