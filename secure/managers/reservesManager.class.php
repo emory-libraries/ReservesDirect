@@ -124,7 +124,7 @@ class reservesManager
 				
 				$ci = new courseInstance($_REQUEST['ci']);
 		
-				$ci->getReserves();
+				$ci->getActiveReserves();
 				$ci->getInstructors();
 				$ci->getCrossListings();
 				$ci->getPrimaryCourse();
