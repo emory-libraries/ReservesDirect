@@ -100,7 +100,7 @@ class reserveItem extends item
 			$this->creationDate		= $row[10];
 			$this->lastModDate		= $row[11];
 			$this->URL				= $row[12];
-			$this->mimeTypeID			= $row[13];
+			$this->mimeTypeID		= $row[13];
 			$this->homeLibraryID	= $row[14];
 			$this->privateUserID	= $row[15];
 			$this->itemType			= $row[16];
@@ -513,9 +513,10 @@ class reserveItem extends item
 	
 	function getPrivateUserID() { return (!is_null($this->privateUserID) && $this->privateUserID != "") ? $this->privateUserID : null; }
 	
-	function getPhysicalCopy($reserveOnly)
+	function getPhysicalCopy()
 	{
-		$this->physicalCopy = new physicalCopy($this->getLocalControlKey(), $reserveOnly);
+		$this->physicalCopy = new physicalCopy();
+		$this->physicalCopy->getByItemID($this->getItemID());
 	}
 	
 	function isPhysicalItem()

@@ -197,16 +197,16 @@ class zQuery
 			array_push($rs, @fgets($fp, 1024));            
 		}
 		$returnStatus = join($rs, "");
-
-		if(ereg("outcome=OK", $returnStatus)) 
-		{
-			list($devnull, $holdings) = split("result: ", $returnStatus);
+		
+		if(ereg("Outcome=OK", $returnStatus)) 
+		{		
+			list($devnull, $holdings) = split("Outcome=OK\n", $returnStatus);
+			
 			$thisCopies = split("\n", $holdings);
 			for($i = 0; $i < (count($thisCopies) - 1); $i++) 
 			{
-				list($catKey, $sequence, $copy, $callnum, $loc, $type, $bar, $library) = split("\|", $thisCopies[$i]);							
-					$tmpArray[$i]['catKey'] 	= $catKey;
-					$tmpArray[$i]['sequence'] 	= $sequence;
+				//list($catKey, $sequence, $copy, $callnum, $loc, $type, $bar, $library) = split("\|", $thisCopies[$i]);							
+				list($devnull, $devnull, $copy, $callnum, $loc, $type, $bar, $library, $status, $reservesDesk) = split("\|", $thisCopies[$i]);							
 					$tmpArray[$i]['copy']		= $copy;
 					$tmpArray[$i]['callNum']	= $callnum;
 					$tmpArray[$i]['loc']		= $loc;
