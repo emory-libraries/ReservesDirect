@@ -364,6 +364,7 @@ class classManager
 				}
 				
 				$ci->getProxies(); //load current proxies
+				$ci->getPrimaryCourse();
 				
 				if (isset($_REQUEST['queryText']) &&  $_REQUEST['queryText'] != "")
 				{
