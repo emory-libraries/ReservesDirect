@@ -70,7 +70,7 @@ http://coursecontrol.sourceforge.net/
 	<faxURL>http://biliku.library.emory.edu/incoming/</faxURL>  <!-- include trailing / -->
 	
 	<documentDirectory>/home/httpd/html/uploaded/</documentDirectory>  <!-- include trailing / -->
-	<documentURL>http://biliku.library.emory.edu/</documentURL> <!-- include trailing / -->
+	<documentURL>http://biliku.library.emory.edu/uploaded/</documentURL> <!-- include trailing / -->
 	<documentCover>/home/jbwhite/html/projects/reserves2/admin/copyright.pdf</documentCover>  
 	
 	<siteURL>https://biliku/reserves2.1</siteURL>
