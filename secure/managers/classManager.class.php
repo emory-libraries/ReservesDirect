@@ -142,7 +142,9 @@ class classManager
 					$carryXListing = (isset($_REQUEST['carryCrossListing'])) ? $_REQUEST['carryCrossListing'] : null;
 					$carryReserves = (isset($_REQUEST['carryReserve'])) ? $_REQUEST['carryReserve'] : null;
 					
-					$newCI = $user->copyCourseInstance($srcCI, $term->getTermName(), $term->getTermYear(), $term->getBeginDate(), $term->getEndDate(), $srcCI->getStatus(), $srcCI->course->getSection(), $instructorList, $proxyList, $carryXListing, $carryReserves);
+					$activeStatus = "ACTIVE";
+					
+					$newCI = $user->copyCourseInstance($srcCI, $term->getTermName(), $term->getTermYear(), $term->getBeginDate(), $term->getEndDate(), $activeStatus, $srcCI->course->getSection(), $instructorList, $proxyList, $carryXListing, $carryReserves);
 			
 					$this->displayFunction = 'displaySuccess';
 					$this->argList = array($page, $newCI);
