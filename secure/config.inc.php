@@ -89,8 +89,7 @@ http://coursecontrol.sourceforge.net/
 	$g_zReflector		= (string)$configure->catalog->zReflector;
 	$g_reserveScript	= (string)$configure->catalog->reserve_script;
 	$g_holdingsScript	= (string)$configure->catalog->holdings_script;
-	$g_desks = array("GENERAL"=>"GEN","MUSICMEDIA"=>"MM", "CHEMISTRY"=>"CHEM", "OXFORD"=>"OX", "THEOLOGY"=>"THEO", "LAW"=>"LAW");
-	
+		
 	$g_no_javascript_msg = (string)$configure->no_javascript_msg;
 
 	$g_request_notifier_lastrun = (string)$configure->request_notifier->last_run;
