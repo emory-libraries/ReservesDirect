@@ -93,68 +93,80 @@ class requestDisplayer
 				echo "    				<td width=\"85%\" valign=\"top\">\n";		
 				echo "    					<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
 				echo "					      <tr>\n";
-				echo "					        <td width=\"12\" valign=\"top\">$cnt)</td>\n";
-				echo "					        <td width=\"98\" valign=\"top\" class=\"strong\">". $ci->course->getName() ."</td>\n";
-				echo "					        <td width=\"359\"><span class=\"strong\">". $ci->course->displayCourseNo() ."</span> <!--| <a href=\"link\">Display All Class Requests for Print</a>--></td>\n";
+				echo "					        <td width=\"15%\" valign=\"top\"><span class=\"strong\">Request ID: </span>".sprintf("%06s",$r->requestID)."</td>\n";
+				echo "					        <td width=\"50%\" valign=\"top\" class=\"strong\">". $ci->course->getName() ."</td>\n";
+				echo "					        <td width=\"35%\"><span class=\"strong\">". $ci->course->displayCourseNo() ."</span> <!--| <a href=\"link\">Display All Class Requests for Print</a>--></td>\n";
 				echo "					      </tr>\n";
-									      
+				
+				echo "						  <tr>";
+				echo "							<td>&nbsp;</td>";
+				echo "							<td colspan='2'>";
+				echo "								<table>";						      
+				
 				echo "					      <tr>\n";
-				echo "					        <td width=\"12\" valign=\"top\">&nbsp;</td>\n";
-				echo "					        <td width=\"98\" valign=\"top\">". $ci->displayTerm() ."</td>\n";
+				echo "					        <td valign=\"top\">&nbsp;</td>\n";
+				echo "					        <td valign=\"top\">". $ci->displayTerm() ."</td>\n";
 				echo "					        <td align=\"left\" valign=\"top\"></td>\n";
 				echo "					      </tr>\n";
 
 				echo "					      <tr>\n";
-				echo "					        <td width=\"12\" valign=\"top\">&nbsp;</td>\n";
-				echo "					        <td width=\"98\" align=\"right\" valign=\"top\" class=\"strong\">Instructors:</td>\n";
+				echo "					        <td valign=\"top\">&nbsp;</td>\n";
+				echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Instructors:</td>\n";
 				echo "					        <td align=\"left\" valign=\"top\">". $ci->displayInstructors() ."</td>\n";
 				echo "					      </tr>\n";				
 				
 				echo "					      <tr>\n";
-				echo "					        <td width=\"12\" valign=\"top\">&nbsp;</td>\n";
-				echo "					        <td width=\"98\" align=\"right\" valign=\"top\" class=\"strong\">Title:</td>\n";
+				echo "					        <td valign=\"top\">&nbsp;</td>\n";
+				echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Title:</td>\n";
 				echo "					        <td align=\"left\" valign=\"top\">". $item->title ."</td>\n";
 				echo "					      </tr>\n";
 					
 				echo "					      <tr>\n";
-				echo "					        <td width=\"12\" valign=\"top\">&nbsp;</td>\n";
-				echo "					        <td width=\"98\" align=\"right\" valign=\"top\" class=\"strong\">Author:</td>\n";
+				echo "					        <td valign=\"top\">&nbsp;</td>\n";
+				echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Author:</td>\n";
 				echo "					        <td align=\"left\" valign=\"top\">". $item->author ."</td>\n";
 				echo "					      </tr>\n";
 									      
 				
 				echo "					      <tr>\n";
-				echo "					        <td width=\"12\" valign=\"top\">&nbsp;</td>\n";
-				echo "					        <td width=\"98\" align=\"right\" valign=\"top\" class=\"strong\">Location:</td>\n";
+				echo "					        <td valign=\"top\">&nbsp;</td>\n";
+				echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Location:</td>\n";
 				echo "					        <td align=\"left\" valign=\"top\">". $pCopy->getOwningLibrary() . " " . $pCopy->getStatus() ." ". $pCopy->getCallNumber() ."</td>\n";
 				echo "					      </tr>\n";
 					
 
 				echo "					      <tr>\n";
-				echo "					        <td width=\"12\" valign=\"top\">&nbsp;</td>\n";
-				echo "					        <td width=\"98\" align=\"right\" valign=\"top\" class=\"strong\">Cross Listings:</td>\n";
+				echo "					        <td valign=\"top\">&nbsp;</td>\n";
+				echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Cross Listings:</td>\n";
 				echo "					        <td align=\"left\" valign=\"top\">" . $ci->displayCrossListings() . "</td>\n";
 				echo "					      </tr>\n";				
 				
 				/*
 				echo "					      <tr>\n";
-				echo "					        <td width=\"12\" valign=\"top\">&nbsp;</td>\n";
-				echo "					        <td width=\"98\" align=\"right\" valign=\"top\" class=\"strong\">Notes:</td>\n";
+				echo "					        <td valign=\"top\">&nbsp;</td>\n";
+				echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Notes:</td>\n";
 				echo "					        <td align=\"left\" valign=\"top\">Not Implemeted</td>\n";
 				echo "					      </tr>\n";
 				*/
 				
 				echo "					      <tr>\n";
-				echo "					        <td width=\"12\" valign=\"top\">&nbsp;</td>\n";
-				echo "					        <td width=\"98\" align=\"right\" valign=\"top\" class=\"strong\">Activate By:</td>\n";
+				echo "					        <td valign=\"top\">&nbsp;</td>\n";
+				echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Activate By:</td>\n";
 				echo "					        <td align=\"left\" valign=\"top\">". common_formatdate($r->getDesiredDate(), "MM-DD-YYYY") ."</td>\n";
 				echo "					      </tr>\n";
 					
 				echo "					      <tr>\n";
-				echo "					        <td width=\"12\" valign=\"top\">&nbsp;</td>\n";
-				echo "					        <td width=\"98\" align=\"right\" valign=\"top\" class=\"strong\">Date Requested:</td>\n";
+				echo "					        <td valign=\"top\">&nbsp;</td>\n";
+				echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Date Requested:</td>\n";
 				echo "					        <td align=\"left\" valign=\"top\">". common_formatdate($r->getDateRequested(), "MM-DD-YYYY") ."</td>\n";
 				echo "					      </tr>\n";
+				
+				echo "					      <tr>\n";
+				echo "					        <td valign=\"top\">&nbsp;</td>\n";
+				echo "					        <td valign=\"top\">&nbsp;</td>\n";
+				echo "					        <td align=\"left\" valign=\"top\">&nbsp;</td>\n";
+				echo "					      </tr>\n";
+				
 				echo "    					</table>\n";
 				echo "    				</td>\n";
 				echo "    				<td align=\"right\" valign=\"top\">\n";
@@ -165,14 +177,8 @@ class requestDisplayer
 				echo "						&nbsp;<a href=\"index.php?cmd=deleteRequest&request_id=".$r->requestID."\">Delete Request</a>&nbsp;";
 				echo "					</td>\n";
 				echo " 				</tr>\n";
-				  				
-				echo " 				<tr align=\"left\" valign=\"middle\" class=\"$rowClass\"><td width=\"85%\" valign=\"top\">&nbsp;</td><td valign=\"top\">&nbsp;</td></tr>\n";
-				echo " 				<tr align=\"left\" valign=\"middle\" class=\"$rowClass\"><td width=\"85%\" valign=\"top\">&nbsp;</td><td valign=\"top\">&nbsp;</td></tr>\n";
-				echo " 				<tr align=\"left\" valign=\"middle\" class=\"$rowClass\"><td width=\"85%\" valign=\"top\">&nbsp;</td><td valign=\"top\">&nbsp;</td></tr>\n";
-				echo " 				<tr align=\"left\" valign=\"middle\" class=\"$rowClass\"><td width=\"85%\" valign=\"top\">&nbsp;</td><td valign=\"top\">&nbsp;</td></tr>\n";
-				echo " 				<tr align=\"left\" valign=\"middle\" class=\"$rowClass\"><td width=\"85%\" valign=\"top\">&nbsp;</td><td valign=\"top\">&nbsp;</td></tr>\n";
-				
-				echo " 				<tr align=\"left\" valign=\"middle\" class=\"$rowClass\"><td width=\"85%\" valign=\"top\">&nbsp;</td><td valign=\"top\">&nbsp;</td></tr>\n";
+
+				echo " </table></td></tr>"; 
 				echo " 			</table>\n";	
 				
 			}
@@ -599,6 +605,10 @@ class requestDisplayer
 		echo "		</td>\n";
 		echo "	</tr>\n";
 		echo "	<tr><td><strong><font color=\"#FF0000\">* </font></strong><span class=\"helperText\">= required fields</span></td></tr>\n";		
+		/*
+		if ($cmd == "addDigitalItem")
+			echo "	<tr><td align=\"center\"><input type=\"checkbox\" name=\"addDuplicate\" value=\"addDuplicate\">&nbsp;<span class=\"small\">Create Item Duplicate</span></td></tr>\n";
+		*/
 		echo "	<tr><td align=\"center\"><input type=\"button\" name=\"store_request\" value=\"$buttonValue\" onClick=\"checkForm(this.form);\"></td></tr>\n";
 		echo "</form\n";
 		echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
