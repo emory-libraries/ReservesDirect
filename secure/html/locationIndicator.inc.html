@@ -153,7 +153,11 @@ if (isset($progress) && is_array($progress))
 	echo "</tr>\n";
 }
 
-$currentClass = ($ci instanceof courseInstance && $ci->course instanceof course) ?  $ci->course->displayCourseNo() . " " . $ci->course->getName() : "";
+if ($ci instanceof courseInstance)
+{
+	if (!$ci->course instanceof course) $ci->getCourseForUser($u->getUserID());
+	$currentClass = $ci->course->displayCourseNo() . " " . $ci->course->getName();
+}
 
 echo "<tr>\n";
 echo "	<td height=\"4\" colspan=\"2\">\n";
