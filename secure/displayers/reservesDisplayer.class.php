@@ -257,7 +257,10 @@ class reservesDisplayer
 	            	echo '<span class="itemTitleNoLink">'.$title.'</span><br>'; 
 	            	if ($author) {echo '<span class="itemAuthor">'.$author.'</span><br>';}
                 	if ($callNumber) {echo '<span class="itemMeta">'.$callNumber.'</span><br>';}
-					echo '<span class="itemMetaPre">On Reserve at:</span> <span class="itemMeta"> '.$reserveDesk.'</span> &gt;&gt; <a href="'.$viewReserveURL.'" target="_blank" class="strong">more info</a><br>';
+					echo '<span class="itemMetaPre">On Reserve at:</span> <span class="itemMeta"> '.$reserveDesk.'</span>';
+					if ($ci->reserveList[$i]->item->getLocalControlKey())
+						{echo ' &gt;&gt; <a href="'.$viewReserveURL.'" target="_blank" class="strong">more info</a>';}
+					echo '<br>';
 	            }
 	            /*
 	            	if ($url)
@@ -1250,7 +1253,8 @@ echo	 '	<tr>'
 	    if (!$reserveItem->isPhysicalItem()) {
 	    		echo '<a href="'.$viewReserveURL.'" target="_blank">'.$ci->reserveList[$i]->item->getTitle().'</a>';
 	    } else {
-	            echo $ci->reserveList[$i]->item->getTitle().' <a href="'.$viewReserveURL.'" target="_blank">(more info)</a>';
+	            echo $ci->reserveList[$i]->item->getTitle();
+	            if ($ci->reserveList[$i]->item->getLocalControlKey()) {echo ' <a href="'.$viewReserveURL.'" target="_blank">(more info)</a>';}
 	    }
 	    
 	    echo '. '.$ci->reserveList[$i]->item->getAuthor().'</td></tr>';
@@ -1376,7 +1380,10 @@ echo '            </tr>';
 	    if (!$reserveItem->isPhysicalItem()) {
 	    		echo '<a href="'.$viewReserveURL.'" target="_blank">'.$ci->reserveList[$i]->item->getTitle().'</a>';
 	    } else {
-	            echo $ci->reserveList[$i]->item->getTitle().' <a href="'.$viewReserveURL.'" target="_blank">(more info)</a>';
+	            echo $ci->reserveList[$i]->item->getTitle();
+	            if ($ci->reserveList[$i]->item->getLocalControlKey()){
+	            	echo ' <a href="'.$viewReserveURL.'" target="_blank">(more info)</a>';
+	            }
 	    }
 	    
 	    echo '. '.$ci->reserveList[$i]->item->getAuthor().'</td>';

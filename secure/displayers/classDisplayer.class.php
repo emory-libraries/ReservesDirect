@@ -247,13 +247,15 @@ class classDisplayer
 			} else {	
 	
 				$rowClass = ($rowNumber++ % 2) ? $rowClass = "evenRow" : "oddRow";
-				
+
 				// begin remove
 				$status = $ci->reserveList[$i]->getStatus();
 				$activationDate = $ci->reserveList[$i]->activationDate;
+				//$expirationDate = $ci->reserveList[$i]->expirationDate;
 				$todaysDate = date ('Y-m-d');
 				//override status of ACTIVE and make HIDDEN if reserve is Active w/a future activation date
 				if (($status == 'ACTIVE') && ($activationDate > $todaysDate)) {$status = 'HIDDEN';}
+				//if (($status == 'ACTIVE') && (($activationDate > $todaysDate) || ($expirationDate <= $todaysDate))) {$status = 'HIDDEN';}
 				$reserveItem = new reserveItem($ci->reserveList[$i]->getItemID());
 				$itemIcon = $reserveItem->getItemIcon();
 				$itemGroup = $reserveItem->itemGroup;
@@ -291,7 +293,10 @@ class classDisplayer
 	            } else {
 	            	echo '<em>'.$ci->reserveList[$i]->item->getTitle().'</em>.';
 	            	if ($callNumber) {echo '<br>'.$callNumber;}
-	            	echo '<br>On Reserve At: '.$reserveDesk.' (<a href="'.$viewReserveURL.'" target="_blank">more info</a>)';
+	            	echo '<br>On Reserve At: '.$reserveDesk;
+	            	if ($ci->reserveList[$i]->item->getLocalControlKey()){
+	            		echo ' (<a href="'.$viewReserveURL.'" target="_blank">more info</a>)';
+	            	}
 	            }
 	            
 	            /*
@@ -1204,7 +1209,10 @@ class classDisplayer
 	            	echo '<span class="itemTitleNoLink">'.$title.'</span><br>'; 
 	            	if ($author) {echo '<span class="itemAuthor">'.$author.'</span><br>';}
                 	if ($callNumber) {echo '<span class="itemMeta">'.$callNumber.'</span><br>';}
-					echo '<span class="itemMetaPre">On Reserve at:</span> <span class="itemMeta"> '.$reserveDesk.'</span> &gt;&gt; <a href="'.$viewReserveURL.'" target="_blank" class="strong">more info</a><br>';
+					echo '<span class="itemMetaPre">On Reserve at:</span> <span class="itemMeta"> '.$reserveDesk.'</span>';
+					if ($ci->reserveList[$i]->item->getLocalControlKey()) {
+						echo ' &gt;&gt; <a href="'.$viewReserveURL.'" target="_blank" class="strong">more info</a><br>';
+					}
 	            }
 	            
 	            	if ($performer)
