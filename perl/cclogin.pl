@@ -15,9 +15,9 @@ my $skin = "";
 my $docs = "";
 my $img = "";
 my $title = "";
-my $loginpath = "/reserves2.1/index.php";
-my $css = "/reserves2/css/ReservesStyles.css";
-my $imagepath = "images";
+my $loginpath = "/mcyork/reserves2/index.php";
+my $css = "/mcyork/reserves2/css/ReservesStyles.css";
+my $imagepath = "/mcyork/reserves2/images";
 my $hostname = "biliku.library.emory.edu";
 
 my $reason = $r->prev->subprocess_env("AuthCookieReason");
@@ -47,7 +47,7 @@ my $form = <<HERE;
     <td colspan="2"><div align="center">
       <table width="100%" border="0" cellspacing="0" cellpadding="0">
         <tr valign="top">
-          <td valign="middle"><img src="$imagepath/logo-_emorylibraries-blue.jpg" ></td>
+          <td valign="middle"><img src="$imagepath/logo-el-blue.jpg" ></td>
           <td><div align="right"><img src="$imagepath/logo_rd-gold.gif"></div></td>
         </tr>
       </table>
@@ -116,7 +116,7 @@ my $form = <<HERE;
       <ul>
          <li>Call the Business School Support Desk 404-727-0581 between the hours of 8:00 am to 5:00 pm Monday through Friday for assistance, or</li>
          <li>Come to room 400 or room 430 in the Business School with your Student ID or,</li>
-         <li>E-mail the Business School Suport Desk and we will e-mail your password to your First Class e-mail account.</li> </p>
+         <li>E-mail the Business School <a href="mailto:Support_Desk<AT>bus.emory.edu">Suport Desk</a> and we will e-mail your password to your First Class e-mail account.</li> </p>
     </td>
  </tr>
       <tr>
