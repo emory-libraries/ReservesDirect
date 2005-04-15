@@ -83,12 +83,12 @@ if (!isset($_REQUEST['ci']))
     echo "		<webMaster>reservesdesk@listserv.cc.emory.edu (Reserves Desk)</webMaster>\n";
     
     echo "		<description>";
-    echo 		"Course Reserves for" . htmlentities($ci->course->displayCourseNo() . " " . $ci->course->name . " " . $ci->displayTerm()) . "<br/>";
+    echo 		"Course Reserves for" . htmlentities($ci->course->displayCourseNo() . " " . $ci->course->name . " " . $ci->displayTerm()) . "&lt;br/&gt;";
     echo 		"taught by: ";
     foreach($ci->instructorList as $instr)
-    	echo htmlentities($instr->getEmail() . " (" . $instr->getName()) . ")<br/>";
+    	echo htmlentities($instr->getEmail() . " (" . $instr->getName()) . ")&lt;br/&gt;";
     
-    echo		"Helper Applications required for viewing reserves: <a href=\"http://www.adobe.com/products/acrobat/readstep2.html\">Adobe Acrobat Reader</a>";
+    echo		"Helper Applications required for viewing reserves: &lt;a href=\"http://www.adobe.com/products/acrobat/readstep2.html\"&gt;Adobe Acrobat Reader&lt;/a&gt;";
     echo 		"</description>\n";
     	
     //$rItem = new reserveItem();
@@ -105,22 +105,22 @@ if (!isset($_REQUEST['ci']))
     	echo "			<description>";
     	
     	//ouput what we have as the description
-    		if ($rItem->item->getAuthor() != "") 				echo htmlentities($rItem->item->getAuthor()) . "<br/>";
-    		if ($rItem->item->getPerformer() != "") 			echo "preformed by: " . htmlentities($rItem->item->getPerformer()) . "<br/>";
+    		if ($rItem->item->getAuthor() != "") 				echo htmlentities($rItem->item->getAuthor()) . "&lt;br/&gt;";
+    		if ($rItem->item->getPerformer() != "") 			echo "preformed by: " . htmlentities($rItem->item->getPerformer()) . "&lt;br/&gt;";
     		
-    		if ($rItem->item->getVolumeTitle() != "")			echo htmlentities($rItem->item->getVolumeTitle() . " " . $rItem->item->getVolumeEdition() . " " . $rItem->item->getPagesTimes()) . "<br/>";
-    		elseif ($rItem->item->getVolumeEdition() != "")		echo htmlentities($rItem->item->getVolumeEdition() . " " . $rItem->item->getPagesTimes()) . "<br/>";
-    		elseif ($rItem->item->getPagesTimes() != "")		echo htmlentities($rItem->item->getPagesTimes()) . "<br/>";
+    		if ($rItem->item->getVolumeTitle() != "")			echo htmlentities($rItem->item->getVolumeTitle() . " " . $rItem->item->getVolumeEdition() . " " . $rItem->item->getPagesTimes()) . "&lt;br/&gt;";
+    		elseif ($rItem->item->getVolumeEdition() != "")		echo htmlentities($rItem->item->getVolumeEdition() . " " . $rItem->item->getPagesTimes()) . "&lt;br/&gt;";
+    		elseif ($rItem->item->getPagesTimes() != "")		echo htmlentities($rItem->item->getPagesTimes()) . "&lt;br/&gt;";
     		
-    		if ($rItem->item->getSource() != "") 				echo htmlentities($rItem->item->getSource()) . "<br/>";
+    		if ($rItem->item->getSource() != "") 				echo htmlentities($rItem->item->getSource()) . "&lt;br/&gt;";
     	
     		foreach ($rItem->item->notes as $n)
     		{
-    			if ($n->getType() == 'Instructor') echo htmlentities($n->getText()) . "<br/>";
-    			elseif ($n->getType() == 'Content') echo htmlentities($n->getText()) . "<br/>";
+    			if ($n->getType() == 'Instructor') echo htmlentities($n->getText()) . "&lt;br/&gt;";
+    			elseif ($n->getType() == 'Content') echo htmlentities($n->getText()) . "&lt;br/&gt;";
     			
     		}
-    	echo 			htmlentities("<hr noshade/>");	
+    	echo 			htmlentities("&lt;hr noshade/&gt;");	
     	echo "			</description>\n";    				
     	echo "		</item>\n";
     }
