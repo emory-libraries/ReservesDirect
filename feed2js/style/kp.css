@@ -1,0 +1,93 @@
+/* begin styles for RSS Feed */
+
+
+
+.rss_box {
+
+	 margin: 5px 5%;
+
+	 padding: 4px 8px;
+
+	 width: 219px;
+
+	 background-color: #ffffff;
+
+	
+
+}
+
+
+
+.rss_title, rss_title a {
+
+	font-family: "verdana, arial, sans-serif;
+
+	font-size: 11;
+
+	font-weight:normal;
+
+	margin: 0px 0;
+
+	padding: 0;
+
+	letter-spacing: 1px;
+
+}
+
+
+
+.rss_items {
+
+  
+
+}
+
+
+
+.rss_item  {
+
+  font-family: verdana, arial, sans-serif;
+
+  font-size: 11px;
+
+  font-weight : normal; 
+
+  margin: 0px 0;
+
+}
+
+
+
+.rss_item a:link, .rss_item a:visited, .rss_item a:active {
+
+	text-decoration : none;
+
+	border-bottom: 1px solid #336699;
+
+	color: #336699;
+
+	}
+
+
+
+.rss_item a:hover { 
+
+	text-decoration : none;
+
+	color: #336699;
+
+	border-bottom: 1px dotted #336699;
+
+	}
+
+	
+
+.rss_date {
+
+	font-size: 11px;
+
+	font-weight : normal;
+
+	color: #336699;
+
+	}

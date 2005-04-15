@@ -1,0 +1,54 @@
+body { 
+	background:#ededed;
+	font-family: verdana, arial, sans-serif; 	
+	margin:0;
+	padding:0;
+}
+
+#content {
+	background:#fff;
+	margin: 20px 5%;
+	padding: 4px 20px;
+	border: 1px dotted #777;
+}
+	
+p { 
+	font-size: x-small;
+	margin: 0 0 1em;
+	}
+	
+.first { margin-top:0;}
+
+h1, h2 { font-family: "American Typewriter", "Courier New", Courier, monospaced; margin-bottom:0;}   
+
+h1 {font-size: 32px;}
+h2 {font-size: 16px;}
+
+.spread, .nospread {
+	font-size: x-small;
+	margin-top:0;
+	margin-left:20px;
+	}
+
+.spread li {
+ 	font-size: 11px;
+	margin-bottom:0.5em;
+}
+
+pre {
+    border: #777777 1px solid;
+    padding: 0.5em;
+    margin-left: 1em;
+    margin-right: 2em;
+    white-space: pre;
+    background-color: #e6e6e6;
+    color: black;
+}
+
+#footer { 
+	margin: 60px 20% 10px;
+}
+
+#footer p.smallprint {
+	font-family: "American Typewriter", "Courier New", Courier, monospaced; font-size: 11px;  color: #222; padding: 0.5em 1em;  background-color:#ccf;}
+

@@ -1,0 +1,55 @@
+/* begin styles for RSS Feed */
+
+.rss_box {
+	 width: 500px;
+	 background:#fff url(dog.jpg) bottom left no-repeat; 
+	 padding: 5px 10px 5px 120px;
+	 border-left: 8px solid #111; 
+	 border-top: 8px solid #111;
+}
+
+.rss_title, .rss_title a:link
+{
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-size: 44px;
+	font-weight: bold;
+	text-decoration:none;
+	margin: 5px 0;
+	padding: 0;
+	text-align:right;
+
+}
+
+.rss_title a:visited, .rss_title a:active {
+	color: #922;
+}
+
+rss_title a:hover {
+text-decoration:underline;
+}
+
+.rss_items {
+  
+}
+
+.rss_item  {
+  font-family: Arial, Verdana, sans-serif;
+  font-size: 14px;
+  margin-bottom: 1em
+}
+
+.rss_item a:link, .rss_item a:visited, .rss_item a:active {
+	text-decoration : none;
+	color: #26590D;
+	}
+
+.rss_item a:hover { 
+	text-decoration : underline;
+	color: #F66025;
+	}
+	
+.rss_date {
+	font-size: 11px;
+	font-weight : normal;
+	color: #338;
+	}

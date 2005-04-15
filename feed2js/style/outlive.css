@@ -1,0 +1,44 @@
+/* begin styles for RSS Feed */
+
+.rss_box {
+	 margin: 1em;
+	 width: 98%;
+	 background-color: #EEE;
+	 border: 1px solid silver;
+	 
+}
+.rss_items {
+	margin-top:0px;
+	padding:0.5em; 0.5em;
+	margin-left:0px;
+	color:#000000;
+}
+p.rss_title {padding:0.5em;}
+.rss_title {
+	font-size: 8pt;
+	background-color: silver;
+	color: gray;
+	font-weight:bold;
+	text-align: left;
+}
+
+.rss_item  {
+  font-size: 7pt;
+  list-style:none;
+  padding-bottom:1em;
+}
+
+.rss_item a {
+	color:navy;
+	font-size: 9pt;
+	font-weight:bold;
+	}
+	
+.rss_item a:visited {
+	color: black;
+}
+
+.rss_date {
+	font-size: 7pt;
+	color: red;
+	}

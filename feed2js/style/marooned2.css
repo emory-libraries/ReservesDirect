@@ -1,0 +1,19 @@
+/* begin styles for RSS Feed */
+
+h2 { color: maroon; font-size: 170%; text-decoration: none font-weight: bold; ffont-family: FontName, Tahoma }
+
+h3 { color: maroon; font-size: 140%; text-decoration: none font-weight: bold; text-indent: 5em; ffont-family: FontName, Tahoma }
+
+.rss_box { background-color: white; margin: 10px 15%; padding: 4px 8px; border: solid 5px maroon }
+
+.rss_title, rss_title a { font-size: 120%; font-family: FontName, Tahoma; font-weight: bold; letter-spacing: 1px; margin: 5px 0; padding: 0 }
+
+.rss_items    { list-style-type: none; list-style-image: url("http://142.27.144.70/gerry/pointer.jpg") }
+
+.rss_item { color: black; font-size: 75%; font-family: Tahoma; font-weight: bold; margin: 8px 0 }
+
+.rss_item a:link, .rss_item a:visited { color: maroon; font-size: 120%; text-decoration: none }
+
+.rss_item a:hover { color: gray; text-decoration: underline }
+
+.rss_date { color: gray; font-size: 80%; font-weight: normal }
