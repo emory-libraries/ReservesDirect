@@ -1,5 +1,8 @@
 <?
 /*******************************************************************************
+THIS FILE HAS BEEN MODIFIED TO WORK WITH THE RESERVES DEMO.  DO NOT ADD IT TO THE MAIN CVS BRANCH
+
+
 index.php
 primary processing and display page
 

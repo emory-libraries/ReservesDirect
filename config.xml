@@ -40,7 +40,7 @@ http://coursecontrol.sourceforge.net/
 	    <username>reserves_user</username>
 	    <pwd>30322</pwd>
 	    <host>localhost</host>
-	    <dbname>reserves</dbname>
+	    <dbname>reservesdemo</dbname>
 	    <dbkey>client-key.pem</dbkey>
 	    <dbcert>client-cert.pem</dbcert>
 	    <dbca>cacert.pem</dbca>
