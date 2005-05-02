@@ -34,7 +34,7 @@ http://coursecontrol.sourceforge.net/
 *******************************************************************************/
 	require_once("DB.php");
 	
-	$xmlConfig = "/etc/httpd/conf/reserves2demo_config.xml";
+	$xmlConfig = "config.xml";
 	
 	if (!is_readable($xmlConfig)) { trigger_error("Could not read configure xml file path=$xmlConfig", E_USER_ERROR); }
 	

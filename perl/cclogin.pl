@@ -15,9 +15,9 @@ my $skin = "";
 my $docs = "";
 my $img = "";
 my $title = "";
-my $loginpath = "/mcyork/reserves2/index.php";
-my $css = "/mcyork/reserves2/css/ReservesStyles.css";
-my $imagepath = "/mcyork/reserves2/images";
+my $loginpath = "/jbwhite/reserves2/index.php";
+my $css = "/jbwhite/reserves2/css/ReservesStyles.css";
+my $imagepath = "/jbwhite/reserves2/images";
 my $hostname = "biliku.library.emory.edu";
 
 my $reason = $r->prev->subprocess_env("AuthCookieReason");

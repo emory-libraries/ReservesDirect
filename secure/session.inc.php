@@ -1,28 +1,23 @@
 <?
-/*
-		THIS FILE HAS BEEN MODIFIED TO WORK WITH THE RESERVES DEMO 
-		
-		Authorization has been removed.  It should never be used in a full distribution.
-		
-*/
 session_start();
+//session_unset();
 
 //find AuthCookieHandler
-$authKey = "ReservesDirectDemo";
-setcookie($authKey, "", null, $domain, $host, 1);
+$keys = array_keys($_REQUEST);
 
-$_SESSION['authKey'] = $authKey;
-$user = new user();
-
-$username = (isset($_REQUEST['user'])) ? $_REQUEST['user'] : $_SESSION['username'];
-	
-if (!$user->getUserByUserName($username))
-{
-	$user->createUser($_REQUEST['user'], "", "", "", $_REQUEST['permission']);  //we allow any authorized user to enter with default role of student
+for($ndx=0;$ndx<count($keys);$ndx++){
+	if (eregi("AuthCookieHandler", $keys[$ndx])){ 	break;	}
 }
-//else 
-	//if (isset($_REQUEST['permission']))
-		//$user->setDefaultRole($_REQUEST['permission']);
+$args = explode(':', $_REQUEST[$keys[$ndx]]); //split out username
+
+$_SESSION['authKey'] = $keys[$ndx];
+$user = new user();
+	
+if (!$user->getUserByUserName($args[0]))
+{
+	$user->createUser($args[0], "", "", "", 0);  //we allow any authorized user to enter with default role of student
+}
+	
 
 // Use $HTTP_SESSION_VARS with PHP 4.0.6 or less
 
