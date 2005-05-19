@@ -129,7 +129,7 @@ class classDisplayer
 	
 		echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">';
 		echo '<tr>';
-		echo "<td width=\"100%\" align=\"right\" valign=\"middle\" class=\"small\" align=\"right\"><a href=\"javascript:openWindow('&cmd=previewStudentView&ci=".$ci->courseInstanceID . "','width=800,height=600');\">Preview Student View</a> | <a href=\"index.php\">Exit class</a></td>\n";
+		echo "<td width=\"90%\" align=\"right\" valign=\"middle\" class=\"small\" align=\"right\"><a href=\"javascript:openWindow('&cmd=previewStudentView&ci=".$ci->courseInstanceID . "','width=800,height=600');\">Preview Student View</a> | <a href=\"index.php\">Exit class</a></td>\n";
 		echo '</tr>';
 		echo	'<tr>'
 		.	'	<td width="100%" colspan="2"><img src=images/spacer.gif" width="1" height="5"> </td>'
@@ -397,7 +397,7 @@ class classDisplayer
 	
 	function displayEditTitle($ci, $deptList, $deptID)
 	{
-		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+		echo "<table width=\"80%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "<tr>\n";
 		echo "<td width =\"100%\" align=\"right\" valign=\"middle\"><!--<div align=\"right\" class=\"currentClass\">".$ci->course->displayCourseNo()."&nbsp;".$ci->course->getName()."</div>--></td>\n";
 		echo "</tr>\n";
@@ -408,7 +408,7 @@ class classDisplayer
 		echo "	<tr><td colspan=\"3\" align=\"right\"> <a href=\"index.php?cmd=editClass&ci=".$ci->courseInstanceID."\">Return to Edit Class</a></div></td></tr>\n";		
 		echo " <tr>\n";
 		echo " 	<td>\n";
-		echo " 	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
+		echo " 	<table width=\"80%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
 		echo "     	<tr align=\"left\" valign=\"top\">\n";
 		echo "         	<td width=\"40%\" class=\"headingCell1\">CLASS TITLE and CROSSLISTINGS</td>\n";
 		echo " 			<td>&nbsp;</td>\n";

@@ -103,8 +103,9 @@ class item
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT item_id, title, item_group, last_modified, creation_date, item_type, content_notes "
-					.  "FROM items "						  
+				$sql = "SELECT i.item_id, i.title, i.item_group, i.last_modified, i.creation_date, i.item_type, i.content_notes, n.note_id "
+					.  "FROM items as i "						  
+					.  "LEFT JOIN notes as n on n.target_table='items' n.target_id = i.item_id "
 					.  "WHERE item_id = !"
 					;
 		}
@@ -120,6 +121,7 @@ class item
 			$this->creationDate = $row[4];
 			$this->itemType		= $row[5];				
 			$this->contentNotes	= $row[6];				
+			$this->notes[] = new note($row[7]);
 	}
 	
 	/**
@@ -222,7 +224,7 @@ class item
 	
 	function getNotes()
 	{
-		$this->notes = common_getNotesByTarget("items", $this->itemID);
+		//$this->notes = common_getNotesByTarget("items", $this->itemID);
 		return $this->notes;
 	}
 	

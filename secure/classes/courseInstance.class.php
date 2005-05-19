@@ -495,38 +495,38 @@ class courseInstance
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT r.reserve_id, r.sort_order, i.title "
+				$sql = "SELECT r.reserve_id, r.sort_order, i.title, n.note_id "
 					.  "FROM reserves as r "
-					.  "  JOIN items as i ON r.item_id = i.item_id  "							  
-					.  "WHERE course_instance_id = ! ORDER BY r.sort_order, i.title";
-				$sql_author = "SELECT r.reserve_id, i.author, i.title "
-					 .  "FROM reserves as r "
-					 .  "  JOIN items as i ON r.item_id = i.item_id  "							  
-					 .  "WHERE course_instance_id = ! "
-					 .  "ORDER BY i.author, i.title"
-					 ;	
-				$sql_title = "SELECT r.reserve_id, i.title, i.author "
-					 .  "FROM reserves as r "
-					 .  "  JOIN items as i ON r.item_id = i.item_id  "							  
-					 .  "WHERE course_instance_id = ! "
-					 .  "ORDER BY i.title, i.author"
-					 ;	
+					.  "  JOIN items as i ON r.item_id = i.item_id  "
+					.  "  LEFT JOIN notes as n ON n.target_table = 'reserves' AND r.reserve_id = n.target_id "	
+					.  "WHERE course_instance_id = ! ";
+					
+				$order_default 	= "ORDER BY r.sort_order, i.title";
+				$order_author  	= "ORDER BY i.author, i.title";
+				$order_title	= "ORDER BY i.title, i.author";
 		}
 		
-		if (!$sortBy) {
-			$rs = $g_dbConn->query($sql, $this->courseInstanceID);		
-			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		} elseif ($sortBy=='author') {
-			$rs = $g_dbConn->query($sql_author, $this->courseInstanceID);		
-			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		} elseif ($sortBy=='title') {
-			$rs = $g_dbConn->query($sql_title, $this->courseInstanceID);		
-			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		switch (!$sortBy) {
+			
+			
+		case 'author':
+			$sort = $order_author;
+			break;
+		case 'title':
+			$sort = $order_title;
+			break;
+		default:
+			$sort = $order_default;
 		}
+		
+		$rs = $g_dbConn->query($sql . $sort, $this->courseInstanceID);		
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
 		$this->reserveList = array();
 		while ($row = $rs->fetchRow()) {
-			$this->reserveList[] = new reserve($row[0]);
+			$r = new reserve($row[0]);
+			$r->notes[] = new note($row[3]);
+			$this->reserveList[] = $r;
 		}
 	}
 	
@@ -541,46 +541,40 @@ class courseInstance
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT r.reserve_id, r.sort_order, i.title "
+				$sql = "SELECT r.reserve_id, r.sort_order, i.title, n.note_id "
 					.  "FROM reserves as r "
 					.  "  JOIN items as i ON r.item_id = i.item_id  "							  
+					.  "  LEFT JOIN notes as n ON n.target_table = 'reserves' AND r.reserve_id = n.target_id "	
 					.  "WHERE course_instance_id = ! "
 					.  "AND r.status='ACTIVE' AND r.activation_date <= ? AND ? <= r.expiration "
-					.  "ORDER BY r.sort_order, i.title"
 					;
-				$sql_author = "SELECT r.reserve_id, i.author, i.title "
-					 .  "FROM reserves as r "
-					 .  "  JOIN items as i ON r.item_id = i.item_id  "							  
-					 .  "WHERE course_instance_id = ! "
-					 .  "AND r.status='ACTIVE' AND r.activation_date <= ? AND ? <= r.expiration "
-					 .  "ORDER BY i.author, i.title"
-					 ;	
-				$sql_title = "SELECT r.reserve_id, i.title, i.author "
-					 .  "FROM reserves as r "
-					 .  "  JOIN items as i ON r.item_id = i.item_id  "							  
-					 .  "WHERE course_instance_id = ! "
-					 .  "AND r.status='ACTIVE' AND r.activation_date <= ? AND ? <= r.expiration "
-					 .  "ORDER BY i.title, i.author"
-					 ;	
+				$order_default = "ORDER BY r.sort_order, i.title";
+				$order_author = "ORDER BY i.author, i.title";	
+				$order_title = "ORDER BY i.title, i.author";	
 					
 				$d = date("Y-m-d"); //get current date
 		}
 		
-		if (!$sortBy) {
-			$rs = $g_dbConn->query($sql, array($this->courseInstanceID, $d, $d));		
-			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		} elseif ($sortBy=='author') {
-			$rs = $g_dbConn->query($sql_author, array($this->courseInstanceID, $d, $d));		
-			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		} elseif ($sortBy=='title') {
-			$rs = $g_dbConn->query($sql_title, array($this->courseInstanceID, $d, $d));		
-			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		switch ($sortBy) {
+			case 'author':
+				$sort = $order_author;
+				break;
+			case 'title':
+				$sort = $order_title;
+				break;
+			default:
+				$sort = $order_default;
 		}
 
+		$rs = $g_dbConn->query($sql . $sort, array($this->courseInstanceID, $d, $d));		
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
 		$this->reserveList = array();
 		while ($row = $rs->fetchRow()) {
-			$this->reserveList[] = new reserve($row[0]);
-		}		
+			$r = new reserve($row[0]);
+			$r->notes[] = new note($row[3]);
+			$this->reserveList[] = $r;
+		}
 	}
 	
 	function updateSortOrder($sortType=null)

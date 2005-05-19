@@ -287,7 +287,7 @@ class reserve
 	
 	function getNotes()
 	{
-		$this->notes = common_getNotesByTarget("reserves", $this->reserveID);
+		//$this->notes = common_getNotesByTarget("reserves", $this->reserveID);
 		return $this->notes;
 	}
 	

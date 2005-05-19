@@ -35,6 +35,7 @@ Reserves Direct 2.0 is located at:
 http://coursecontrol.sourceforge.net/
 
 *******************************************************************************/
+$load_start_time = time();
 require_once("secure/config.inc.php");
 require_once("secure/common.inc.php");
 
@@ -227,6 +228,13 @@ if (isset($_REQUEST['no_control']))
 if (isset($_REQUEST['no_control']) && $_REQUEST['no_control'] != 'false')
 	include "secure/html/no_table.inc.html";
 else
+	
+
+if (isset($_SESSION['debug']))
+{
+	$load_end_time = time();
+	$load_time = $load_end_time - $load_start_time;
+}	
 }
 ?>
 
