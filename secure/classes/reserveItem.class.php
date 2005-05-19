@@ -77,12 +77,13 @@ class reserveItem extends item
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT item_id, title, item_group, author, source, content_notes, volume_edition, pages_times, performer, local_control_key, "
-					.     "creation_date, last_modified, url, mimeType, home_library, private_user_id, item_type, volume_title "
-					.  "FROM items "						  
+				$sql = "SELECT i.item_id, i.title, i.item_group, i.author, i.source, i.content_notes, i.volume_edition, i.pages_times, i.performer, i.local_control_key, "
+					.     "i.creation_date, i.last_modified, i.url, i.mimeType, i.home_library, i.private_user_id, i.item_type, i.volume_title, n.note_id "
+					.  "FROM items as i "
+					.  "  LEFT JOIN notes as n ON n.target_table='items' and i.item_id = n.target_id "
 					.  "WHERE item_id = !";
 		}
-		
+	
 		$rs = $g_dbConn->query($sql, $itemID);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 				
@@ -105,7 +106,11 @@ class reserveItem extends item
 			$this->privateUserID	= $row[15];
 			$this->itemType			= $row[16];
 			$this->volumeTitle		= $row[17];
+			$this->notes[] = new note($row[18]);			
 			
+			while ($row = $rs->fetchRow())
+				$this->notes[] = new note($row[18]);			
+
 	}	
 
 	/**

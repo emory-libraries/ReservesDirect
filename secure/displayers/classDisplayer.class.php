@@ -241,6 +241,7 @@ class classDisplayer
 		{
 			$ci->reserveList[$i]->getItem();
 			
+			
 			if ($ci->reserveList[$i]->item->isHeading())
 			{
 				//echo "headings";
@@ -256,7 +257,9 @@ class classDisplayer
 				//override status of ACTIVE and make HIDDEN if reserve is Active w/a future activation date
 				if (($status == 'ACTIVE') && ($activationDate > $todaysDate)) {$status = 'HIDDEN';}
 				//if (($status == 'ACTIVE') && (($activationDate > $todaysDate) || ($expirationDate <= $todaysDate))) {$status = 'HIDDEN';}
-				$reserveItem = new reserveItem($ci->reserveList[$i]->getItemID());
+				
+				$reserveItem = $ci->reserveList[$i]->item;
+				
 				$itemIcon = $reserveItem->getItemIcon();
 				$itemGroup = $reserveItem->itemGroup;
 				
