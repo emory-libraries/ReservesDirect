@@ -518,7 +518,6 @@ class courseInstance
 		default:
 			$sort = $order_default;
 		}
-
 		$rs = $g_dbConn->query($sql . $sort, $this->courseInstanceID);		
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
@@ -528,6 +527,7 @@ class courseInstance
 			
 			if (!is_null($row[3]))
 				$r->notes[] = new note($row[3]);
+				
 			$this->reserveList[] = $r;
 		}
 	}
@@ -574,7 +574,8 @@ class courseInstance
 		$this->reserveList = array();
 		while ($row = $rs->fetchRow()) {
 			$r = new reserve($row[0]);
-			$r->notes[] = new note($row[3]);
+			if (!is_null($row[3]))
+				$r->notes[] = new note($row[3]);
 			$this->reserveList[] = $r;
 		}
 	}

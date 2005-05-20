@@ -106,10 +106,12 @@ class reserveItem extends item
 			$this->privateUserID	= $row[15];
 			$this->itemType			= $row[16];
 			$this->volumeTitle		= $row[17];
-			$this->notes[] = new note($row[18]);			
-			
-			while ($row = $rs->fetchRow())
+			if (!is_null($row[18]))
 				$this->notes[] = new note($row[18]);			
+			
+			while ($row = $rs->fetchRow()) //get additional notes
+				if (!is_null($row[18]))
+					$this->notes[] = new note($row[18]);			
 
 	}	
 
