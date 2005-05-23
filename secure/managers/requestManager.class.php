@@ -96,10 +96,10 @@ class requestManager
 
 				if (!isset($request['request_id']))
 				{
-					if (isset($_REQUEST['item_id']) && !is_null($_REQUEST['item_id']))
+					if ($request['item_id'] && !is_null($request['item_id']))
 						$item->getItemByID($_REQUEST['item_id']);
 					else
-						$item->createNewItem();				
+						$item->createNewItem();
 						
 					$reserve->createNewReserve($ci->getCourseInstanceID(), $item->getItemID());	
 					
@@ -241,7 +241,7 @@ class requestManager
 					break;					
 				} else {					
 				
-					$loc  = "add an item";				
+					$loc  = "add an item";
 					$this->displayFunction = 'addSuccessful';				
 					$this->argList = array($ci, $request['selected_instr'], $ilsResult);
 				}
