@@ -506,18 +506,17 @@ class courseInstance
 				$order_title	= "ORDER BY i.title, i.author";
 		}
 		
-		switch (!$sortBy) {
-			
-			
-		case 'author':
-			$sort = $order_author;
-			break;
-		case 'title':
-			$sort = $order_title;
-			break;
-		default:
-			$sort = $order_default;
+		switch ($sortBy) {		
+			case 'author':
+				$sort = $order_author;
+				break;
+			case 'title':
+				$sort = $order_title;
+				break;
+			default:
+				$sort = $order_default;
 		}
+		
 		$rs = $g_dbConn->query($sql . $sort, $this->courseInstanceID);		
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
