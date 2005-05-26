@@ -469,34 +469,36 @@ class instructor extends proxy
 				$rListing = new reserve($srcReserve);
 				
 				$r = new reserve();
-				$r->createNewReserve($newCI->getCourseInstanceID(), $rListing->getItemID());
-				$r->setActivationDate($newActivation);
-				$r->setExpirationDate($newExpiration);
-				$r->setSortOrder($rListing->getSortOrder());
-				//$r->setStatus($rListing->getStatus()); //commented out by kawashi 12.1.2004 - replaced with logic below
-				
-				//When reactivating a class, the default status of the reserve should be "IN PROCESS" if physical item
-				//and "ACTIVE" if an electronic item
-
-				$rListing->getItem();				
-				if ($rListing->item->getItemGroup() == 'MULTIMEDIA' || $rListing->item->getItemGroup() == 'MONOGRAPH') {
-					$r->setStatus('IN PROCESS');
-				} else {
-					$r->setStatus('ACTIVE');
-				}
-				//End of changes made by kawashi on 12.1.2004
-				
-				$r->getItem();
-
-				if ($r->item->getItemGroup() != 'ELECTRONIC')
+				if ($r->createNewReserve($newCI->getCourseInstanceID(), $rListing->getItemID()))
 				{
-					$req = new request();
-					$req->createNewRequest($newCI->getCourseInstanceID(), $r->getItemID());
-					$req->setDateRequested(date('Y-m-d'));
-					$req->setRequestingUser($instructorList[0]);
-					$req->setReserveID($r->getReserveID());
+					$r->setActivationDate($newActivation);
+					$r->setExpirationDate($newExpiration);
+					$r->setSortOrder($rListing->getSortOrder());
+					//$r->setStatus($rListing->getStatus()); //commented out by kawashi 12.1.2004 - replaced with logic below
 					
-					$r->setStatus("IN PROCESS");
+					//When reactivating a class, the default status of the reserve should be "IN PROCESS" if physical item
+					//and "ACTIVE" if an electronic item
+	
+					$rListing->getItem();				
+					if ($rListing->item->getItemGroup() == 'MULTIMEDIA' || $rListing->item->getItemGroup() == 'MONOGRAPH') {
+						$r->setStatus('IN PROCESS');
+					} else {
+						$r->setStatus('ACTIVE');
+					}
+					//End of changes made by kawashi on 12.1.2004
+					
+					$r->getItem();
+	
+					if ($r->item->getItemGroup() != 'ELECTRONIC')
+					{
+						$req = new request();
+						$req->createNewRequest($newCI->getCourseInstanceID(), $r->getItemID());
+						$req->setDateRequested(date('Y-m-d'));
+						$req->setRequestingUser($instructorList[0]);
+						$req->setReserveID($r->getReserveID());
+						
+						$r->setStatus("IN PROCESS");
+					}
 				}
 			}
 		}

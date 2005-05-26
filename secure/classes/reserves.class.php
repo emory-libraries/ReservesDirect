@@ -79,9 +79,17 @@ class reserve
 		}
 		
 		
-		$rs = $g_dbConn->query($sql, array($courseInstanceID, $itemID, $d, $d));
-	
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		$rs = $g_dbConn->query($sql, array($courseInstanceID, $itemID, $d, $d));	
+		if (DB::isError($rs)) 
+		{ 
+			
+			if ($rs->getMessage() == 'DB Error: already exists')
+			{ 
+				return false;
+			}
+			else
+				trigger_error($rs->getMessage(), E_USER_ERROR); 
+		}
 		
 		$rs = $g_dbConn->query($sql2);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
@@ -94,6 +102,7 @@ class reserve
 		$this->lastModDate = $d;
 		
 		$this->getReserveByID($this->reserveID);
+		return true;
 	}
 	
 	/**

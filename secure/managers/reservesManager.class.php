@@ -283,9 +283,11 @@ class reservesManager
 					foreach($reserves as $r)
 					{				
 						$reserve = new reserve();
-						$reserve->createNewReserve($ci->getCourseInstanceID(), $r);
-						$reserve->setActivationDate($ci->getActivationDate());	
-						$reserve->setExpirationDate($ci->getExpirationDate());					
+						if ($reserve->createNewReserve($ci->getCourseInstanceID(), $r))
+						{
+							$reserve->setActivationDate($ci->getActivationDate());	
+							$reserve->setExpirationDate($ci->getExpirationDate());					
+						}
 					}
 				}
 		
@@ -295,16 +297,18 @@ class reservesManager
 					{
 						//store reserve with status processing	
 						$reserve = new reserve();
-						$reserve->createNewReserve($ci->getCourseInstanceID(), $r);	
-						$reserve->setStatus("IN PROCESS");
-						$reserve->setActivationDate($ci->getActivationDate());	
-						$reserve->setExpirationDate($ci->getExpirationDate());
-						
-						//create request
-						$request = new request();				
-						$request->createNewRequest($ci->getCourseInstanceID(), $r);
-						$request->setRequestingUser($user->getUserID());
-						$request->setReserveID($reserve->getReserveID());
+						if ($reserve->createNewReserve($ci->getCourseInstanceID(), $r))
+						{
+							$reserve->setStatus("IN PROCESS");
+							$reserve->setActivationDate($ci->getActivationDate());	
+							$reserve->setExpirationDate($ci->getExpirationDate());
+							
+							//create request
+							$request = new request();				
+							$request->createNewRequest($ci->getCourseInstanceID(), $r);
+							$request->setRequestingUser($user->getUserID());
+							$request->setReserveID($reserve->getReserveID());
+						}
 					}
 				}
 				$this->displayFunction = "displayReserveAdded";
@@ -374,12 +378,14 @@ class reservesManager
 				$ci = new courseInstance($_REQUEST['ci'])	;
 			
 				$reserve = new reserve();
-				$reserve->createNewReserve($ci->getCourseInstanceID(), $item->getItemID());
-				$reserve->setActivationDate($ci->getActivationDate());	
-				$reserve->setExpirationDate($ci->getExpirationDate());
-				
-				$itemAudit = new itemAudit();
-				$itemAudit->createNewItemAudit($item->getItemID(),$user->getUserID());
+				if ($reserve->createNewReserve($ci->getCourseInstanceID(), $item->getItemID()))
+				{
+					$reserve->setActivationDate($ci->getActivationDate());	
+					$reserve->setExpirationDate($ci->getExpirationDate());
+					
+					$itemAudit = new itemAudit();
+					$itemAudit->createNewItemAudit($item->getItemID(),$user->getUserID());
+				}
 	    	
 	    		$this->displayFunction = "displayReserveAdded";
 	    		$this->argList = array($_REQUEST['ci']);
@@ -448,12 +454,14 @@ class reservesManager
 					$item->setType('ITEM');
 							
 					$reserve = new reserve();
-					$reserve->createNewReserve($ci->getCourseInstanceID(), $item->getItemID());
-					$reserve->setActivationDate($ci->getActivationDate());	
-					$reserve->setExpirationDate($ci->getExpirationDate());
-					
-					$itemAudit = new itemAudit();
-					$itemAudit->createNewItemAudit($item->getItemID(),$user->getUserID());
+					if ($reserve->createNewReserve($ci->getCourseInstanceID(), $item->getItemID()))
+					{
+						$reserve->setActivationDate($ci->getActivationDate());	
+						$reserve->setExpirationDate($ci->getExpirationDate());
+						
+						$itemAudit = new itemAudit();
+						$itemAudit->createNewItemAudit($item->getItemID(),$user->getUserID());
+					}
 				}
 		
 				$this->displayFunction = "displayReserveAdded";

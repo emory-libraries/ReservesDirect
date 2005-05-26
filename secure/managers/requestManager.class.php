@@ -101,10 +101,11 @@ class requestManager
 					else
 						$item->createNewItem();
 						
-					$reserve->createNewReserve($ci->getCourseInstanceID(), $item->getItemID());	
-					
-					$itemAudit = new itemAudit();
-					$itemAudit->createNewItemAudit($item->getItemID(),$user->getUserID());				
+					if ($reserve->createNewReserve($ci->getCourseInstanceID(), $item->getItemID()))
+					{					
+						$itemAudit = new itemAudit();
+						$itemAudit->createNewItemAudit($item->getItemID(),$user->getUserID());				
+					}
 				} else {
 					$requestObj	= new request($request['request_id']);
 					$item->getItemByID($requestObj->requestedItemID);
