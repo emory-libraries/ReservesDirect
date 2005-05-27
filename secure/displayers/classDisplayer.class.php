@@ -31,6 +31,7 @@ http://coursecontrol.sourceforge.net/
 *******************************************************************************/
 require_once("secure/common.inc.php");
 require_once("secure/classes/terms.class.php");
+require_once("secure/managers/lookupManager.class.php");	
 
 class classDisplayer 
 {
@@ -55,9 +56,10 @@ class classDisplayer
 		echo "						<ul>\n";
 		echo "							<li><a href=\"index.php?cmd=createClass\" align=\"center\">Add Class</a></li>\n";
 		echo "							<li><a href=\"index.php?cmd=staffEditClass\">Edit Class</a></li>\n";
-		echo "							<!--<li><a href=\"index.php?cmd=deleteClass\">Delete Class</a>--?<!--Goes to staff-mngClass-deleteClass.html --></li>\n";
+		echo "							<li><a href=\"index.php?cmd=deleteClass\">Delete Class</a></li>\n";
 		echo "							<li><a href=\"index.php?cmd=reactivateClass\" align=\"center\">Reactivate Course</a></li>\n";
-		echo "							<!--<li><a href=\"index.php?cmd=copyCourse\">Copy Reserve List or Merge Classes</a>--><!--Links to staff-mngClass-CopyList1.html --></li>\n";
+		echo "							<li><a href=\"index.php?cmd=copyClass\">Copy Reserve List or Merge Classes</a><!--Links to staff-mngClass-CopyList1.html --></li>\n";
+		echo "							<li><a href=\"index.php?cmd=viewEnrollment\">View Student Enrollment</a><!--Links to staff-mngClass-CopyList1.html --></li>\n";
 		echo "							<li><a href=\"index.php?cmd=exportClass\">Export a Class to Blackboard, etc.</a><!--Same screens as faculty use for exporting a class--></li>\n";
 		echo "						</ul>\n";
 		echo "					</td>\n";
@@ -1181,6 +1183,7 @@ class classDisplayer
 			$itemNotes = $ci->reserveList[$i]->item->getNotes();
 			$instructorNotes = $ci->reserveList[$i]->getNotes();
 			
+			
 			$callNumber = $ci->reserveList[$i]->item->physicalCopy->getCallNumber();
 			$reserveDesk = $ci->reserveList[$i]->item->physicalCopy->getOwningLibrary();
 			
@@ -1218,6 +1221,7 @@ class classDisplayer
 					}
 	            }
 	            
+	            	
 	            	if ($performer)
 	            	{
 	            		echo '<span class="itemMetaPre">Performed by:</span><span class="itemMeta"> '.$performer.'</span><br>';
@@ -1242,6 +1246,8 @@ class classDisplayer
 	            	{
 	            		echo '<span class="noteType">Content Note:</span>&nbsp;<span class="noteText">'.$contentNotes.'</span><br>';
 	            	}
+	            	
+	            	
 	            	if ($itemNotes) 
 	            	{
 	            		for ($n=0; $n<count($itemNotes); $n++)
@@ -1256,7 +1262,9 @@ class classDisplayer
 	            		{
 	            			echo '<span class="noteType">Instructor Note:</span>&nbsp;<span class="noteText">'.$instructorNotes[$n]->getText().'</span><br>';
 	            		}
-	            	}	            	
+	            	}
+	            	
+	            		            	
 	            	echo '</td>';
 					if (!$ci->reserveList[$i]->item->isPersonalCopy())
 						echo "<td align=\"right\"><input type=\"checkbox\" name=\"carryReserve[]\" value=\"".$ci->reserveList[$i]->getReserveID()."\" checked></td></tr>";
@@ -1795,5 +1803,176 @@ class classDisplayer
 		echo '</form>';
 		echo '</table>';
 	}	
+	
+	
+	function displayClassEnrollment ($cmd, $u, $request) 
+	{
+		
+		switch ($cmd) {
+			case 'viewEnrollment':
+				echo "<form action=\"index.php\" method=\"POST\">\n";
+				echo "<input type=\"hidden\" name=\"cmd\" value=\"$cmd\">\n";
+		
+				$tableHeading="VIEW STUDENT ENROLLMENT FOR:";		
+				$selectClassMgr = new lookupManager($tableHeading, 'lookupClass', $u, $request);
+				$selectClassMgr->display();
+				if (isset($_REQUEST['ci']) && $_REQUEST['ci'] && $_REQUEST['ci'] != null)
+				{
+					echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+
+        			echo '<tr><td>&nbsp;</td></tr>';
+					echo "	<tr><td valign=\"top\" align=\"center\"><input type=\"submit\" name=\"performAction\" value=\"View Enrollment\" onClick=\"this.form.cmd.value='processViewEnrollment';\"></td></tr>\n";
+				}
+				else {
+					echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+					echo "	<tr><td valign=\"top\" align=\"center\"><input type=\"submit\" name=\"performAction\" value=\"View Enrollment\" DISABLED></td></tr>\n";
+				}
+				echo "	<tr><td align=\"left\" valign=\"top\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+				echo "</table>\n";		
+				echo "</form>\n";
+		
+			break;
+		
+			case 'processViewEnrollment':
+				$ci=new courseInstance($_REQUEST['ci']);
+				$ci->getStudents();
+				echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+				echo '<tr><td width="100%"><img src="images/spacer.gif" width="1" height="5"></td></tr>';
+				echo '<tr>';
+				echo 	'<td align="left" valign="top" class="helperText">'.count($ci->students).' Total Enrolled Students<br><br>';
+				
+				for ($i=0; $i<count($ci->students); $i++)
+				{
+					echo '<span class="strong">'.$ci->students[$i]->getName().'</span>';
+					echo '<br>';
+				}
+				
+        		
+				
+				echo 	'</td>';
+        		echo '</tr>';
+        		echo '<tr><td align="left" valign="top">&nbsp;</td></tr>';
+        		echo '<tr><td>&gt;&gt;<a href="index.php?cmd=manageClasses">Return to &quot;Manage Classes&quot; home</a></td></tr>';
+        		echo '<tr><td align="left" valign="top">&nbsp;</td></tr>';
+				echo "</table>\n";		
+			break;
+		
+		}
+
+	}
+	
+	function displayDeleteClass ($cmd, $u, $request) {
+		echo "<form action=\"index.php\" method=\"POST\">\n";
+		echo "<input type=\"hidden\" name=\"cmd\" value=\"$cmd\">\n";
+		
+		$tableHeading="Select Class to Delete";		
+		$selectClassMgr = new lookupManager($tableHeading, 'lookupClass', $u, $request);
+		$selectClassMgr->display();
+		if (isset($_REQUEST['ci']) && $_REQUEST['ci'] && $_REQUEST['ci'] != null)
+		{
+			echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+			echo '<tr><td>&nbsp;</td></tr>';
+			echo '<tr><td><div align="center" class="strong"><font color="#CC0000">CAUTION! Deleting a class cannot be undone!</font></div></td></tr>';
+
+        	echo '<tr><td>&nbsp;</td></tr>';
+			//echo "	<tr><td valign=\"top\" align=\"center\"><input type=\"submit\" name=\"performAction\" value=\"Delete Class\" onClick=\"this.form.cmd.value='clearCopyClassLookup';\"></td></tr>\n";
+			echo "	<tr><td valign=\"top\" align=\"center\"><input type=\"submit\" name=\"deleteClass\" value=\"Delete Class\" onClick=\"this.form.cmd.value='confirmDeleteClass';\"></td></tr>\n";
+		}
+		else {
+			echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+			echo '<tr><td>&nbsp;</td></tr>';
+			echo '<tr><td><div align="center" class="strong"><font color="#CC0000">CAUTION! Deleting a class cannot be undone!</font></div></td></tr>';
+			echo '<tr><td>&nbsp;</td></tr>';
+			echo "	<tr><td valign=\"top\" align=\"center\"><input type=\"submit\" name=\"deleteClass\" value=\"Delete Class\" DISABLED></td></tr>\n";
+		}
+		echo "	<tr><td align=\"left\" valign=\"top\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+		echo "</table>\n";		
+		echo "</form>\n";
+
+	}
+	
+	function displayConfirmDelete ($sourceClass) {
+
+		echo '<input type="hidden" name="ci" value="'.$sourceClass->getCourseInstanceID().'">';
+		
+		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+		echo '<tr><td width="100%"><img src="images/spacer.gif" width="1" height="5"></td></tr>';
+
+		echo '<tr>';
+		echo 	'<td align="left" valign="top">';
+        echo 	  '<p>';
+        echo 		'<span class="courseTitle">';
+        echo 			$sourceClass->course->displayCourseNo().' -- '.$sourceClass->course->getName().' ('.$sourceClass->displayTerm().')</span>,';
+        echo 			' <span class="helperText">Instructors: ';
+
+        	for($i=0;$i<count($sourceClass->instructorList);$i++) {
+				if ($i>0)
+					echo ',&nbsp;';
+				echo $sourceClass->instructorList[$i]->getFirstName().'&nbsp;'.$sourceClass->instructorList[$i]->getLastName();
+			}
+
+		echo 			'</span></p></td></tr>';
+		echo '<tr><td>&nbsp;</td></tr>';
+		echo '<tr>';
+				echo 	'<td align="left" valign="top"><p><span class="helperText">'.count($sourceClass->students).' Total Enrolled Students<br><br>';
+				
+				for ($i=0; $i<count($sourceClass->students); $i++)
+				{
+					echo '<span class="strong">'.$sourceClass->students[$i]->getName().'</span>';
+					echo '<br>';
+				}
+				
+        		
+				
+				echo 	'</p></td>';
+        		echo '</tr>';
+        echo '<tr><td>&nbsp;</td></tr>';
+        echo '<tr>';
+		echo 	'<td align="left" valign="top">';
+        echo 	  '<p>';
+        echo 		'<span class="failedText">';
+        echo 'Are you sure you want to delete this class?';
+        echo 		'</span>';
+        echo 	  '</p>';
+
+        echo 	  '<p>';
+        echo 		'&gt;&gt;<a href="index.php?cmd=deleteClassSuccess&ci='.$sourceClass->getCourseInstanceID().'">Yes, Delete this class</a><br>';
+        echo 		'&gt;&gt;<a href="index.php?cmd=deleteClass">No, Delete another class</a><br>';
+        echo 		'&gt;&gt;<a href="index.php?cmd=manageClasses">No, Return to &quot;Manage Classes&quot; home</a><br>';
+        echo 	  '</p>';
+        echo 	'</td>';
+        echo '</tr>';
+        
+        echo '<tr><td align="left" valign="top">&nbsp;</td></tr>';
+		echo "</table>\n";		
+		
+	}
+	
+	function displayDeleteSuccess ($sourceClass) {
+
+		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+		echo '<tr><td width="100%"><img src="images/spacer.gif" width="1" height="5"></td></tr>';
+
+		echo '<tr>';
+		echo 	'<td align="left" valign="top">';
+        echo 	  '<p>';
+        echo 		'<span class="strong">';
+        echo 			$sourceClass->course->displayCourseNo().' -- '.$sourceClass->course->getName().' ('.$sourceClass->displayTerm().')';
+        echo 		'</span>';
+        echo 		'<span class="successText"> has been deleted.</span>';
+        echo 	  '</p>';
+
+        echo 	  '<p>';
+        echo 		'&gt;&gt;<a href="index.php?cmd=deleteClass">Delete another class</a><br>';
+        echo 		'&gt;&gt;<a href="index.php?cmd=manageClasses">Return to &quot;Manage Classes&quot; home</a><br>';
+        echo 	  '</p>';
+        echo 	'</td>';
+        echo '</tr>';
+        
+        echo '<tr><td align="left" valign="top">&nbsp;</td></tr>';
+		echo "</table>\n";		
+		
+	}
+	
 }
 ?>
