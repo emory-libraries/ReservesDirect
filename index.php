@@ -143,6 +143,11 @@ switch ($cmd)
 	case 'searchForClass':		// myReserves - search for a class by Instructor or Dept
 	case 'createNewClass':		// manageClass create class (store meta-data to DB)
 	case 'removeClass':			// myReserves - remove a class you are a student in		
+	case 'deleteClass':			
+	case 'deleteClass':
+	case 'confirmDeleteClass':
+	case 'viewEnrollment':		//manageClass - display enrolled students
+	case 'processViewEnrollment':
 		require_once("secure/managers/classManager.class.php");		
 		require_once("secure/managers/classManager.class.php");
 		$mgr = new classManager($cmd, $u, $adminUser, $_REQUEST);	
@@ -201,6 +206,15 @@ switch ($cmd)
 			require_once("secure/managers/classManager.class.php");					
 			$mgr = new classManager('editClass', $u, $adminUser, $_REQUEST);
 		}	
+	break;
+	
+
+	case 'clearCopyClassLookup':
+	case 'copyClassOptions':
+	case 'copyExisting':
+	case 'importClass':			//import reserves list from one ci to another
+		require_once("secure/managers/copyClassManager.class.php");			
+		require_once("secure/managers/copyClassManager.class.php");
 		$mgr = new copyClassManager($cmd, $u, $_REQUEST);
 	
 
