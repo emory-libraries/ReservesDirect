@@ -62,6 +62,7 @@ class courseInstance
 	public $notes;
 	public $proxies = array();
 	public $proxyIDs = array();
+	public $students = array();
 	//public $aliasID;
 
 	
@@ -192,10 +193,35 @@ class courseInstance
 		}	
 	}
 	
+	function getStudents()
+	{
+		global $g_dbConn;
+		
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql  = "SELECT DISTINCT u.username, u.user_id "
+					  . "FROM users u "
+					  .	"LEFT JOIN access AS a ON a.user_id = u.user_id "
+					  . "LEFT JOIN course_aliases AS ca ON ca.course_alias_id = a.alias_id "					  
+					  . "WHERE ca.course_instance_id = ! "
+					  . "AND a.permission_level = 0";
+		}
+
+		$rs = $g_dbConn->query($sql, $this->courseInstanceID);	
+
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		while ($row = $rs->fetchRow()) {		
+			$this->students[] = new student($row[0]);
+		}	
+	}
+	
 	/**
 	* @return void
 	* @desc destroy the database entry
 	*/
+	/*
 	function destroy()
 	{
 		global $g_dbConn;
@@ -210,6 +236,121 @@ class courseInstance
 		}
 		
 		$rs = $g_dbConn->query($sql, $requestID);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }		
+	}
+	*/
+	function destroy()
+	{
+		global $g_dbConn;
+		
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql_deleteReserves = 
+					"DELETE "
+					.  "FROM reserves "						  
+					.  "WHERE course_instance_id = !"
+					;
+				
+				$sql_deleteCourseInstance = 
+					"DELETE "
+					.  "FROM course_instances "						  
+					.  "WHERE course_instance_id = !"
+					;
+					
+				$sql_deleteAccess = 
+					"DELETE access "
+					.  "FROM  access "						  
+					.	"JOIN course_aliases as ca on ca.course_alias_id = access.alias_id "
+					.  "WHERE ca.course_instance_id = !"
+					;
+					
+				//Until MySQL version is upgraded to accommodate nested SQL statements, break this statement
+				//into separate SQL statements - kawashi 5.27.05
+				/*
+				$sql_checkCourse = 
+					"SELECT count( ca.course_instance_id ) "
+					.	"FROM course_aliases AS ca "
+					.	"WHERE ca.course_id "
+					.	"IN ( "
+					.		"SELECT course_id "
+					.		"FROM course_aliases "
+					.		"WHERE course_instance_id = ! "
+					.		") "
+					.	"AND ca.course_instance_id <> !"
+					;
+				*/
+				
+				//Combine these queries into a single nested SQL statement, once MySQL is upgraded
+				$sql_checkCourse = 
+					"SELECT course_id "
+					.		"FROM course_aliases "
+					.		"WHERE course_instance_id = ! "
+					;
+					
+				$sql_checkCourse2 = 
+					"SELECT count( ca.course_instance_id ) "
+					.	"FROM course_aliases AS ca "
+					.	"WHERE ca.course_id = ! "
+					.	"AND ca.course_instance_id <> !"
+					;
+				//End SQL statements to be combined into a nested SQL statement	
+				
+				/*
+				$sql_deleteCourse = 
+					"DELETE courses "
+					.  "FROM  courses "						  
+					.	"JOIN course_aliases as ca on ca.course_id = courses.course_id "
+					.  "WHERE ca.course_instance_id = !"
+					;
+				*/
+
+				$sql_deleteCourse = 
+					"DELETE "
+					.  "FROM  courses "						  
+					.  "WHERE course_id = !"
+					;
+					
+				$sql_deleteCourseAliases = 
+					"DELETE "
+					.  "FROM course_aliases "						  
+					.  "WHERE course_instance_id = !"
+					;
+					
+				$sql_deleteRequests = 
+					"DELETE "
+					.  "FROM requests "						  
+					.  "WHERE course_instance_id = !"
+					;
+		}
+		
+		$rs = $g_dbConn->query($sql_deleteReserves, $this->courseInstanceID);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }		
+		
+		$rs = $g_dbConn->query($sql_deleteCourseInstance, $this->courseInstanceID);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }		
+		
+		$rs = $g_dbConn->query($sql_deleteAccess, $this->courseInstanceID);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }	
+		
+		$rs = $g_dbConn->query($sql_checkCourse, $this->courseInstanceID);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }		
+		
+		while ($row = $rs->fetchRow()) {	
+			$rs2 = $g_dbConn->query($sql_checkCourse2, array($row[0],$this->courseInstanceID));
+			if (DB::isError($rs2)) { trigger_error($rs2->getMessage(), E_USER_ERROR); }		
+			
+			$row2 = $rs2->fetchRow();
+			if ($row2[0] == 0) {
+				$rs3 = $g_dbConn->query($sql_deleteCourse, $row[0]);
+				if (DB::isError($rs3)) { trigger_error($rs3->getMessage(), E_USER_ERROR); }		
+			}
+		}
+
+		$rs = $g_dbConn->query($sql_deleteCourseAliases, $this->courseInstanceID);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }		
+		
+		$rs = $g_dbConn->query($sql_deleteRequests, $this->courseInstanceID);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }		
 	}
 	
