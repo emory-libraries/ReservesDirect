@@ -502,6 +502,16 @@ class classManager
 				$this->argList = "";
 			break;
 			
+			
+			case 'viewEnrollment':
+			case 'processViewEnrollment':
+				$page = "manageClasses";
+				$loc = "enrolled students";
+				
+				$this->displayFunction = 'displayClassEnrollment';
+				$this->argList = array($cmd, $user, $request);
+			break;
+			
 			case 'createClass':
 				$page = "manageClasses";
 
@@ -538,6 +548,49 @@ class classManager
 				
 				$this->displayFunction = 'displaySuccess';
 				$this->argList = array($page, $ci);
+			break;
+			
+			case 'deleteClass':
+				$page = "manageClasses";
+				$loc = "delete class";
+				
+				if ($user->getDefaultRole() >= $g_permission['staff'])
+				{
+					$this->displayFunction = 'displayDeleteClass';
+					$this->argList = array($cmd, $user, $request);
+				} 
+			break;
+			
+			case 'confirmDeleteClass':
+				$page = "manageClasses";
+				$loc = "confirm delete class";
+
+				if (isset($request['ci']))
+				{
+					$courseInstance = new courseInstance($request['ci']);
+					$courseInstance->getPrimaryCourse();
+					$courseInstance->getStudents();
+					$courseInstance->getInstructors();
+					
+					$this->displayFunction = 'displayConfirmDelete';
+					$this->argList = array($courseInstance);
+				}
+			break;
+			
+			case 'deleteClassSuccess':
+				$page = "manageClasses";
+				$loc = "delete class";
+				
+				if (isset($request['ci']))
+				{
+					$courseInstance = new courseInstance($request['ci']);
+					$courseInstance->getPrimaryCourse();
+					$courseInstance->destroy();
+					
+					$this->displayFunction = 'displayDeleteSuccess';
+					$this->argList = array($courseInstance);
+				}
+			break;
 		}	
 	}
 }
