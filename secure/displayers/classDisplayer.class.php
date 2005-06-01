@@ -1266,10 +1266,14 @@ class classDisplayer
 	            	
 	            		            	
 	            	echo '</td>';
-					if (!$ci->reserveList[$i]->item->isPersonalCopy())
-						echo "<td align=\"right\"><input type=\"checkbox\" name=\"carryReserve[]\" value=\"".$ci->reserveList[$i]->getReserveID()."\" checked></td></tr>";
+
+					if ($ci->reserveList[$i]->item->isPersonalCopy() && $ci->reserveList[$i]->item->privateUserID != $user->getUserID()
+						&& $user->getDefaultRole() <= $g_permission['staff'])
+					{
+						echo "<td align=\"left\" class=\"failedText\">Personal items can not be reactivated.<br>  Please contact your reserves desk for assistance.</td></tr>";						
+					}
 					else
-						echo "<td align=\"left\" class=\"failedText\">Personal items can not be reactivated.<br>  Please contact your reserves desk for assistance.</td></tr>";
+						echo "<td align=\"right\"><input type=\"checkbox\" name=\"carryReserve[]\" value=\"".$ci->reserveList[$i]->getReserveID()."\" checked></td></tr>";
 	            	
 			}
 		}
