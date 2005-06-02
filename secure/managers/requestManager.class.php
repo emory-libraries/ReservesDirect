@@ -105,7 +105,9 @@ class requestManager
 					{					
 						$itemAudit = new itemAudit();
 						$itemAudit->createNewItemAudit($item->getItemID(),$user->getUserID());				
-					}
+					} else 
+						$reserve->getReserveByCI_Item($ci->getCourseInstanceID(), $item->getItemID());
+						
 				} else {
 					$requestObj	= new request($request['request_id']);
 					$item->getItemByID($requestObj->requestedItemID);
