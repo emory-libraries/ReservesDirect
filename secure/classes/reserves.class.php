@@ -140,6 +140,39 @@ class reserve
 
 	/**
 	* @return void
+	* @param int $course_instance_id, int item_id
+	* @desc get reserve info from the database by ci and item
+	*/
+	function getReserveByCI_Item($course_instance_id, $item_id)
+	{
+		global $g_dbConn;
+		
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "SELECT reserve_id, course_instance_id, item_id, activation_date, expiration, status, sort_order, date_created, last_modified "
+					.  "FROM reserves "						  
+					.  "WHERE course_instance_id = ! AND item_id = !"
+					;
+		}
+		
+		$rs = $g_dbConn->query($sql, array($course_instance_id, $item_id));	
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		$row = $rs->fetchRow();
+			$this->reserveID 		= $row[0];
+			$this->courseInstanceID	= $row[1];
+			$this->itemID			= $row[2];
+			$this->activationDate	= $row[3];
+			$this->expirationDate	= $row[4];
+			$this->status	 		= $row[5];
+			$this->sortOrder		= $row[6];
+			$this->creationDate		= $row[7];
+			$this->lastModDate		= $row[8];
+	}	
+	
+	/**
+	* @return void
 	* @desc destroy the database entry
 	*/
 	function destroy()
@@ -181,6 +214,7 @@ class reserve
 				$d = date("Y-m-d"); //get current date
 		}
 		$rs = $g_dbConn->query($sql, array($date, $d, $this->reserveID));				
+
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
 		$this->activationDate = $date;
