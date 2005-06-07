@@ -170,9 +170,7 @@ function common_getNotesByTarget($targetTable, $targetID)
 function common_setNote($noteID=NULL, $noteType, $noteText, $targetTable, $targetID)
 {
 	$tempNote = new note($noteID);
-	if (is_null($noteID)) {
-		$tempNote->noteID = $tempNote->createNewNote();
-	}
+
 	$tempNote->setType($noteType);
 	$tempNote->setTarget($targetID, $targetTable);
 	$tempNote->setText($noteText);
