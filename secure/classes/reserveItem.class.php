@@ -81,7 +81,8 @@ class reserveItem extends item
 					.     "i.creation_date, i.last_modified, i.url, i.mimeType, i.home_library, i.private_user_id, i.item_type, i.volume_title, n.note_id "
 					.  "FROM items as i "
 					.  "  LEFT JOIN notes as n ON n.target_table='items' and i.item_id = n.target_id "
-					.  "WHERE item_id = !";
+					.  "WHERE item_id = ! "
+					.  "ORDER BY n.type, n.note_id";
 		}
 	
 		$rs = $g_dbConn->query($sql, $itemID);
