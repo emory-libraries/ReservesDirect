@@ -117,9 +117,11 @@ class reserve
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT reserve_id, course_instance_id, item_id, activation_date, expiration, status, sort_order, date_created, last_modified "
-					.  "FROM reserves "						  
-					.  "WHERE reserve_id = !"
+				$sql = "SELECT reserve_id, course_instance_id, item_id, activation_date, expiration, status, sort_order, date_created, last_modified, n.note_id "
+					.  "FROM reserves as r "						  
+					.  "LEFT JOIN notes as n ON n.target_table='reserves' and r.reserve_id = n.target_id "
+					.  "WHERE reserve_id = ! "
+					.  "ORDER BY n.type, n.note_id"
 					;
 		}
 		
@@ -136,6 +138,14 @@ class reserve
 			$this->sortOrder		= $row[6];
 			$this->creationDate		= $row[7];
 			$this->lastModDate		= $row[8];
+			
+			
+			if (!is_null($row[9]))
+				$this->notes[] = new note($row[9]);			
+			
+			while ($row = $rs->fetchRow()) //get additional notes
+				if (!is_null($row[9]))
+					$this->notes[] = new note($row[9]);	
 	}
 
 	/**
