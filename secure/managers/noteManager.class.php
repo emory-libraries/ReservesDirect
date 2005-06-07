@@ -69,7 +69,6 @@ class noteManager
 					if ($noteText) {
 						$reserve = new reserve($reserveID);
 				
-						$newNote = new note();
 						$noteType = $_REQUEST['noteType'];
 						
 						if ($noteType=='Content' || $noteType=='Staff' || $noteType=='Copyright') {
