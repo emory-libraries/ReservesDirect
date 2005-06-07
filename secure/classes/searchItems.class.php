@@ -153,11 +153,13 @@ class searchItems
 	 * @param string $courseInstance -- user selected courseInstance
 	 * @desc Allows user search for items
 	 * 		expected next steps
-	 *			open EUCLID in new window
+	 *			open catalog in new window
 	 *			searchItems::displaySearchResults
 	*/
 	function displaySearchScreen($page, $subpage, $courseInstance=null)
 	{
+		global $g_catalogName, $g_libraryURL;
+		
 		$instructors = common_getUsers('instructor');
 				      	
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
@@ -219,7 +221,7 @@ class searchItems
         echo "							<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
         echo "								<tr>\n";
         echo "									<td align=\"left\" valign=\"top\" align=\"center\">\n";
-        echo "										You may also search the library's collection in <a href=\"http://www.library.emory.edu\">EUCLID</a>.\n";
+        echo "										You may also search the library's collection in <a href=\"$g_libraryURL\">$g_catalogName</a>.\n";
         echo "									</td>\n";
         echo "								</tr>\n";
         echo "							</table>\n";

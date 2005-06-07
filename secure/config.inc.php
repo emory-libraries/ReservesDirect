@@ -34,7 +34,7 @@ http://coursecontrol.sourceforge.net/
 *******************************************************************************/
 	require_once("DB.php");
 	
-	$xmlConfig = "config.xml";
+	$xmlConfig = "/home/jbwhite/configs/biliku_testsite.xml";
 	
 	if (!is_readable($xmlConfig)) { trigger_error("Could not read configure xml file path=$xmlConfig", E_USER_ERROR); }
 	
@@ -87,9 +87,15 @@ http://coursecontrol.sourceforge.net/
 	$g_zport 			= (string)$configure->catalog->zport;
 	$g_zdb	 			= (string)$configure->catalog->zdb;
 	$g_zReflector		= (string)$configure->catalog->zReflector;
+	
+	$g_catalogName		= (string)$configure->catalog->catalogName;
 	$g_reserveScript	= (string)$configure->catalog->reserve_script;
 	$g_holdingsScript	= (string)$configure->catalog->holdings_script;
 		
+	$g_reservesViewer	= (string)$configure->reserves_viewer;
+	
+	$g_libraryURL		= (string)$configure->library_url;
+	
 	$g_no_javascript_msg = (string)$configure->no_javascript_msg;
 
 	$g_request_notifier_lastrun = (string)$configure->request_notifier->last_run;

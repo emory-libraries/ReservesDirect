@@ -198,7 +198,7 @@ class requestDisplayer
 
 	function addItem($user, $cmd, $search_results, $owner_list, $lib_list, $request_id=null, $request, $hidden_fields, $isActive=true, $buttonValue="Add Item", $msg="")
 	{	
-		global $g_documentURL;
+		global $g_documentURL, $g_catalogName;
 
 		$circRules = new circRules();	
 		
@@ -324,16 +324,16 @@ class requestDisplayer
 			echo "				<tr bgcolor=\"#CCCCCC\">\n";
 			echo "					<td width=\"20%\" align=\"left\" valign=\"middle\">\n";
 			echo "						<input name=\"addType\" type=\"radio\" value=\"EUCLID_ITEM\" $EUCLID_ITEM  onClick=\"this.form.personal_item.value='no'; this.form.searchTerm.disabled=false; this.form.searchField.disabled=false; this.form.euclid_record.checked=false; this.form.euclid_record.disabled=false; this.form.submit();\">\n";
-			echo "						<span class=\"strong\">EUCLID Item</span>\n";
+			echo "						<span class=\"strong\">$g_catalogName Item</span>\n";
 			echo "					</td>\n";
 			echo "					<td width=\"40%\" align=\"left\" valign=\"top\">\n";
 			echo "						<input type=\"radio\" name=\"addType\" value=\"PERSONAL\" $PERSONAL onClick=\"this.form.personal_item.value='yes'; this.form.searchTerm.disabled=true; this.form.searchField.disabled=true; this.form.euclid_record.checked=true; this.form.euclid_record.disabled=true; this.form.submit();\">\n";
-			echo "						<span class=\"strong\">Personal Copy (EUCLID Item Available)</span>\n";
+			echo "						<span class=\"strong\">Personal Copy ($g_catalogName Item Available)</span>\n";
 			echo "					</td>\n";
 					
 			echo "					<td width=\"40%\" align=\"left\" valign=\"top\">\n";
 			echo "						<input type=\"radio\" name=\"addType\" value=\"MANUAL\" $MANUAL onClick=\"this.form.searchTerm.disabled=true; this.form.searchField.disabled=true; this.form.euclid_record.checked=false; this.form.euclid_record.disabled=true;\">\n";
-			echo "						<span class=\"strong\">Enter Item Manually (no EUCLID lookup)</span>\n";
+			echo "						<span class=\"strong\">Enter Item Manually (no $g_catalogName lookup)</span>\n";
 			echo "					</td>\n";
 			echo "				</tr>\n";
 			
@@ -413,7 +413,7 @@ class requestDisplayer
 			echo "				<tr bgcolor=\"#CCCCCC\">\n";
 			echo "					<td colspan=\"2\" align=\"left\" valign=\"middle\">\n";
 			echo "						<input type=\"checkbox\" name=\"euclid_record\" value=\"yes\" checked>\n";
-			echo "						<span class=\"strong\">Create EUCLID Reserve Record</span>\n";
+			echo "						<span class=\"strong\">Create $g_catalogName Reserve Record</span>\n";
 			echo "					</td>\n";
 			echo "				</tr>\n";
 			echo "			</table>\n";

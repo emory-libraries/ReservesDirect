@@ -80,7 +80,7 @@ foreach ($libraries as $library)
 		if ($row[0] > 0) //if count of requests is greater than 0
 		{
 			$msg = "There are " . $row[0] . " new request(s) generated for " .$library->getLibrary(). " since $g_request_notifier_lastrun\n";
-			$msg .= "Please login to Reserves Direct and check your requests queue <a href=\"https://ereserves.library.emory.edu/reserves2/index.php\">https://ereserves.library.emory.edu/reserves2/index.php</a>";
+			$msg .= "Please login to Reserves Direct and check your requests queue <a href=\"$g_siteURL/index.php\">$g_siteURL/index.php</a>";
 			
 			if (!mail($library->getContactEmail(), 'Reserves Direct Requests Notification', $msg))
 			{

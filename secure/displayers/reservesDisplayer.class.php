@@ -242,7 +242,7 @@ class reservesDisplayer
 									
 				if ($reserveItem->isPhysicalItem()) {
 					//move to config file
-					$viewReserveURL = "http://libcat1.cc.emory.edu/uhtbin/cgisirsi/x/0/5?searchdata1=" . $ci->reserveList[$i]->item->getLocalControlKey();
+					$viewReserveURL = $g_reservesViewer . $ci->reserveList[$i]->item->getLocalControlKey();
 				} else {
 					$viewReserveURL = "reservesViewer.php?viewer=" . $user->getUserID() . "&reserve=" . $ci->reserveList[$i]->getReserveID();// . "&location=" . $ci->reserveList[$i]->item->getURL();
 				}
@@ -507,11 +507,13 @@ function displaySearchItemMenu($ci)
 	 * @param string $courseInstance -- user selected courseInstance
 	 * @desc Allows user search for items
 	 * 		expected next steps
-	 *			open EUCLID in new window
+	 *			open catalog in new window
 	 *			searchItems::displaySearchResults
 	*/
 	function displaySearchScreen($page, $cmd, $ci=null)
 	{
+		global $g_catalogName, $g_libraryURL;
+		
 		$instructors = common_getUsers('instructor');
 				      	
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
@@ -573,7 +575,7 @@ function displaySearchItemMenu($ci)
         echo "							<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
         echo "								<tr>\n";
         echo "									<td align=\"left\" valign=\"top\" align=\"center\">\n";
-        echo "										You may also search the library's collection in <a href=\"http://www.library.emory.edu\">EUCLID</a>.\n";
+        echo "										You may also search the library's collection in <a href=\"$g_libraryURL\">$g_catalogName</a>.\n";
         echo "									</td>\n";
         echo "								</tr>\n";
         echo "							</table>\n";
@@ -595,7 +597,7 @@ function displaySearchItemMenu($ci)
 	 * @param string $query -- users search terms
 	 * @desc display search resulting items
 	 * 		expected next steps
-	 *			open EUCLID in new window and search for query
+	 *			open catalog in new window and search for query
 	 *			dependent on page value
 	*/	
 	function displaySearchResults($search, $cmd, $ci=null, $hidden_requests=null, $hidden_reserves=null)
@@ -718,7 +720,7 @@ function displaySearchItemMenu($ci)
         	$viewReserveURL = "reservesViewer.php?item=" . $item->getItemID();
 				if ($item->isPhysicalItem()) {
 					//move to config file
-					$viewReserveURL = "http://libcat1.cc.emory.edu/uhtbin/cgisirsi/x/0/5?searchdata1=" . $item->getLocalControlKey();
+					$viewReserveURL = $g_reservesViewer . $item->getLocalControlKey();
 				}
 				echo '<td width="88%">';
 	            if (!$item->isPhysicalItem()) {
@@ -808,16 +810,6 @@ function displaySearchItemMenu($ci)
 		echo "		</tbody>\n";
 		echo "</table>\n";
 		
-/*SEARCH EUCLID CODE
-		echo "			<tr>\n";
-		echo "				<td colspan=\"2\">\n";
-		echo "					<a href=\"\">New Search</a>\n";
-		echo "					&nbsp;&nbsp;|&nbsp;&nbsp;\n";
-		echo "					<a href=\"http://www.library.emory.edu/uhtbin/AU/" .urlencode($search->query). "\" target=\"EUCLID\">Search EUCLID with this Query</a>\n";
-		echo "					<br><hr noshade=\"noshade\">\n";
-		echo "				</td>\n";
-		echo "			</tr>\n";
-*/		
 	}
 	
 function displayReserveAdded($ci)
@@ -1177,267 +1169,271 @@ function displayFaxMetadataForm($faxes, $ci)
 
 function displaySortScreen($user, $ci)
 {
-
-echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">'
-.	 '<FORM METHOD=POST NAME="sortScreen" ACTION="index.php">'
-.	 '<INPUT TYPE="HIDDEN" NAME="cmd" VALUE="sortReserves">'
-.	 '<INPUT TYPE="HIDDEN" NAME="ci" VALUE="'.$ci->getCourseInstanceID().'">'
-.	 '<INPUT TYPE="HIDDEN" NAME="sortBy" VALUE="'.$_REQUEST['sortBy'].'">'
-.    '	<tr>'
-.    '		<td width="140%" colspan="2"><img src="images/spacer.gif" width="1" height="5"> </td>'
-.	 '	</tr>';
-echo '			<tr>';
-echo '				<td colspan="2" width ="100%" align="center" valign="middle" class="small"><a href="index.php?cmd=editClass&ci='.$ci->getCourseInstanceID().'">Return to Edit Class</a></td>';
-echo '        </tr>';
-echo	 '	<tr>'
-.    '		<td width="35%" align="left" valign="middle" bgcolor="#CCCCCC" class="borders"><div align="center"><span class="strong">Sort  by:</span> [ <a href="index.php?cmd=sortReserves&ci='.$ci->getCourseInstanceID().'&sortBy=title" class="editlinks">title</a> ] [ <a href="index.php?cmd=sortReserves&ci='.$ci->getCourseInstanceID().'&sortBy=author" class="editlinks">author</a>            ] [ <a href="index.php?cmd=customSort&ci='.$ci->getCourseInstanceID().'" class="editlinks">custom</a> ]</div></td>'
-.    '		<td width="65%" align="left" valign="top">&nbsp;</td>'
-.	 '	</tr>'
-.	 '	<tr>'
-.    '		<td colspan="2" align="left" valign="top"><div align="right">'
-.    '		<table width="100%" border="0" cellspacing="0" cellpadding="5">'
-.	 '	    	<tr>'
-.	 '             	<td width="100%">&nbsp;</td>'
-.	 '             	<td><div align="right"></div></td>'
-.	 '             	<td><div align="right"></div></td>'
-.	 '             	<td><div align="right"><input type="submit" name="saveOrder" value="Save Order"></div></td>'
-.	 '	    	</tr>'
-.    '		</table></div>'
-.    '		</td>'
-.	 '	</tr>'
-.	 '	<tr>'
-.    '		<td colspan="2" align="left" valign="top">'
-.    '		<table width="100%" border="0" cellspacing="0" cellpadding="0">'
-.	 '	    	<tr align="left" valign="top">'
-.	 '             	<td class="headingCell1"><div align="center">COURSE MATERIALS</div></td>'
-.	 '             	<td width="75%">&nbsp;</td>'
-.	 '	    	</tr>'
-.    '		</table>'
-.    '		</td>'
-.	 '	</tr>'
-.	 '	<tr>'
-.    '		<td colspan="2" align="left" valign="top" class="borders">'
-.    '		<table width="100%" border="0" cellpadding="2" cellspacing="0" class="displayList">'
-.	 '	    	<tr align="left" valign="middle">'
-.	 '             	<td width="1%" valign="top" bgcolor="#FFFFFF" class="headingCell1">&nbsp;</td>'
-.	 '             	<td width="100%" bgcolor="#FFFFFF" class="headingCell1">'.count($ci->reserveList).' Item(s) On Reserve</td>'
-.	 '	    	</tr>';
-//Begin Loop Through Records
-	$rowNumber = 0;
-	for($i=0;$i<count($ci->reserveList);$i++)
-	{
-		$ci->reserveList[$i]->getItem();
-			
-		if ($ci->reserveList[$i]->item->isHeading())
-		{
-			//echo "headings";
-		} else {	
-	
-		$rowClass = ($rowNumber++ % 2) ? "evenRow" : "oddRow";
-				
-		$reserveItem = new reserveItem($ci->reserveList[$i]->getItemID());
-		$itemIcon = $reserveItem->getItemIcon();
-		$itemGroup = $reserveItem->itemGroup;
-				
-		if ($reserveItem->isPhysicalItem()) {
-			//move to config file
-			$viewReserveURL = "http://libcat1.cc.emory.edu/uhtbin/cgisirsi/x/0/5?searchdata1=" . $ci->reserveList[$i]->item->getLocalControlKey();
-		} else {
-			$viewReserveURL = "reservesViewer.php?viewer=" . $user->getUserID() . "&reserve=" . $ci->reserveList[$i]->getReserveID();// . "&location=" . $ci->reserveList[$i]->item->getURL();
-		}
+	global $g_reservesViewer;
 		
-		echo '	<tr align="left" valign="middle" class="'.$rowClass.'">'
-		.    '		<td width="1%" valign="top"><img src="'.$itemIcon.'" alt="text" width="24" height="20"></td>'
-	    .    '		<td width="100%">';
-	    
-	    if (!$reserveItem->isPhysicalItem()) {
-	    		echo '<a href="'.$viewReserveURL.'" target="_blank">'.$ci->reserveList[$i]->item->getTitle().'</a>';
-	    } else {
-	            echo $ci->reserveList[$i]->item->getTitle();
-	            if ($ci->reserveList[$i]->item->getLocalControlKey()) {echo ' <a href="'.$viewReserveURL.'" target="_blank">(more info)</a>';}
-	    }
-	    
-	    echo '. '.$ci->reserveList[$i]->item->getAuthor().'</td></tr>';
-
+		
+	echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">'
+	.	 '<FORM METHOD=POST NAME="sortScreen" ACTION="index.php">'
+	.	 '<INPUT TYPE="HIDDEN" NAME="cmd" VALUE="sortReserves">'
+	.	 '<INPUT TYPE="HIDDEN" NAME="ci" VALUE="'.$ci->getCourseInstanceID().'">'
+	.	 '<INPUT TYPE="HIDDEN" NAME="sortBy" VALUE="'.$_REQUEST['sortBy'].'">'
+	.    '	<tr>'
+	.    '		<td width="140%" colspan="2"><img src="images/spacer.gif" width="1" height="5"> </td>'
+	.	 '	</tr>';
+	echo '			<tr>';
+	echo '				<td colspan="2" width ="100%" align="center" valign="middle" class="small"><a href="index.php?cmd=editClass&ci='.$ci->getCourseInstanceID().'">Return to Edit Class</a></td>';
+	echo '        </tr>';
+	echo	 '	<tr>'
+	.    '		<td width="35%" align="left" valign="middle" bgcolor="#CCCCCC" class="borders"><div align="center"><span class="strong">Sort  by:</span> [ <a href="index.php?cmd=sortReserves&ci='.$ci->getCourseInstanceID().'&sortBy=title" class="editlinks">title</a> ] [ <a href="index.php?cmd=sortReserves&ci='.$ci->getCourseInstanceID().'&sortBy=author" class="editlinks">author</a>            ] [ <a href="index.php?cmd=customSort&ci='.$ci->getCourseInstanceID().'" class="editlinks">custom</a> ]</div></td>'
+	.    '		<td width="65%" align="left" valign="top">&nbsp;</td>'
+	.	 '	</tr>'
+	.	 '	<tr>'
+	.    '		<td colspan="2" align="left" valign="top"><div align="right">'
+	.    '		<table width="100%" border="0" cellspacing="0" cellpadding="5">'
+	.	 '	    	<tr>'
+	.	 '             	<td width="100%">&nbsp;</td>'
+	.	 '             	<td><div align="right"></div></td>'
+	.	 '             	<td><div align="right"></div></td>'
+	.	 '             	<td><div align="right"><input type="submit" name="saveOrder" value="Save Order"></div></td>'
+	.	 '	    	</tr>'
+	.    '		</table></div>'
+	.    '		</td>'
+	.	 '	</tr>'
+	.	 '	<tr>'
+	.    '		<td colspan="2" align="left" valign="top">'
+	.    '		<table width="100%" border="0" cellspacing="0" cellpadding="0">'
+	.	 '	    	<tr align="left" valign="top">'
+	.	 '             	<td class="headingCell1"><div align="center">COURSE MATERIALS</div></td>'
+	.	 '             	<td width="75%">&nbsp;</td>'
+	.	 '	    	</tr>'
+	.    '		</table>'
+	.    '		</td>'
+	.	 '	</tr>'
+	.	 '	<tr>'
+	.    '		<td colspan="2" align="left" valign="top" class="borders">'
+	.    '		<table width="100%" border="0" cellpadding="2" cellspacing="0" class="displayList">'
+	.	 '	    	<tr align="left" valign="middle">'
+	.	 '             	<td width="1%" valign="top" bgcolor="#FFFFFF" class="headingCell1">&nbsp;</td>'
+	.	 '             	<td width="100%" bgcolor="#FFFFFF" class="headingCell1">'.count($ci->reserveList).' Item(s) On Reserve</td>'
+	.	 '	    	</tr>';
+	//Begin Loop Through Records
+		$rowNumber = 0;
+		for($i=0;$i<count($ci->reserveList);$i++)
+		{
+			$ci->reserveList[$i]->getItem();
+				
+			if ($ci->reserveList[$i]->item->isHeading())
+			{
+				//echo "headings";
+			} else {	
+		
+			$rowClass = ($rowNumber++ % 2) ? "evenRow" : "oddRow";
+					
+			$reserveItem = new reserveItem($ci->reserveList[$i]->getItemID());
+			$itemIcon = $reserveItem->getItemIcon();
+			$itemGroup = $reserveItem->itemGroup;
+					
+			if ($reserveItem->isPhysicalItem()) {
+				//move to config file
+				$viewReserveURL = $g_reservesViewer . $ci->reserveList[$i]->item->getLocalControlKey();
+			} else {
+				$viewReserveURL = "reservesViewer.php?viewer=" . $user->getUserID() . "&reserve=" . $ci->reserveList[$i]->getReserveID();// . "&location=" . $ci->reserveList[$i]->item->getURL();
+			}
+			
+			echo '	<tr align="left" valign="middle" class="'.$rowClass.'">'
+			.    '		<td width="1%" valign="top"><img src="'.$itemIcon.'" alt="text" width="24" height="20"></td>'
+		    .    '		<td width="100%">';
+		    
+		    if (!$reserveItem->isPhysicalItem()) {
+		    		echo '<a href="'.$viewReserveURL.'" target="_blank">'.$ci->reserveList[$i]->item->getTitle().'</a>';
+		    } else {
+		            echo $ci->reserveList[$i]->item->getTitle();
+		            if ($ci->reserveList[$i]->item->getLocalControlKey()) {echo ' <a href="'.$viewReserveURL.'" target="_blank">(more info)</a>';}
+		    }
+		    
+		    echo '. '.$ci->reserveList[$i]->item->getAuthor().'</td></tr>';
+	
+			}
 		}
-	}
-
-//End Loop Through Records
-
-echo '	    	<tr align="left" valign="middle" class="headingCell1">'
-.	 '             	<td valign="top">&nbsp;</td>'
-.	 '             	<td width="100%"><div align="right"> </div></td>'
-.	 '	    	</tr>'
-.    '		</table>'
-.    '		</td>'
-.	 '	</tr>'
-.	 '	<tr>'
-.    '		<td colspan="2">&nbsp;</td>'
-.	 '	</tr>'
-.	 '	<tr>'
-.    '		<td colspan="2"><div align="right">'
-.    '		<table width="100%" border="0" cellspacing="0" cellpadding="5">'
-.	 '	    	<tr>'
-.	 '             	<td width="100%">&nbsp;</td>'
-.	 '             	<td><div align="right"></div></td>'
-.	 '             	<td><div align="right"></div></td>'
-.	 '             	<td><div align="right"><input type="submit" name="saveOrder" value="Save Order"></div></td>'
-.	 '	    	</tr>'
-.    '		</table></div>'
-.    '		</td>'
-.	 '	</tr>';
-echo '			<tr>';
-echo '				<td colspan="2" width ="100%" align="center" valign="middle" class="small"><a href="index.php?cmd=editClass&ci='.$ci->getCourseInstanceID().'">Return to Edit Class</a></td>';
-echo '        </tr>';
-echo	 '	<tr>'
-.    '		<td colspan="2"><img src="images/spacer.gif" width="1" height="15"></td>'
-.	 '	</tr>'
-.	 '	</form>'
-.	 '	</table>';
+	
+	//End Loop Through Records
+	
+	echo '	    	<tr align="left" valign="middle" class="headingCell1">'
+	.	 '             	<td valign="top">&nbsp;</td>'
+	.	 '             	<td width="100%"><div align="right"> </div></td>'
+	.	 '	    	</tr>'
+	.    '		</table>'
+	.    '		</td>'
+	.	 '	</tr>'
+	.	 '	<tr>'
+	.    '		<td colspan="2">&nbsp;</td>'
+	.	 '	</tr>'
+	.	 '	<tr>'
+	.    '		<td colspan="2"><div align="right">'
+	.    '		<table width="100%" border="0" cellspacing="0" cellpadding="5">'
+	.	 '	    	<tr>'
+	.	 '             	<td width="100%">&nbsp;</td>'
+	.	 '             	<td><div align="right"></div></td>'
+	.	 '             	<td><div align="right"></div></td>'
+	.	 '             	<td><div align="right"><input type="submit" name="saveOrder" value="Save Order"></div></td>'
+	.	 '	    	</tr>'
+	.    '		</table></div>'
+	.    '		</td>'
+	.	 '	</tr>';
+	echo '			<tr>';
+	echo '				<td colspan="2" width ="100%" align="center" valign="middle" class="small"><a href="index.php?cmd=editClass&ci='.$ci->getCourseInstanceID().'">Return to Edit Class</a></td>';
+	echo '        </tr>';
+	echo	 '	<tr>'
+	.    '		<td colspan="2"><img src="images/spacer.gif" width="1" height="15"></td>'
+	.	 '	</tr>'
+	.	 '	</form>'
+	.	 '	</table>';
 
 }
 
 function displayCustomSort($user,$ci)
 {
-echo '      <table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">';
-echo '        <tr>';
-echo '          <td width="140%" colspan="2"><img src="images/spacer.gif" width="1" height="5"> </td>';
-echo '        </tr>';
-echo'			<FORM METHOD=POST NAME="customSortScreen" ACTION="index.php">';
-echo'			<INPUT TYPE="HIDDEN" NAME="cmd" VALUE="customSort">'
-.	 '			<INPUT TYPE="HIDDEN" NAME="ci" VALUE="'.$ci->getCourseInstanceID().'">';
-echo '			<tr>';
-echo '				<td colspan="2" width ="100%" align="center" valign="middle" class="small"><a href="index.php?cmd=editClass&ci='.$ci->getCourseInstanceID().'">Return to Edit Class</a></td>';
-echo '        </tr>';
-echo '        <tr>';
-echo '    		<td width="35%" align="left" valign="middle" bgcolor="#CCCCCC" class="borders"><div align="center"><span class="strong">Sort  by:</span> [ <a href="index.php?cmd=sortReserves&ci='.$ci->getCourseInstanceID().'&sortBy=title" class="editlinks">title</a> ] [ <a href="index.php?cmd=sortReserves&ci='.$ci->getCourseInstanceID().'&sortBy=author" class="editlinks">author</a>            ] [ <a href="index.php?cmd=customSort&ci='.$ci->getCourseInstanceID().'" class="editlinks">custom</a> ]</div></td>';
-echo '          <td width="65%" align="left" valign="top">&nbsp;</td>';
-echo '        </tr>';
-echo '        <tr>';
-echo '          <td colspan="2" align="left" valign="top"><div align="right">';
-echo '            <table width="100%" border="0" cellspacing="0" cellpadding="5">';
-echo '              <tr>';
-echo '                <td width="100%">&nbsp;</td>';
-echo '                <td><div align="right">';
-echo '                  <input type="button" name="reset1" value="Reset to Original Values" onClick="javascript:resetForm(this.form)">';
-echo '                </div></td>';
-echo '                <td><div align="right">';
-echo '                  <input type="submit" name="customSort" value="Save Order">';
-echo '                </div></td>';
-echo '              </tr>';
-echo '            </table>';
-echo '          </div></td>';
-echo '        </tr>';
-echo '        <tr>';
-echo '          <td colspan="2" align="left" valign="top"><div align="right"></div></td>';
-echo '        </tr>';
-echo '        <tr>';
-echo '          <td colspan="2" align="left" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">';
-echo '            <tr align="left" valign="top">';
-echo '              <td class="headingCell1"><div align="center">COURSE';
-echo '                MATERIALS</div></td>';
-echo '              <td width="75%">&nbsp;</td>';
-echo '            </tr>';
-echo '          </table></td>';
-echo '        </tr>';
-echo '        <tr>';
-echo '          <td colspan="2" align="left" valign="top" class="borders"><table width="100%" border="0" cellpadding="2" cellspacing="0" class="displayList">';
-echo '            <tr align="left" valign="middle">';
-echo '              <td width="1%" valign="top" bgcolor="#FFFFFF" class="headingCell1">&nbsp;</td>';
-echo '              <td width="60%" bgcolor="#FFFFFF" class="headingCell1">'.count($ci->reserveList).' Item(s) On Reserve</td>';
-echo '              <td width="10%" class="headingCell1">Sort Order</td>';
-echo '            </tr>';
-
-//Begin Loop Through Records
-	$rowNumber = 0;
-	$oldValue = array();
-	for($i=0;$i<count($ci->reserveList);$i++)
-	{
-		$ci->reserveList[$i]->getItem();
-			
-		if ($ci->reserveList[$i]->item->isHeading())
-		{
-			//echo "headings";
-		} else {	
-	
-		$rowClass = ($rowNumber++ % 2) ? "evenRow" : "oddRow";
-				
-		$reserveItem = new reserveItem($ci->reserveList[$i]->getItemID());
-		$itemIcon = $reserveItem->getItemIcon();
-		$itemGroup = $reserveItem->itemGroup;
-				
-		if ($reserveItem->isPhysicalItem()) {
-			//move to config file
-			$viewReserveURL = "http://libcat1.cc.emory.edu/uhtbin/cgisirsi/x/0/5?searchdata1=" . $ci->reserveList[$i]->item->getLocalControlKey();
-		} else {
-			$viewReserveURL = "reservesViewer.php?viewer=" . $user->getUserID() . "&reserve=" . $ci->reserveList[$i]->getReserveID();// . "&location=" . $ci->reserveList[$i]->item->getURL();
-		}
+	global $g_reservesViewer;	
 		
-		echo '	<tr align="left" valign="middle" class="'.$rowClass.'">'
-		.    '		<td width="1%" valign="top"><img src="'.$itemIcon.'" alt="text" width="24" height="20"></td>'
-	    .    '		<td width="60%">';
-	    
-	    if (!$reserveItem->isPhysicalItem()) {
-	    		echo '<a href="'.$viewReserveURL.'" target="_blank">'.$ci->reserveList[$i]->item->getTitle().'</a>';
-	    } else {
-	            echo $ci->reserveList[$i]->item->getTitle();
-	            if ($ci->reserveList[$i]->item->getLocalControlKey()){
-	            	echo ' <a href="'.$viewReserveURL.'" target="_blank">(more info)</a>';
-	            }
-	    }
-	    
-	    echo '. '.$ci->reserveList[$i]->item->getAuthor().'</td>';
-	    echo '              <td width="10%" valign="middle" class="borders"><div align="center">';
-		echo '                <input type="hidden" name="'.$ci->reserveList[$i]->reserveID.'" value="'.$ci->reserveList[$i]->sortOrder.'">';
-	    echo '                <input name="reserveSortIDs['.$ci->reserveList[$i]->reserveID.'][newSortOrder]" value="'.$ci->reserveList[$i]->sortOrder.'" type="text" size="3" onChange="javascript:if (this.value <=0 || this.value > '.count($ci->reserveList).' || !parseInt(this.value)) {alert (\'Invalid value\')} else {updateSort(document.forms.customSortScreen, '.$ci->reserveList[$i]->reserveID.', this.value, this.name)}">';
-		echo '              </td>';
-		echo '            </tr>';
-
+	echo '      <table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">';
+	echo '        <tr>';
+	echo '          <td width="140%" colspan="2"><img src="images/spacer.gif" width="1" height="5"> </td>';
+	echo '        </tr>';
+	echo'			<FORM METHOD=POST NAME="customSortScreen" ACTION="index.php">';
+	echo'			<INPUT TYPE="HIDDEN" NAME="cmd" VALUE="customSort">'
+	.	 '			<INPUT TYPE="HIDDEN" NAME="ci" VALUE="'.$ci->getCourseInstanceID().'">';
+	echo '			<tr>';
+	echo '				<td colspan="2" width ="100%" align="center" valign="middle" class="small"><a href="index.php?cmd=editClass&ci='.$ci->getCourseInstanceID().'">Return to Edit Class</a></td>';
+	echo '        </tr>';
+	echo '        <tr>';
+	echo '    		<td width="35%" align="left" valign="middle" bgcolor="#CCCCCC" class="borders"><div align="center"><span class="strong">Sort  by:</span> [ <a href="index.php?cmd=sortReserves&ci='.$ci->getCourseInstanceID().'&sortBy=title" class="editlinks">title</a> ] [ <a href="index.php?cmd=sortReserves&ci='.$ci->getCourseInstanceID().'&sortBy=author" class="editlinks">author</a>            ] [ <a href="index.php?cmd=customSort&ci='.$ci->getCourseInstanceID().'" class="editlinks">custom</a> ]</div></td>';
+	echo '          <td width="65%" align="left" valign="top">&nbsp;</td>';
+	echo '        </tr>';
+	echo '        <tr>';
+	echo '          <td colspan="2" align="left" valign="top"><div align="right">';
+	echo '            <table width="100%" border="0" cellspacing="0" cellpadding="5">';
+	echo '              <tr>';
+	echo '                <td width="100%">&nbsp;</td>';
+	echo '                <td><div align="right">';
+	echo '                  <input type="button" name="reset1" value="Reset to Original Values" onClick="javascript:resetForm(this.form)">';
+	echo '                </div></td>';
+	echo '                <td><div align="right">';
+	echo '                  <input type="submit" name="customSort" value="Save Order">';
+	echo '                </div></td>';
+	echo '              </tr>';
+	echo '            </table>';
+	echo '          </div></td>';
+	echo '        </tr>';
+	echo '        <tr>';
+	echo '          <td colspan="2" align="left" valign="top"><div align="right"></div></td>';
+	echo '        </tr>';
+	echo '        <tr>';
+	echo '          <td colspan="2" align="left" valign="top"><table width="100%" border="0" cellspacing="0" cellpadding="0">';
+	echo '            <tr align="left" valign="top">';
+	echo '              <td class="headingCell1"><div align="center">COURSE';
+	echo '                MATERIALS</div></td>';
+	echo '              <td width="75%">&nbsp;</td>';
+	echo '            </tr>';
+	echo '          </table></td>';
+	echo '        </tr>';
+	echo '        <tr>';
+	echo '          <td colspan="2" align="left" valign="top" class="borders"><table width="100%" border="0" cellpadding="2" cellspacing="0" class="displayList">';
+	echo '            <tr align="left" valign="middle">';
+	echo '              <td width="1%" valign="top" bgcolor="#FFFFFF" class="headingCell1">&nbsp;</td>';
+	echo '              <td width="60%" bgcolor="#FFFFFF" class="headingCell1">'.count($ci->reserveList).' Item(s) On Reserve</td>';
+	echo '              <td width="10%" class="headingCell1">Sort Order</td>';
+	echo '            </tr>';
+	
+	//Begin Loop Through Records
+		$rowNumber = 0;
+		$oldValue = array();
+		for($i=0;$i<count($ci->reserveList);$i++)
+		{
+			$ci->reserveList[$i]->getItem();
+				
+			if ($ci->reserveList[$i]->item->isHeading())
+			{
+				//echo "headings";
+			} else {	
+		
+			$rowClass = ($rowNumber++ % 2) ? "evenRow" : "oddRow";
+					
+			$reserveItem = new reserveItem($ci->reserveList[$i]->getItemID());
+			$itemIcon = $reserveItem->getItemIcon();
+			$itemGroup = $reserveItem->itemGroup;
+					
+			if ($reserveItem->isPhysicalItem()) {
+				//move to config file
+				$viewReserveURL = $g_reservesViewer . $ci->reserveList[$i]->item->getLocalControlKey();
+			} else {
+				$viewReserveURL = "reservesViewer.php?viewer=" . $user->getUserID() . "&reserve=" . $ci->reserveList[$i]->getReserveID();// . "&location=" . $ci->reserveList[$i]->item->getURL();
+			}
+			
+			echo '	<tr align="left" valign="middle" class="'.$rowClass.'">'
+			.    '		<td width="1%" valign="top"><img src="'.$itemIcon.'" alt="text" width="24" height="20"></td>'
+		    .    '		<td width="60%">';
+		    
+		    if (!$reserveItem->isPhysicalItem()) {
+		    		echo '<a href="'.$viewReserveURL.'" target="_blank">'.$ci->reserveList[$i]->item->getTitle().'</a>';
+		    } else {
+		            echo $ci->reserveList[$i]->item->getTitle();
+		            if ($ci->reserveList[$i]->item->getLocalControlKey()){
+		            	echo ' <a href="'.$viewReserveURL.'" target="_blank">(more info)</a>';
+		            }
+		    }
+		    
+		    echo '. '.$ci->reserveList[$i]->item->getAuthor().'</td>';
+		    echo '              <td width="10%" valign="middle" class="borders"><div align="center">';
+			echo '                <input type="hidden" name="'.$ci->reserveList[$i]->reserveID.'" value="'.$ci->reserveList[$i]->sortOrder.'">';
+		    echo '                <input name="reserveSortIDs['.$ci->reserveList[$i]->reserveID.'][newSortOrder]" value="'.$ci->reserveList[$i]->sortOrder.'" type="text" size="3" onChange="javascript:if (this.value <=0 || this.value > '.count($ci->reserveList).' || !parseInt(this.value)) {alert (\'Invalid value\')} else {updateSort(document.forms.customSortScreen, '.$ci->reserveList[$i]->reserveID.', this.value, this.name)}">';
+			echo '              </td>';
+			echo '            </tr>';
+	
+			}
 		}
+	
+	//End Loop Through Records
+	
+	echo '';
+	echo '            <tr align="left" valign="middle" class="headingCell1">';
+	echo '              <td valign="top">&nbsp;</td>';
+	echo '              <td><div align="right"> </div>';
+	echo '              </td>';
+	echo '              <td>&nbsp;</td>';
+	echo '            </tr>';
+	echo '          </table></td>';
+	echo '        </tr>';
+	echo '        <tr>';
+	echo '          <td colspan="2">&nbsp;</td>';
+	echo '        </tr>';
+	echo '        <tr>';
+	echo '          <td colspan="2"><div align="right">';
+	echo '            <table width="100%" border="0" cellspacing="0" cellpadding="5">';
+	echo '              <tr>';
+	echo '                <td width="100%">&nbsp;</td>';
+	echo '                <td><div align="right">';
+	echo '                    <input type="button" name="reset1" value="Reset to Original Values" onClick="javascript:resetForm(this.form)">';
+	echo '                  </div>';
+	echo '                </td>';
+	echo '                <td>&nbsp;</td>';
+	echo '                <td><div align="right">';
+	echo '                    <input type="submit" name="customSort" value="Save Order">';
+	echo '                  </div>';
+	echo '                </td>';
+	echo '              </tr>';
+	echo '            </table>';
+	echo '          </div></td>';
+	echo '        </tr>';
+	echo '			<tr>';
+	echo '				<td colspan="2" width ="100%" align="center" valign="middle" class="small"><a href="index.php?cmd=editClass&ci='.$ci->getCourseInstanceID().'">Return to Edit Class</a></td>';
+	echo '        </tr>';
+	echo '        <tr>';
+	echo '          <td colspan="2"><img src="images/spacer.gif" width="1" height="15"></td>';
+	echo '        </tr>';
+	echo '			</FORM>';
+	echo '      </table>';
+	
 	}
-
-//End Loop Through Records
-
-echo '';
-echo '            <tr align="left" valign="middle" class="headingCell1">';
-echo '              <td valign="top">&nbsp;</td>';
-echo '              <td><div align="right"> </div>';
-echo '              </td>';
-echo '              <td>&nbsp;</td>';
-echo '            </tr>';
-echo '          </table></td>';
-echo '        </tr>';
-echo '        <tr>';
-echo '          <td colspan="2">&nbsp;</td>';
-echo '        </tr>';
-echo '        <tr>';
-echo '          <td colspan="2"><div align="right">';
-echo '            <table width="100%" border="0" cellspacing="0" cellpadding="5">';
-echo '              <tr>';
-echo '                <td width="100%">&nbsp;</td>';
-echo '                <td><div align="right">';
-echo '                    <input type="button" name="reset1" value="Reset to Original Values" onClick="javascript:resetForm(this.form)">';
-echo '                  </div>';
-echo '                </td>';
-echo '                <td>&nbsp;</td>';
-echo '                <td><div align="right">';
-echo '                    <input type="submit" name="customSort" value="Save Order">';
-echo '                  </div>';
-echo '                </td>';
-echo '              </tr>';
-echo '            </table>';
-echo '          </div></td>';
-echo '        </tr>';
-echo '			<tr>';
-echo '				<td colspan="2" width ="100%" align="center" valign="middle" class="small"><a href="index.php?cmd=editClass&ci='.$ci->getCourseInstanceID().'">Return to Edit Class</a></td>';
-echo '        </tr>';
-echo '        <tr>';
-echo '          <td colspan="2"><img src="images/spacer.gif" width="1" height="15"></td>';
-echo '        </tr>';
-echo '			</FORM>';
-echo '      </table>';
-
-}
 
 }
 

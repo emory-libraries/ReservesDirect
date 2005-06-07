@@ -40,7 +40,7 @@ http://coursecontrol.sourceforge.net/
 	    <username>reserves_user</username>
 	    <pwd>30322</pwd>
 	    <host>localhost</host>
-	    <dbname>reservesdemo</dbname>
+	    <dbname>reserves</dbname>
 	    <dbkey>client-key.pem</dbkey>
 	    <dbcert>client-cert.pem</dbcert>
 	    <dbca>cacert.pem</dbca>
@@ -51,6 +51,7 @@ http://coursecontrol.sourceforge.net/
 	</database>
 	
 	<catalog>
+		<catalogName>EUCLID</catalogName>
 		<useCatalog>yes</useCatalog> <!-- all others may be blank if no -->
 		<zhost>libcat1.cc.emory.edu</zhost>
 		<zport>2200</zport>
@@ -60,6 +61,10 @@ http://coursecontrol.sourceforge.net/
 		<holdings_script>http://www.library.emory.edu/uhtbin/holding_request</holdings_script>
 		<display_reserve>http://www.library.emory.edu/uhtbin/display_reserve</display_reserve>
 	</catalog>
+	
+	<reserves_viewer>http://libcat1.cc.emory.edu/uhtbin/cgisirsi/x/0/5?searchdata1=</reserves_viewer>
+	
+	<library_url>http://www.library.emory.edu</library_url>
 	
 	<error_log>/home/httpd/html/jbwhite/projects/reserves2_1/error.log</error_log>
 	<errorEmail>jbwhite@emory.edu</errorEmail>

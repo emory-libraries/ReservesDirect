@@ -129,7 +129,7 @@ class exportDisplayer
 		echo "		<td align=\"left\" valign=\"top\">\n";
 		echo "			<p>Make sure the &quot;Smart Text&quot; radio button is selected.</p>\n";
 		echo "			<p>Choose any other options you wish and click on Submit.</p>\n";
-		echo "			<p>Your reserve list (both electronic and physical, circulating items) will appear on the page. Physical items will have links to EUCLID for their bibliographic and holdings information.</p>\n";
+		echo "			<p>Your reserve list (both electronic and physical, circulating items) will appear on the page. Physical items will have links to $g_catalogName for their bibliographic and holdings information.</p>\n";
 		echo "	        <p align=\"center\"><a href=\"index.php?cmd=exportClass\">Export another class</a><br> <a href=\"index.php\">Return to Home </a> </p>\n";		
 		echo "		</td>\n";
 		echo "	</tr>\n";
@@ -158,7 +158,7 @@ class exportDisplayer
 		echo "	<tr>\n";
 		echo "		<td align=\"left\" valign=\"top\">\n";
 		echo "			<p>In Learnlink, open your conference and in the &quot;File&quot; menu, select &quot;Upload&quot;. Find the file on your computer and click &quot;Select&quot;. It should appear in your conference. If you open the file, it should open the course listing in the browser window.</p>\n";
-		echo "			<p>Your reserve list (both electronic and physical, circulating items) will appear on the page. Physical items will have links to EUCLID for theirbib and holdings information.</p>\n";
+		echo "			<p>Your reserve list (both electronic and physical, circulating items) will appear on the page. Physical items will have links to $g_catalogName for theirbib and holdings information.</p>\n";
 		echo "	        <p align=\"center\"><a href=\"index.php?cmd=exportClass\">Export another class</a><br> <a href=\"index.php\">Return to Home </a> </p>\n";
 		echo "		</td>\n";
 		echo "	</tr>\n";
@@ -202,36 +202,6 @@ class exportDisplayer
 	
 	function generateRSS_javascript($ci)
 	{
-/*
-document.write('\<style\ type\=\"text\/css\"\></style>\
-\
-')
-document.write('\.rssTable\ \{color\:\ \#000000\;\ background\:\ \#FFFFFF\;\ border\-color\:\ \#000000\;\	border\-style\:\ solid\;\ border\-width\:\ thin\;\}\
-\
-')
-document.write('\.rssLink\ \{background\:\ transparent\;\}\
-\
-')
-document.write('\.rssChan\ \{color\:\ transparent\;\	background\:\ \#EEEEEE\;\ font\-size\:\ large\;\ font\-family\:\ sans\-serif\;\ font\-weight\:\ normal\;\}\
-\
-')
-document.write('\.rssItem\ \{color\:\ transparent\;\ background\:\ \#FFFFFF\;\ font\-size\:\ small\;\ font\-family\:\ sans\-serif\;\ font\-weight\:\ bold\;\}\
-\
-')
-document.write('\.rssDesc\ \{color\:\ \#000000\;\ background\:\ \#FFFFFF\;\ font\-size\:\ smaller\;\ font\-family\:\ sans\-serif\;\ font\-weight\:\ normal\;\}\
-\
-')
-document.write('\<\/style\>')
-document.write('<table class="rssTable" cellspacing="0" cellpadding="2" width="100%">')
-document.write('<tr class="rssChan"><td valign="middle" align="center">')
-document.write('<a class="rssLink" href="https://ereserves.library.emory.edu/reserves/">AAS1234-A Jason\'s Test Spring 2005 Reserves List</a>')
-document.write('</td></tr>')
-document.write('<tr class="rssChanDesc"><td valign="middle" align="center">')
-document.write('Course Reserves for AAS1234-A Jason\'s Test Spring 2005 <br />taught by: Jason White<br />Helper Applications required for viewing reserves:<br /><a href="http://www.real.com/">RealPlayer</a>')
-document.write('</td></tr>')
-document.write('</td></tr></table>')
-document.close()
-*/		
 	}
 	
 }

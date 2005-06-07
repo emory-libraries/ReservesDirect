@@ -19,7 +19,6 @@ if ($_REQUEST['Submit'] == "Send")
 		
 		if (!isset($error))	{
 			//echo $toEmail;		
-			//$mail = mail($toEmail, "Greetings, from $toEmail!", "This space for rent. PHP mail function working", "From:goingpostal@biliku.library.emory.edu\n");		
 			$mail = mail($toEmail, $subject, $msg, "From:$fromEmail\n");		
 			if($mail)        
 			{			

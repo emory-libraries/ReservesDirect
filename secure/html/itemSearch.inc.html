@@ -1,6 +1,6 @@
 function displaySearchScreen()
 {
-	global $u, $page, $subpage;
+	global $u, $page, $subpage, $g_catalogName, $g_libraryURL;
 
 	echo
 	"<table align=\"center\" cellspacing=\"0\" cellpadding=\"3\">
@@ -12,7 +12,7 @@ function displaySearchScreen()
 						<tbody>
 							<tr>
 								<td><font size=\"+2\">1:</font></td>
-								<td><a href=\"http://www.library.emory.edu/\" target=\"EUCLID\"><b>Search for items in EUCLID</b></a>&nbsp;&nbsp;<i>Note:  EUCLID will open in a new window</i></td>
+								<td><a href=\"$g_libraryURL\" target=\"$g_catalogName\"><b>Search for items in $g_catalogName</b></a>&nbsp;&nbsp;<i>Note:  $g_catalogName will open in a new window</i></td>
 							</tr>
 						</tbody>
 					</table>
@@ -88,7 +88,7 @@ function displaySearchResults($items)
 		"<table align=\"center\" cellspacing=\"0\" cellpadding=\"3\">
 			<tbody>
 				<tr class=\"heading\">
-					<td><b>elect Items to place on Reserve</b></td>
+					<td><b>Select Items to place on Reserve</b></td>
 					<td align=\"right\">
 						<a href=\"\" class=\"bluebox\">Return to previous page</a>
 					</td>
@@ -98,7 +98,7 @@ function displaySearchResults($items)
 					<td colspan=\"2\">
 						<a href=\"\">New Search</a>
 						&nbsp;&nbsp;|&nbsp;&nbsp;
-						<a href=\"http://www.library.emory.edu/uhtbin/AU/Ross+Singer\" target=\"EUCLID\">Search EUCLID with this Query</a>
+						<a href=\"http://www.library.emory.edu/uhtbin/AU/Ross+Singer\" target=\"$g_catalogName\">Search $g_catalogName with this Query</a>
 	
 						<br><hr noshade=\"noshade\">
 					</td>

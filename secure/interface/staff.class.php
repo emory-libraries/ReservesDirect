@@ -354,7 +354,7 @@ class staff extends instructor
 	*/
 	function createILS_record($barcode, $copy, $borrowerID, $libraryID, $term, $circRule, $altCirc, $expiration)
 	{
-		global $g_reserveScript;
+		global $g_reserveScript, $g_catalogName;
 		
 		$reservesDesk = new library($libraryID);
 		
@@ -382,9 +382,9 @@ class staff extends instructor
         $returnStatus = ereg_replace("\n", "", $returnStatus);
         
         if(!ereg("outcome=OK", $returnStatus)){
-        	return "There was a problem setting the location and circ-rule in EUCLID. <BR>EUCLID returned:  $returnStatus.";
+        	return "There was a problem setting the location and circ-rule in $g_catalogName. <BR>$g_catalogName returned:  $returnStatus.";
         } else 
-        	return "Location and circ-rule have been successfully set in EUCLID";
+        	return "Location and circ-rule have been successfully set in $g_catalogName";
 	}
 	
 	function getSpecialUserMsg() { return $this->sp->getMsg(); }

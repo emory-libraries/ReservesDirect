@@ -123,7 +123,7 @@ class classDisplayer
 	
 	function displayEditClass($user, $ci)
 	{
-		global $g_permission;
+		global $g_permission, $g_reservesViewer;
 					
 		echo('<FORM METHOD=POST NAME="editReserves" ACTION="index.php">');
 	    echo('<INPUT TYPE="HIDDEN" NAME="cmd" VALUE="editClass">');
@@ -288,7 +288,7 @@ class classDisplayer
 				$viewReserveURL = "reservesViewer.php?viewer=" . $user->getUserID() . "&reserve=" . $ci->reserveList[$i]->getReserveID();// . "&location=" . $ci->reserveList[$i]->item->getURL();
 				if ($reserveItem->isPhysicalItem()) {
 					//move to config file
-					$viewReserveURL = "http://libcat1.cc.emory.edu/uhtbin/cgisirsi/x/0/5?searchdata1=" . $ci->reserveList[$i]->item->getLocalControlKey();
+					$viewReserveURL = $g_reservesViewer . $ci->reserveList[$i]->item->getLocalControlKey();
 				}
 				echo '<tr align="left" valign="middle" class="'.$rowClass.'">'
 	            .    '	<td width="4%" valign="top"><img src="'.$itemIcon.'" alt="text" width="24" height="20"></td>'
@@ -1014,7 +1014,7 @@ class classDisplayer
 	
 	function displaySelectReservesToReactivate($ci, $user, $instructor_list, $hidden_fields=null)
 	{
-		global $g_permission;		
+		global $g_permission, $g_reservesViewer;		
 		echo "<form action=\"index.php\" method=\"POST\" name=\"reactivateList\">\n";
 		
 		if (isset($_REQUEST['term'])) {
@@ -1200,7 +1200,7 @@ class classDisplayer
 									
 				if ($reserveItem->isPhysicalItem()) {
 					//move to config file
-					$viewReserveURL = "http://libcat1.cc.emory.edu/uhtbin/cgisirsi/x/0/5?searchdata1=" . $ci->reserveList[$i]->item->getLocalControlKey();
+					$viewReserveURL = $g_reservesViewer . $ci->reserveList[$i]->item->getLocalControlKey();
 				} else {
 					$viewReserveURL = "reservesViewer.php?viewer=" . $user->getUserID() . "&reserve=" . $ci->reserveList[$i]->getReserveID();// . "&location=" . $ci->reserveList[$i]->item->getURL();
 				}
