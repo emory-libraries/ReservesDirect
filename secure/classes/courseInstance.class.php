@@ -636,10 +636,9 @@ class courseInstance
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT r.reserve_id, r.sort_order, i.title, n.note_id "
+				$sql = "SELECT r.reserve_id, r.sort_order, i.title "
 					.  "FROM reserves as r "
 					.  "  JOIN items as i ON r.item_id = i.item_id  "
-					.  "  LEFT JOIN notes as n ON n.target_table = 'reserves' AND r.reserve_id = n.target_id "	
 					.  "WHERE course_instance_id = ! ";
 					
 				$order_default 	= "ORDER BY r.sort_order, i.title";
@@ -662,14 +661,11 @@ class courseInstance
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
 		$this->reserveList = array();
+
 		while ($row = $rs->fetchRow()) {
-			$r = new reserve($row[0]);
-			
-			if (!is_null($row[3]))
-				$r->notes[] = new note($row[3]);
-				
-			$this->reserveList[] = $r;
-		}
+            $r = new reserve($row[0]);
+            $this->reserveList[] = $r;
+        }
 	}
 	
 	/**
