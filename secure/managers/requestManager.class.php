@@ -88,7 +88,7 @@ class requestManager
 				$this->argList = array($requestList, $user->getLibraries(), $request, $user);
 			break;
 						
-			case 'storeRequest':
+			case 'storeRequest':		
 				global $g_documentURL;				
 			
 				$item 		= new reserveItem();
@@ -107,17 +107,16 @@ class requestManager
 						$itemAudit->createNewItemAudit($item->getItemID(),$user->getUserID());				
 					} else 
 						$reserve->getReserveByCI_Item($ci->getCourseInstanceID(), $item->getItemID());
-						
-				} else {
-					$requestObj	= new request($request['request_id']);
+					
+				} else {				
+					$requestObj	= new request($request['request_id']);	
 					$item->getItemByID($requestObj->requestedItemID);
 					$reserve->getReserveByID($requestObj->getReserveID());
-									
 					$requestObj->setDateProcessed(date('Y-m-d'));
 					//set ci so it will be displayed for user
 					$ci = new courseInstance($reserve->getCourseInstanceID());
 				}
-				
+						
 				$reserve->setActivationDate($request['hide_year'].'-'.$request['hide_month'].'-'.$request['hide_day']);
 				$reserve->setExpirationDate($ci->getExpirationDate());
 				
@@ -134,7 +133,7 @@ class requestManager
 				if (isset($request['home_library'])) $item->sethomeLibraryID($request['home_library']);
 				if (isset($request['item_type'])) $item->setGroup($request['item_type']);
 				if (isset($request['volume_title'])) $item->setVolumeTitle($request['volume_title']);
-				if (isset($request['pages_times'])) $item->setPagesTimes($request['pages_times']);
+				if (isset($request['times_pages'])) $item->setPagesTimes($request['times_pages']);
 
 				if ($request['personal_item'] == "yes")
 					$item->setprivateUserID($request['selected_owner']);			
@@ -242,6 +241,36 @@ class requestManager
 					$this->displayFunction = 'processSuccessful';				
 					$this->argList = array($ci, $ilsResult);
 					break;					
+				} elseif ($request['addDuplicate'] == 'addDuplicate') { //user had requested a duplicate copy
+						$duplicateItem = new reserveItem();
+						
+						$item_id = $duplicateItem->createNewItem();
+						
+						$search_results = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'source'=>'', 'content_note'=>'', 'controlKey'=>'', 'personal_owner'=>null, 'physicalCopy'=>'');
+						$search_results['title'] = ($item->getTitle() <> "") ? $item->getTitle() : "";
+						$search_results['author'] = ($item->getAuthor() <> "") ? $item->getAuthor() : "";
+						$search_results['edition'] = ($item->getVolumeEdition() <> "") ? $item->getVolumeEdition() : "";
+						$search_results['performer'] = ($item->getPerformer() <> "") ? $item->getPerformer() : "";
+						$search_results['volume_title'] = ($item->getVolumeTitle() <> "") ? $item->getVolumeTitle() : "";
+						$search_results['times_pages'] = ($item->getPagesTimes() <> "") ? $item->getPagesTimes() : "";
+						$search_results['source'] = ($item->getSource() <> "") ? $item->getSource() : "";
+						$search_results['content_note'] = ($item->getContentNotes() <> "") ? $item->getContentNotes() : "";
+						$search_results['controlKey'] = $item->getLocalControlKey();
+						$search_results['personal_owner'] = $item->getPrivateUserID();						
+						
+						//populate personal owners
+						if (isset($_REQUEST['personal_item']) && ($_REQUEST['personal_item'] == "yes") && (isset($_REQUEST['select_owner_by']) && isset($_REQUEST['owner_qryTerm']))) //user is searching for an owner
+						{				
+							$users = new users();
+							$users->search($_REQUEST['select_owner_by'], $_REQUEST['owner_qryTerm'], 'student'); //any registered user could own an item
+							$owner_list = $users->userList;
+						} else $owner_list = null;		
+						
+						//get all Libraries
+						$lib_list = $user->getLibraries();
+						$this->displayFunction = 'addItem';
+											
+						$this->argList = array($user, $request['previous_cmd'], $search_results, $owner_list, $lib_list, null, $_REQUEST, array('cmd'=>$cmd, 'previous_cmd'=>$cmd, 'ci'=>$_REQUEST['ci'], 'selected_instr'=>$_REQUEST['selected_instr'], 'item_id'=>$item_id));
 				} else {					
 				
 					$loc  = "add an item";
@@ -359,8 +388,10 @@ class requestManager
 					}
 									
 					$search_results['physicalCopy'] = $zQry->getHoldings($_REQUEST['searchField'], $_REQUEST['searchTerm']);					
-				} else $search_results = null;
-				
+				} else {
+					$search_results = null;
+					$item_id = null;
+				}
 				//populate personal owners
 				if (isset($_REQUEST['personal_item']) && ($_REQUEST['personal_item'] == "yes") && (isset($_REQUEST['select_owner_by']) && isset($_REQUEST['owner_qryTerm']))) //user is searching for an owner
 				{				
@@ -378,7 +409,7 @@ class requestManager
 				//print_r($search_results);
 				//exit;
 				
-				//when form is sumbit for save cmd is set to storeRequest its ugly but it works
+				//when form is sumbitted for save cmd is set to storeRequest its ugly but it works
 				$this->argList = array($user, $cmd, $search_results, $owner_list, $lib_list, null, $_REQUEST, array('cmd'=>$cmd, 'previous_cmd'=>$cmd, 'ci'=>$_REQUEST['ci'], 'selected_instr'=>$_REQUEST['selected_instr'], 'item_id'=>$item_id));
 			break;
 		}

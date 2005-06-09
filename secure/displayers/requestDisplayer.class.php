@@ -198,7 +198,7 @@ class requestDisplayer
 
 	function addItem($user, $cmd, $search_results, $owner_list, $lib_list, $request_id=null, $request, $hidden_fields, $isActive=true, $buttonValue="Add Item", $msg="")
 	{	
-		global $g_documentURL, $g_catalogName;
+		global $g_documentURL;
 
 		$circRules = new circRules();	
 		
@@ -284,7 +284,7 @@ class requestDisplayer
 			echo "	<input type=\"hidden\" name=\"home_library\" value=\"1\">\n"; //will not be processed so set to default of Woodruff
 			echo "			<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"borders\">\n";
 			echo "				<tr>\n";
-			echo "					<td width=\"25%\" align=\"left\" valign=\"top\"> <p class=\"headingCell1\" >MATERIAL TYPE (Pick One):</p></td><td width=\"75%\"></td>\n";
+			echo "					<td width=\"25%\" align=\"left\" valign=\"top\"> <p class=\"headingCell1\" >MATERIAL TYPE (Pick One):</p></td><td width=\"75%\">&nbsp;</td>\n";
 			echo "				</tr>\n";
 			echo "				<tr>\n";
 			echo "					<td align=\"left\" valign=\"top\" colspan=\"2\">\n";
@@ -324,16 +324,16 @@ class requestDisplayer
 			echo "				<tr bgcolor=\"#CCCCCC\">\n";
 			echo "					<td width=\"20%\" align=\"left\" valign=\"middle\">\n";
 			echo "						<input name=\"addType\" type=\"radio\" value=\"EUCLID_ITEM\" $EUCLID_ITEM  onClick=\"this.form.personal_item.value='no'; this.form.searchTerm.disabled=false; this.form.searchField.disabled=false; this.form.euclid_record.checked=false; this.form.euclid_record.disabled=false; this.form.submit();\">\n";
-			echo "						<span class=\"strong\">$g_catalogName Item</span>\n";
+			echo "						<span class=\"strong\">EUCLID Item</span>\n";
 			echo "					</td>\n";
 			echo "					<td width=\"40%\" align=\"left\" valign=\"top\">\n";
 			echo "						<input type=\"radio\" name=\"addType\" value=\"PERSONAL\" $PERSONAL onClick=\"this.form.personal_item.value='yes'; this.form.searchTerm.disabled=true; this.form.searchField.disabled=true; this.form.euclid_record.checked=true; this.form.euclid_record.disabled=true; this.form.submit();\">\n";
-			echo "						<span class=\"strong\">Personal Copy ($g_catalogName Item Available)</span>\n";
+			echo "						<span class=\"strong\">Personal Copy (EUCLID Item Available)</span>\n";
 			echo "					</td>\n";
 					
 			echo "					<td width=\"40%\" align=\"left\" valign=\"top\">\n";
 			echo "						<input type=\"radio\" name=\"addType\" value=\"MANUAL\" $MANUAL onClick=\"this.form.searchTerm.disabled=true; this.form.searchField.disabled=true; this.form.euclid_record.checked=false; this.form.euclid_record.disabled=true;\">\n";
-			echo "						<span class=\"strong\">Enter Item Manually (no $g_catalogName lookup)</span>\n";
+			echo "						<span class=\"strong\">Enter Item Manually (no EUCLID lookup)</span>\n";
 			echo "					</td>\n";
 			echo "				</tr>\n";
 			
@@ -413,7 +413,7 @@ class requestDisplayer
 			echo "				<tr bgcolor=\"#CCCCCC\">\n";
 			echo "					<td colspan=\"2\" align=\"left\" valign=\"middle\">\n";
 			echo "						<input type=\"checkbox\" name=\"euclid_record\" value=\"yes\" checked>\n";
-			echo "						<span class=\"strong\">Create $g_catalogName Reserve Record</span>\n";
+			echo "						<span class=\"strong\">Create EUCLID Reserve Record</span>\n";
 			echo "					</td>\n";
 			echo "				</tr>\n";
 			echo "			</table>\n";
@@ -509,9 +509,10 @@ class requestDisplayer
 		echo "					<td align=\"right\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"strong\">Content Notes:</td>\n";
 		echo "					<td><textarea name=\"content_note\" cols=\"50\" rows=\"3\">".$search_results['content_note']."</textarea></td>\n";
 		echo "				</tr>\n";
-		
+
 		$personal_item = isset($request['personal_item']) ? $request['personal_item'] : "";
 		echo "				<input type=\"hidden\" name=\"personal_item\" value=\"".$personal_item."\">\n";
+
 		if (isset($request['personal_item']) && ($request['personal_item'] == "yes") || !is_null($search_results['personal_owner'])) 
 		{
 			echo "				<tr align=\"left\" valign=\"middle\">\n";
@@ -527,7 +528,7 @@ class requestDisplayer
 			$$selector = "selected";
 			
 			$owner_qryTerm = (isset($request['owner_qryTerm'])) ? $request['owner_qryTerm'] : "";
-			
+
 			echo "					</td>\n";
 			echo "					<td>\n";
 			echo "						<select name=\"select_owner_by\">\n";
@@ -537,7 +538,7 @@ class requestDisplayer
 			echo "						&nbsp;\n";
 			echo "						<input type=\"submit\" name=\"owner_search\" value=\"Search\">\n";
 			echo "						&nbsp;\n";
-			
+
 			//set selected
 			$inst_DISABLED = (is_null($owner_list)) ? "DISABLED" : "";
 			
@@ -556,10 +557,6 @@ class requestDisplayer
 			echo "				</tr>\n";		
 		}
 
-		
-		
-		$barcode_value = (isset($barcode) && (isset($request['searchTerm']) && $request['searchTerm'] != "")) ? $request['searchTerm'] : $search_results['physicalCopy'][0]['bar'];
-		
 		echo "				<tr align=\"left\" valign=\"middle\">\n";
 		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">Barcode:</td>\n";
 		echo "					<td><input name=\"barcode\" type=\"text\" size=\"12\" value=\"$barcode_value\"></td>\n";
@@ -569,14 +566,14 @@ class requestDisplayer
 		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">Control Number:</td>\n";
 		echo "					<td>".$search_results['controlKey']."<input name=\"controlKey\" type=\"hidden\" size=\"10\" value=\"".$search_results['controlKey']."\"></td>\n";
 		echo "				</tr>\n";
-		
+
 		if (is_array($search_results['physicalCopy']))
 		{
 			echo "				<tr align=\"left\" valign=\"top\">\n";
 			echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">Select Copy:</td>\n";
 			echo "					<td>\n";
 			echo "						<table class=\"strong\" border=\"0\" width=\"100%\">\n";
-						
+
 			for ($i=0;$i<count($search_results['physicalCopy']);$i++)
 			{			
 				$copySelect = (count($search_results['physicalCopy']) == 1 || $search_results['physicalCopy'][$i]['bar'] == $barcode_value) ? "checked" : ""; 
@@ -591,7 +588,7 @@ class requestDisplayer
 			echo "				</tr>\n";		
 		} //else 
 			//echo "	<tr><td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">COULD NOT RETRIEVE HOLDING INFORMATION</td><td>". $search_results['physicalCopy']['error'] . "</td></tr>\n";
-		
+
 		echo "				<tr align=\"left\" valign=\"middle\">\n";
 		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">&nbsp;</td>\n";
 		echo "					<td>&nbsp;</td>\n";
@@ -605,10 +602,9 @@ class requestDisplayer
 		echo "		</td>\n";
 		echo "	</tr>\n";
 		echo "	<tr><td><strong><font color=\"#FF0000\">* </font></strong><span class=\"helperText\">= required fields</span></td></tr>\n";		
-		/*
-		if ($cmd == "addDigitalItem")
-			echo "	<tr><td align=\"center\"><input type=\"checkbox\" name=\"addDuplicate\" value=\"addDuplicate\">&nbsp;<span class=\"small\">Create Item Duplicate</span></td></tr>\n";
-		*/
+		
+		echo "	<tr><td align=\"center\"><input type=\"checkbox\" name=\"addDuplicate\" value=\"addDuplicate\">&nbsp;<span class=\"small\">Create Item Duplicate</span></td></tr>\n";
+		
 		echo "	<tr><td align=\"center\"><input type=\"button\" name=\"store_request\" value=\"$buttonValue\" onClick=\"checkForm(this.form);\"></td></tr>\n";
 		echo "</form\n";
 		echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
