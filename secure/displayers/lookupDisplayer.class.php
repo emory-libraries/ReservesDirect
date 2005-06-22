@@ -166,24 +166,13 @@ class lookupDisplayer
 		echo "	<tr><td align=\"left\" valign=\"top\">&nbsp;</td></tr>\n";
 		echo "</table>\n";
 	}
-
-	function instructorLookup($instr_list, $request, $hidden_fields=null)
+	
+	function instructorLookup($instr_list, $request)
 	{
-		if (is_array($hidden_fields)){
-			$keys = array_keys($hidden_fields);
-			foreach($keys as $key){
-				if (is_array($hidden_fields[$key])){
-					foreach ($hidden_fields[$key] as $field){
-						echo "<input type=\"hidden\" name=\"".$key."[]\" value=\"". $field ."\">\n";
-					}
-				} else {
-					echo "<input type=\"hidden\" name=\"$key\" value=\"". $hidden_fields[$key] ."\">\n";
-				}
-			}
-		}
 
-		echo "					<td>\n";
-
+		//echo "					<td>\n";
+		echo "<table><tr><td>";
+		
 		//set selected
 		$username = "";
 		$last_name = "";
@@ -210,7 +199,8 @@ class lookupDisplayer
 		}
 
 		echo "						</select>\n";
-		echo "					</td>\n";
+		//echo "					</td>\n";
+		echo "</td></tr></table>";
 	}
 }
 
