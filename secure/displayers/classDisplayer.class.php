@@ -40,27 +40,25 @@ class classDisplayer
 		echo "	<tr>\n";
 		echo "		<td align=\"center\" valign=\"top\">\n";
 		echo "			<table width=\"66%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
-		echo "				<tr class=\"headingCell1\"><td width=\"33%\">Process Materials</td><td width=\"33%\">Classes</td><!--<td width=\"33%\">Departments</td>--></tr>\n";
+		echo "				<tr class=\"headingCell1\"><td width=\"66%\" colspan=\"2\">Manage Classes</td><!--<td width=\"33%\">Manage Departments</td>--></tr>\n";
 		echo "				<tr align=\"left\" valign=\"top\">\n";
-		echo "					<td width=\"33%\" class=\"borders\"><p align=\"center\"><span class=\"strong\">Unprocessed Requests:</span> <!--(21/200)--></p>\n";
-		echo "						<ul>\n";
-		echo "							<li><a href=\"index.php?cmd=displayRequest\" align=\"center\">Process Requests</a><!--Goes to staff-mngClass-requests.html --></li>\n";
-		echo "							<li><a href=\"index.php?cmd=addDigitalItem\" align=\"center\">Add an Electronic Item</a><!--Goes to class lookup, then staff-mngClass-addItem-dig.html --></li>\n";
-		echo "							<li><a href=\"index.php?cmd=addPhysicalItem\">Add a Physical Item</a><!--Goes to class lookup, then staff-mngClass-addItem-phys.html --></li>\n";
-		echo "							<!--<li><a href=\"index.php?cmd=physicalItemXListing\">Physical Item Cross-listings </a>--><!--Goes to staff-mngClass-phys-XList1.html --></li>\n";
-		echo "						</ul>\n";
-		echo "					</td>\n";
 		echo "					<td width=\"33%\" class=\"borders\">\n";
 		echo "						<ul>\n";
-		echo "							<li><a href=\"index.php?cmd=createClass\" align=\"center\">Add Class</a></li>\n";
+		echo "							<li><a href=\"index.php?cmd=createClass\" align=\"center\">Create Class</a></li>\n";
 		echo "							<li><a href=\"index.php?cmd=staffEditClass\">Edit Class</a></li>\n";
 		echo "							<li><a href=\"index.php?cmd=deleteClass\">Delete Class</a></li>\n";
-		echo "							<li><a href=\"index.php?cmd=reactivateClass\" align=\"center\">Reactivate Course</a></li>\n";
+		echo "							<li><a href=\"index.php?cmd=reactivateClass\" align=\"center\">Reactivate Class</a></li>\n";
+		echo "						</ul>\n";
+		echo "					</td>\n";
+		
+		echo "					<td width=\"33%\" class=\"borders\">\n";
+		echo "						<ul>\n";
 		echo "							<li><a href=\"index.php?cmd=copyClass\">Copy Reserve List or Merge Classes</a><!--Links to staff-mngClass-CopyList1.html --></li>\n";
 		echo "							<li><a href=\"index.php?cmd=viewEnrollment\">View Student Enrollment</a><!--Links to staff-mngClass-CopyList1.html --></li>\n";
 		echo "							<li><a href=\"index.php?cmd=exportClass\">Export a Class to Blackboard, etc.</a><!--Same screens as faculty use for exporting a class--></li>\n";
 		echo "						</ul>\n";
 		echo "					</td>\n";
+		
 		//echo "					<td width=\"33%\" class=\"borders\">\n";
 		//echo "						&nbsp;<ul>\n";
 		//echo "							<!--<li><a DISABLED href=\"index.php?cmd=addDept\">Add Department</a>--><!--Goes to staff-mngClass-createDept1.html --></li>\n";
@@ -230,6 +228,7 @@ class classDisplayer
 		.    '		<table width="100%" border="0" cellpadding="2" cellspacing="0" class="displayList">'
 		.    '      <tr align="left" valign="middle">'
 		.    '          <td valign="top" bgcolor="#FFFFFF" class="headingCell1">&nbsp;</td>'
+		.    '          <td valign="top" bgcolor="#FFFFFF" class="headingCell1">&nbsp;</td>'
 		.	 '			<td bgcolor="#FFFFFF" class="headingCell1">'.count($ci->reserveList).' Item(s) On Reserve</td>'
 		.    '          <td class="headingCell1">Status</td>'
 		.    '          <td class="headingCell1">Edit</td>'
@@ -289,8 +288,9 @@ class classDisplayer
 					$viewReserveURL = $g_reservesViewer . $ci->reserveList[$i]->item->getLocalControlKey();
 				}
 				echo '<tr align="left" valign="middle" class="'.$rowClass.'">'
-	            .    '	<td width="4%" valign="top"><img src="'.$itemIcon.'" alt="text" width="24" height="20"></td>'
-	            .    '	<td width="72%">'.$ci->reserveList[$i]->item->getAuthor().'&nbsp;';
+	            .    '	<td width="3%" valign="top" class="itemNumber">'.($i+1).'</td>'
+				.    '	<td width="4%" valign="top"><img src="'.$itemIcon.'" alt="text" width="24" height="20"></td>'
+	            .    '	<td width="69%">'.$ci->reserveList[$i]->item->getAuthor().'&nbsp;';
 	            if (!$reserveItem->isPhysicalItem()) {
 	            	echo '<a href="'.$viewReserveURL.'" target="_blank">'.$ci->reserveList[$i]->item->getTitle().'</a>';
 	            } else {
@@ -371,9 +371,11 @@ class classDisplayer
 
 		echo '		<tr align="left" valign="middle" class="headingCell1">'
 		.	 '			<td valign="top">&nbsp;</td>'
+		.    '          <td valign="top">&nbsp;</td>'
 		. '				<td colspan="4"><div align="right">'
 		. '				<select name="reserveListAction">'
 		. '					<option selected>For all Selected Items:</option>'
+		. '					<option value="copyAll">Copy items to another class</option>'
 		. '					<option value="deleteAll">Delete all selected items</option>'
 		. '					<option value="activateAll">Set all Selected to ACTIVE</option>'
 		. '					<option value="deactivateAll">Set all Selected to INACTIVE</option>'
@@ -581,7 +583,7 @@ class classDisplayer
 		." </table>\n";
 	}
 
-	function displayEditInstructors($ci, $instructorList, $addTableTitle, $dropDownDefault, $userType, $removeTableTitle, $removeButtonText)
+	function displayEditInstructors($ci, $addTableTitle, $dropDownDefault, $userType, $removeTableTitle, $removeButtonText, $request)
 	{
 		echo " <table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">";
 		echo "<form name=\"editInstructors\" action=\"index.php?cmd=editInstructors&ci=".$ci->courseInstanceID."\" method=\"post\">";
@@ -620,6 +622,7 @@ class classDisplayer
 		echo "                 	</tr>";
 		echo "                 	<tr align=\"left\" valign=\"middle\">";
 		echo "                   		<td width=\"88%\" bgcolor=\"#CCCCCC\"><div align=\"center\">";
+		/*
 		echo "                	    		<select name=\"prof\">";
 		echo "                           		<option value=\"\" selected>-- ".$dropDownDefault." --</option>";
 								foreach($instructorList as $instructor)
@@ -627,6 +630,9 @@ class classDisplayer
 									echo "<option value=\"" . $instructor["user_id"] . "\">" . $instructor["full_name"] . "</option>";
 								}
 		echo "                       		</select>";
+		*/
+		$selectClassMgr = new lookupManager('','lookupInstructor', $u, $request);
+		$selectClassMgr->display();
 		echo "                   		</div></td>";
 
 		echo "                 	</tr>";
@@ -814,8 +820,7 @@ class classDisplayer
 		echo "</form>\n";
 	}
 
-
-	function displayReactivate($userList, $courses, $courseInstances, $nextPage, $request, $hidden_fields=null)
+	function displayReactivate($courses, $courseInstances, $nextPage, $request, $hidden_fields=null)
 	{
 		global $u;
 
@@ -828,8 +833,7 @@ class classDisplayer
 			foreach($keys as $key){
 				if (is_array($hidden_fields[$key])){
 					foreach ($hidden_fields[$key] as $field){
-						echo "<input type=\"hidden\" name=\"".$key."[]\" value=\"". $field ."\">\n";
-						echo 'key: '.$key.'&nbsp;field: '.$field.'<br>'; //kaw
+						echo "<input type=\"hidden\" name=\"".$key."[]\" value=\"". $field ."\">\n";	
 					}
 				} else {
 					echo "<input type=\"hidden\" name=\"$key\" value=\"". $hidden_fields[$key] ."\">\n";
@@ -875,6 +879,7 @@ class classDisplayer
 			echo "				<tr>\n";
 			echo "					<td width=\"50%\" align=\"right\" valign=\"middle\" bgcolor=\"#CCCCCC\" class=\"strong\">1) Select an Instructor:</td>\n";
 			echo "					<td align=\"left\" valign=\"middle\">\n";
+			/*
 			echo "						<select name=\"instructor\" onChange=\"this.form.submit();\">\n";
 			echo "							<option>-- Select --</option>\n";
 
@@ -883,14 +888,18 @@ class classDisplayer
 				echo "							<option $SELECTED value=\"". $aUser['user_id'] ."\">". $aUser['full_name'] ."</option>\n";
 			}
 			echo "						</select>\n";
+			*/
+			$selectClassMgr = new lookupManager('','lookupInstructor', $u, $request);
+			$selectClassMgr->display();
 			echo "					</td>\n";
 			echo "				</tr>\n";
 			echo "				<tr>\n";
 			echo "					<td width=\"50%\" align=\"right\" valign=\"middle\" bgcolor=\"#CCCCCC\" class=\"strong\">2) Select a Course:</td>\n";
 			echo "					<td align=\"left\" valign=\"middle\">\n";
+		
+			
+			if (!isset($request['selected_instr']))  //if instuctor has been selected
 
-
-			if (!isset($request['instructor']))  //if instuctor has been selected
 			{
 				echo "						<select name=\"select2\" DISABLED><option>-- Select --</option></select>\n";
 			} else {
@@ -1159,6 +1168,7 @@ class classDisplayer
 		echo "			<table width=\"100%\" border=\"0\" cellpadding=\"2\" cellspacing=\"0\" class=\"displayList\">\n";
 		echo "				<tr align=\"left\" valign=\"middle\">\n";
 		echo "					<td valign=\"top\" bgcolor=\"#FFFFFF\" class=\"headingCell1\">&nbsp;</td>\n";
+		echo "					<td valign=\"top\" bgcolor=\"#FFFFFF\" class=\"headingCell1\">&nbsp;</td>\n";
 		echo "					<td bgcolor=\"#FFFFFF\" class=\"headingCell1\">".count($ci->reserveList)." Item(s) On Reserve</td>\n";
 		echo "					<td bgcolor=\"#FFFFFF\" class=\"headingCell1\">Select</td>\n";
 		echo "      		</tr>\n";
@@ -1204,8 +1214,9 @@ class classDisplayer
 				}
 
 				echo '		<tr align="left" valign="middle" class="'.$rowClass.'">'
-	            .    '			<td width="4%" valign="top"><img src="'.$itemIcon.'" alt="text" width="24" height="20"></td>'
-	            .    '			<td width="96%">';
+	            .    '			<td width="3%" valign="top" class="itemNumber">'.($i+1).'</td>'
+				.    '			<td width="4%" valign="top"><img src="'.$itemIcon.'" alt="text" width="24" height="20"></td>'
+	            .    '			<td width="93%">';
 	            if (!$reserveItem->isPhysicalItem()) {
 	            	echo '<a href="'.$viewReserveURL.'" target="_blank" class="itemTitle">'.$title.'</a><br>';
 	            	if ($author) {echo '<span class="itemAuthor">'.$author.'</span><br>';}
@@ -1278,10 +1289,10 @@ class classDisplayer
 		echo "			</table>\n";
 		echo "		</td>\n";
 		echo "	</tr>\n";
-
-		echo "	<tr><td colspan=\"2\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
-		echo "	<tr><td colspan=\"2\" align=\"center\" class=\"strong\"><input type=\"submit\" name=\"Submit\" value=\"Reactivate Class\"></td></tr>\n";
-		echo "	<tr><td colspan=\"2\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+			
+		echo "	<tr><td colspan=\"3\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+		echo "	<tr><td colspan=\"3\" align=\"center\" class=\"strong\"><input type=\"submit\" name=\"Submit\" value=\"Reactivate Class\"></td></tr>\n";
+		echo "	<tr><td colspan=\"3\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "</table>\n";
 
 		echo "<script language=\"javaScript\">
@@ -1325,8 +1336,8 @@ class classDisplayer
 		.	 "</table>\n"
 		;
 	}
-
-	function displayCreateClass($instructors, $departments, $terms, $hidden_fields=null)
+	
+	function displayCreateClass($departments, $terms, $hidden_fields=null, $request)
 	{
 		global $u, $g_permission;
 
@@ -1375,8 +1386,8 @@ class classDisplayer
 		echo "			errorMsg = errorMsg + 'Semester';";
 		echo "			fieldCount++;";
 		echo "		}";
-
-		echo "		if (!(form.instructor.value)) {";
+		
+		echo "		if (!(form.selected_instr.value)) {";
 		echo "			requiredFields=false;";
 		echo "			if (fieldCount>0) errorMsg = errorMsg + ', ';";
 		echo "			errorMsg = errorMsg + 'Instructor';";
@@ -1409,8 +1420,30 @@ class classDisplayer
 		echo "</script>\n";
 
 	    echo "<form action=\"index.php\" method=\"post\" name=\"frmClass\">\n";
-
-		if (is_array($hidden_fields)){
+	
+	
+		if (!isset($request['term'])) {
+			$request['term'] = $terms[0]->getTermID();
+			$request['activation_date'] = $terms[0]->getBeginDate();
+			$request['expiration_date'] = $terms[0]->getEndDate();
+		}
+		
+		if (isset($request['course_number']))
+			$course_number = $request['course_number'];
+		else 
+			$course_number = '';
+			
+		if (isset($request['course_name']))
+			$course_name = stripslashes($request['course_name']);
+		else 
+			$course_name = '';
+			
+		if (isset($request['section']))
+			$section = $request['section'];
+		else 
+			$section = '';
+	    
+	    if (is_array($hidden_fields)){
 			$keys = array_keys($hidden_fields);
 			foreach($keys as $key){
 				if (is_array($hidden_fields[$key])){
@@ -1448,24 +1481,27 @@ class classDisplayer
 		echo "						<td align=\"left\">\n";
 		echo "							<select name=\"department\">\n";
 		echo "								<option value=''>-- Select a Department --</option>\n";
-		foreach ($departments as $dept) { echo "								<option value=\"". $dept[0] ."\">". $dept[1] ." " . $dept[2] ."</option>\n"; }
+			foreach ($departments as $dept) { 
+        		($dept[0] == $request['department']) ? $dept_selected = "selected" : $dept_selected = "";
+        		echo "<option $dept_selected value=\"". $dept[0] ."\">". $dept[1] ." " . $dept[2] ."</option>\n"; 
+        	}
 		echo "							</select>\n";
 		echo "						</td>\n";
 		echo "				</tr>\n";
 
 		echo "				<tr valign=\"middle\">\n";
 		echo "					<td width=\"35%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\" class=\"strong\">Course Number</td>\n";
-		echo "					<td align=\"left\"><input name=\"course_number\" type=\"text\" size=\"5\"></td>\n";
+		echo "					<td align=\"left\"><input name=\"course_number\" value=\"$course_number\" type=\"text\" size=\"5\"></td>\n";
 		echo "				</tr>\n";
 
 		echo "				<tr valign=\"middle\">\n";
 		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\" class=\"strong\">Section:</td>\n";
-		echo "					<td align=\"left\"><input name=\"section\" type=\"text\" size=\"4\"></td>\n";
+		echo "					<td align=\"left\"><input name=\"section\" value=\"$section\" type=\"text\" size=\"4\"></td>\n";
 		echo "				</tr>\n";
 
 		echo "				<tr valign=\"middle\">\n";
 		echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\" class=\"strong\">Course Name:</td>\n";
-		echo "					<td align=\"left\"><input name=\"course_name\" type=\"text\" size=\"50\"></td>\n";
+		echo "					<td align=\"left\"><input name=\"course_name\" value=\"$course_name\" type=\"text\" size=\"50\"></td>\n";
 		echo "				</tr>\n";
 
 		echo "				<tr valign=\"middle\">\n";
@@ -1474,10 +1510,12 @@ class classDisplayer
 
 		foreach($terms as $t)
 		{
+			($t->getTermID() == $request['term']) ? $term_checked = "checked" : $term_checked = "";
 			echo "								<td>\n";
-			echo "									<input type=\"radio\" name=\"term\" value=\"". $t->getTermID() ."\" onClick=\"activateDates(this.form, '". $t->getBeginDate() ."','". $t->getEndDate() ."');\">". $t->getTerm() ."\n";
+			echo "									<input type=\"radio\" name=\"term\" $term_checked value=\"". $t->getTermID() ."\" onClick=\"activateDates(this.form, '". $t->getBeginDate() ."','". $t->getEndDate() ."');\">". $t->getTerm() ."\n";
 			echo "								</td>\n";
-		}
+		}	
+		
 		echo "					</tr></table></td>";
 		echo "				</tr>\n";
 
@@ -1486,24 +1524,33 @@ class classDisplayer
 			echo "				<tr valign=\"middle\">\n";
 			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\" class=\"strong\">Instructor:</td>\n";
 			echo "					<td align=\"left\">\n";
+			/*
 			echo "						<select name=\"instructor\">\n";
 			echo "							<option value='' selected>-- Select an Instructor --</option>\n";
 			foreach ($instructors as $inst) { echo "								<option value=\"". $inst['user_id'] ."\">". $inst['full_name'] ."</option>\n"; }
 			echo "						</select>\n";
+			*/
+			if (!isset($request['selected_instr'])) {
+				echo "<input type=\"hidden\" name=\"selected_instr\" value=\"null\">\n"; 
+			}
+			$selectClassMgr = new lookupManager('','lookupInstructor', $u, $request);
+			$selectClassMgr->display();
 			echo "					</td>\n";
 			echo "				</tr>\n";
 
 			echo "				<tr valign=\"middle\">\n";
 			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\" class=\"strong\">Activation Date: (yyyy-mm-dd)</td>\n";
-			echo "					<td align=\"left\"><input type=\"text\" name=\"activation_date\" value=\"". $terms[0]->getBeginDate() ."\"></td>\n";
+			//echo "					<td align=\"left\"><input type=\"text\" name=\"activation_date\" value=\"". $terms[0]->getBeginDate() ."\"></td>\n";
+			echo "					<td align=\"left\"><input type=\"text\" name=\"activation_date\" value=\"". $request['activation_date'] ."\"></td>\n";
 			echo "				</tr>\n";
 
 			echo "				<tr valign=\"middle\">\n";
-			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\" class=\"strong\">Expiration Date: (yyyy-mm-dd)</td>\n";
-			echo "					<td align=\"left\"><input type=\"text\" name=\"expiration_date\" value=\"". $terms[0]->getEndDate() ."\"></td>\n";
+			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\" class=\"strong\">Expiration Date: (yyyy-mm-dd)</td>\n";		
+			//echo "					<td align=\"left\"><input type=\"text\" name=\"expiration_date\" value=\"". $terms[0]->getEndDate() ."\"></td>\n";	
+			echo "					<td align=\"left\"><input type=\"text\" name=\"expiration_date\" value=\"". $request['expiration_date'] ."\"></td>\n";	
 			echo "				</tr>\n";
-		} else {
-			echo "			<input type=\"hidden\" name=\"instructor\" value=\"". $u->getUserID() . "\">\n";
+		} else { 
+			echo "			<input type=\"hidden\" name=\"selected_instr\" value=\"". $u->getUserID() . "\">\n";
 			echo "			<input type=\"hidden\" name=\"activation_date\" value=\"". $terms[0]->getBeginDate() ."\">\n";
 			echo "			<input type=\"hidden\" name=\"expiration_date\" value=\"". $terms[0]->getEndDate() ."\">\n";
 		}
@@ -1518,7 +1565,7 @@ class classDisplayer
 		echo "			</table>\n";
 		echo "		</td>\n";
 		echo "	</tr>\n";
-		echo "	<tr><td align=\"center\"><input type=\"submit\" name=\"Submit\" value=\"Create Course\" onClick=\"javascript:return validate(document.forms.frmClass);\"></td></tr>\n";
+		echo "	<tr><td align=\"center\"><input type=\"submit\" name=\"Submit\" value=\"Create Course\" onClick=\"this.form.cmd.value='createNewClass';javascript:return validate(document.forms.frmClass);\"></td></tr>\n";
 		echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "</table>\n";
 		echo "</form>\n";
@@ -1599,8 +1646,8 @@ class classDisplayer
 	{
 		$user->selectUserForAdmin('instructor', 'selectClass');
 	}
-
-	function displaySearchForClass($instructorList, $deptList)
+	
+	function displaySearchForClass($deptList, $request)
 	{
 		global $u;
         global $g_permission;
@@ -1611,7 +1658,7 @@ class classDisplayer
 		echo '	</tr>';
 		echo '    <tr>';
 		echo '    	<td align="left" valign="top">';
-		echo '    	<table width="75%" border="0" align="center" cellpadding="0" cellspacing="0">';
+		echo '    	<table width="95%" border="0" align="center" cellpadding="0" cellspacing="0">';
 		echo '        	<tr align="left" valign="top" class="headingCell1">';
 		echo '            	<td width="50%">Search by Instructor</td>';
 		echo '                <td width="50%">Search by Department</td>';
@@ -1619,7 +1666,10 @@ class classDisplayer
 		echo '			<tr>';
 		echo '        		<td width="50%" class="borders"><div align="center"><br>';
 		echo '<FORM METHOD=POST ACTION="index.php">';
-		echo '<INPUT TYPE="HIDDEN" NAME="cmd" VALUE="addClass">';
+		//echo '<INPUT TYPE="HIDDEN" NAME="cmd" VALUE="addClass">';
+		//echo "<input type=\"hidden\" name=\"cmd\" value=\"$cmd\">\n";
+		echo '<INPUT TYPE="HIDDEN" NAME="cmd" VALUE="searchForClass">';
+		/*
 		echo '                	    <select name="prof">';
 		echo '                    	  <option value="" selected>Choose an Instructor ';
 		foreach($instructorList as $instructor)
@@ -1628,9 +1678,12 @@ class classDisplayer
 		}
 
 		echo '                    	</select>';
+		*/
+		$selectClassMgr = new lookupManager('','lookupInstructor', $u, $request);
+		$selectClassMgr->display();
+		//echo '                    	<br>';
 		echo '                    	<br>';
-		echo '                    	<br>';
-		echo '                    	<input type="submit" name="Submit2" value="Lookup Classes">';
+		echo '                    	<input type="submit" name="Submit2" value="Lookup Classes" onClick="this.form.cmd.value=\'addClass\'">';
 		echo '                    	<br>';
 		echo '                    	<br>';
 		echo '                    	<br>';
@@ -1974,6 +2027,115 @@ class classDisplayer
 		echo "</table>\n";
 
 	}
+	
+	function displayCopyItems ($cmd, $user, $request) {
+		
+		global $g_permission;
 
+		echo "<form action=\"index.php\" method=\"POST\">\n";
+		echo "<input type=\"hidden\" name=\"cmd\" value=\"$cmd\">\n";
+
+		for ($i=0; $i<count($request['reservesArray']); $i++) {
+			echo '<INPUT TYPE="HIDDEN" NAME="reservesArray[]" VALUE="'.$request['reservesArray'][$i].'">';
+		}
+		
+		echo '<INPUT TYPE="HIDDEN" NAME="originalClass" VALUE="'.$request['originalClass'].'">';
+		
+		if ($user->dfltRole >= $g_permission['staff']) {
+		
+			$tableHeading="TARGET CLASS (Copy Items To)";		
+			$selectClassMgr = new lookupManager($tableHeading, 'lookupClass', $user, $request);
+			$selectClassMgr->display();
+		
+			echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+			if (isset($_REQUEST['ci']) && $_REQUEST['ci'] && $_REQUEST['ci'] != null)
+			{
+			
+				echo "	<tr><td valign=\"top\" align=\"center\"><input type=\"submit\" name=\"performAction\" value=\"Copy\" onClick=\"this.form.cmd.value='processCopyItems'\"></td></tr>\n";
+			} else {
+				//echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+				echo "	<tr><td valign=\"top\" align=\"center\"><input type=\"submit\" name=\"performAction\" value=\"Copy\" DISABLED></td></tr>\n";
+			}
+			echo "	<tr><td align=\"left\" valign=\"top\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+			echo "</table>\n";		
+		} else {
+			//
+
+			$ci_list = $user->getCourseInstances(null, null, 'true');
+			echo "			<table width=\"90%\" border=\"0\" align=\"center\" cellpadding=\"5\" cellspacing=\"0\" class=\"displayList\">\n";
+			echo "				<tr align=\"left\" valign=\"middle\" bgcolor=\"#CCCCCC\" class=\"headingCell1\">\n";
+			echo "					<td width=\"10%\">&nbsp;</td>\n";
+			echo "					<td width=\"15%\">Course Number</td>\n";
+			echo "					<td>Course Name</td><td>Taught By</td><td>Last Active</td><td width=\"20%\">Reserve List</td>\n";
+			echo "				</tr>\n";
+
+			for($i=0; $i<count($ci_list); $i++)
+			{
+				
+				$ci_list[$i]->getPrimaryCourse();
+				$ci_list[$i]->getInstructors();
+				
+				$rowClass = ($i % 2) ? "evenRow" : "oddRow";
+			
+				echo "				<tr align=\"left\" valign=\"middle\" class=\"$rowClass\">\n";
+				
+				$class_SELECTED = ((isset($request['ci']) && $request['ci'] != null) && ($ci_list[$i]->getCourseInstanceID()==$request['ci'])) ? "CHECKED" : "";		
+			
+				echo "					<td width=\"10%\" align=\"center\"><input type=\"radio\" name=\"ci\" $class_SELECTED value=\"". $ci_list[$i]->getCourseInstanceID() ."\" onClick=\"this.form.submit();\"></td>\n";
+				
+				echo "					<td width=\"15%\">".$ci_list[$i]->course->displayCourseNo()."</td>\n";
+				echo "					<td>".$ci_list[$i]->course->getName()."</td>\n";
+
+				echo "					<td>".$ci_list[$i]->displayInstructorList()."</td>\n";
+				echo "					<td width=\"20%\" align=\"center\">".$ci_list[$i]->displayTerm()."</td>\n";
+				echo "					<td width=\"20%\" align=\"center\"><a href=\"javascript:openWindow('no_control&cmd=previewReservesList&ci=".$ci_list[$i]->courseInstanceID . "','width=800,height=600');\">preview</a></td>\n";
+				echo "				</tr>\n";
+			}
+
+			echo "				<tr align=\"left\" valign=\"middle\" bgcolor=\"#CCCCCC\" class=\"headingCell1\"><td colspan=\"6\">&nbsp;</td></tr>\n";
+			if (isset($request['ci']) && $request['ci'] && $request['ci'] != null)
+			{
+				echo "	<tr><td valign=\"top\" align=\"center\" colspan=\"6\"><input type=\"submit\" name=\"performAction\" value=\"Copy\" onClick=\"this.form.cmd.value='processCopyItems'\"></td></tr>\n";
+			} else {
+				//echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+				echo "	<tr><td valign=\"top\" align=\"center\" colspan=\"6\"><input type=\"submit\" name=\"performAction\" value=\"Copy\" DISABLED></td></tr>\n";
+			}
+			
+			echo "			</table>\n";
+			//
+		}
+		echo "</form>\n";
+	}
+	
+	
+	function displayCopyItemsSuccess ($targetClass, $originalClass, $numberCopied) {
+
+		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+		echo '<tr><td width="100%"><img src="images/spacer.gif" width="1" height="5"></td></tr>';
+
+		echo '<tr>';
+		echo 	'<td align="left" valign="top">';
+        echo 	  '<p>';
+        echo 		'<span class="successText">'.$numberCopied.' item(s) were copied from </span>';
+        echo 		'<span class="strong">';
+        echo 			$originalClass->course->displayCourseNo().' -- '.$originalClass->course->getName().' ('.$originalClass->displayTerm().')';
+        echo 		'</span>';
+        echo 		'<span class="successText"> to </span>';
+        echo 		'<span class="strong">';
+        echo 			$targetClass->course->displayCourseNo().' -- '.$targetClass->course->getName().' ('.$targetClass->displayTerm().')';
+        echo 		'</span>';
+        echo 	  '</p>';
+
+        echo 	  '<p>';
+        echo 		'&gt;&gt;<a href="index.php?cmd=editClass&ci='.$originalClass->getCourseInstanceID().'">Return to original class</a><br>';
+        echo 		'&gt;&gt;<a href="index.php?cmd=editClass&ci='.$targetClass->getCourseInstanceID().'">Go to target class</a><br>';
+        echo 	  '</p>';
+        echo 	'</td>';
+        echo '</tr>';
+        
+        echo '<tr><td align="left" valign="top">&nbsp;</td></tr>';
+		echo "</table>\n";		
+		
+	}
 }
 ?>
