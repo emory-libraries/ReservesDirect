@@ -79,6 +79,7 @@ class lookupManager
 			break;
 
 			case 'lookupInstructor':
+				
 				if (isset($request['select_instr_by']) && isset($request['instr_qryTerm'])) //user is searching for an instructor
 				{
 					$users = new users();
@@ -88,7 +89,7 @@ class lookupManager
 
 
 				$this->displayFunction = 'instructorLookup';
-				$this->argList = array($instr_list, $request, $hidden_fields);
+				$this->argList = array($instr_list, $request);
 			break;
 		}
 
