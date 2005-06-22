@@ -373,8 +373,10 @@ class copyClassDisplayer {
         echo '    			<tr valign="middle">';
         echo '      			<td width="35%" align="right" bgcolor="#CCCCCC"><div align="right"><span class="strong">Instructor</span><span class="strong">:</span></div></td>';
 
+        echo '<td>';
         $selectClassMgr = new lookupManager('','lookupInstructor', $u, $request);
 		$selectClassMgr->display();
+		echo '</td>';
 
         echo '    			</tr>';
 
@@ -427,6 +429,7 @@ class copyClassDisplayer {
 
         echo 		'</ul>';
         echo 	  '<p>';
+        echo 		'&gt;&gt;<a href="index.php?cmd=editClass&ci='.$targetClass->getCourseInstanceID().'">Go to target class</a><br>';
         echo 		'&gt;&gt;<a href="index.php?cmd=copyClass">Copy another class</a><br>';
         echo 		'&gt;&gt;<a href="index.php?cmd=manageClasses">Return to &quot;Manage Classes&quot; home</a><br>';
         echo 	  '</p>';
