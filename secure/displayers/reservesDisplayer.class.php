@@ -204,6 +204,7 @@ class reservesDisplayer
 		.	'			<table width="100%" border="0" cellpadding="2" cellspacing="0" class="displayList">'
 		.	'				<tr align="left" valign="middle">'
 		.	'					<td valign="top" bgcolor="#FFFFFF" class="headingCell1">&nbsp;</td>'
+		.	'					<td valign="top" bgcolor="#FFFFFF" class="headingCell1">&nbsp;</td>'
 		.	'					<td bgcolor="#FFFFFF" class="headingCell1">'.count($ci->reserveList).' Item(s) On Reserve</td>'
 		.   '      			</tr>';
 		//Loop through Records Here
@@ -246,8 +247,9 @@ class reservesDisplayer
 				}
 
 				echo '		<tr align="left" valign="middle" class="'.$rowClass.'">'
-	            .    '			<td width="4%" valign="top"><img src="'.$itemIcon.'" alt="text" width="24" height="20"></td>'
-	            .    '			<td width="96%">';
+	            .    '			<td width="3%" valign="top" class="itemNumber">'.($i+1).'</td>'
+				.    '			<td width="4%" valign="top"><img src="'.$itemIcon.'" alt="text" width="24" height="20"></td>'
+	            .    '			<td width="93%">';
 	            if (!$reserveItem->isPhysicalItem()) {
 	            	echo '<a href="'.$viewReserveURL.'" target="_blank" class="itemTitle">'.$title.'</a><br>';
 	            	if ($author) {echo '<span class="itemAuthor">'.$author.'</span><br>';}
@@ -317,24 +319,52 @@ class reservesDisplayer
 		echo "		</td>\n";
 		echo "	</tr>\n";
 		echo "	<tr>\n";
-		echo "		<td colspan=\"2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td>\n";
+		echo "		<td colspan=\"3\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td>\n";
 		echo "	</tr>\n";
 		echo "	<tr>\n";
 
 		if (is_null($no_control))
-			echo "		<td colspan=\"2\"><div align=\"center\" class=\"strong\"><a href=\"index.php\">Exit Class</a></div></td>\n";
+			echo "		<td colspan=\"3\"><div align=\"center\" class=\"strong\"><a href=\"index.php\">Exit Class</a></div></td>\n";
 		else
-			echo "		<td colspan=\"2\"><div align=\"center\" class=\"strong\"><a href=\"javascript:window.close();\">Close Window</a></div></td>\n";
-
+			echo "		<td colspan=\"3\"><div align=\"center\" class=\"strong\"><a href=\"javascript:window.close();\">Close Window</a></div></td>\n";
+		
 		echo "	</tr>\n";
 		echo "	<tr>\n";
-		echo "		<td colspan=\"2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td>\n";
+		echo "		<td colspan=\"3\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td>\n";
 		echo "	</tr>\n";
 		echo "</table>\n";
 		echo "</form>\n";;
 
 	}
-
+	
+	function displayStaffAddReserve()
+	{
+		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+		echo "	<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
+		echo "	<tr>\n";
+		echo "		<td align=\"center\" valign=\"top\">\n";
+		//echo "			<table width=\"40%\" border=\"0\" cellspacing=\"0\" cellpadding=\"8\">\n";
+		echo '			<table width="40%" border="0" cellspacing="0" cellpadding="8" class="borders">';
+		echo "				<tr class=\"headingCell1\"><td width=\"40%\">Add / Process Materials</td></tr>\n";
+		echo "				<tr align=\"left\" valign=\"top\">\n";
+		echo "					<td width=\"40%\">\n";
+		echo "						<ul>\n";
+		echo "							<li><a href=\"index.php?cmd=displayRequest\" align=\"center\">Process Requests</a></li>\n";
+		echo "							<li><a href=\"index.php?cmd=addDigitalItem\" align=\"center\">Add an Electronic Item</a></li>\n";
+		echo "							<li><a href=\"index.php?cmd=addPhysicalItem\">Add a Physical Item</a></li>\n";
+		echo "							<!--<li><a href=\"index.php?cmd=physicalItemXListing\">Physical Item Cross-listings </a>--><!--Goes to staff-mngClass-phys-XList1.html --></li>\n";
+		echo "						</ul>\n";
+		echo "					</td>\n";
+		echo "				</tr>\n";
+		//echo "<tr><td>&nbsp;</td></tr>";
+		echo "			</table>\n";
+		echo "		</td>\n";
+		echo "	</tr>\n";
+		echo "	<tr><td>&nbsp;</td></tr>\n";
+		echo "</table>\n";		
+	}
+	
+	
 	/**
  * @return void
  * @param int $courseInstances
@@ -1219,7 +1249,22 @@ function displaySortScreen($user, $ci)
 		for($i=0;$i<count($ci->reserveList);$i++)
 		{
 			$ci->reserveList[$i]->getItem();
-
+				
+			$ci->reserveList[$i]->item->getPhysicalCopy();
+			$title = $ci->reserveList[$i]->item->getTitle();
+			$author = $ci->reserveList[$i]->item->getAuthor();
+			$url = $ci->reserveList[$i]->item->getURL();
+			$performer = $ci->reserveList[$i]->item->getPerformer();
+			$volTitle = $ci->reserveList[$i]->item->getVolumeTitle();
+			$volEdition = $ci->reserveList[$i]->item->getVolumeEdition();
+			$pagesTimes = $ci->reserveList[$i]->item->getPagesTimes();
+			$source = $ci->reserveList[$i]->item->getSource();
+			$contentNotes = $ci->reserveList[$i]->item->getContentNotes();
+			$itemNotes = $ci->reserveList[$i]->item->getNotes();
+			$instructorNotes = $ci->reserveList[$i]->getNotes();
+			$callNumber = $ci->reserveList[$i]->item->physicalCopy->getCallNumber();
+			$reserveDesk = $ci->reserveList[$i]->item->physicalCopy->getOwningLibrary();
+			
 			if ($ci->reserveList[$i]->item->isHeading())
 			{
 				//echo "headings";
@@ -1241,7 +1286,8 @@ function displaySortScreen($user, $ci)
 			echo '	<tr align="left" valign="middle" class="'.$rowClass.'">'
 			.    '		<td width="1%" valign="top"><img src="'.$itemIcon.'" alt="text" width="24" height="20"></td>'
 		    .    '		<td width="100%">';
-
+		    
+		    /*
 		    if (!$reserveItem->isPhysicalItem()) {
 		    		echo '<a href="'.$viewReserveURL.'" target="_blank">'.$ci->reserveList[$i]->item->getTitle().'</a>';
 		    } else {
@@ -1250,9 +1296,77 @@ function displaySortScreen($user, $ci)
 		    }
 
 		    echo '. '.$ci->reserveList[$i]->item->getAuthor().'</td></tr>';
+		    */
+	///START Changes to Display Metadata fields on author/title sort screen - 6.1.2005
+		if (!$reserveItem->isPhysicalItem()) {
+	    	echo '<a href="'.$viewReserveURL.'" target="_blank" class="itemTitle">'.$title.'</a><br>';
+	        if ($author) {echo '<span class="itemAuthor">'.$author.'</span><br>';}
+	    } else {
+	      echo '<span class="itemTitleNoLink">'.$title.'</span><br>'; 
+	      if ($author) {echo '<span class="itemAuthor">'.$author.'</span><br>';}
+          if ($callNumber) {echo '<span class="itemMeta">'.$callNumber.'</span><br>';}
+          
+          echo '<span class="itemMetaPre">On Reserve at:</span> <span class="itemMeta"> '.$reserveDesk.'</span>';
+          if ($ci->reserveList[$i]->item->getLocalControlKey())
+          	{echo ' &gt;&gt; <a href="'.$viewReserveURL.'" target="_blank" class="strong">more info</a>';}
+          echo '<br>';
+	    }
 
-			}
+	    /*
+	    if ($url)
+	    {
+	    	echo '<span class="itemMetaPre">URL:</span><span class="itemMeta"> '.$url.'</span><br>';
+	    }
+	    */
+	    if ($performer)
+	    {
+	    	echo '<span class="itemMetaPre">Performed by:</span><span class="itemMeta"> '.$performer.'</span><br>';
+	    }
+	    if ($volTitle)
+	    {
+	    	echo '<span class="itemMetaPre">From:</span><span class="itemMeta"> '.$volTitle.'</span><br>';
+	    }
+	    if ($volEdition)
+	    {
+	    	echo '<span class="itemMetaPre">Volume/Edition:</span><span class="itemMeta"> '.$volEdition.'</span><br>';
+	    }
+	    if ($pagesTimes)
+	    {
+	    	echo '<span class="itemMetaPre">Pages/Time:</span><span class="itemMeta"> '.$pagesTimes.'</span><br>';
+	    }
+	    if ($source)
+	    {
+	    	echo '<span class="itemMetaPre">Source/Year:</span><span class="itemMeta"> '.$source.'</span><br>';
+	    }
+	    if ($contentNotes)
+	    {
+	        echo '<span class="noteType">Content Note:</span>&nbsp;<span class="noteText">'.$contentNotes.'</span><br>';
+	    }
+	    if ($itemNotes) 
+	    {
+	    
+	    	for ($n=0; $n<count($itemNotes); $n++)
+	    	{
+            	$type = strtolower($itemNotes[$n]->getType());
+            	if ($type == "content") {
+	            	echo '<span class="noteType">'.ucfirst($type).' Note:</span>&nbsp;<span class="noteText">'.$itemNotes[$n]->getText().'</span><br>';
+            	}
+	        }
+	    }
+	    if ($instructorNotes)
+	    {
+	    
+	    	for ($n=0; $n<count($instructorNotes); $n++)
+	        {
+	        	echo '<span class="noteType">Instructor Note:</span>&nbsp;<span class="noteText">'.$instructorNotes[$n]->getText().'</span><br>';
+	        }
+	    }
+	    echo '</td></tr>';
+
 		}
+	}
+	
+	//END Changes to Display Metadata fields on author/title sort screen - 6.1.2005
 
 	//End Loop Through Records
 
@@ -1348,7 +1462,21 @@ function displayCustomSort($user,$ci)
 		for($i=0;$i<count($ci->reserveList);$i++)
 		{
 			$ci->reserveList[$i]->getItem();
-
+			$ci->reserveList[$i]->item->getPhysicalCopy();
+			$title = $ci->reserveList[$i]->item->getTitle();
+			$author = $ci->reserveList[$i]->item->getAuthor();
+			$url = $ci->reserveList[$i]->item->getURL();
+			$performer = $ci->reserveList[$i]->item->getPerformer();
+			$volTitle = $ci->reserveList[$i]->item->getVolumeTitle();
+			$volEdition = $ci->reserveList[$i]->item->getVolumeEdition();
+			$pagesTimes = $ci->reserveList[$i]->item->getPagesTimes();
+			$source = $ci->reserveList[$i]->item->getSource();
+			$contentNotes = $ci->reserveList[$i]->item->getContentNotes();
+			$itemNotes = $ci->reserveList[$i]->item->getNotes();
+			$instructorNotes = $ci->reserveList[$i]->getNotes();
+			$callNumber = $ci->reserveList[$i]->item->physicalCopy->getCallNumber();
+			$reserveDesk = $ci->reserveList[$i]->item->physicalCopy->getOwningLibrary();
+				
 			if ($ci->reserveList[$i]->item->isHeading())
 			{
 				//echo "headings";
@@ -1370,7 +1498,8 @@ function displayCustomSort($user,$ci)
 			echo '	<tr align="left" valign="middle" class="'.$rowClass.'">'
 			.    '		<td width="1%" valign="top"><img src="'.$itemIcon.'" alt="text" width="24" height="20"></td>'
 		    .    '		<td width="60%">';
-
+		    
+		    /*
 		    if (!$reserveItem->isPhysicalItem()) {
 		    		echo '<a href="'.$viewReserveURL.'" target="_blank">'.$ci->reserveList[$i]->item->getTitle().'</a>';
 		    } else {
@@ -1381,6 +1510,73 @@ function displayCustomSort($user,$ci)
 		    }
 
 		    echo '. '.$ci->reserveList[$i]->item->getAuthor().'</td>';
+		    */
+		  ///START Changes to Display Metadata fields on custom sort screen - 6.1.2005
+	    if (!$reserveItem->isPhysicalItem()) {
+	    	echo '<a href="'.$viewReserveURL.'" target="_blank" class="itemTitle">'.$title.'</a><br>';
+	        if ($author) {echo '<span class="itemAuthor">'.$author.'</span><br>';}
+	    } else {
+	      echo '<span class="itemTitleNoLink">'.$title.'</span><br>'; 
+	      if ($author) {echo '<span class="itemAuthor">'.$author.'</span><br>';}
+          if ($callNumber) {echo '<span class="itemMeta">'.$callNumber.'</span><br>';}
+          
+          echo '<span class="itemMetaPre">On Reserve at:</span> <span class="itemMeta"> '.$reserveDesk.'</span>';
+          if ($ci->reserveList[$i]->item->getLocalControlKey())
+          	{echo ' &gt;&gt; <a href="'.$viewReserveURL.'" target="_blank" class="strong">more info</a>';}
+          echo '<br>';
+	    }
+
+	    /*
+	    if ($url)
+	    {
+	    	echo '<span class="itemMetaPre">URL:</span><span class="itemMeta"> '.$url.'</span><br>';
+	    }
+	    */
+	    if ($performer)
+	    {
+	    	echo '<span class="itemMetaPre">Performed by:</span><span class="itemMeta"> '.$performer.'</span><br>';
+	    }
+	    if ($volTitle)
+	    {
+	    	echo '<span class="itemMetaPre">From:</span><span class="itemMeta"> '.$volTitle.'</span><br>';
+	    }
+	    if ($volEdition)
+	    {
+	    	echo '<span class="itemMetaPre">Volume/Edition:</span><span class="itemMeta"> '.$volEdition.'</span><br>';
+	    }
+	    if ($pagesTimes)
+	    {
+	    	echo '<span class="itemMetaPre">Pages/Time:</span><span class="itemMeta"> '.$pagesTimes.'</span><br>';
+	    }
+	    if ($source)
+	    {
+	    	echo '<span class="itemMetaPre">Source/Year:</span><span class="itemMeta"> '.$source.'</span><br>';
+	    }
+	    if ($contentNotes)
+	    {
+	        echo '<span class="noteType">Content Note:</span>&nbsp;<span class="noteText">'.$contentNotes.'</span><br>';
+	    }
+	    if ($itemNotes) 
+	    {
+	    
+	    	for ($n=0; $n<count($itemNotes); $n++)
+	    	{
+            	$type = strtolower($itemNotes[$n]->getType());
+            	if ($type == "content") {
+	            	echo '<span class="noteType">'.ucfirst($type).' Note:</span>&nbsp;<span class="noteText">'.$itemNotes[$n]->getText().'</span><br>';
+            	}
+	        }
+	    }
+	    if ($instructorNotes)
+	    {
+	    
+	    	for ($n=0; $n<count($instructorNotes); $n++)
+	        {
+	        	echo '<span class="noteType">Instructor Note:</span>&nbsp;<span class="noteText">'.$instructorNotes[$n]->getText().'</span><br>';
+	        }
+	    }
+	    echo '</td>';
+	    //END Changes to Display Metadata fields on custom sort screen - 6.1.2005  
 		    echo '              <td width="10%" valign="middle" class="borders"><div align="center">';
 			echo '                <input type="hidden" name="'.$ci->reserveList[$i]->reserveID.'" value="'.$ci->reserveList[$i]->sortOrder.'">';
 		    echo '                <input name="reserveSortIDs['.$ci->reserveList[$i]->reserveID.'][newSortOrder]" value="'.$ci->reserveList[$i]->sortOrder.'" type="text" size="3" onChange="javascript:if (this.value <=0 || this.value > '.count($ci->reserveList).' || !parseInt(this.value)) {alert (\'Invalid value\')} else {updateSort(document.forms.customSortScreen, '.$ci->reserveList[$i]->reserveID.', this.value, this.name)}">';
