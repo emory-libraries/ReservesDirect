@@ -173,12 +173,12 @@ class reservesManager
 				if ($_REQUEST['customSort'])
 				{
 					//get Post Data that contains the newSortValues assigned by the user
-					$reserveSortIDs = array_keys($_REQUEST[reserveSortIDs]);
-
+					$reserveSortIDs = array_keys($_REQUEST['reserveSortIDs']);
+					
 					foreach ($reserveSortIDs as $reserveSortID)
 					{
 						$reserve = new reserve($reserveSortID);
-						$reserve->setSortOrder($_REQUEST[reserveSortIDs][$reserveSortID][newSortOrder]);
+						$reserve->setSortOrder($_REQUEST['reserveSortIDs'][$reserveSortID]['newSortOrder']);
 					}
 
 					// goto sort Reserves
@@ -207,7 +207,10 @@ class reservesManager
 				$progress = array ('total' => 4, 'full' => 0);
 
 				if ($user->getDefaultRole() >= $g_permission['staff']) {
-					$courseInstances = $user->getCourseInstances($_REQUEST['u']);
+					//$courseInstances = $user->getCourseInstances($_REQUEST['u']);
+					$this->displayFunction = "displayStaffAddReserve";
+					$this->argList = array();
+					break;
 				} elseif ($user->getDefaultRole() >= $g_permission['proxy']) { //2 = proxy
 					$courseInstances = $user->getCourseInstances();
 				} else {
@@ -324,6 +327,7 @@ class reservesManager
 				$this->displayFunction = "displayUploadForm";
 				$this->argList = array($_REQUEST['ci'], "URL");
 			break;
+			
 			case 'storeUploaded':
 				$page = "addReserve";
 				// Check to see if this was a valid file they submitted
@@ -385,8 +389,8 @@ class reservesManager
 					$itemAudit = new itemAudit();
 					$itemAudit->createNewItemAudit($item->getItemID(),$user->getUserID());
 				}
-
-	    		$this->displayFunction = "displayReserveAdded";
+				
+				$this->displayFunction = "displayReserveAdded";
 	    		$this->argList = array($_REQUEST['ci']);
 			break;
 			case 'faxReserve':
