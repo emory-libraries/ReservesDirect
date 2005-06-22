@@ -623,8 +623,8 @@ class requestDisplayer
 		echo "          <p>&gt;&gt;<a href=\"index.php?cmd=editClass&ci=".$ci->getCourseInstanceID()."\"> Go to class</a></p>\n";
 		echo "			<p>&gt;&gt;<a href=\"index.php?cmd=addPhysicalItem&ci=".$ci->getCourseInstanceID()."&selected_instr=$selected_instr\"> Add another physical item to this class.</a><br>\n";
 		echo "			&gt;&gt;<a href=\"index.php?cmd=addDigitalItem&ci=".$ci->getCourseInstanceID()."&selected_instr=$selected_instr\"> Add another digital item to this class.</a><br>\n";
-
-		echo "			&gt;&gt; <a href=\"index.php?cmd=manageClasses\">Return to Manage Classes home</a></p>\n";
+		
+		echo "			&gt;&gt; <a href=\"index.php?cmd=addReserve\">Return to Add a Reserve home</a></p>\n";
 		echo "		</td>\n";
 		echo "	</tr>\n";
 		echo "	<tr><td align=\"center\"></td></tr>\n";
