@@ -31,6 +31,8 @@ http://www.reservesdirect.org/
 require_once("secure/common.inc.php");
 require_once("secure/classes/users.class.php");
 require_once("secure/displayers/copyClassDisplayer.class.php");
+require_once("secure/classes/checkDuplicates.class.php");
+require_once("secure/managers/checkDuplicatesManager.class.php");
 
 class copyClassManager
 {
@@ -109,30 +111,40 @@ class copyClassManager
 
 				if(isset($request['copyNew']))
 				{
-					$t = new term($request['term']);
 
-					$c  = new course(null);
-					$ci = new courseInstance(null);
-
-					$ci->createCourseInstance();
-					$c->createNewCourse($ci->getCourseInstanceID());
-
-					$ci->addInstructor($c->getCourseAliasID(), $request['selected_instr']);
-
-					$c->setCourseNo($request['course_number']);
-					$c->setDepartmentID($request['department']);
-					$c->setName($request['course_name']);
-					$c->setSection($request['section']);
-					$ci->setPrimaryCourseAliasID($c->getCourseAliasID());
-					$ci->setTerm($t->getTermName());
-					$ci->setYear($t->getTermYear());
-					$ci->setActivationDate($request['activation_date']);
-					$ci->setExpirationDate($request['expiration_date']);
-					$ci->setEnrollment($request['enrollment']);
-					$ci->setStatus('ACTIVE');
-
-					$request['ci']=$ci->getCourseInstanceID();
-					unset($ci);
+					$checkDuplicates = new checkDuplicates();
+					$duplicateClasses = $checkDuplicates->checkDuplicateClass($request['department'],$request['course_number'], $request['section']);
+					
+					if ($duplicateClasses) {
+						// goto check Duplicates
+						checkDuplicatesManager::checkDuplicatesManager('checkDuplicateClass', $user, $duplicateClasses);
+						break;
+					}
+					else {
+						$t = new term($request['term']);
+		
+						$c  = new course(null);
+						$ci = new courseInstance(null);
+					
+						$ci->createCourseInstance();
+						$c->createNewCourse($ci->getCourseInstanceID());
+						$ci->addInstructor($c->getCourseAliasID(), $request['selected_instr']);
+				
+						$c->setCourseNo($request['course_number']);
+						$c->setDepartmentID($request['department']);
+						$c->setName($request['course_name']);
+						$c->setSection($request['section']);
+						$ci->setPrimaryCourseAliasID($c->getCourseAliasID());
+						$ci->setTerm($t->getTermName());
+						$ci->setYear($t->getTermYear());
+						$ci->setActivationDate($request['activation_date']);
+						$ci->setExpirationDate($request['expiration_date']);
+						$ci->setEnrollment($request['enrollment']);
+						$ci->setStatus('ACTIVE');
+					
+						$request['ci']=$ci->getCourseInstanceID();
+						unset($ci);
+					}
 				}
 
 				$copyStatus = array();
