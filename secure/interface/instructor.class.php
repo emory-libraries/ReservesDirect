@@ -394,8 +394,20 @@ class instructor extends proxy
 			default: //'mysql'
 				$sql_add_access			 = "INSERT INTO access (user_id, alias_id, permission_level) VALUES (!,!,!)";
 		}
-
-
+		
+		$oldCI->getPrimaryCourse();
+		
+		$checkDuplicates = new checkDuplicates();
+		$duplicateReactivations = $checkDuplicates->checkDuplicateReactivation($oldCI->course->deptID, $oldCI->course->getCourseNo(), $section, $newTerm, $newYear);
+		
+		if ($duplicateReactivations) {
+					
+			//return false;
+			return  $duplicateReactivations;
+		}
+		else {
+		
+		
 		//create new CI in db
 		$newCI = new courseInstance();
 		$newCI->createCourseInstance();
@@ -409,7 +421,7 @@ class instructor extends proxy
 		$newCI->setEnrollment($oldCI->getEnrollment());
 
 		//set Primary Course Info
-		$oldCI->getPrimaryCourse();
+		//$oldCI->getPrimaryCourse();			
 		$newCI->setPrimaryCourse($oldCI->course->getCourseID(), $section);
 
 		foreach($instructorList as $instr)
@@ -499,6 +511,8 @@ class instructor extends proxy
 		}
 
 		return $newCI;
+	    }
 	}
+	
 
 }
