@@ -1,37 +1,35 @@
 <?
 /*******************************************************************************
-Reserves Direct 2.0
+noteDisplayer.class.php
 
-Copyright (c) 2004 Emory University General Libraries
 
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-\"Software\"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
+Created by Kathy Washington (kawashi@emory.edu)
 
-The above copyright notice and this permission notice shall be included
-in all copies or substantial portions of the Software.
+This file is part of GNU ReservesDirect 2.1
 
-THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Copyright (c) 2004-2005 Emory University, Atlanta, Georgia.
 
-Created by Kathy A. Washington (kawashi@emory.edu)
+ReservesDirect 2.1 is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
 
-Reserves Direct 2.0 is located at:
-http://coursecontrol.sourceforge.net/
+ReservesDirect 2.1 is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ReservesDirect 2.1; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+Reserves Direct 2.1 is located at:
+http://www.reservesdirect.org/
 
 *******************************************************************************/
 require_once("secure/common.inc.php");
 
-class noteDisplayer 
+class noteDisplayer
 {
 	/**
 	* @return void
@@ -41,10 +39,10 @@ class noteDisplayer
 	function displayAddNoteScreen($user, $hidden_fields)
 	{
 		global $g_permission;
-		
+
 		//$reserve = new reserve($reserveID);
 		//$reserve->getItem();
-		
+
 		echo "<form name=\"addNote\" action=\"index.php?cmd=addNote\" method=\"post\">\n";
 
 		if (is_array($hidden_fields)){
@@ -52,7 +50,7 @@ class noteDisplayer
 			foreach($keys as $key){
 				if (is_array($hidden_fields[$key])){
 					foreach ($hidden_fields[$key] as $field){
-						echo "<input type=\"hidden\" name=\"".$key."[]\" value=\"". $field ."\">\n";	
+						echo "<input type=\"hidden\" name=\"".$key."[]\" value=\"". $field ."\">\n";
 					}
 				} else {
 					echo "<input type=\"hidden\" name=\"$key\" value=\"". $hidden_fields[$key] ."\">\n";
@@ -60,12 +58,12 @@ class noteDisplayer
 			}
 		}
 
-		
+
 		//echo '<table width="410" border="0" cellspacing="0" cellpadding="0">';
 		//echo '	<tr>';
 		//echo '		<td width="10">&nbsp;</td>';
 		//echo '		<td width = "400">';
-		
+
 		echo '<center>';
 		echo '<table width="400" border="0" cellspacing="0" cellpadding="0">';
   		echo '	<tr><td align="left" valign="top"><h1>Add Note</h1></td></tr>';
@@ -90,7 +88,7 @@ class noteDisplayer
   			echo '	    			<span class="small-x">(This will show as the title of the note for editing';
 			echo '				    purposes.)</span></p>';
 			echo '					</td>';
-        	echo '					<td width="78%" align="left"><p>';        
+        	echo '					<td width="78%" align="left"><p>';
        		echo '					<label><input type="radio" name="noteType" value="Content" checked>Content Note</label><br>';
        		echo '					<label><input type="radio" name="noteType" value="Instructor">Instructor Note</label><br>';
        		echo '					<label><input type="radio" name="noteType" value="Staff">Staff Note</label><br>';
@@ -138,26 +136,26 @@ class noteDisplayer
     	echo '			</table>';
     	echo '		</td>';
   		echo '	</tr>';
-  		
+
   		echo "    <tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
   		echo "    <tr>\n";
 		echo "    	<td align=\"center\"><input type=\"submit\" value=\"Save Note\"></td>\n";
 		echo "	</tr>\n";
 		echo "    <tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo '</table>';
-		
+
 		echo '</td>';
 		echo '</tr>';
 		echo '</table>';
 		echo "</form>\n";
 		echo "</center>";
 	}
-	
-	
+
+
 	function displaySuccess($noteID)
 	{
 		echo "<script language=\"JavaScript\">this.window.opener.newWindow_returnValue='$noteID';</script>\n"; //pass value to parent window
-		
+
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n"
 		.	 "	<tbody>\n"
 		.	 "		<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n"

@@ -1,37 +1,35 @@
 <?
 /*******************************************************************************
-Reserves Direct 2.0
+itemDisplayer.class.php
 
-Copyright (c) 2004 Emory University General Libraries
 
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-\"Software\"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
+Created by Kathy Washington (kawashi@emory.edu)
 
-The above copyright notice and this permission notice shall be included
-in all copies or substantial portions of the Software.
+This file is part of GNU ReservesDirect 2.1
 
-THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Copyright (c) 2004-2005 Emory University, Atlanta, Georgia.
 
-Created by Kathy A. Washington (kawashi@emory.edu)
+ReservesDirect 2.1 is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
 
-Reserves Direct 2.0 is located at:
-http://coursecontrol.sourceforge.net/
+ReservesDirect 2.1 is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ReservesDirect 2.1; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+Reserves Direct 2.1 is located at:
+http://www.reservesdirect.org/
 
 *******************************************************************************/
 require_once("secure/common.inc.php");
 
-class itemDisplayer 
+class itemDisplayer
 {
 	/**
 	* @return void
@@ -41,24 +39,24 @@ class itemDisplayer
 	*/
 	function displayEditItemScreen($reserve,$user)
 	{
-		
+
 		global $g_permission;
-		
+
 		if (!is_a($reserve->item, "reserveItem")) $reserve->getItem();
-		
+
 		echo "<form name=\"reservesMgr\" action=\"index.php?cmd=editItem\" method=\"post\">\n";
 		echo "<input type=\"hidden\" name=\"ci\" value=\"".$reserve->getCourseInstanceID()."\">\n";
 		echo "<input type=\"hidden\" name=\"rID\" value=\"".$reserve->getReserveID()."\">\n";
 
-				
+
 		$activationDate = $reserve->getActivationDate();
 		list($year, $month, $day) = split("-", $activationDate);
-		
+
 		$status = $reserve->getStatus();
 		$todaysDate = date ("Y-m-d");
 
 		$statusColor = common_getStatusDisplayColor($status);
-		
+
 		$title = $reserve->item->getTitle();
 		$author = $reserve->item->getAuthor();
 		$url = $reserve->item->getURL();
@@ -70,12 +68,12 @@ class itemDisplayer
 		$contentNotes = $reserve->item->getContentNotes();
 		$itemNotes = $reserve->item->getNotes(); //Valid note types, associated with an item, are content, copyright, and staff
 		$instructorNotes = $reserve->getNotes();
-		
+
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "	<tr>\n";
 		echo "    	<td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td>\n";
 		echo "	</tr>\n";
-		echo "	<tr><td colspan=\"3\" align=\"right\"> <a href=\"index.php?cmd=editClass&ci=".$reserve->getCourseInstanceID()."\" class=\"strong\">Return to Class</a></div></td></tr>\n";		
+		echo "	<tr><td colspan=\"3\" align=\"right\"> <a href=\"index.php?cmd=editClass&ci=".$reserve->getCourseInstanceID()."\" class=\"strong\">Return to Class</a></div></td></tr>\n";
 		echo "    <tr>\n";
 		echo "    	<td>\n";
 		echo "    	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
@@ -99,7 +97,7 @@ class itemDisplayer
 		echo "            	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
 		echo "                	<tr>\n";
 		echo "                  		<td width=\"35%\" height=\"14\"><p><span class=\"strong\">Current Status: </span><strong><font color=\"".$statusColor."\">".$status."</font></strong>\n";
-		
+
 		if ($status == "ACTIVE") {
 			if ($activationDate > $todaysDate) {
 				echo "<span class=\"small\"> (hidden until ".$month."/".$day."/".$year.")</span>\n";
@@ -111,7 +109,7 @@ class itemDisplayer
 		} elseif (($status == "IN PROCESS") && ($user->dfltRole >= $g_permission['staff'])) { //only staff can change an in-process status
 			echo " | <input type=\"checkbox\" name=\"activateReserve\" value=\"".$reserve->getReserveID()."\"> Activate?";
 		}
-		
+
 		echo "					</tr>\n";
 		echo "              	</table>\n";
 		echo "              	</td>\n";
@@ -149,16 +147,16 @@ class itemDisplayer
 		echo "				<td width=\"100%\" align=\"left\"><input name=\"source\" type=\"text\" id=\"source\" size=\"50\" value=\"".$source."\"></td>\n";
 		echo "			</tr>\n";
 		if ($contentNotes) {
-		
+
 			echo "            <tr valign=\"middle\">\n";
 			echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Content Note:<br></span></div></td>\n";
 			echo "				<td width=\"100%\" align=\"left\"><textarea name=\"contentNotes\" cols=\"50\" rows=\"3\">".$contentNotes."</textarea></td>\n";
 			echo "			</tr>\n";
 		}
 		if ($itemNotes) {
-			
+
 			for ($i=0; $i<count($itemNotes); $i++) {
-				
+
 				if ($user->dfltRole >= $g_permission['staff'] || $itemNotes[$i]->getType() == "Instructor" || $itemNotes[$i]->getType() == "Content") {
 					echo "      <tr valign=\"middle\">\n";
 					echo "			";
@@ -170,11 +168,11 @@ class itemDisplayer
 					echo "      </tr>\n";
 				}
 			}
-		}			
+		}
 		if ($instructorNotes) {
-			
+
 			for ($i=0; $i<count($instructorNotes); $i++) {
-				
+
 				echo "      <tr valign=\"middle\">\n";
 				echo "			";
 				echo "			<!-- On page load, by default, there is no blank \"Notes\" field showing, only ";
@@ -184,7 +182,7 @@ class itemDisplayer
 				echo "				<td align=\"left\"><textarea name=\"instructorNotes[".$instructorNotes[$i]->getID()."]\" cols=\"50\" rows=\"3\">".$instructorNotes[$i]->getText()."</textarea></td>\n";
 				echo "      </tr>\n";
 			}
-		}			
+		}
 		echo "          <tr valign=\"middle\">\n";
 		//echo "            	<td colspan=\"2\" align=\"left\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"borders\" align=\"center\"><a href='index.php?cmd=addNote&reserveID=".$reserve->getReserveID()."'><input type=\"button\" name=\"addNote\" value=\"Add Note\"></a></td>\n";
 		echo "            	<td colspan=\"2\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"borders\" align=\"center\">\n";
@@ -210,6 +208,6 @@ class itemDisplayer
 		echo "</form>\n";
 	}
 
-	
+
 }
 ?>

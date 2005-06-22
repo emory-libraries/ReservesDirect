@@ -3,33 +3,28 @@
 term.class.php
 term object handles term table
 
-Reserves Direct 2.0
-
-Copyright (c) 2004 Emory University General Libraries
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be included
-in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 Created by Jason White (jbwhite@emory.edu)
 
-Reserves Direct 2.0 is located at:
-http://coursecontrol.sourceforge.net/
+This file is part of GNU ReservesDirect 2.1
+
+Copyright (c) 2004-2005 Emory University, Atlanta, Georgia.
+
+ReservesDirect 2.1 is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+ReservesDirect 2.1 is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ReservesDirect 2.1; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+Reserves Direct 2.1 is located at:
+http://www.reservesdirect.org/
 
 *******************************************************************************/
 require_once("secure/classes/term.class.php");
@@ -37,11 +32,11 @@ require_once("secure/classes/term.class.php");
 class terms
 {
 	function terms() {}
-	
+
 	function getTerms()
 	{
 		global $g_dbConn;
-		
+
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
@@ -49,25 +44,25 @@ class terms
 				.		"FROM terms "
 				.		"WHERE end_date >= ? "
 				.		"ORDER BY sort_order LIMIT 4"
-				;			
-				
+				;
+
 				$d = date("Y-m-d");
 		}
-		
-		$rs = $g_dbConn->query($sql, $d);		
+
+		$rs = $g_dbConn->query($sql, $d);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		
+
 		unset($tmpArray);
 		while($rows = $rs->fetchRow()){
 			$tmpArray[] = new term($rows[0]);
 		}
 		return $tmpArray;
 	}
-	
+
 	function getCurrentTerm()
 	{
 		global $g_dbConn;
-		
+
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
@@ -75,16 +70,16 @@ class terms
 				.		"FROM terms "
 				.		"WHERE begin_date <= ? AND ? <= end_date "
 				.		"LIMIT 1"
-				;			
-				
+				;
+
 				$d = date("Y-m-d");
 		}
-		
-		$rs = $g_dbConn->query($sql, array($d, $d));					
+
+		$rs = $g_dbConn->query($sql, array($d, $d));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		
+
 		$rows = $rs->fetchRow();
-		return new term($rows[0]);	
+		return new term($rows[0]);
 	}
 }
 ?>

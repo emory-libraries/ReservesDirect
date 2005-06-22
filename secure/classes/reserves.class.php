@@ -3,33 +3,28 @@
 reserve.class.php
 Reserve Primitive Object
 
-Reserves Direct 2.0
-
-Copyright (c) 2004 Emory University General Libraries
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be included
-in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 Created by Jason White (jbwhite@emory.edu)
 
-Reserves Direct 2.0 is located at:
-http://coursecontrol.sourceforge.net/
+This file is part of GNU ReservesDirect 2.1
+
+Copyright (c) 2004-2005 Emory University, Atlanta, Georgia.
+
+ReservesDirect 2.1 is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+ReservesDirect 2.1 is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ReservesDirect 2.1; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+Reserves Direct 2.1 is located at:
+http://www.reservesdirect.org/
 
 *******************************************************************************/
 require_once("secure/common.inc.php");
@@ -49,7 +44,7 @@ class reserve
 	public $creationDate;
 	public $lastModDate;
 	public $notes = array();
-	
+
 	/**
 	* @return reserve
 	* @param int $reserveID
@@ -57,11 +52,11 @@ class reserve
 	*/
 	function reserve($reserveID = NULL)
 	{
-		if (!is_null($reserveID)){			
-			$this->getReserveByID($reserveID);	
-		}				
+		if (!is_null($reserveID)){
+			$this->getReserveByID($reserveID);
+		}
 	}
-	
+
 	/**
 	* @return int reserveID
 	* @desc create new reserve in database
@@ -74,37 +69,37 @@ class reserve
 			default: //'mysql'
 				$sql = "INSERT INTO reserves (course_instance_id, item_id, date_created, last_modified) VALUES (!, !, ?, ?)";
 				$sql2 = "SELECT LAST_INSERT_ID() FROM reserves";
-		
+
 				$d = date("Y-m-d"); //get current date
 		}
-		
-		
-		$rs = $g_dbConn->query($sql, array($courseInstanceID, $itemID, $d, $d));	
-		if (DB::isError($rs)) 
-		{ 
-			
+
+
+		$rs = $g_dbConn->query($sql, array($courseInstanceID, $itemID, $d, $d));
+		if (DB::isError($rs))
+		{
+
 			if ($rs->getMessage() == 'DB Error: already exists')
-			{ 
+			{
 				return false;
 			}
 			else
-				trigger_error($rs->getMessage(), E_USER_ERROR); 
+				trigger_error($rs->getMessage(), E_USER_ERROR);
 		}
-		
+
 		$rs = $g_dbConn->query($sql2);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		
+
 		$row = $rs->fetchRow();
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }	
-		
-		$this->reserveID = $row[0];	
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+		$this->reserveID = $row[0];
 		$this->creationDate = $d;
 		$this->lastModDate = $d;
-		
+
 		$this->getReserveByID($this->reserveID);
 		return true;
 	}
-	
+
 	/**
 	* @return void
 	* @param int $reserveID
@@ -113,21 +108,21 @@ class reserve
 	function getReserveByID($reserveID)
 	{
 		global $g_dbConn;
-		
+
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
 				$sql = "SELECT reserve_id, course_instance_id, item_id, activation_date, expiration, status, sort_order, date_created, last_modified, n.note_id "
-					.  "FROM reserves as r "						  
+					.  "FROM reserves as r "
 					.  "LEFT JOIN notes as n ON n.target_table='reserves' and r.reserve_id = n.target_id "
 					.  "WHERE reserve_id = ! "
 					.  "ORDER BY n.type, n.note_id"
 					;
 		}
-		
-		$rs = $g_dbConn->query($sql, $reserveID);	
+
+		$rs = $g_dbConn->query($sql, $reserveID);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		
+
 		$row = $rs->fetchRow();
 			$this->reserveID 		= $row[0];
 			$this->courseInstanceID	= $row[1];
@@ -138,14 +133,14 @@ class reserve
 			$this->sortOrder		= $row[6];
 			$this->creationDate		= $row[7];
 			$this->lastModDate		= $row[8];
-			
-			
+
+
 			if (!is_null($row[9]))
-				$this->notes[] = new note($row[9]);			
-			
+				$this->notes[] = new note($row[9]);
+
 			while ($row = $rs->fetchRow()) //get additional notes
 				if (!is_null($row[9]))
-					$this->notes[] = new note($row[9]);	
+					$this->notes[] = new note($row[9]);
 	}
 
 	/**
@@ -156,19 +151,19 @@ class reserve
 	function getReserveByCI_Item($course_instance_id, $item_id)
 	{
 		global $g_dbConn;
-		
+
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
 				$sql = "SELECT reserve_id, course_instance_id, item_id, activation_date, expiration, status, sort_order, date_created, last_modified "
-					.  "FROM reserves "						  
+					.  "FROM reserves "
 					.  "WHERE course_instance_id = ! AND item_id = !"
 					;
 		}
-		
-		$rs = $g_dbConn->query($sql, array($course_instance_id, $item_id));	
+
+		$rs = $g_dbConn->query($sql, array($course_instance_id, $item_id));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		
+
 		$row = $rs->fetchRow();
 			$this->reserveID 		= $row[0];
 			$this->courseInstanceID	= $row[1];
@@ -179,8 +174,8 @@ class reserve
 			$this->sortOrder		= $row[6];
 			$this->creationDate		= $row[7];
 			$this->lastModDate		= $row[8];
-	}	
-	
+	}
+
 	/**
 	* @return void
 	* @desc destroy the database entry
@@ -188,25 +183,25 @@ class reserve
 	function destroy()
 	{
 		global $g_dbConn;
-		
+
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
 				$sql = "DELETE "
-					.  "FROM reserves "						  
+					.  "FROM reserves "
 					.  "WHERE reserve_id = ! "
 					.  "LIMIT 1"
 					;
 		}
-		
+
 		if (!is_null($this->reserveID))
 		{
 			$rs = $g_dbConn->query($sql, $this->reserveID);
-			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }		
+			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		}
 	}
-	
-	
+
+
 	/**
 	* @return void
 	* @param date $activationDate
@@ -223,14 +218,14 @@ class reserve
 				$sql = "UPDATE reserves SET activation_date = ?, last_modified = ? WHERE reserve_id = !";
 				$d = date("Y-m-d"); //get current date
 		}
-		$rs = $g_dbConn->query($sql, array($date, $d, $this->reserveID));				
+		$rs = $g_dbConn->query($sql, array($date, $d, $this->reserveID));
 
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		
+
 		$this->activationDate = $date;
 		$this->lastModDate = $d;
 	}
-	
+
 	/**
 	* @return void
 	* @param date $expirationDate
@@ -247,13 +242,13 @@ class reserve
 				$sql = "UPDATE reserves SET expiration = ?, last_modified = ? WHERE reserve_id = !";
 				$d = date("Y-m-d"); //get current date
 		}
-		$rs = $g_dbConn->query($sql, array($date, $d, $this->reserveID));		
+		$rs = $g_dbConn->query($sql, array($date, $d, $this->reserveID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		
+
 		$this->expirationDate = $date;
 		$this->lastModDate = $d;
 	}
-	
+
 		/**
 	* @return void
 	* @param string $status
@@ -269,13 +264,13 @@ class reserve
 				$sql = "UPDATE reserves SET status = ?, last_modified = ? WHERE reserve_id = !";
 				$d = date("Y-m-d"); //get current date
 		}
-		$rs = $g_dbConn->query($sql, array($status, $d, $this->reserveID));		
+		$rs = $g_dbConn->query($sql, array($status, $d, $this->reserveID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		
+
 		$this->status = $status;
 		$this->lastModDate = $d;
 	}
-	
+
 		/**
 	* @return void
 	* @param int $sortOrder
@@ -292,13 +287,13 @@ class reserve
 				$sql = "UPDATE reserves SET sort_order = !, last_modified = ? WHERE reserve_id = !";
 				$d = date("Y-m-d"); //get current date
 		}
-		$rs = $g_dbConn->query($sql, array($sortOrder, $d, $this->reserveID));		
+		$rs = $g_dbConn->query($sql, array($sortOrder, $d, $this->reserveID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		
+
 		$this->sortOrder = $sortOrder;
 		$this->lastModDate = $d;
 	}
-	
+
 	/**
 	* @return void
 	* @param int $userID
@@ -308,17 +303,17 @@ class reserve
 	{
 		global $g_dbConn;
 
-		$this->privateUserID = $privateUserIDID; 
+		$this->privateUserID = $privateUserIDID;
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
 				$sql = "INSERT INTO user_view_log (user_id, reserve_id, timestamp_viewed) VALUES (!, !, CURRENT_TIMESTAMP)";
 		}
-		$rs = $g_dbConn->query($sql, array($userID, $this->reserveID));		
+		$rs = $g_dbConn->query($sql, array($userID, $this->reserveID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		
+
 	}
-	
+
 	/**
 	* @return void
 	* @desc Retrieve the item object associated with this reserve
@@ -337,27 +332,27 @@ class reserve
 	function getSortOrder() { return $this->sortOrder; }
 	function getCreationDate() { return $this->creationDate; }
 	function getModificationDate() { return $this->lastModDate; }
-	
+
 	function getNotes()
 	{
 		//$this->notes = common_getNotesByTarget("reserves", $this->reserveID);
 		return $this->notes;
 	}
-	
+
 	function setNote($type, $text)
 	{
 		$this->notes[] = common_setNote($noteID=null, $type, $text, "reserves", $this->reserveID);
 	}
-	
+
 	/**
 	* @return boolean
-	* @desc tests associated item if item is a heading returns true false otherwise 
+	* @desc tests associated item if item is a heading returns true false otherwise
 	*/
 	function isHeading()
 	{
 		if (is_a($this->item, "reserveItem")) return false;  //reserveItems are not headings
 		else return true;
 	}
-	
+
 }
 ?>

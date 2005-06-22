@@ -5,33 +5,28 @@
 requestNotifier.php
 send email when new requests are generated
 
-Reserves Direct 2.0
-
-Copyright (c) 2004 Emory University General Libraries
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be included
-in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 Created by Jason White (jbwhite@emory.edu)
 
-Reserves Direct 2.0 is located at:
-http://coursecontrol.sourceforge.net/
+This file is part of GNU ReservesDirect 2.1
+
+Copyright (c) 2004-2005 Emory University, Atlanta, Georgia.
+
+ReservesDirect 2.1 is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+ReservesDirect 2.1 is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ReservesDirect 2.1; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+Reserves Direct 2.1 is located at:
+http://www.reservesdirect.org/
 
 *******************************************************************************/
 require_once("secure/config.inc.php");
@@ -67,7 +62,7 @@ switch ($g_dbConn->phptype)
 foreach ($libraries as $library)
 {
 	echo "process ".$library->getLibraryID()." .... ";
-	$rs = $g_dbConn->query($sql, array($library->getLibraryID(), $library->getLibraryID()));		
+	$rs = $g_dbConn->query($sql, array($library->getLibraryID(), $library->getLibraryID()));
 
 	if (DB::isError($rs)) {
 		report_error($sql . " arg[" . implode("] arg[", array($library->getLibraryID(), $library->getLibraryID()))."]");
@@ -81,7 +76,7 @@ foreach ($libraries as $library)
 		{
 			$msg = "There are " . $row[0] . " new request(s) generated for " .$library->getLibrary(). " since $g_request_notifier_lastrun\n";
 			$msg .= "Please login to Reserves Direct and check your requests queue <a href=\"$g_siteURL/index.php\">$g_siteURL/index.php</a>";
-			
+
 			if (!mail($library->getContactEmail(), 'Reserves Direct Requests Notification', $msg))
 			{
 				$err = "Notification Email not sent for " . $library->getContactEmail() . "\n";
@@ -90,14 +85,14 @@ foreach ($libraries as $library)
 		}
 	}
 	echo " done\n\n";
-}	
+}
 
 //update last run date
 $configure->request_notifier->last_run = $d;
 
 //write out new xml file
 $xmlDOM = new DomDocument();
-$xmlDOM->loadXML($configure->asXML());	 
+$xmlDOM->loadXML($configure->asXML());
 $xmlDOM->save($xmlConfig);
 
 function report_error($err)

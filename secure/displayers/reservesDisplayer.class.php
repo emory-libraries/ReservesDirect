@@ -1,38 +1,36 @@
 <?
 /*******************************************************************************
-Reserves Direct 2.0
+reservesDisplayer.class.php
 
-Copyright (c) 2004 Emory University General Libraries
 
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
+Created by Kathy Washington (kawashi@emory.edu)
 
-The above copyright notice and this permission notice shall be included
-in all copies or substantial portions of the Software.
+This file is part of GNU ReservesDirect 2.1
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+Copyright (c) 2004-2005 Emory University, Atlanta, Georgia.
 
-Created by Kathy A. Washington (kawashi@emory.edu)
+ReservesDirect 2.1 is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
 
-Reserves Direct 2.0 is located at:
-http://coursecontrol.sourceforge.net/
+ReservesDirect 2.1 is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ReservesDirect 2.1; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+Reserves Direct 2.1 is located at:
+http://www.reservesdirect.org/
 
 *******************************************************************************/
 require_once("secure/common.inc.php");
 //require_once("classes/reserves.class.php");
 
-class reservesDisplayer 
+class reservesDisplayer
 {
 	/**
 	* @return void
@@ -66,17 +64,17 @@ class reservesDisplayer
 	    .	 '	<tr>'
 	    .    '  	<td align="left" valign="top" class="borders"><table width="100%" border="0" cellpadding="2" cellspacing="0" class="displayList">	'
 	    ;
-	
+
 	    $permissionLvl = 0; //default to student
 		if (is_array($user->courseInstances) && !empty($user->courseInstances))
 		{
-			for ($j=0; $j<count($user->courseInstances); $j++){ 
+			for ($j=0; $j<count($user->courseInstances); $j++){
 
 				$rowClass = ($j % 2) ? "evenRow" : "oddRow";
-				
+
 				$ci = $user->courseInstances[$j];
 				$permissionLvl = $ci->getPermissionForUser($user->getUserID());  //get user access for this ci
-				
+
 				echo '<tr align="left" valign="middle" class="'.$rowClass.'">';
 				echo '<td width="2%">';
 				if ($permissionLvl >= $g_permission['proxy']) {
@@ -99,23 +97,23 @@ class reservesDisplayer
 				echo 			$ci->courseInstanceID . '">' . $ci->course->getName() . '</a></td>'
 				.   '			<td NOWRAP align="left" width="15%">' . $ci->displayTerm() . '</td>'
 				.   '			<td width="25%">'
-				; 
-				
+				;
+
 				for($i=0;$i<count($ci->instructorList);$i++) {
 					if ($i>0)
 						echo ',&nbsp;';
-					echo $ci->instructorList[$i]->getFirstName() . "&nbsp;" .$ci->instructorList[$i]->getLastName() ;	
+					echo $ci->instructorList[$i]->getFirstName() . "&nbsp;" .$ci->instructorList[$i]->getLastName() ;
 				}
 				echo "</td>\n</tr>";
 			}
 		} else {
 			echo "<tr><td align=\"center\">No active classes have been added</td></tr>";
 		}
-		
+
 		echo "	</tbody>\n"
 		.	 "</table>\n"
 		;
-		
+
 		echo '<tr>'
 		.	'	<td height="14"><img src="images/spacer.gif" width="1" height="15"></td>'
 		.	'</tr>';
@@ -129,23 +127,23 @@ class reservesDisplayer
 	    .   '</tr>'
 		;
 	}
-	
+
 	function displayReserves($user, $ci, $no_control=null)
-	{	
+	{
 		global $g_permission;
-					
+
 		echo('<FORM METHOD=POST NAME="editReserves" ACTION="index.php">');
 	    echo('<INPUT TYPE="HIDDEN" NAME="cmd" VALUE="editClass">');
 		echo('<INPUT TYPE="HIDDEN" NAME="ci" VALUE="'.$ci->getCourseInstanceID().'">');
-	
+
 		echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">';
 		echo '	<tr>';
-		
+
 		if (is_null($no_control))
 			echo '		<td width ="100%" align="right" valign="middle" class="small" align="right"><a href="index.php">Exit class</a></td>';
 		else
 			echo '		<td width ="100%" align="right" valign="middle" class="small" align="right"><a href="javascript:window.close();">Close Window</a></td>';
-			
+
 		echo '	</tr>';
 		echo	'<tr>'
 		.	'		<td width="140%" colspan="2"><img src="images/spacer.gif" width="1" height="5"> </td>'
@@ -158,7 +156,7 @@ class reservesDisplayer
 		.	'			</tr>'
 		.	'			<tr align="left" valign="top">'
 		.	'				<td class="courseHeaders">' . $ci->displayTerm() . '</td>'
-		.	'			</tr>'		
+		.	'			</tr>'
 		.	'			<tr align="left" valign="top">'
 		.	'				<td class="courseHeaders">Instructors: ';
 								for($i=0;$i<count($ci->instructorList);$i++) {
@@ -227,26 +225,26 @@ class reservesDisplayer
 			$instructorNotes = $ci->reserveList[$i]->getNotes();
 			$callNumber = $ci->reserveList[$i]->item->physicalCopy->getCallNumber();
 			$reserveDesk = $ci->reserveList[$i]->item->physicalCopy->getOwningLibrary();
-			
-						
+
+
 			if ($ci->reserveList[$i]->item->isHeading())
 			{
 				//echo "headings";
-			} else {	
-	
+			} else {
+
 				$rowClass = ($rowNumber++ % 2) ? "evenRow" : "oddRow";
-				
+
 				$reserveItem = new reserveItem($ci->reserveList[$i]->getItemID());
 				$itemIcon = $reserveItem->getItemIcon();
 				$itemGroup = $reserveItem->itemGroup;
-									
+
 				if ($reserveItem->isPhysicalItem()) {
 					//move to config file
 					$viewReserveURL = $g_reservesViewer . $ci->reserveList[$i]->item->getLocalControlKey();
 				} else {
 					$viewReserveURL = "reservesViewer.php?viewer=" . $user->getUserID() . "&reserve=" . $ci->reserveList[$i]->getReserveID();// . "&location=" . $ci->reserveList[$i]->item->getURL();
 				}
-				
+
 				echo '		<tr align="left" valign="middle" class="'.$rowClass.'">'
 	            .    '			<td width="4%" valign="top"><img src="'.$itemIcon.'" alt="text" width="24" height="20"></td>'
 	            .    '			<td width="96%">';
@@ -254,7 +252,7 @@ class reservesDisplayer
 	            	echo '<a href="'.$viewReserveURL.'" target="_blank" class="itemTitle">'.$title.'</a><br>';
 	            	if ($author) {echo '<span class="itemAuthor">'.$author.'</span><br>';}
 	            } else {
-	            	echo '<span class="itemTitleNoLink">'.$title.'</span><br>'; 
+	            	echo '<span class="itemTitleNoLink">'.$title.'</span><br>';
 	            	if ($author) {echo '<span class="itemAuthor">'.$author.'</span><br>';}
                 	if ($callNumber) {echo '<span class="itemMeta">'.$callNumber.'</span><br>';}
 					echo '<span class="itemMetaPre">On Reserve at:</span> <span class="itemMeta"> '.$reserveDesk.'</span>';
@@ -292,9 +290,9 @@ class reservesDisplayer
 	            	{
 	            		echo '<span class="noteType">Content Note:</span>&nbsp;<span class="noteText">'.$contentNotes.'</span><br>';
 	            	}
-	            	if ($itemNotes) 
+	            	if ($itemNotes)
 	            	{
-	            		
+
 	            		for ($n=0; $n<count($itemNotes); $n++)
 	            		{
             				$type = strtolower($itemNotes[$n]->getType());
@@ -305,7 +303,7 @@ class reservesDisplayer
 	            	}
 	            	if ($instructorNotes)
 	            	{
-	            		
+
 	            		for ($n=0; $n<count($instructorNotes); $n++)
 	            		{
 	            			echo '<span class="noteType">Instructor Note:</span>&nbsp;<span class="noteText">'.$instructorNotes[$n]->getText().'</span><br>';
@@ -322,12 +320,12 @@ class reservesDisplayer
 		echo "		<td colspan=\"2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td>\n";
 		echo "	</tr>\n";
 		echo "	<tr>\n";
-		
+
 		if (is_null($no_control))
 			echo "		<td colspan=\"2\"><div align=\"center\" class=\"strong\"><a href=\"index.php\">Exit Class</a></div></td>\n";
 		else
 			echo "		<td colspan=\"2\"><div align=\"center\" class=\"strong\"><a href=\"javascript:window.close();\">Close Window</a></div></td>\n";
-		
+
 		echo "	</tr>\n";
 		echo "	<tr>\n";
 		echo "		<td colspan=\"2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td>\n";
@@ -336,11 +334,11 @@ class reservesDisplayer
 		echo "</form>\n";;
 
 	}
-	
+
 	/**
  * @return void
  * @param int $courseInstances
- * @desc Displays the Users Active Classes this is the first screen of the addReserve 
+ * @desc Displays the Users Active Classes this is the first screen of the addReserve
  * 		expected next steps
  *			addReserve::displaySearchItemMenu
  *			manageClasses::createClass
@@ -348,14 +346,14 @@ class reservesDisplayer
 */
 function displaySelectClasses($courseInstances,$user)
 {
-	
+
 	echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 	echo "	<tbody>\n";
 	echo "		<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
-	
+
 	if (is_array($courseInstances) && !empty($courseInstances))
 	{
-				
+
 		echo "      <tr>\n";
         echo "          <td height=\"14\"><table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
         echo "              <tr align=\"left\" valign=\"top\">\n";
@@ -366,14 +364,14 @@ function displaySelectClasses($courseInstances,$user)
         echo "            </table>\n";
         echo "          </td>\n";
         echo "		</tr>\n";
-        
+
         echo "		<tr>\n";
         echo "			<td align=\"left\" valign=\"top\" class=\"borders\">\n";
-        echo "				<table width=\"100%\" border=\"0\" cellpadding=\"5\" cellspacing=\"0\" class=\"displayList\">\n";    
-         
+        echo "				<table width=\"100%\" border=\"0\" cellpadding=\"5\" cellspacing=\"0\" class=\"displayList\">\n";
+
         $i=0;
 		foreach($courseInstances as $ci)
-		{	
+		{
 			$rowClass = "oddRow";
 			$ci->getInstructors();
 			$ci->getProxies();
@@ -387,11 +385,11 @@ function displaySelectClasses($courseInstances,$user)
 				echo "					<td width=\"25%\" NOWRAP>" . $ci->getActivationDate() . " - " . $ci->getExpirationDate() . "</td>\n";
 				echo "				</tr>\n";
 			}
-		}	
+		}
 			echo "			</table>\n";
 			echo "		</td>\n";
 			echo "	</tr>\n";
-			
+
 			echo "	<tr><td colspan=\'4\">&nbsp;</td></tr>\n";
 			echo "	<tr>\n";
 			echo "		<td align=\"left\" valign=\"top\">\n";
@@ -402,19 +400,19 @@ function displaySelectClasses($courseInstances,$user)
 			echo "			</p>\n";
 			echo "		</td>\n";
 			echo "	</tr>\n";
-			
+
 	} else {
 		echo "		<tr><td>You have no associated classes.  Please select the Manage Classes tab.</td></tr>\n";
 	}
-	
-	echo "		<tr><td align=\"left\" valign=\"top\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";		
+
+	echo "		<tr><td align=\"left\" valign=\"top\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 	echo "	</tbody>\n";
 	echo "</table>\n";
 }
 function displaySelectInstructor($user, $page, $cmd)
 	{
 		$subordinates = common_getUsers('instructor');
-				      	
+
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "	<tbody>\n";
 		echo "		<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
@@ -424,10 +422,10 @@ function displaySelectInstructor($user, $page, $cmd)
 		echo "					<tr align=\"left\" valign=\"top\" class=\"headingCell1\">\n";
         echo "						<td width=\"50%\">Search by Instructor </td><td width=\"50%\">Search by Department</td>\n";
         echo "					</tr>\n";
-		
-        echo "					<tr>\n";        
+
+        echo "					<tr>\n";
         echo "						<td width=\"50%\" align=\"left\" valign=\"top\" class=\"borders\" align=\"center\" NOWRAP>\n";
-        
+
         echo "							<form method=\"post\" action=\"index.php\" name=\"frmReserveItem\">\n";
         //if (!is_null($courseInstance)) echo "					<input type=\"hidden\" name=\"ci\" value=\"$courseInstance\">\n";
     	echo "								<input type=\"hidden\" name=\"page\" value=\"$page\">\n";
@@ -446,7 +444,7 @@ function displaySelectInstructor($user, $page, $cmd)
 		{
 			echo "									<option value=\"" . $subordinate['user_id'] . "\">" . $subordinate['full_name'] . "</option>\n";
 		}
-	    
+
         echo "								</select>\n";
         //echo "								<br>\n";
         //echo "								<br>\n";
@@ -463,7 +461,7 @@ function displaySelectInstructor($user, $page, $cmd)
 		echo "</table>\n";
 
 	}
-	
+
 	/**
  * @return void
  * @param int $ci -- user selected course_instance selected for DisplaySelectClass
@@ -476,7 +474,7 @@ function displaySelectInstructor($user, $page, $cmd)
 */
 function displaySearchItemMenu($ci)
 {
-	
+
 	echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n"
 	.	 "	<tbody>\n"
 	.	 "		<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n"
@@ -513,9 +511,9 @@ function displaySearchItemMenu($ci)
 	function displaySearchScreen($page, $cmd, $ci=null)
 	{
 		global $g_catalogName, $g_libraryURL;
-		
+
 		$instructors = common_getUsers('instructor');
-				      	
+
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "	<tbody>\n";
 		echo "		<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
@@ -525,16 +523,16 @@ function displaySearchItemMenu($ci)
 		echo "					<tr align=\"left\" valign=\"top\" class=\"headingCell1\">\n";
         echo "						<td width=\"50%\">Search for Archived Materials</td><td width=\"50%\">Search by Instructor</td>\n";
         echo "					</tr>\n";
-		
+
         echo "					<tr>\n";
         //		SEARCH BY Author or Title
         echo "						<td width=\"50%\" class=\"borders\" align=\"center\">\n";
         echo "							<br>\n";
         echo "							<form action=\"index.php\" method=\"post\">\n";
-        echo "							<input type=\"text\" name=\"query\" size=\"25\">\n";   
+        echo "							<input type=\"text\" name=\"query\" size=\"25\">\n";
         echo "							<input type=\"hidden\" name=\"page\" value=\"$page\">\n";
 		echo "							<input type=\"hidden\" name=\"cmd\" value=\"$cmd\">\n";
-        if (!is_null($ci)) echo "							<input type=\"hidden\" name=\"ci\" value=\"$ci\">\n";               
+        if (!is_null($ci)) echo "							<input type=\"hidden\" name=\"ci\" value=\"$ci\">\n";
         //echo "							<br>\n";
         echo "							<select name=\"field\">\n";
         echo "								<option value=\"Title\" selected>Title</option><option value=\"Author\">Author</option>\n";
@@ -546,15 +544,15 @@ function displaySearchItemMenu($ci)
         echo "							<br>\n";
         echo "							</form>\n";
         echo "						</td>\n";
-        
+
         echo "						<td width=\"50%\" align=\"left\" valign=\"top\" class=\"borders\" align=\"center\" NOWRAP>\n";
         echo "							<form method=\"post\" action=\"index.php\" name=\"frmReserveItem\">\n";
 		echo "								<input type=\"hidden\" name=\"page\" value=\"$page\">\n";
 		echo "								<input type=\"hidden\" name=\"cmd\" value=\"$cmd\">\n";
 		echo "								<input type=\"hidden\" name=\"searchType\" value=\"reserveItem\">\n";
-		echo "								<input type=\"hidden\" name=\"field\" value=\"instructor\">\n";		
-		if (!is_null($ci)) echo "					<input type=\"hidden\" name=\"ci\" value=\"$ci\">\n";	
-		
+		echo "								<input type=\"hidden\" name=\"field\" value=\"instructor\">\n";
+		if (!is_null($ci)) echo "					<input type=\"hidden\" name=\"ci\" value=\"$ci\">\n";
+
         echo "								<br>\n";
 		echo "								<select name=\"query\">\n";
 	    echo "									<option value=\"--\" selected>Choose an Instructor\n";
@@ -562,7 +560,7 @@ function displaySearchItemMenu($ci)
 		{
 			echo "									<option value=\"" . $instructor['user_id'] . "\">" . $instructor['full_name'] . "</option>\n";
 		}
-	    
+
         echo "								</select>\n";
         //echo "								<br>\n";
         //echo "								<br>\n";
@@ -588,7 +586,7 @@ function displaySearchItemMenu($ci)
 		echo "</table>\n";
 
 	}
-	
+
 	/**
 	 * @return void
 	 * @param string $page 	  -- the current page selector
@@ -599,23 +597,23 @@ function displaySearchItemMenu($ci)
 	 * 		expected next steps
 	 *			open catalog in new window and search for query
 	 *			dependent on page value
-	*/	
+	*/
 	function displaySearchResults($search, $cmd, $ci=null, $hidden_requests=null, $hidden_reserves=null)
 	{
 		$showNextLink = false;
 		$showPrevLink = false;
 		$e = 20;
 
-		if ($search->totalCount > ($search->first + 20)){ 
+		if ($search->totalCount > ($search->first + 20)){
 			$showNextLink = true;
 			$fNext = $search->first + 20;
 		}
-		
-		if ($search->first > 0){ 
+
+		if ($search->first > 0){
 			$showPrevLink = true;
 			$fPrev = $search->first - 20;
 		}
-		
+
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "		<tbody>\n";
 		echo "			<tr><td width=\"100%\" colspan=\"2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
@@ -627,27 +625,27 @@ function displaySearchItemMenu($ci)
 				echo "<input type=\"hidden\" name=\"reserve[" . $r ."]\" value=\"" . $r ."\">\n";
 			}
 		}
-		
+
 		if (is_array($hidden_requests) && !empty($hidden_requests)){
 			foreach($hidden_requests as $r)
 			{
 				echo "<input type=\"hidden\" name=\"request[" . $r ."]\" value=\"" . $r ."\">\n";
 			}
 		}
-		
+
 		echo "			<input type=\"hidden\" name=\"cmd\" value=\"$cmd\">\n";
 		echo "			<input type=\"hidden\" name=\"ci\" value=\"$ci\">\n";
-		
+
 		echo "			<input type=\"hidden\" name=\"f\">\n";
 		echo "			<input type=\"hidden\" name=\"e\" value=\"$e\">\n";
 		echo "			<input type=\"hidden\" name=\"field\" value=\"$search->field\">\n";
 		echo "			<input type=\"hidden\" name=\"query\" value=\"".urlencode($search->query)."\">\n";
-	
+
 		echo "			<tr>\n";
 		echo "					<td align=\"left\">[ <a href=\"index.php?cmd=searchScreen&ci=$ci\" class=\"editlinks\">New Search</a> ] &nbsp;[ <a href=\"index.php?cmd=editClass&ci=$ci\" class=\"editlinks\">Cancel Search</a> ]</td>\n";
 		echo "					<td align=\"right\"><input type=\"submit\" name=\"Submit\" value=\"Add Selected Materials\"></td>\n";
 		echo "			</tr>\n";
-	    
+
 	    if ($showNextLink || $showPrevLink) {
 	   		echo "       	<tr><td colspan=\"2\">&nbsp;</td></tr>\n";
         	echo "			<tr><td colspan=\"2\" align='right'>";
@@ -661,8 +659,8 @@ function displaySearchItemMenu($ci)
         } else {
         	echo "<tr><td>&nbsp;</tr></td>\n";
         }
-	    
-	    
+
+
         echo "			<tr>\n";
         echo "				<td colspan=\"2\">\n";
         echo "					<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
@@ -679,17 +677,17 @@ function displaySearchItemMenu($ci)
         echo "					        <td colspan=\"2\" valign=\"left\" bgcolor=\"#FFFFFF\" class=\"headingCell2\">&nbsp;&nbsp;<i>". $search->totalCount . " items found</i></td>\n";
         echo "							<td class=\"headingCell1\">Select</td>\n";
         echo "				        </tr>\n";
-			
+
 		$cnt = $search->first;
 		$i = 0;
 		for ($ndx=0;$ndx<count($search->items);$ndx++)
 		{
-			
+
 			$item = $search->items[$ndx];
 			$physicalCopy = new physicalCopy();
 			$physicalCopy->getByItemID($item->getItemID());
 			$callNumber = $physicalCopy->getCallNumber();
-			
+
 			$title = $item->getTitle();
 			$author = $item->getAuthor();
 			$url = $item->getURL();
@@ -700,23 +698,23 @@ function displaySearchItemMenu($ci)
 			$source = $item->getSource();
 			$contentNotes = $item->getContentNotes();
 			$itemNotes = $item->getNotes();
-			
-			$cnt++; 			
+
+			$cnt++;
 			$rowClass = ($i++ % 2) ? "evenRow" : "oddRow";
-			
+
 			 if ((is_array($hidden_requests) && in_array($item->getItemID(),$hidden_requests)) || (is_array($hidden_reserves) && in_array($item->getItemID(),$hidden_reserves)))
 			 {
 			 	$checked = 'checked';
 			 } else {
 			 	$checked = '';
 			 }
-			
+
 			echo "						<tr align=\"left\" valign=\"middle\" class=\"$rowClass\">\n";
         	echo "					        <td width=\"4%\" valign=\"top\">\n";
         	echo "								<img src=\"". $item->getitemIcon() ."\" width=\"24\" height=\"20\"></td>\n";
         	echo "							</td>\n";
         	//echo "							<td width=\"88%\"><font class=\"titlelink\">" . $title . ". " . $author . "</font>";
-        	
+
         	$viewReserveURL = "reservesViewer.php?item=" . $item->getItemID();
 				if ($item->isPhysicalItem()) {
 					//move to config file
@@ -731,13 +729,13 @@ function displaySearchItemMenu($ci)
 	            }
 	            if ($author)
 	            	echo '<br><font class="titlelink"> '. $author . '</font>';
-        	
-        	
+
+
         				if ($callNumber) {
             				echo '<br>Call Number: '.$callNumber;
             				//if ($this->itemGroup == 'MULTIMEDIA' || $this->itemGroup == 'MONOGRAPH')
             			}
-            			
+
            		if ($performer)
 	            {
 	            	echo '<br><span class="itemMetaPre">Performed by:</span><span class="itemMeta"> '.$performer.'</span>';
@@ -758,12 +756,12 @@ function displaySearchItemMenu($ci)
 	            {
 	            	echo '<br><span class="itemMetaPre">Source/Year:</span><span class="itemMeta"> '.$source.'</span>';
 	            }
-	            
+
 	            if ($contentNotes)
 	            {
 	            	echo '<br><span class="noteType">Content Note:</span>&nbsp;<span class="noteText">'.$contentNotes.'</span>';
 	            }
-	            if ($itemNotes) 
+	            if ($itemNotes)
 	            {
 	            	for ($n=0; $n<count($itemNotes); $n++)
 	            	{
@@ -775,19 +773,19 @@ function displaySearchItemMenu($ci)
 	            }
 
             echo "							</td>\n";
-            
+
             echo "						    <td width=\"8%\" valign=\"top\" class=\"borders\" align=\"center\">\n";
-            
+
             if ($item->getItemGroup() == "ELECTRONIC"){
 				echo "                          <input type=\"checkbox\" name=\"reserve[" . $item->getItemID() ."]\" value=\"" . $item->getItemID() ."\" ".$checked.">\n";
 			} else {
 				echo "                          <input type=\"checkbox\" name=\"request[" . $item->getItemID() ."]\" value=\"" . $item->getItemID() ."\" ".$checked.">\n";
 			}
-            
+
             echo "				            </td>\n";
-            echo "						</tr>\n";					
-		}	
-        	
+            echo "						</tr>\n";
+		}
+
         echo "         			</table>\n";
         echo "         		</td>\n";
         echo "         	</tr>";
@@ -803,18 +801,18 @@ function displaySearchItemMenu($ci)
         	}
         	echo "</td></tr>\n";
         }
-        
+
 		echo "			<tr><td colspan=\"2\">&nbsp;</td></tr>\n";
 		echo "			<tr><td colspan=\"2\" align=\"right\"><input type=\"submit\" name=\"Submit2\" value=\"Add Selected Materials\"></td></tr>\n";
 		echo "			<tr><td colspan=\"2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "		</tbody>\n";
 		echo "</table>\n";
-		
+
 	}
-	
+
 function displayReserveAdded($ci)
 {
-		
+
 	echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
     echo "	<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\">&nbsp;</td></tr>\n";
     echo "	<tr>\n";
@@ -845,10 +843,10 @@ function displayUploadForm($ci, $type)
 	echo "<form action=\"index.php\" method=\"post\"";
 	if ($type == 'DOCUMENT') echo " ENCTYPE=\"multipart/form-data\"";
 	echo ">\n";
-	
+
 	echo "<input type=\"hidden\" name=\"cmd\" value=\"storeUploaded\">\n";
-	echo "<input type=\"hidden\" name=\"ci\" value=\"$ci\">\n";	
-	echo "<input type=\"hidden\" name=\"type\" value=\"$type\">\n";	
+	echo "<input type=\"hidden\" name=\"ci\" value=\"$ci\">\n";
+	echo "<input type=\"hidden\" name=\"type\" value=\"$type\">\n";
 	echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 	echo "	<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
 	echo "	<tr>\n";
@@ -871,7 +869,7 @@ function displayUploadForm($ci, $type)
 	echo "					<td width=\"35%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\">Author/Composer:</div></td>\n";
 	echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"author\" SIZE=50></td>\n";
 	echo "				</tr>\n";
-	
+
 	if ($type == "URL")
 	{
 		echo "				<tr valign=\"middle\">\n";
@@ -882,23 +880,23 @@ function displayUploadForm($ci, $type)
 		echo "				<tr valign=\"middle\">\n";
 		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\">File:</div></td>\n";
 		echo "					<td align=\"left\"><INPUT TYPE=\"file\" NAME=\"userfile\" SIZE=40></td>\n";
-		echo "				</tr>\n";		
-		
+		echo "				</tr>\n";
+
 		echo "				<tr valign=\"middle\">\n";
 		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\">&nbsp;</div></td>\n";
 		echo "					<td align=\"left\">Please limit uploaded documents to 25 clear, clean sheets to minimize downloading and printing time.</td>\n";
-		echo "				</tr>\n";		
+		echo "				</tr>\n";
 	}
 	echo "				<tr valign=\"middle\">\n";
 	echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Performer </span>(<em>if applicable)</em><span class=\"strong\">:</span></div></td>\n";
 	echo "					<td align=\"left\"><input name=\"performer\" type=\"text\" id=\"Title3\" size=\"50\"></td>\n";
 	echo "				</tr>\n";
-	
+
 	echo "				<tr valign=\"middle\">\n";
 	echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Book/Journal/Work Title</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
 	echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"volumetitle\" SIZE=50></td>\n";
 	echo "				</tr>\n";
-	
+
 	echo "				<tr valign=\"middle\">\n";
 	echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Volume / Edition</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
 	echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"volume\" SIZE=50></td>\n";
@@ -908,7 +906,7 @@ function displayUploadForm($ci, $type)
 	echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Pages</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
 	echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"pagefrom\" SIZE=3>  To:  <INPUT TYPE=\"text\" NAME=\"pageto\" SIZE=3></td>\n";
 	echo "				</tr>\n";
-	
+
 	echo "				<tr valign=\"middle\">\n";
 	echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Times</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
 	echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"timefrom\" SIZE=3>  To:  <INPUT TYPE=\"text\" NAME=\"timeto\" SIZE=3></td>\n";
@@ -918,7 +916,7 @@ function displayUploadForm($ci, $type)
 	echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Source / Year</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
 	echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"source\" SIZE=50></td>\n";
 	echo "				</tr>\n";
-	
+
 	echo "				<tr valign=\"middle\">\n";
 	echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Contents</span>(<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
 	echo "					<td align=\"left\"><TEXTAREA NAME=\"contents\" cols=50 rows=3>\n</TEXTAREA>\n</td>\n";
@@ -927,15 +925,15 @@ function displayUploadForm($ci, $type)
 	echo "				<tr valign=\"middle\">\n";
 	echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">This document is from my personal collection:</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
 	echo "					<td align=\"left\"><INPUT TYPE=\"checkbox\" NAME=\"personal\" CHECKED></td>\n";
-	echo "				</tr>\n";	
-	
-	if ($type == "URL") 
+	echo "				</tr>\n";
+
+	if ($type == "URL")
 	{
 		echo "				<tr><td width=\"20%\" valign=\"top\" colspan=\"3\" align=\"center\"><input type=\"submit\" name=\"Submit\" value=\"Save URL\"></td></tr>\n";
 	} else {
-		echo "				<tr><td width=\"20%\" valign=\"top\" colspan=\"3\" align=\"center\"><input type=\"submit\" name=\"Submit\" value=\"Save Document\"></td></tr>\n"; 
+		echo "				<tr><td width=\"20%\" valign=\"top\" colspan=\"3\" align=\"center\"><input type=\"submit\" name=\"Submit\" value=\"Save Document\"></td></tr>\n";
 	}
-	
+
 	echo "			</table>\n";
 	echo "		</td>\n";
 	echo "	</tr>\n";
@@ -946,7 +944,7 @@ function displayUploadForm($ci, $type)
 
 function displayFaxInfo($ci)
 {
-	
+
 	echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
     echo "	<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
     echo "	<tr>\n";
@@ -957,11 +955,11 @@ function displayFaxInfo($ci)
     echo "						<blockquote>\n";
     echo "							<p class=\"helperText\">Reserves Direct allows you to fax in a document and will automatically convert it to PDF. Please limit faxed documents to 25 clear, clean sheets to minimize downloading and printing time. To proceed, please fax each document individually (with no cover sheet!) to: </p>\n";
     echo "							<p><span class=\"strong\">(404) 727-9089</span> (On-campus may dial <span class=\"strong\">7-9089</span> )</p>\n";
-    echo "							<p class=\"helperText\">Please note that faxes make take up to a minute per page to process during peak times. For best results, wait for a confirmation sheet to print from your fax machine before faxing another document.</p>\n";    
+    echo "							<p class=\"helperText\">Please note that faxes make take up to a minute per page to process during peak times. For best results, wait for a confirmation sheet to print from your fax machine before faxing another document.</p>\n";
     echo "						</blockquote>\n";
     echo "					</td>\n";
     echo "				</tr>\n";
-    echo "			</table>\n";       
+    echo "			</table>\n";
     echo "		</td>\n";
     echo "	</tr>\n";
     echo "	<tr><td>&nbsp;</td></tr>\n";
@@ -984,10 +982,10 @@ function displayFaxInfo($ci)
 function claimFax($faxReader, $ci)
 {
 	global $g_faxURL;
-	
+
 	echo "<form method=\"post\" action=\"index.php\">\n";
 	echo "<input type=\"hidden\" name=\"cmd\" value=\"addFaxMetadata\">\n";
-	echo "<input type=\"hidden\" name=\"ci\" value=\"$ci\">\n";	
+	echo "<input type=\"hidden\" name=\"ci\" value=\"$ci\">\n";
 	echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
     echo "	<tr><td width=\"140%\" colspan=\"2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
     echo "	<tr>\n";
@@ -1005,7 +1003,7 @@ function claimFax($faxReader, $ci)
 	echo "			</table>\n";
 	echo "		</td>\n";
 	echo "	</tr>\n";
-	
+
 	if (is_array($faxReader->faxes) && !empty($faxReader->faxes)){
 		echo "	<tr>\n";
 		echo "		<td colspan=\"2\" align=\"left\" valign=\"top\" class=\"borders\">\n";
@@ -1017,13 +1015,13 @@ function claimFax($faxReader, $ci)
 		echo "					<td width=\"10%\" class=\"headingCell1\">&nbsp;</td>\n";
 		echo "					<td width=\"15%\" class=\"headingCell1\">Claim Fax</td>\n";
 		echo "				</tr>\n";
-	
+
 		for($i=0;$i<count($faxReader->faxes);$i++)
 		{
 			$fax =& $faxReader->faxes[$i];
-			
+
 			$rowClass = ($i % 2) ? "evenRow" : "oddRow";
-			
+
 			echo "				<tr align=\"left\" valign=\"middle\" class=\"$rowClass\">\n";
 			echo "					<td width=\"20%\" valign=\"top\" class=\"$rowClass\" align=\"center\">" . $fax['phone'] . "</td>\n";
 			echo "					<td width=\"40%\" class=\"$rowClass\" align=\"center\">" . $fax['time'] . "</td>\n";
@@ -1031,7 +1029,7 @@ function claimFax($faxReader, $ci)
 			echo "					<td width=\"10%\" valign=\"top\" class=\"$rowClass\" align=\"center\"><a href=\"" . $g_faxURL . $fax['file'] . "\">preview</a></td>\n";
 			echo "					<td width=\"15%\" valign=\"top\" class=\"$rowClass\" align=\"center\"><input type=\"checkbox\" name=\"claimFax[$i]\" value=\"" . $fax['file'] . "\"></td>\n";
 			echo "				</tr>\n";
-			
+
 		}
 		echo "				<tr align=\"left\" valign=\"middle\"><td width=\"20%\" valign=\"top\" class=\"headingCell1\">&nbsp;</td><td width=\"40%\" class=\"headingCell1\">&nbsp;</td><td width=\"15%\" valign=\"top\" class=\"headingCell1\">&nbsp;</td><td width=\"10%\" valign=\"top\" class=\"headingCell1\">&nbsp;</td><td width=\"15%\" valign=\"top\" class=\"headingCell1\">&nbsp;</td></tr>\n";
 		echo "			</table>\n";
@@ -1054,17 +1052,17 @@ function displayFaxMetadataForm($faxes, $ci)
 
 	echo "<FORM METHOD=POST ACTION=\"index.php\">\n";
 	echo "	<INPUT TYPE=\"HIDDEN\" NAME=\"cmd\" VALUE=\"storeFaxMetadata\">\n";
-	echo "	<INPUT TYPE=\"HIDDEN\" NAME=\"ci\" VALUE=\"$ci\">\n";	
-	
+	echo "	<INPUT TYPE=\"HIDDEN\" NAME=\"ci\" VALUE=\"$ci\">\n";
+
 	echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 	echo "	<tr><td width=\"140%\" colspan=\"2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
 	echo "	<tr>\n";
 	echo "		<td width=\"50%\" align=\"left\" valign=\"top\" class=\"helperText\">Add information about your fax(es).</td>\n";
 	echo "		<td width=\"50%\" align=\"left\" valign=\"top\" align=\"right\"><a href=\"link\">Return to previous page</a></td>\n";
 	echo "	</tr>\n";
-	
+
 	echo "	<tr><td colspan=\"2\" align=\"left\" valign=\"top\">&nbsp;</td></tr>\n";
-	
+
 	echo "	<tr>\n";
 	echo "		<td colspan=\"2\" align=\"left\" valign=\"top\">\n";
 	echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
@@ -1078,7 +1076,7 @@ function displayFaxMetadataForm($faxes, $ci)
 	{
 		$i = 0;
 		foreach ($faxes as $fax)
-		{	
+		{
 			$rowClass = ($i++ % 2) ? "evenRow" : "oddRow";
 			echo "	<tr>\n";
 			echo "		<td colspan=\"2\" align=\"left\" valign=\"top\" class=\"borders\">\n";
@@ -1092,7 +1090,7 @@ function displayFaxMetadataForm($faxes, $ci)
 			echo "			</table>\n";
 			echo "		</td>\n";
 			echo "	</tr>\n";
-		
+
 			echo "	<tr>\n";
 			echo "		<td colspan=\"2\" align=\"left\" valign=\"top\">\n";
 			echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
@@ -1100,9 +1098,9 @@ function displayFaxMetadataForm($faxes, $ci)
 			echo "			</table>\n";
 			echo "		</td>\n";
 			echo "	</tr>\n";
-	
+
 			echo "	<INPUT TYPE=\"HIDDEN\" NAME=\"file[" . str_replace('.', '_',$fax['file']) . "]\" value=\"" . $fax['file'] ."\" >\n";
-			
+
 			echo "	<tr>\n";
 			echo "		<td colspan=\"2\" align=\"left\" valign=\"top\" class=\"borders\">\n";
 			echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
@@ -1110,37 +1108,37 @@ function displayFaxMetadataForm($faxes, $ci)
 			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\" class=\"strong\">Title:</td>\n";
 			echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"" . $fax['file'] . "[title]\" SIZE=50></td>\n";
 			echo "				</tr>\n";
-		
+
 			echo "				<tr valign=\"middle\">\n";
 			echo "					<td width=\"35%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\" class=\"strong\">Author</td>\n";
 			echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"" . $fax['file'] . "[author]\" SIZE=50></td>\n";
 			echo "				</tr>\n";
-			
+
 			echo "				<tr valign=\"middle\">\n";
 			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\"><span class=\"strong\">Book/Journal/Work Title</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
 			echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"" . $fax['file'] . "[volumetitle]\" SIZE=50></td>\n";
 			echo "				</tr>\n";
-			
+
 			echo "				<tr valign=\"middle\">\n";
 			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Volume / Edition</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
 			echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"" . $fax['file'] . "[volume]\" SIZE=50></td>\n";
 			echo "				</tr>\n";
-			
+
 			echo "				<tr valign=\"middle\">\n";
 			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Pages</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
 			echo "					<td align=\"left\">From:  <INPUT TYPE=\"text\" NAME=\"" . $fax['file'] . "[pagefrom]\" SIZE=3> To: <INPUT TYPE=\"text\" NAME=\"" . $fax['file'] . "[pageto]\" SIZE=3></td>\n";
 			echo "				</tr>\n";
-/* Not implemented in database			
+/* Not implemented in database
 			echo "				<tr valign=\"middle\">\n";
 			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Year</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
 			echo "					<td align=\"left\"><input NAME=\"" . $fax[file] . "[year]\" type=\"text\" size=\"50\"></td>\n";
 			echo "				</tr>\n";
-*/			
+*/
 			echo "				<tr valign=\"middle\">\n";
 			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Contents</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
 			echo "					<td align=\"left\"><textarea NAME=\"" . $fax['file'] . "[contents]\" cols=\"50\" rows=\"3\"></textarea></td>\n";
 			echo "				</tr>\n";
-		
+
 			echo "				<tr valign=\"middle\">\n";
 			echo "					<td align=\"right\" bgcolor=\"#CCCCCC\">&nbsp;</td>\n";
 			echo "					<td align=\"left\" align=\"center\" class=\"strong\">\n";
@@ -1170,8 +1168,8 @@ function displayFaxMetadataForm($faxes, $ci)
 function displaySortScreen($user, $ci)
 {
 	global $g_reservesViewer;
-		
-		
+
+
 	echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">'
 	.	 '<FORM METHOD=POST NAME="sortScreen" ACTION="index.php">'
 	.	 '<INPUT TYPE="HIDDEN" NAME="cmd" VALUE="sortReserves">'
@@ -1221,43 +1219,43 @@ function displaySortScreen($user, $ci)
 		for($i=0;$i<count($ci->reserveList);$i++)
 		{
 			$ci->reserveList[$i]->getItem();
-				
+
 			if ($ci->reserveList[$i]->item->isHeading())
 			{
 				//echo "headings";
-			} else {	
-		
+			} else {
+
 			$rowClass = ($rowNumber++ % 2) ? "evenRow" : "oddRow";
-					
+
 			$reserveItem = new reserveItem($ci->reserveList[$i]->getItemID());
 			$itemIcon = $reserveItem->getItemIcon();
 			$itemGroup = $reserveItem->itemGroup;
-					
+
 			if ($reserveItem->isPhysicalItem()) {
 				//move to config file
 				$viewReserveURL = $g_reservesViewer . $ci->reserveList[$i]->item->getLocalControlKey();
 			} else {
 				$viewReserveURL = "reservesViewer.php?viewer=" . $user->getUserID() . "&reserve=" . $ci->reserveList[$i]->getReserveID();// . "&location=" . $ci->reserveList[$i]->item->getURL();
 			}
-			
+
 			echo '	<tr align="left" valign="middle" class="'.$rowClass.'">'
 			.    '		<td width="1%" valign="top"><img src="'.$itemIcon.'" alt="text" width="24" height="20"></td>'
 		    .    '		<td width="100%">';
-		    
+
 		    if (!$reserveItem->isPhysicalItem()) {
 		    		echo '<a href="'.$viewReserveURL.'" target="_blank">'.$ci->reserveList[$i]->item->getTitle().'</a>';
 		    } else {
 		            echo $ci->reserveList[$i]->item->getTitle();
 		            if ($ci->reserveList[$i]->item->getLocalControlKey()) {echo ' <a href="'.$viewReserveURL.'" target="_blank">(more info)</a>';}
 		    }
-		    
+
 		    echo '. '.$ci->reserveList[$i]->item->getAuthor().'</td></tr>';
-	
+
 			}
 		}
-	
+
 	//End Loop Through Records
-	
+
 	echo '	    	<tr align="left" valign="middle" class="headingCell1">'
 	.	 '             	<td valign="top">&nbsp;</td>'
 	.	 '             	<td width="100%"><div align="right"> </div></td>'
@@ -1293,8 +1291,8 @@ function displaySortScreen($user, $ci)
 
 function displayCustomSort($user,$ci)
 {
-	global $g_reservesViewer;	
-		
+	global $g_reservesViewer;
+
 	echo '      <table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">';
 	echo '        <tr>';
 	echo '          <td width="140%" colspan="2"><img src="images/spacer.gif" width="1" height="5"> </td>';
@@ -1343,36 +1341,36 @@ function displayCustomSort($user,$ci)
 	echo '              <td width="60%" bgcolor="#FFFFFF" class="headingCell1">'.count($ci->reserveList).' Item(s) On Reserve</td>';
 	echo '              <td width="10%" class="headingCell1">Sort Order</td>';
 	echo '            </tr>';
-	
+
 	//Begin Loop Through Records
 		$rowNumber = 0;
 		$oldValue = array();
 		for($i=0;$i<count($ci->reserveList);$i++)
 		{
 			$ci->reserveList[$i]->getItem();
-				
+
 			if ($ci->reserveList[$i]->item->isHeading())
 			{
 				//echo "headings";
-			} else {	
-		
+			} else {
+
 			$rowClass = ($rowNumber++ % 2) ? "evenRow" : "oddRow";
-					
+
 			$reserveItem = new reserveItem($ci->reserveList[$i]->getItemID());
 			$itemIcon = $reserveItem->getItemIcon();
 			$itemGroup = $reserveItem->itemGroup;
-					
+
 			if ($reserveItem->isPhysicalItem()) {
 				//move to config file
 				$viewReserveURL = $g_reservesViewer . $ci->reserveList[$i]->item->getLocalControlKey();
 			} else {
 				$viewReserveURL = "reservesViewer.php?viewer=" . $user->getUserID() . "&reserve=" . $ci->reserveList[$i]->getReserveID();// . "&location=" . $ci->reserveList[$i]->item->getURL();
 			}
-			
+
 			echo '	<tr align="left" valign="middle" class="'.$rowClass.'">'
 			.    '		<td width="1%" valign="top"><img src="'.$itemIcon.'" alt="text" width="24" height="20"></td>'
 		    .    '		<td width="60%">';
-		    
+
 		    if (!$reserveItem->isPhysicalItem()) {
 		    		echo '<a href="'.$viewReserveURL.'" target="_blank">'.$ci->reserveList[$i]->item->getTitle().'</a>';
 		    } else {
@@ -1381,19 +1379,19 @@ function displayCustomSort($user,$ci)
 		            	echo ' <a href="'.$viewReserveURL.'" target="_blank">(more info)</a>';
 		            }
 		    }
-		    
+
 		    echo '. '.$ci->reserveList[$i]->item->getAuthor().'</td>';
 		    echo '              <td width="10%" valign="middle" class="borders"><div align="center">';
 			echo '                <input type="hidden" name="'.$ci->reserveList[$i]->reserveID.'" value="'.$ci->reserveList[$i]->sortOrder.'">';
 		    echo '                <input name="reserveSortIDs['.$ci->reserveList[$i]->reserveID.'][newSortOrder]" value="'.$ci->reserveList[$i]->sortOrder.'" type="text" size="3" onChange="javascript:if (this.value <=0 || this.value > '.count($ci->reserveList).' || !parseInt(this.value)) {alert (\'Invalid value\')} else {updateSort(document.forms.customSortScreen, '.$ci->reserveList[$i]->reserveID.', this.value, this.name)}">';
 			echo '              </td>';
 			echo '            </tr>';
-	
+
 			}
 		}
-	
+
 	//End Loop Through Records
-	
+
 	echo '';
 	echo '            <tr align="left" valign="middle" class="headingCell1">';
 	echo '              <td valign="top">&nbsp;</td>';
@@ -1432,7 +1430,7 @@ function displayCustomSort($user,$ci)
 	echo '        </tr>';
 	echo '			</FORM>';
 	echo '      </table>';
-	
+
 	}
 
 }

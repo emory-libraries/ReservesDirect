@@ -3,33 +3,28 @@
 physicalCopy.class.php
 User Primitive Object
 
-Reserves Direct 2.0
-
-Copyright (c) 2004 Emory University General Libraries
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be included
-in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 Created by Kathy Washington (kawashi@emory.edu)
 
-Reserves Direct 2.0 is located at:
-http://coursecontrol.sourceforge.net/
+This file is part of GNU ReservesDirect 2.1
+
+Copyright (c) 2004-2005 Emory University, Atlanta, Georgia.
+
+ReservesDirect 2.1 is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+ReservesDirect 2.1 is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ReservesDirect 2.1; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+Reserves Direct 2.1 is located at:
+http://www.reservesdirect.org/
 
 *******************************************************************************/
 require_once("secure/classes/note.class.php");
@@ -48,8 +43,8 @@ class physicalCopy
 	public $itemType;
 	public $ownerUserID;
 	public $notes = array();
-	
-	
+
+
 	/**
 	* Constructor Method
 	* @return void
@@ -63,14 +58,14 @@ class physicalCopy
 			$this->getCopyByID($physicalCopyID);
 		}
 	}
-	
+
 	/**
 	* @return int physicalCopyID
 	* @desc Insert new physical copy record into the DB and return the new physicalCopyID
 	*/
 	function createPhysicalCopy()
 	{
-		global $g_dbConn;		
+		global $g_dbConn;
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
@@ -80,28 +75,28 @@ class physicalCopy
 
 		$rs = $g_dbConn->query($sql); //insert new row into PHSICAL_COPIES table
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		
+
 		$rs2 = $g_dbConn->query($sql2);
 		if (DB::isError($rs2)) { trigger_error($rs2->getMessage(), E_USER_ERROR); }
-		
+
 		$row = $rs2->fetchRow();		//retrieve the row just inserted into the PHYSICAL_COPIES table
 		if (DB::isError($row)) { trigger_error($row->getMessage(), E_USER_ERROR); }
-		
+
 		$this->physicalCopyID = $row[0]; //return physical_copy_id of newly created record
 	}
-	
+
 	function getByItemID($itemID)
 	{
 		global $g_dbConn;
-		
+
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
 				$sql = "SELECT physical_copy_id, reserve_id, item_id, status, call_number, barcode, owning_library, item_type, owner_user_id "
-					.  "FROM physical_copies "						  
+					.  "FROM physical_copies "
 					.  "WHERE item_id = ! ORDER BY physical_copy_id DESC";
 		}
-		
+
 		$rs = $g_dbConn->query($sql, $itemID);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
@@ -109,11 +104,11 @@ class physicalCopy
 		{
 			list($this->physicalCopyID, $this->reserveID, $this->itemID, $this->status, $this->callNumber, $this->barcode, $this->owningLibrary, $this->itemType, $this->ownerUserID) = $row;
 			return true;
-		} else 
+		} else
 			return false;
 	}
 
-	
+
 	/**
 	* @return void
 	* @param optional int $noteID
@@ -139,8 +134,8 @@ class physicalCopy
 	* @param int $reserveID
 	* @desc Updates the reserveID, associated w/the physicalCopy, in the DB
 	*/
-	function setReserveID($reserveID) 
-	{ 
+	function setReserveID($reserveID)
+	{
 		global $g_dbConn;
 
 		$this->reserveID = $reserveID;
@@ -152,14 +147,14 @@ class physicalCopy
 		$rs = $g_dbConn->query($sql, array($reserveID, $this->physicalCopyID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
-	
+
 	/**
 	* @return void
 	* @param int $itemID
 	* @desc Updates the itemID, associated w/the physicalCopy, in the DB
 	*/
-	function setItemID($itemID) 
-	{ 
+	function setItemID($itemID)
+	{
 		global $g_dbConn;
 
 		$this->itemID = $itemID;
@@ -177,8 +172,8 @@ class physicalCopy
 	* @param string $status
 	* @desc Updates the status, associated w/the physicalCopy, in the DB
 	*/
-	function setStatus($status) 
-	{ 
+	function setStatus($status)
+	{
 		global $g_dbConn;
 
 		$this->status = $status;
@@ -196,8 +191,8 @@ class physicalCopy
 	* @param string $callNumber
 	* @desc Updates the callNumber, associated w/the physicalCopy, in the DB
 	*/
-	function setCallNumber($callNumber) 
-	{ 
+	function setCallNumber($callNumber)
+	{
 		global $g_dbConn;
 
 		$this->callNumber = $callNumber;
@@ -216,7 +211,7 @@ class physicalCopy
 	* @desc Updates the barcode, associated w/the physicalCopy, in the DB
 	*/
 	function setBarcode($barcode)
-	{ 
+	{
 		global $g_dbConn;
 
 		$this->barcode = $barcode;
@@ -228,14 +223,14 @@ class physicalCopy
 		$rs = $g_dbConn->query($sql, array($barcode, $this->physicalCopyID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
-	
+
 	/**
 	* @return void
 	* @param int $owningLibrary
 	* @desc Updates the Owning Library, associated w/the physicalCopy, in the DB
 	*/
 	function setOwningLibrary($owningLibrary)
-	{ 
+	{
 		global $g_dbConn;
 
 		$this->owningLibrary = $owningLibrary;
@@ -245,17 +240,17 @@ class physicalCopy
 				$sql = "UPDATE physical_copies SET owning_library = ? WHERE physical_copy_id = !";
 		}
 
-		$rs = $g_dbConn->query($sql, array($owningLibrary, $this->physicalCopyID));		
+		$rs = $g_dbConn->query($sql, array($owningLibrary, $this->physicalCopyID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
-	
+
 	/**
 	* @return void
 	* @param string $itemType
 	* @desc Updates the item type, associated w/the physicalCopy, in the DB
 	*/
 	function setItemType($itemType)
-	{ 
+	{
 		global $g_dbConn;
 
 		$this->itemType = $itemType;
@@ -274,7 +269,7 @@ class physicalCopy
 	* @desc Updates the owner_user_id value, associated w/the physicalCopy, in the DB
 	*/
 	function setOwnerUserID($ownerUserID)
-	{ 
+	{
 		global $g_dbConn;
 
 		$this->ownerUserID = $ownerUserID;
@@ -301,8 +296,8 @@ class physicalCopy
 	* @return void
 	* @desc Calls getNotesByTarget() to retrieve all notes for a physical copy, from the DB, by physicalCopyID
 	*/
-	function getNotes()	
-	{ 
+	function getNotes()
+	{
 		$this->notes = common_getNotesByTarget("physical_copies", $this->physicalCopyID);
 	}
 
@@ -314,21 +309,21 @@ class physicalCopy
 	function getCopyByID($physicalCopyID)
 	{
 		global $g_dbConn;
-		
+
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
 				$sql = "SELECT physical_copy_id, reserve_id, item_id, status, call_number, barcode, owning_library, item_type, owner_user_id "
-					.  "FROM physical_copies "						  
+					.  "FROM physical_copies "
 					.  "WHERE physical_copy_id = !";
 		}
-		
+
 		$rs = $g_dbConn->query($sql, $physicalCopyID);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		
+
 		list($this->physicalCopyID, $this->reserveID, $this->itemID, $this->status, $this->callNumber, $this->barcode, $this->owningLibrary, $this->itemType, $this->ownerUserID) = $rs->fetchRow();
 	}
-	
+
 	/**
 	* @return void
 	* @desc destroy the database entry
@@ -336,12 +331,12 @@ class physicalCopy
 	function destroy()
 	{
 		global $g_dbConn;
-		
+
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
 				$sql = "DELETE "
-					.  "FROM physical_copies "						  
+					.  "FROM physical_copies "
 					.  "WHERE physical_copy_id = !"
 					;
 				$sql2 = "DELETE "
@@ -349,12 +344,12 @@ class physicalCopy
 					.	"WHERE target_id = ! AND target_table = 'physical_copies'"
 					;
 		}
-		
+
 		$rs = $g_dbConn->query($sql, $this->physicalCopyID);
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }		
-		
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
 		$rs = $g_dbConn->query($sql2, $this->physicalCopyID);
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }		
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 }
 

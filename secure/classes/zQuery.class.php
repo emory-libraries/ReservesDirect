@@ -3,33 +3,29 @@
 zQuery.class.php
 connect to library catalog to get book info
 
-Reserves Direct 2.0
-
-Copyright (c) 2004 Emory University General Libraries
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be included
-in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 Created by Jason White (jbwhite@emory.edu)
 
-Reserves Direct 2.0 is located at:
-http://coursecontrol.sourceforge.net/
+This file is part of GNU ReservesDirect 2.1
+
+Copyright (c) 2004-2005 Emory University, Atlanta, Georgia.
+
+ReservesDirect 2.1 is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+ReservesDirect 2.1 is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ReservesDirect 2.1; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+Reserves Direct 2.1 is located at:
+http://www.reservesdirect.org/
+
 
 *******************************************************************************/
 require_once("secure/common.inc.php");
@@ -44,31 +40,31 @@ class zQuery
 		global $g_zhost;
 
 		if ($search_field == 'barcode')  //use barcode to get controlNumber
-		{			
-			//open socket to EUCLID widget which will return a controlNumber 
+		{
+			//open socket to EUCLID widget which will return a controlNumber
 			$fp = fsockopen($g_zhost, 4321, $errno, $errstr, 60);
 			if (!$fp) {
-				 trigger_error("zQuery could not connect $errstr ($errno)", E_USER_ERROR); 
+				 trigger_error("zQuery could not connect $errstr ($errno)", E_USER_ERROR);
 			} else {
 				fwrite ($fp, $search_term);
 				while (!feof($fp)) {
 					$term =  fgets ($fp,128);
 					$term = ereg_replace("[^A-z0-9]", "", $term);
-					//echo "bib=$term<hr>";            
+					//echo "bib=$term<hr>";
 				}
 				fclose ($fp);
 			}
 		} else $term = $search_term;
-		//$bibval = array("isbn"=>7, "issn"=>8,"bib"=>12,"callno"=>926, "title"=>4);		
+		//$bibval = array("isbn"=>7, "issn"=>8,"bib"=>12,"callno"=>926, "title"=>4);
 		//echo '@attr 1=' . $bibval[$search_field] .  ' "' . $term . '"<br>';
-		
-		//search for xml data based on the controlNumber		
-		
+
+		//search for xml data based on the controlNumber
+
 		if (ltrim(rtrim($term)) != "")
 			$this->zDoQuery('@attr 1=12 "' . $term . '"', 0, 1);
 	}
-	
-	function zDoQuery($query, $start, $limit) 
+
+	function zDoQuery($query, $start, $limit)
 	{
 		/*
 		// Executes a z39.50 search
@@ -81,7 +77,7 @@ class zQuery
 		// yaz_wait actually executes the query
 		yaz_wait();
 		*/
-		
+
 		global $g_zhost, $g_zport, $g_zdb, $g_zReflector;
 
 		if (isset($_SESSION['debug']))
@@ -98,26 +94,26 @@ class zQuery
 			      $xmlresults.= fread($fp,1024);
 			}
 			fclose($fp);
-			
+
 			$this->xmlResults = $xmlresults;
 		} //else  echo("<TR><TD>Record not found.  This item may be hidden from searches please enter catalog information manually.</TD></TR>\n");
 	}
-	
+
 	function getResults()
 	{
-		return simplexml_load_string(rtrim(ltrim($this->xmlResults)));		
+		return simplexml_load_string(rtrim(ltrim($this->xmlResults)));
 	}
-	
+
 	function showXMLResults()
 	{
 		echo htmlentities($this->xmlResults);
 	}
-	
+
 	function parseToArray()
 	{
 		$search_results = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'volume_title'=>'', 'source'=>'', 'content_note'=>'', 'controlKey'=>'', 'personal_owner'=>null, 'physicalCopy'=>'');
 		$sXML = simplexml_load_string(rtrim(ltrim($this->xmlResults)));
-		
+
 		//if (is_array($sXML->record->field) && !empty($sXML->record->field))
 		if (!empty($sXML->record->field))
 		{
@@ -127,13 +123,13 @@ class zQuery
 						case '001':  // control Number
 			   			$search_results['controlKey'] = (string)$field;
 			   		break;
-			   		
+
 			   		case '100':
 			   		case '110':
 			   		case '111':
 			   			foreach ($field->subfield as $subfield)
 			   				$search_results['author'] .= (string)$subfield;
-						   	
+
 			   		case '245': //Title
 			   			$search_results['title'] = "";
 			   			foreach ($field->subfield as $subfield)
@@ -144,7 +140,7 @@ class zQuery
 			   						$search_results['title'] .= " ".(string)$subfield;
 			   			}
 			   		break;
-			   					   		
+
 			   		case '260':
 			   			$search_results['source'] = "";
 			   			foreach ($field->subfield as $subfield)
@@ -156,13 +152,13 @@ class zQuery
 			   			}
 			   		break;
 
-	
+
 					/* replaced by getHoldings jbwhite 10/25/04
-			   		case '926':	
+			   		case '926':
 			   			unset($tmpArray);
-			   			$tmpArray = array();	   			
+			   			$tmpArray = array();
 			   			foreach ($field->subfield as $subfield)
-			   			{		   				
+			   			{
 			   				if ($subfield[@type] == 'a')
 			   					 $tmpArray['library'] = (string)$subfield;
 			   				if ($subfield[@type] == 'b')
@@ -172,48 +168,48 @@ class zQuery
 			   				if ($subfield[@type] == 'd')
 			   					$tmpArray['type'] = (string)$subfield;
 			   				if ($subfield[@type] == 'e')
-			   					$tmpArray['returnDate'] = (string)$subfield;		   					
+			   					$tmpArray['returnDate'] = (string)$subfield;
 			   				if ($subfield[@type] == 'f')
 			   					$tmpArray['copy'] = (string)$subfield;
 			   			}
 			   			$search_results['physicalCopy'][] = $tmpArray;
-			   		break;					   		
+			   		break;
 			   		*/
 				}
-			}	
-		}			
+			}
+		}
 		return $search_results;
 	}
-	
+
 	function getHoldings($keyType, $key)
 	{
 		global $g_holdingsScript;
 
 		$rs = array();
-		
+
 		if (isset($_SESSION['debug']))
 			echo $g_holdingsScript . "?key=" . $key . "&key_type=$keyType<P>";
-			
+
 		$fp = fopen($g_holdingsScript . "?key=" . $key . "&key_type=$keyType", "rb");
 		if(!$fp) {
 			trigger_error("zQuery could not get holdings", E_USER_ERROR);
 		}
 		while (!feof ($fp)) {
-			array_push($rs, @fgets($fp, 1024));            
+			array_push($rs, @fgets($fp, 1024));
 		}
 		$returnStatus = join($rs, "");
-		
-		if(ereg("Outcome=OK\n", $returnStatus)) 
-		{		
+
+		if(ereg("Outcome=OK\n", $returnStatus))
+		{
 			list($devnull, $holdings) = split("Outcome=OK\n", $returnStatus);
-			
+
 			$thisCopies = split("\n", $holdings);
 
 			$j = 0;
-			for($i = 0; $i < (count($thisCopies) - 1); $i++) 
+			for($i = 0; $i < (count($thisCopies) - 1); $i++)
 			{
-				//list($catKey, $sequence, $copy, $callnum, $loc, $type, $bar, $library) = split("\|", $thisCopies[$i]);							
-				list($devnull, $devnull, $copy, $callnum, $loc, $type, $bar, $library, $status, $reservesDesk) = split("\|", $thisCopies[$i]);							
+				//list($catKey, $sequence, $copy, $callnum, $loc, $type, $bar, $library) = split("\|", $thisCopies[$i]);
+				list($devnull, $devnull, $copy, $callnum, $loc, $type, $bar, $library, $status, $reservesDesk) = split("\|", $thisCopies[$i]);
 				if ($copy != "" && $callnum != "")
 				{
 					$tmpArray[$j]['copy']		= $copy;
@@ -227,15 +223,15 @@ class zQuery
  			}
 /*jbwhite we now want to display all holding info
  			if ($keyType == "barcode")
- 			{ 			
+ 			{
 				for($x = 0; $x < count($tmpArray); $x++) {
-					if($key == $tmpArray[$x]['bar']) 
-					{	
+					if($key == $tmpArray[$x]['bar'])
+					{
 						return array($tmpArray[$x]);  //we need to make this a multi dem array
 					}
 				}
  			} else
-*/ 			
+*/
 				return $tmpArray;
 		} else return null;
 	}

@@ -1,38 +1,30 @@
 <?
 /*******************************************************************************
-THIS FILE HAS BEEN MODIFIED TO WORK WITH THE RESERVES DEMO.  DO NOT ADD IT TO THE MAIN CVS BRANCH
-
-
 index.php
 primary processing and display page
 
-Reserves Direct 2.0
-
-Copyright (c) 2004 Emory University General Libraries
-
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
-
-The above copyright notice and this permission notice shall be included
-in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 Created by Jason White (jbwhite@emory.edu)
 
-Reserves Direct 2.0 is located at:
-http://coursecontrol.sourceforge.net/
+This file is part of GNU ReservesDirect 2.1
+
+Copyright (c) 2004-2005 Emory University, Atlanta, Georgia.
+
+ReservesDirect 2.1 is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+ReservesDirect 2.1 is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with ReservesDirect 2.1; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+Reserves Direct 2.1 is located at:
+http://www.reservesdirect.org/
 
 *******************************************************************************/
 $load_start_time = time();
@@ -71,12 +63,12 @@ $u = $usersObject->initUser($userClass, $userName);
 require_once('secure/auth.inc.php');
 
 $adminUser = null;
-{	
+if (isset($_REQUEST['u']))
 {
 	 $tmpUser = new user;
-	 
+	 $tmpUser->getUserByID($_REQUEST['u']);
 
-	 
+	 $adminUser = $usersObject->initUser($tmpUser->getUserClass(), $tmpUser->getUsername());
 
 	 unset($tmpUser);
 }
@@ -85,7 +77,7 @@ if (isset($_REQUEST['ci']))
 if (!empty($_REQUEST['ci']))
 {
 	$ci = new courseInstance($_REQUEST['ci']);
-} else 
+	$ci->getPrimaryCourse();
 } else
 
 //set cmd default to viewCourseList
@@ -99,7 +91,7 @@ if (($u->getEmail() == "" || $u->getLastName() == "") && $cmd!="storeUser") //di
 	 $cmd = 'newProfile';
 }
 }
-switch ($cmd) 
+
 switch ($cmd)
 	case 'myReserves':
 	case 'viewCourseList':  // myReserves Course List
@@ -108,7 +100,7 @@ switch ($cmd)
 	case 'previewReservesList':
 	case 'previewStudentView';
 	case 'sortReserves':
-	case 'selectInstructor': //addReserve Staff Interface - Search for Class by Instructor or Dept				
+	case 'customSort':
 	case 'addReserve': //Proxy & Faculty Interface - add a reserve to a class
 	case 'displaySearchItemMenu': //addReserve - How would you like to put item on reserve? screen
 	case 'addReserve': //add a reserve to a class
@@ -123,12 +115,12 @@ switch ($cmd)
 	case 'addFaxMetadata': //addReserve - Fax Meta Data Screen
 	case 'addStudent': //myReserves - give a user student access to class
 	case 'removeStudent': //myReserves - remove a students access to a class
-		require_once("secure/managers/reservesManager.class.php");		
+	case 'editMultipleReserves':	//edit common reserve data for multiple reserves in a class
 		require_once("secure/managers/reservesManager.class.php");
 		$mgr = new reservesManager($cmd, $u);
-	
+	break;
 	case 'addReserve':
-	
+
 	case 'deactivateClass':
 	case 'manageClasses':
 	case 'editProxies':
@@ -142,17 +134,17 @@ switch ($cmd)
 	case 'reactivate':			// managerClass reactivate class
 	case 'searchForClass':		// myReserves - search for a class by Instructor or Dept
 	case 'createNewClass':		// manageClass create class (store meta-data to DB)
-	case 'removeClass':			// myReserves - remove a class you are a student in		
-	case 'deleteClass':			
+	case 'addClass':			// myReserves - add a class as a student
+	case 'removeClass':			// myReserves - remove a class you are a student in
 	case 'deleteClass':
 	case 'confirmDeleteClass':
 	case 'viewEnrollment':		//manageClass - display enrolled students
 	case 'processViewEnrollment':
-		require_once("secure/managers/classManager.class.php");		
 		require_once("secure/managers/classManager.class.php");
-		$mgr = new classManager($cmd, $u, $adminUser, $_REQUEST);	
+		require_once("secure/managers/classManager.class.php");
+		$request = $_REQUEST;
 		$mgr = new classManager($cmd, $u, $adminUser, $_REQUEST);
-	
+	break;
 
 	case 'newProfile':
 	case 'editProfile':
@@ -165,23 +157,23 @@ switch ($cmd)
 	case 'resetPwd':
 	case 'removePwd':
 	case 'addProxy':
-		require_once("secure/managers/userManager.class.php");		
-		$mgr = new userManager($cmd, $u, $adminUser);	
+	case 'removeProxy':
+		require_once("secure/managers/userManager.class.php");
 		$mgr = new userManager($cmd, $u, $adminUser);
-	
+	break;
 
 	case 'duplicateReserve';
 		require_once("secure/managers/itemManager.class.php");
 	break;
-	
 
-	case 'processRequest':	
+
+	case 'displayRequest':
 	case 'processRequest':
 	case 'storeRequest':
 	case 'printRequest':
 		require_once("secure/managers/requestManager.class.php");
-	break;	
-	
+		$mgr = new requestManager($cmd, $u, $ci, $_REQUEST);
+	break;
 
 	case 'addDigitalItem':
 		if (!isset($_REQUEST['ci']) || !isset($_REQUEST['selected_instr']))
@@ -195,45 +187,45 @@ switch ($cmd)
 			require_once("secure/managers/requestManager.class.php");
 			$mgr = new requestManager($cmd, $u, $ci, $_REQUEST);
 		}
-	
+
 	case 'staffEditClass':
 		if (!isset($_REQUEST['ci']) || !isset($_REQUEST['selected_instr']))
 		{
 			//display selectClass
-			require_once("secure/managers/selectClassManager.class.php");			
+			require_once("secure/managers/selectClassManager.class.php");
 			$mgr = new selectClassManager('lookupClass', $cmd, 'manageClass', 'Edit Class', $u, $_REQUEST);
 		} else {
-			require_once("secure/managers/classManager.class.php");					
+			require_once("secure/managers/classManager.class.php");
 			$mgr = new classManager('editClass', $u, $adminUser, $_REQUEST);
-		}	
+		}
 	break;
-	
+	break;
 
 	case 'clearCopyClassLookup':
 	case 'copyClassOptions':
 	case 'copyExisting':
 	case 'importClass':			//import reserves list from one ci to another
-		require_once("secure/managers/copyClassManager.class.php");			
+	case 'processCopyClass':
 		require_once("secure/managers/copyClassManager.class.php");
 		$mgr = new copyClassManager($cmd, $u, $_REQUEST);
-	
+	break;
 
 	case 'addNote':
 	case 'saveNote':
 		$mgr = new noteManager($cmd, $u, $_REQUEST['reserve_id']);
 		$mgr = new noteManager($cmd, $u);
-	
+
 
 		if ($u->getDefaultRole() >= $g_permission['staff'] && (!isset($_REQUEST['ci']) || !isset($_REQUEST['selected_instr'])))
 		{
-			require_once("secure/managers/selectClassManager.class.php");			
+			require_once("secure/managers/selectClassManager.class.php");
 			$mgr = new selectClassManager('lookupClass', $cmd, 'manageClass', 'Export Class', $u, $_REQUEST);
 		} else {
 			require_once("secure/managers/exportManager.class.php");
-			$mgr = new exportManager($cmd, $u, $_REQUEST);		
+			$mgr = new exportManager($cmd, $u, $_REQUEST);
 		}
 		$mgr = new exportManager($cmd);
-	
+	break;
 
 	default:
 		trigger_error("index.php cmd=$cmd case not defined", E_USER_ERROR);
@@ -242,13 +234,13 @@ if (isset($_REQUEST['no_control']))
 if (isset($_REQUEST['no_control']) && $_REQUEST['no_control'] != 'false')
 	include "secure/html/no_table.inc.html";
 else
-	
+	include "secure/html/index.inc.html";
 
 if (isset($_SESSION['debug']))
 {
 	$load_end_time = time();
 	$load_time = $load_end_time - $load_start_time;
-}	
+	echo "<br>this page took $load_time s to load";
 }
 ?>
 
