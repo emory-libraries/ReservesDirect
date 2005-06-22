@@ -140,7 +140,9 @@ switch ($cmd)
 	case 'confirmDeleteClass':
 	case 'viewEnrollment':		//manageClass - display enrolled students
 	case 'processViewEnrollment':
-		require_once("secure/managers/classManager.class.php");
+	case 'deleteClassSuccess':
+	case 'copyItems':
+		require_once("secure/managers/classManager.class.php");		
 		require_once("secure/managers/classManager.class.php");
 		$request = $_REQUEST;
 		$mgr = new classManager($cmd, $u, $adminUser, $_REQUEST);
@@ -164,6 +166,12 @@ switch ($cmd)
 
 	case 'duplicateReserve';
 		require_once("secure/managers/itemManager.class.php");
+		$mgr = new itemManager($cmd, $u);
+	
+	case 'checkDuplicateClass':
+	case 'checkDuplicateReactivation':
+		require_once("secure/managers/checkDuplicatesManager.class.php");
+		$mgr = new checkDuplicatesManager($cmd,$u);
 	break;
 
 
