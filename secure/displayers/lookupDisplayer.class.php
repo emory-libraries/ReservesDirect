@@ -83,7 +83,7 @@ class lookupDisplayer
 		//set selected
 
 
-		$inst_DISABLED = (is_null($instr_list)) ? "DISABLED" : "";
+		$inst_DISABLED = (is_null($instr_list) || count($instr_list) < 1) ? "DISABLED" : "";
 
 		echo "						<select name=\"selected_instr\" $inst_DISABLED onChange=\"this.form.select_course.selectedIndex=-1; this.form.submit();\">\n";
 		echo "							<option value=\"null\">-- Choose an Instructor -- </option>\n";
@@ -188,7 +188,8 @@ class lookupDisplayer
 		echo "						<input type=\"submit\" name=\"instr_search\" value=\"Search\" onClick=\"this.form.selected_instr.selectedIndex=-1;\">\n"; //by setting selectedIndex to -1 we can clear the selectbox or previous values
 		echo "						&nbsp;\n";
 
-		$inst_DISABLED = (is_null($instr_list)) ? "DISABLED" : "";
+		$inst_DISABLED = (is_null($instr_list) || count($instr_list) < 1) ? "DISABLED" : "";
+		
 		echo "						<select name=\"selected_instr\" $inst_DISABLED onChange=\"this.form.submit();\">\n";
 		echo "							<option value=\"null\">-- Choose an Instructor -- </option>\n";
 
