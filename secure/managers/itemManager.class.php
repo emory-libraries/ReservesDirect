@@ -51,9 +51,77 @@ class itemManager
 
 		$this->displayClass = "itemDisplayer";
 
+		$itemID = $_REQUEST['itemID'];
+		$item = new reserveItem($itemID);		
+		
 		switch ($cmd)
 		{
 			case 'editItem':
+				if (!isset($_REQUEST["Submit"]))		
+				{
+					$page = "manageClasses";
+					$loc  = "home";
+					
+					if (isset($_REQUEST['deleteNote'])) {
+						$note = new note($_REQUEST['deleteNote']);
+						if ($note->getID()) {
+							$note->destroy();
+						}
+					}
+									
+					$this->displayFunction = 'displayEditItemScreen';
+					$this->argList = array($item, $user, $_REQUEST['sql']);
+				} else {
+					if ($_REQUEST['title']) $item->setTitle($_REQUEST['title']);
+					if ($_REQUEST['author']) $item->setAuthor($_REQUEST['author']); else $item->setAuthor("");					
+					if ($_REQUEST['performer']) $item->setPerformer($_REQUEST['performer']); else $item->setPerformer("");
+					if ($_REQUEST['volumeTitle']) $item->setVolumeTitle($_REQUEST['volumeTitle']); else $item->setVolumeTitle("");
+					if ($_REQUEST['volumeEdition']) $item->setVolumeEdition($_REQUEST['volumeEdition']); else $item->setVolumeEdition("");
+					if ($_REQUEST['pagesTimes']) $item->setPagesTimes($_REQUEST['pagesTimes']); else $item->setPagesTimes("");
+					if ($_REQUEST['source']) $item->setSource($_REQUEST['source']); else $item->setSource("");
+					if ($_REQUEST['contentNotes']) $item->setContentNotes($_REQUEST['contentNotes']); else $item->setContentNotes("");
+
+					// Check to see if this was a valid file they submitted
+					if ($_REQUEST['documentType'] == 'DOCUMENT')
+					{
+						if ($_FILES['userFile']['error'])
+							trigger_error("Possible file upload attack. Filename: " . $_FILES['userFile']['name'] . "If you are trying to load a very large file (> 10 MB) contact Reserves to add the file.", E_USER_ERROR);
+
+						list($filename, $type) = split("\.", $_FILES['userFile']['name']);
+						//move file set permissions and store location
+						//position uploaded file so that common_move and move it
+						move_uploaded_file($_FILES['userFile']['tmp_name'], $_FILES['userFile']['tmp_name'] . "." . $type);
+						chmod($_FILES['userFile']['tmp_name'] . "." . $type, 0644);
+
+						$newFileName = ereg_replace('[^A-Za-z0-9]*','',$filename); //strip any non A-z or 0-9 characters
+
+						//$newFileName = str_replace("&", "_", $filename); 											//remove & in filenames
+						//$newFileName = str_replace(".", "", $newFileName); 											//remove . in filenames
+						$newFileName = $item->getItemID() ."-". str_replace(" ", "_", $newFileName . "." . $type); 	//remove spaces in filenames
+						common_moveFile($_FILES['userFile']['tmp_name'] . "." . $type,  $newFileName );
+						$item->setURL($g_documentURL . $newFileName);
+						$item->setMimeTypeByFileExt($type);
+					} else {
+						if ($_REQUEST['url']) $item->setURL($_REQUEST['url']); else $item->setURL("");
+					}			
+					
+					if ($_REQUEST['itemNotes']) {
+						$itemNotes = array_keys($_REQUEST['itemNotes']);
+						foreach ($itemNotes as $itemNote)
+						{
+								$note = new note($itemNote);
+								$note->setText($_REQUEST['itemNotes'][$itemNote]);
+						}
+					}
+					
+					// display success
+					$this->displayFunction = 'displayItemSuccessScreen';
+					$this->argList = array($_REQUEST['sql'], $user);
+					break;
+				}			
+			break;
+			
+			case 'editReserve':
 
 				if (!isset($_REQUEST["Submit"]))
 				{
@@ -71,8 +139,8 @@ class itemManager
 
 					$reserve = new reserve($reserveID);
 					$reserve->getItem();
-
-					$this->displayFunction = 'displayEditItemScreen';
+					
+					$this->displayFunction = 'displayEditReserveScreen';
 					$this->argList = array($reserve, $user);
 				} else {
 					if ($_REQUEST['rID']) {

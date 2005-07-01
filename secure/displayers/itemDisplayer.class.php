@@ -37,14 +37,14 @@ class itemDisplayer
 	* @param courseInstance $ci
 	* @desc display edit course form
 	*/
-	function displayEditItemScreen($reserve,$user)
+	function displayEditReserveScreen($reserve,$user)
 	{
 
 		global $g_permission;
 
 		if (!is_a($reserve->item, "reserveItem")) $reserve->getItem();
-
-		echo "<form name=\"reservesMgr\" action=\"index.php?cmd=editItem\" method=\"post\">\n";
+		
+		echo "<form name=\"reservesMgr\" action=\"index.php?cmd=editReserve\" method=\"post\">\n";
 		echo "<input type=\"hidden\" name=\"ci\" value=\"".$reserve->getCourseInstanceID()."\">\n";
 		echo "<input type=\"hidden\" name=\"rID\" value=\"".$reserve->getReserveID()."\">\n";
 
@@ -163,7 +163,7 @@ class itemDisplayer
 					echo "			<!-- On page load, by default, there is no blank \"Notes\" field showing, only ";
 					echo "			previously created notes, if any, and the \"add Note\" button. Notes should";
 					echo "			be added one after the other at the bottom of the table, but above the \"add Note\" button.-->\n";
-					echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">".$itemNotes[$i]->getType()." Note:</span><br><a href=\"index.php?cmd=editItem&reserveID=".$reserve->getReserveID()."&deleteNote=".$itemNotes[$i]->getID()."\">Delete this note</a></td>\n";
+					echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">".$itemNotes[$i]->getType()." Note:</span><br><a href=\"index.php?cmd=editReserve&reserveID=".$reserve->getReserveID()."&deleteNote=".$itemNotes[$i]->getID()."\">Delete this note</a></td>\n";
 					echo "				<td align=\"left\"><textarea name=\"itemNotes[".$itemNotes[$i]->getID()."]\" cols=\"50\" rows=\"3\">".$itemNotes[$i]->getText()."</textarea></td>\n";
 					echo "      </tr>\n";
 				}
@@ -178,7 +178,7 @@ class itemDisplayer
 				echo "			<!-- On page load, by default, there is no blank \"Notes\" field showing, only ";
 				echo "			previously created notes, if any, and the \"add Note\" button. Notes should";
 				echo "			be added one after the other at the bottom of the table, but above the \"add Note\" button.-->\n";
-				echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">Instructor Note:</span><br><a href=\"index.php?cmd=editItem&reserveID=".$reserve->getReserveID()."&deleteNote=".$instructorNotes[$i]->getID()."\">Delete this note</a></td>\n";
+				echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">Instructor Note:</span><br><a href=\"index.php?cmd=editReserve&reserveID=".$reserve->getReserveID()."&deleteNote=".$instructorNotes[$i]->getID()."\">Delete this note</a></td>\n";
 				echo "				<td align=\"left\"><textarea name=\"instructorNotes[".$instructorNotes[$i]->getID()."]\" cols=\"50\" rows=\"3\">".$instructorNotes[$i]->getText()."</textarea></td>\n";
 				echo "      </tr>\n";
 			}
@@ -208,6 +208,237 @@ class itemDisplayer
 		echo "</form>\n";
 	}
 
+	function displayEditItemScreen($item,$user,$sql=null)
+	{
+		
+		global $g_permission, $g_documentURL;
+		
+		$title = $item->getTitle();
+		$author = $item->getAuthor();
+		$url = $item->getURL();
+		$performer = $item->getPerformer();
+		$volTitle = $item->getVolumeTitle();
+		$volEdition = $item->getVolumeEdition();
+		$pagesTimes = $item->getPagesTimes();
+		$source = $item->getSource();
+		$contentNotes = $item->getContentNotes();
+		$itemNotes = $item->getNotes(); //Valid note types, associated with an item, are content, copyright, and staff
+
+		$formEncode = ($item->getItemGroup() == 'ELECTRONIC') ? "enctype=\"multipart/form-data\"" : "";
+		echo "<form name=\"reservesMgr\" action=\"index.php?cmd=editItem\" method=\"post\" $formEncode>\n";
+		
+		echo "<input type=\"hidden\" name=\"itemID\" value=\"".$item->getItemID()."\">\n";
+		echo "<input type=\"hidden\" name=\"sql\" value=\"".urlencode($sql)."\">\n";		
+
+		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+		echo "	  <tr>\n";
+		echo "     	<td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td>\n";
+		echo "	  </tr>\n";		
+		
+		if ($item->getItemGroup() == 'ELECTRONIC')
+		{
+			if (!isset($request['documentType']) || $request['documentType'] == 'DOCUMENT')
+			{
+				$upload_checked  = 'checked';
+				$upload_disabled = '';
+				
+				$url_checked	 = ''; 
+				$url_disabled	 = 'disabled';
+			} else {
+				$upload_checked  = '';
+				$upload_disabled = 'disabled';
+				
+				$url_checked	 = 'checked'; 
+				$url_disabled	 = '';				
+			}
+			
+			echo "  <tr>\n";
+			echo "    	<td>\n";
+			echo "    	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
+			echo "        	<tr align=\"left\" valign=\"top\">\n";
+			echo "            	<td class=\"headingCell1\"><div align=\"center\">ITEM SOURCE</div></td>\n";
+			echo "				<td width=\"75%\">&nbsp;</td>\n";
+			echo "			</tr>\n";
+			echo "		</table>\n";
+			echo "		</td>\n";
+			echo "	</tr>\n";
+			echo "  <tr>\n";
+			echo "    	<td align=\"left\" valign=\"top\" class=\"borders\">\n";
+			echo "			<table width=\"100%\" border=\"0\" cellpadding=\"3\" cellspacing=\"0\" bgcolor=\"#CCCCCC\" align=\"center\">\n";
+			echo "				<tr class=\"borders\">\n";
+			echo "					<td align=\"left\" valign=\"top\" NOWRAP>Current URL:</td>\n";
+			echo "					<td>$url &nbsp;&nbsp;&nbsp;<i><b>to overwrite set below</b></i></td>\n";
+			echo "				</tr>\n";
+
+			echo "				<tr class=\"borders\">\n";
+			echo "					<td align=\"left\" valign=\"top\" NOWRAP>\n";
+			echo "						<input type=\"radio\" name=\"documentType\" value=\"DOCUMENT\" $upload_checked onClick=\"this.form.userFile.disabled = !this.checked; this.form.url.disabled = this.checked; this.form.prependURL.disabled = this.checked;\">";
+			echo "						&nbsp;<span class=\"strong\">Upload&gt;&gt;</span>\n";
+			echo "					</td>\n";
+			echo "					<td align=\"left\" valign=\"top\" colspan=\"2\"><input type=\"file\" name=\"userFile\" size=\"40\" $upload_disabled></td>\n";
+			echo "				</tr>\n";
+			echo "				<tr class=\"borders\">\n";
+			echo "					<td align=\"left\" valign=\"top\">\n";
+			echo "						<input type=\"radio\" name=\"documentType\" value=\"URL\" $url_checked onClick=\"this.form.url.disabled = !this.checked; this.form.prependURL.disabled = !this.checked; this.form.userFile.disabled = this.checked;\">\n";
+			echo "						<span class=\"strong\"> URL&gt;&gt;</span>\n";
+			echo "					</td>\n";
+			echo "					<td align=\"left\" valign=\"top\">\n";
+			echo "						<input name=\"url\" type=\"text\" size=\"100\" $url_disabled>\n";
+			echo "					</td>\n";
+			echo "					<td align=\"left\" valign=\"top\" width=\"80%\">";
+			echo "						<input type=\"button\" onClick=\"openNewWindow(this.form.url.value, 500);\" value=\"Preview\">";
+			echo "					</td>\n";			
+			echo "				</tr>\n";
+			echo "			</table>\n";		
+			echo "		</td>\n";
+			echo "	</tr>\n";
+		}
+		
+		echo "    <tr>\n";
+		echo "    	<td>\n";
+		echo "    	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
+		echo "        	<tr align=\"left\" valign=\"top\">\n";
+		echo "            	<td class=\"headingCell1\"><div align=\"center\">ITEM DETAILS</div></td>\n";
+		echo "				<td width=\"75%\">&nbsp;</td>\n";
+		echo "			</tr>\n";
+		echo "		</table>\n";
+		echo "		</td>\n";
+		echo "	</tr>\n";
+		echo "    <tr>\n";
+		echo "    	<td align=\"left\" valign=\"top\" class=\"borders\">\n";
+		echo "    	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
+		echo "            <tr valign=\"middle\">\n";
+		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>Document Title:</div></td>\n";
+		echo "				<td width=\"100%\" align=\"left\"><input name=\"title\" type=\"text\" id=\"title\" size=\"50\" value=\"$title\"></td>\n";
+		echo "			</tr>\n";
+		echo "            <tr valign=\"middle\">\n";
+		echo "            	<td width=\"25%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>Author/Composer:</div></td>\n";
+		echo "				<td width=\"100%\" align=\"left\"><input name=\"author\" type=\"text\" id=\"author\" size=\"50\" value=\"".$author."\"></td>\n";
+		echo "			</tr>\n";
+
+		if ($item->getItemGroup() != 'ELECTRONIC')
+		{
+/*			
+			echo "          <tr valign=\"middle\">\n";
+			echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>URL:</div></td>\n";
+			echo "				<td width=\"100%\" align=\"left\">";
+			//echo "					<input name=\"url\" type=\"text\" size=\"50\" value=\"".urldecode($url)."\">";
+			//echo "					<input type=\"button\" onClick=\"openNewWindow(this.form.url.value, 500);\" value=\"Preview\">";
+			//echo "					&nbsp;&nbsp;";
+			//echo "					<input type=\"button\" onClick=\"openNewWindow(this.form.url.value, 500);\" value=\"Preview\">";
+
+
+			
+			
+			
+			echo "				</td>\n";
+			echo "			</tr>\n";
+		} else {
+*/
+			$pc = new physicalCopy();
+			$pc->getByItemID($item->getItemID());
+			echo "          <tr valign=\"middle\">\n";
+			echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>Barcode:</div></td>\n";
+			echo "				<td width=\"100%\" align=\"left\"><input name=\"url\" type=\"text\" size=\"50\" value=\"". $pc->getBarcode() ."\"></td>\n";
+			echo "			</tr>\n";
+		}
+		
+		echo "          <tr valign=\"middle\">\n";
+		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Performer </span><span class=\"strong\">:</span></div></td>\n";
+		echo "				<td width=\"100%\" align=\"left\"><input name=\"performer\" type=\"text\" id=\"performer\" size=\"50\" value=\"".$performer."\"></td>\n";
+		echo "			</tr>\n";
+		echo "            <tr valign=\"middle\">\n";
+		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Book/Journal/Work Title</span><span class=\"strong\">:</span></div></td>\n";
+		echo "				<td width=\"100%\" align=\"left\"><input name=\"volumeTitle\" type=\"text\" id=\"volumeTitle\" size=\"50\" value=\"".$volTitle."\"></td>\n";
+		echo "			</tr>\n";
+		echo "            <tr valign=\"middle\">\n";
+		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Volume/ Edition</span><span class=\"strong\">:</span></div></td>\n";
+		echo "				<td width=\"100%\" align=\"left\"><input name=\"volumeEdition\" type=\"text\" id=\"volumeEdition\" size=\"50\" value=\"".$volEdition."\"></td>\n";
+		echo "			</tr>\n";
+		echo "            <tr valign=\"middle\">\n";
+		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Pages/Time</span><span class=\"strong\">:</span></div></td>\n";
+		echo "				<td width=\"100%\" align=\"left\"><input name=\"pagesTimes\" type=\"text\" id=\"pages\" size=\"50\" value=\"".$pagesTimes."\"></td>\n";
+		echo "            </tr>\n";
+		echo "            <tr valign=\"middle\">\n";
+		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Source/ Year</span><span class=\"strong\">:</span></div></td>\n";
+		echo "				<td width=\"100%\" align=\"left\"><input name=\"source\" type=\"text\" id=\"source\" size=\"50\" value=\"".$source."\"></td>\n";
+		echo "			</tr>\n";
+		if ($contentNotes) {
+		
+			echo "            <tr valign=\"middle\">\n";
+			echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Content Note:<br></span></div></td>\n";
+			echo "				<td width=\"100%\" align=\"left\"><textarea name=\"contentNotes\" cols=\"50\" rows=\"3\">".$contentNotes."</textarea></td>\n";
+			echo "			</tr>\n";
+		}
+		if ($itemNotes) {
+			
+			for ($i=0; $i<count($itemNotes); $i++) {
+				
+				if ($user->dfltRole >= $g_permission['staff'] || $itemNotes[$i]->getType() == "Instructor" || $itemNotes[$i]->getType() == "Content") {
+					echo "      <tr valign=\"middle\">\n";
+					echo "			";
+					echo "			<!-- On page load, by default, there is no blank \"Notes\" field showing, only ";
+					echo "			previously created notes, if any, and the \"add Note\" button. Notes should";
+					echo "			be added one after the other at the bottom of the table, but above the \"add Note\" button.-->\n";
+					echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">".$itemNotes[$i]->getType()." Note:</span><br><a href=\"index.php?cmd=editReserve&reserveID=".$reserve->getReserveID()."&deleteNote=".$itemNotes[$i]->getID()."\">Delete this note</a></td>\n";
+					echo "				<td align=\"left\"><textarea name=\"itemNotes[".$itemNotes[$i]->getID()."]\" cols=\"50\" rows=\"3\">".$itemNotes[$i]->getText()."</textarea></td>\n";
+					echo "      </tr>\n";
+				}
+			}
+		}			
+		echo "          <tr valign=\"middle\">\n";	
+		echo "            	<td colspan=\"2\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"borders\" align=\"center\">\n";
+		echo "					<input type=\"button\" name=\"addNote\" value=\"Add Note\" onClick=\"openWindow('&cmd=addNote&item_id=".$item->getitemID()."');\">\n";
+		echo "				</td>\n";
+		echo "			</tr>\n";
+		echo "		</table>\n";
+		echo "		</td>\n";
+		echo "	</tr>\n";
+		echo "    <tr>\n";
+		echo "    	<td><strong><font color=\"#FF0000\">* </font></strong><span class=\"helperText\">=required fields</span></td>\n";
+		echo "	</tr>\n";
+		echo "    <tr>\n";
+		echo "    	<td><div align=\"center\"><input type=\"submit\" name=\"Submit\" value=\"Save Changes\"></div></td>\n";
+		echo "	</tr>\n";
+		echo "	<tr><td colspan=\"3\">&nbsp;</td></tr>\n";
+
+		echo "	<tr><td colspan=\"3\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+		echo "    <tr>\n";
+		echo "    	<td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td>\n";
+		echo "	</tr>\n";
+		echo "</table>\n";
+		echo "</form>\n";
+	}
+
+	function displayItemSuccessScreen($sql,$user)
+	{
+		
+		global $g_permission;
+
+		echo "	<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+		echo "		<tr>\n";
+		echo "	    	<td width=\"140%\"><img src=\"/images/spacer.gif\" width=\"1\" height=\"5\"> </td>\n";
+		echo "	    </tr>\n";
+		echo "	    <tr>\n";
+		echo "	        <td align=\"left\" valign=\"top\" class=\"borders\">\n";
+		echo "				<table width=\"50%\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"5\">\n";
+		echo "	            	<tr>\n";
+		echo "	                	<td><strong>Your item has been updated successfully.</strong></td>\n";
+		echo "	                </tr>\n";
+		echo "	                <tr>\n";
+		echo "	                	<td align=\"left\" valign=\"top\">\n";
+		echo "	                		<ul>\n";
+		echo "	                			<li><a href=\"index.php?cmd=doSearch&sql=". urlencode($sql) ."\">Return to Search Results</a></li>\n";
+		echo "	                			<li><a href=\"index.php\">Return to myReserves</a><br></li>\n";
+		echo "	                		</ul>\n";
+		echo "	                	</td>\n";
+		echo "	                </tr>\n";
+		echo "	            </table>\n";
+		echo "			</td>\n";
+		echo "		</tr>\n";
+		echo "	</table>\n";				
+
+	}	
 
 }
 ?>
