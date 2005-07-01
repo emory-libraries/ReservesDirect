@@ -99,4 +99,12 @@ function openWindow(argList, size)
 	newWindow = window.open(location, "noteWindow", options);
 }
 
+
+function openNewWindow(url, size)
+{
+	var options  = size + ",toolbar=no,alwaysRaised=yes,dependent=yes,directories=no,hotkeys=no,menubar=no,resizable=yes,scrollbars=yes";
+	var location = url;
+	
+	newWindow = window.open(location, "newWindow", options);
+}
 //-->
