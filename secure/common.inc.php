@@ -253,12 +253,6 @@ function common_getStatusDisplayColor($status)
 	return $statusColor;
 }
 
-function common_getSkin($skin)
-{
-	global $g_skins;
-	return (!is_null($skin) && key_exists($skin, $g_skins)) ? $g_skins[$skin] : $g_skins['default'];
-}
-
 function common_formatDate($d, $format)
 {
 		$D = split('-', $d);

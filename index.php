@@ -32,6 +32,7 @@ require_once("secure/config.inc.php");
 require_once("secure/common.inc.php");
 
 require_once("secure/classes/users.class.php");
+require_once("secure/classes/skins.class.php");
 
 require_once("secure/interface/student.class.php");
 require_once("secure/interface/custodian.class.php");
@@ -40,7 +41,6 @@ require_once("secure/interface/instructor.class.php");
 require_once("secure/interface/staff.class.php");
 require_once("secure/interface/admin.class.php");
 
-include("secure/skins_config.inc");
 include("secure/session.inc.php");
 
 // we will do our own error handling

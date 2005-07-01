@@ -34,10 +34,11 @@ if (!isset($_SESSION['pageStack'])) {
 }
 //array_push($_SESSION['pageStack'], $_REQUEST['QUERY_STRING']);
 
+$skins = new skins();
 
 if (!isset($_SESSION['skin'])){
 	$_SESSION['skin'] = isset($_REQUEST['skin']) ? $_REQUEST['skin'] : 'general';
-	$_SESSION['css'] = common_getSkin($_SESSION['skin']);
+	$_SESSION['css'] = $skins->getSkin($_SESSION['skin']);
 }
 
 if (!isset($_SESSION['debug']) && isset($_REQUEST['debug'])) $_SESSION['debug'] = true; 
