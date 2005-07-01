@@ -164,6 +164,7 @@ switch ($cmd)
 		$mgr = new userManager($cmd, $u, $adminUser);
 	break;
 
+	case 'editReserve':
 	case 'duplicateReserve';
 		require_once("secure/managers/itemManager.class.php");
 		$mgr = new itemManager($cmd, $u);
@@ -234,6 +235,13 @@ switch ($cmd)
 		}
 		$mgr = new exportManager($cmd);
 	break;
+
+	case 'searchTab':
+	case 'doSearch':
+	case 'addResultsToClass':
+		require_once("secure/managers/searchManager.class.php");
+		$mgr = new searchManager($cmd, $u, $_REQUEST);
+	
 
 	default:
 		trigger_error("index.php cmd=$cmd case not defined", E_USER_ERROR);
