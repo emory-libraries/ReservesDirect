@@ -237,8 +237,14 @@ class itemDisplayer
 		
 		if ($item->getItemGroup() == 'ELECTRONIC')
 		{
-			if (!isset($request['documentType']) || $request['documentType'] == 'DOCUMENT')
-			{
+			if (!isset($request['documentType'])) {
+				$maintain_current = 'checked';
+				$upload_checked  = '';
+				$upload_disabled = 'disabled';
+				
+				$url_checked	 = ''; 
+				$url_disabled	 = 'disabled';
+			} elseif ($request['documentType'] == 'DOCUMENT') {
 				$upload_checked  = 'checked';
 				$upload_disabled = '';
 				
@@ -266,24 +272,32 @@ class itemDisplayer
 			echo "    	<td align=\"left\" valign=\"top\" class=\"borders\">\n";
 			echo "			<table width=\"100%\" border=\"0\" cellpadding=\"3\" cellspacing=\"0\" bgcolor=\"#CCCCCC\" align=\"center\">\n";
 			echo "				<tr class=\"borders\">\n";
-			echo "					<td align=\"left\" valign=\"top\" NOWRAP>Current URL:</td>\n";
+			echo "					<td align=\"left\" valign=\"top\" NOWRAP><strong>Current URL:</strong></td>\n";
 			echo "					<td>$url &nbsp;&nbsp;&nbsp;<i><b>to overwrite set below</b></i></td>\n";
 			echo "				</tr>\n";
 
 			echo "				<tr class=\"borders\">\n";
+			echo "					<td align=\"left\" valign=\"top\" NOWRAP colspan=\"2\">\n";
+			echo "						<input type=\"radio\" name=\"documentType\" $maintain_current onClick=\"this.form.userFile.disabled = true; this.form.url.disabled = true;\">";
+			echo "						&nbsp;<span class=\"strong\">Maintain current URL</span>\n";
+			echo "					</td>\n";
+			echo "				</tr>\n";			
+			
+			
+			echo "				<tr class=\"borders\">\n";
 			echo "					<td align=\"left\" valign=\"top\" NOWRAP>\n";
-			echo "						<input type=\"radio\" name=\"documentType\" value=\"DOCUMENT\" $upload_checked onClick=\"this.form.userFile.disabled = !this.checked; this.form.url.disabled = this.checked; this.form.prependURL.disabled = this.checked;\">";
-			echo "						&nbsp;<span class=\"strong\">Upload&gt;&gt;</span>\n";
+			echo "						<input type=\"radio\" name=\"documentType\" value=\"DOCUMENT\" $upload_checked onClick=\"this.form.userFile.disabled = !this.checked; this.form.url.disabled = this.checked;\">";
+			echo "						&nbsp;<span class=\"strong\">Upload new file&gt;&gt;</span>\n";
 			echo "					</td>\n";
 			echo "					<td align=\"left\" valign=\"top\" colspan=\"2\"><input type=\"file\" name=\"userFile\" size=\"40\" $upload_disabled></td>\n";
 			echo "				</tr>\n";
 			echo "				<tr class=\"borders\">\n";
 			echo "					<td align=\"left\" valign=\"top\">\n";
-			echo "						<input type=\"radio\" name=\"documentType\" value=\"URL\" $url_checked onClick=\"this.form.url.disabled = !this.checked; this.form.prependURL.disabled = !this.checked; this.form.userFile.disabled = this.checked;\">\n";
-			echo "						<span class=\"strong\"> URL&gt;&gt;</span>\n";
+			echo "						<input type=\"radio\" name=\"documentType\" value=\"URL\" $url_checked onClick=\"this.form.url.disabled = !this.checked; this.form.userFile.disabled = this.checked;\">\n";
+			echo "						<span class=\"strong\">Change URL&gt;&gt;</span>\n";
 			echo "					</td>\n";
 			echo "					<td align=\"left\" valign=\"top\">\n";
-			echo "						<input name=\"url\" type=\"text\" size=\"100\" $url_disabled>\n";
+			echo "						<input name=\"url\" type=\"text\" size=\"50\" $url_disabled>\n";
 			echo "					</td>\n";
 			echo "					<td align=\"left\" valign=\"top\" width=\"80%\">";
 			echo "						<input type=\"button\" onClick=\"openNewWindow(this.form.url.value, 500);\" value=\"Preview\">";
