@@ -65,25 +65,25 @@ class specialUser extends user
 
 	private function setPassword($username, $pass=null)
 	{
-		global $g_specialUserEmail;
+		global $g_specialUserEmail, $g_siteURL, $g_reservesEmail, $g_specialUserDefaultPwd, $u, $g_permission;
 
-		$pwd = (is_null($pass)) ? 'A4z238h' : $pass;
+		$pwd = (is_null($pass)) ? $g_specialUserDefaultPwd : $pass;
 		$this->response['pwd'] = $pwd;
 
-		$msg = ereg_replace("\?", $username, $g_specialUserEmail['msg']);
-		$msg = ereg_replace("\?", $pwd, $msg);
-
-		$email="";
-
-		if (!mail($email, $g_specialUserEmail['subject'], $msg, md5($pwd)))
-			$this->response['msg'] = "Special User set but email was not sent.  email:$email";
-
+		$notifyEmailSentTo = null;
+		if ($u->getDefaultRole() < $g_permission['admin'])
+		{
+			$this->sendUserEmail($g_specialUserEmail['subject'], $g_specialUserEmail['msg'], $pwd);
+			$notifyEmailSentTo = $this->getEmail();
+		}
+		
+		$this->auditSpecialUser($u->getUserID(), $notifyEmailSentTo);
 		return $pwd;
 	}
 
 	function resetPassword($username, $pass=null)
 	{
-		global $g_dbConn;
+		global $g_dbConn, $g_specialUserEmail;
 
 		switch ($g_dbConn->phptype)
 		{
@@ -117,5 +117,21 @@ class specialUser extends user
 	}
 
 	function getMsg() { return $this->response['msg']; }
+	
+	function auditSpecialUser($creator, $email=null)
+	{
+		global $g_dbConn;
+
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "INSERT INTO special_users_audit (user_id, creator_user_id, email_sent_to) 
+						VALUES (!, !, ?);";
+		}
+
+		$rs = $g_dbConn->query($sql, array($this->getUserID(), $creator, $email));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+	}
 }
 ?>

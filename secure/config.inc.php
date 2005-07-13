@@ -72,8 +72,13 @@ http://www.reservesdirect.org/
 
 	$g_siteURL				= (string)$configure->siteURL;
 
+	$g_newUserEmail['subject']  = (string)$configure->newUserEmail->subject;
+	$g_newUserEmail['msg']  = (string)$configure->newUserEmail->msg;	
+	
 	$g_specialUserEmail['subject']  = (string)$configure->specialUserEmail->subject;
 	$g_specialUserEmail['msg']  = (string)$configure->specialUserEmail->msg;
+	
+	$g_specialUserDefaultPwd = (string)$configure->specialUserDefaultPwd;
 
 	$g_EmailRegExp = (string)$configure->EmailRegExp;
 

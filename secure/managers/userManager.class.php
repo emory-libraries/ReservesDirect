@@ -78,14 +78,23 @@ class userManager
 				}
 			break;
 
+			case "newProfile":				
 			case "editProfile":
 				$page = "manageUser";
 
+				$newUser = ($cmd == "newProfile") ? true : false;
+				
 				if ($user->getDefaultRole() >= $g_permission['instructor'])
 					$user->getInstructorAttributes();
-
+				
+				$hidden_fields = array (
+					'cmd' 			=> 'storeUser', 
+					'previous_cmd'	=> $cmd,
+					'newUser'		=> $newUser
+				);
+				
 				$this->displayFunction = 'displayEditUser';
-				$this->argList = array($cmd, 'storeUser', $user, $user, null, null, $_REQUEST);
+				$this->argList = array($user, $user, null, $_REQUEST, null, $hidden_fields);
 			break;
 
 			case 'addUser':
@@ -112,8 +121,14 @@ class userManager
 
 				}
 
-				$this->displayFunction = 'displayEditUser';
-				$this->argList = array($cmd, 'storeUser', $userToEdit, $user, null, null, $_REQUEST);
+				$hidden_fields = array (
+					'cmd' 			=> 'storeUser', 
+					'previous_cmd'	=> $cmd,
+					'newUser'		=> false
+				);
+				
+				$this->displayFunction = 'displayEditUser';				
+				$this->argList = array($userToEdit, $user, null, $_REQUEST, null, $hidden_fields);
 			break;
 
 			case 'resetPwd':
@@ -143,8 +158,14 @@ class userManager
 						$this->argList = array('Override Password Reset');
 					}
 				} else {
+					$hidden_fields = array (
+						'cmd' 			=> 'storeUser', 
+						'previous_cmd'	=> $cmd,
+						'newUser'		=> false
+					);
+				//($userToEdit, $user, $msg=null, $request, $usersObj=null, $hidden_fields=null)
 					$this->displayFunction = 'displayEditUser';
-					$this->argList = array($cmd, 'storeUser', $userToEdit, $user, null, $users, $_REQUEST);
+					$this->argList = array($userToEdit, $user, null, $_REQUEST, $users, $hidden_fields);
 				}
 
 			break;
@@ -192,8 +213,14 @@ class userManager
 					$userToEdit->getInstructorAttributes();
 				}
 
+				$hidden_fields = array (
+					'cmd' 			=> 'storeUser', 
+					'previous_cmd'	=> $cmd,
+					'newUser'		=> false
+				);
+				
 				$this->displayFunction = 'displayEditUser';
-				$this->argList = array($cmd, 'storeUser', $userToEdit, $user, null, $users, $_REQUEST);
+				$this->argList = array($userToEdit, $user, null, $_REQUEST, $users, $hidden_fields);
 
 			break;
 
@@ -229,13 +256,14 @@ class userManager
 					{
 						$editUser->createUser($_REQUEST['user']['username'], '', '', '', 0);
 					} else {
-						//$editUser->setEmail($_REQUEST['user']['email']);
-						//$editUser->setFirstName($_REQUEST['user']['first_name']);
-						//$editUser->setLastName($_REQUEST['user']['last_name']);
-						//$editUser->setDefaultRole($_REQUEST['user']['defaultRole']);
-
+						$hidden_fields = array (
+							'cmd' 			=> 'addUser', 
+							'previous_cmd'	=> 'storeUser',
+							'newUser'		=> false
+						);
+						
 						$this->displayFunction = 'displayEditUser';
-						$this->argList = array('addUser', 'storeUser', $editUser, $user, "This username is in use.  Please choose another.", $users, $_REQUEST);
+						$this->argList = array($editUser, $user, "This username is in use.  Please choose another.", $_REQUEST, $users, $hidden_fields);
 						return;
 					}
 				} else
@@ -247,7 +275,7 @@ class userManager
 					$editUser->setLastName($_REQUEST['user']['last_name']);
 					$editUser->setDefaultRole($_REQUEST['user']['defaultRole']);
 
-					if ($editUser->isSpecialUser() && isset($_REQUEST['user']['pwd']))
+					if ($editUser->isSpecialUser() && isset($_REQUEST['user']['pwd']) && $_REQUEST['user']['pwd'] != "")
 					{
 						$sp = new specialUser($editUser->getUserID());
 						$sp->resetPassword($editUser->getUsername(), $_REQUEST['user']['pwd']);
@@ -294,7 +322,7 @@ class userManager
 
 				if (isset($_REQUEST['select_user_by']) && isset($_REQUEST['user_qryTerm']))
 					$users->search($_REQUEST['select_user_by'], $_REQUEST['user_qryTerm']);
-
+				
 				$userToEdit = (isset($_REQUEST['selectedUser'])) ? new user($_REQUEST['selectedUser']) : null;
 
 				if (!is_null($userToEdit))
@@ -314,7 +342,7 @@ class userManager
 					}
 				} else {
 					$this->displayFunction = 'displayAssignUser';
-					$this->argList = array($cmd, $nextCmd, $userToEdit, null, $users, 'Remove Override Password', $_REQUEST);
+					$this->argList = array($cmd, $cmd, $userToEdit, null, $users, 'Remove Override Password', $_REQUEST);
 				}
 			break;
 

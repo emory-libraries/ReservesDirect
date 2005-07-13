@@ -168,21 +168,33 @@ class userDisplayer
       	echo '</table>';
 	}
 
-	function displayEditUser($cmd, $nextCmd, $userToEdit, $user, $msg=null, $usersObj=null, $request)
+	function displayEditUser($userToEdit, $user, $msg=null, $request, $usersObj=null, $hidden_fields=null)
 	{
 		global $g_permission;
 
 		if (!is_null($usersObj))
-			$usersObj->displayUserSearch($cmd, $msg, 'Select a User to Edit', $usersObj->userList, false, $request);
+			$usersObj->displayUserSearch($hidden_fields['previous_cmd'], $msg, 'Select a User to Edit', $usersObj->userList, false, $request);
 
 		if (!is_null($userToEdit))
 		{
 			echo "<form action=\"index.php\" method=\"post\" name=\"editUser\">\n";
-	    	echo "<input type=\"hidden\" name=\"cmd\" value=\"$nextCmd\">\n";
-	    	echo "<input type=\"hidden\" name=\"previous_cmd\" value=\"$cmd\">\n";
 			echo "<input type=\"hidden\" name=\"user[userID]\" value=\"". $userToEdit->getUserID() ."\">\n";
 			echo "<input type=\"hidden\" name=\"selectedUser\" value=\"" . $userToEdit->getUserID() . "\">";
 
+			if (is_array($hidden_fields)){
+				$keys = array_keys($hidden_fields);
+				foreach($keys as $key){
+					if (is_array($hidden_fields[$key])){
+						foreach ($hidden_fields[$key] as $field){
+							echo "<input type=\"hidden\" name=\"".$key."[]\" value=\"". $field ."\">\n";
+						}
+					} else {
+						echo "<input type=\"hidden\" name=\"$key\" value=\"". $hidden_fields[$key] ."\">\n";
+					}
+				}
+			}			
+			
+			
 			echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 			//echo "	<tr><td width=\"100%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
 			echo "	<tr><td align=\"center\" valign=\"top\" class=\"helperText\">$msg&nbsp;</td></tr>\n";
@@ -193,7 +205,7 @@ class userDisplayer
 			echo "			<tr><td colspan=\"3\" align=\"right\">[ <a href=\"index.php?cmd=manageUser\">Exit</a> ]</div></td></tr>\n";
 
 
-			if ($cmd == "addUser")
+			if ($hidden_fields['cmd'] == "addUser")
 				echo "				<tr align=\"left\" valign=\"top\"><td height=\"14\" class=\"headingCell1\" align=\"center\">CREATE NEW USER</td><td width=\"75%\">&nbsp;</td></tr>\n";
 			else
 				echo "				<tr align=\"left\" valign=\"top\"><td height=\"14\" class=\"headingCell1\" align=\"center\">USER PROFILE - " . $userToEdit->getUsername() . " - " . $userToEdit->getName() ."</td><td width=\"75%\">&nbsp;</td></tr>\n";
@@ -243,7 +255,7 @@ class userDisplayer
 				$$select = " SELECTED ";
 
 				echo "					<td>\n";
-				echo "						<select name=\"user[defaultRole]\" onChange=\"this.form.cmd.value='$cmd'; this.form.submit();\">\n";
+				echo "						<select name=\"user[defaultRole]\" onChange=\"this.form.cmd.value='".$hidden_fields['cmd']."'; this.form.submit();\">\n";
 				echo "							<option value=\"0\" $SELECT_0>STUDENT</option>\n";
 				echo "							<option value=\"1\" $SELECT_1>CUSTODIAN</option>\n";
 				echo "							<option value=\"2\" $SELECT_2>PROXY</option>\n";
@@ -282,9 +294,11 @@ class userDisplayer
 			{
 				if ($user->getDefaultRole() >= $g_permission['staff'] || $user->getUserID() == $userToEdit->getUserID() || $user->getDefaultRole() == $g_permission['custodian'])
 				{
+					$warningText = ($user->getUserID() != $userToEdit->getUserID()) ? "(use only if user cannot login normally)" : "";
+					
 					echo "				<tr>\n";
 					echo "					<td class=\"strong\" align=\"right\">Password:</td>\n";
-					echo "					<td><input name=\"user[pwd]\" type=\"text\" size=\"40\" value=\"\"> (use only if user cannot login normally)</td>\n";
+					echo "					<td><input name=\"user[pwd]\" type=\"text\" size=\"40\" value=\"\"> $warningText</td>\n";
 					echo "				</tr>\n";
 					echo "				<tr>\n";
 					echo "					<td class=\"strong\" align=\"right\">Confirm Password:</td>\n";

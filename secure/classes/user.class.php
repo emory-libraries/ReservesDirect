@@ -54,8 +54,8 @@ class user
 			$this->getUserByID($userID);
 		else
 			$this->userID = null;
-	}
-
+	}	
+	
 	/**
 	* @return void
 	* @param string $userName
@@ -228,22 +228,28 @@ class user
 	*/
 	function setEmail($email)
 	{
-		global $g_dbConn, $g_EmailRegExp;
+		global $g_dbConn, $g_EmailRegExp, $g_newUserEmail;
 
-		// if $email valid format add email to database
-		if(ereg($g_EmailRegExp, $email)){
-			$this->email = $email;
-			switch ($g_dbConn->phptype)
-			{
-				default: //'mysql'
-					$sql = "UPDATE users SET email = ? WHERE user_id = !";
+		if ($this->email != $email)
+		{
+			// if $email valid format add email to database
+			if(ereg($g_EmailRegExp, $email)){
+				$this->email = $email;
+				switch ($g_dbConn->phptype)
+				{
+					default: //'mysql'
+						$sql = "UPDATE users SET email = ? WHERE user_id = !";
+				}
+				$rs = $g_dbConn->query($sql, array($email, $this->userID));
+				if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+	
+				$this->sendUserEmail($g_newUserEmail['subject'], $g_newUserEmail['msg']);			
+				return true;
+			} else {
+				return false;
 			}
-			$rs = $g_dbConn->query($sql, array($email, $this->userID));
-			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-			return true;
-		} else {
-			return false;
 		}
+		return true;
 	}
 
 	/**
@@ -421,5 +427,22 @@ class user
 		return $tmpArry;
 	}
 
+	function sendUserEmail($subject, $baseMsg, $pwd='')
+	{
+		global $g_siteURL, $g_reservesEmail;
+
+		$msg = ereg_replace("\?url", $g_siteURL, $baseMsg);
+		$msg = ereg_replace("\?username", $this->getUsername(), $msg);
+		$msg = ereg_replace("\?password", $pwd, $msg);
+		$msg = ereg_replace("\?deskemail", $g_reservesEmail, $msg);
+
+		
+		$to      = $this->getEmail();
+		$headers = "From: $g_reservesEmail" . "\r\n" .
+		   "Reply-To: $g_reservesEmail" . "\r\n" .
+		   "X-Mailer: PHP/" . phpversion();
+		
+		mail($to, $subject, $msg, $headers);
+	}
 }
 ?>
