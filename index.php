@@ -87,7 +87,7 @@ $cmd = (isset($_REQUEST['cmd'])) ? $_REQUEST['cmd'] : 'viewCourseList';
 
 //Force user to update email address
 if (($u->getEmail() == "" || $u->getLastName() == "") && $cmd!="storeUser") //direct user to edit profile
-	 $cmd = 'editProfile';
+{
 	 $cmd = 'newProfile';
 }
 }
@@ -148,6 +148,7 @@ switch ($cmd)
 		$mgr = new classManager($cmd, $u, $adminUser, $_REQUEST);
 	break;
 
+	case 'manageUser':
 	case 'newProfile':
 	case 'editProfile':
 	case 'storeUser':
