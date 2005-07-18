@@ -5,7 +5,7 @@
 
 <? echo "<link rel=\"stylesheet\" href=\"" . $_SESSION['css'] ."\" type=\"text/css\">\n"; ?>
 
-<script language="JavaScript" src="secure/javascript/jsFunctions.js"></script>
+<script language="JavaScript1.2" src="secure/javascript/jsFunctions.js"></script>
 </head>
 
 <body bgcolor="#FFFFFF" text="#000000">
@@ -38,7 +38,9 @@
   <tr>
     <td height="108" align="left" valign="top" colspan="2">
     
-    <? $mgr->display() ?>
+  		<div id="alertMsg" align="center" class="failedText"></div><br>
+  
+    	<? $mgr->display() ?>
     
     </td>
   </tr>
