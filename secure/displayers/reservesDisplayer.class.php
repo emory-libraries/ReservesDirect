@@ -869,10 +869,42 @@ function displayReserveAdded($ci)
 
 function displayUploadForm($ci, $type)
 {
+	
+	if ($type == "URL")		
+		$documentTest = "if (frm.url.value == \"\") alertMsg = alertMsg + \"URL is required.<br>\";\n";
+	else
+		$documentTest = "if (frm.userfile.value == \"\") alertMsg = alertMsg + \"File is required.<br>\";\n";
+	
+	echo "
+		<script language=\"JavaScript\">
+		//<!--
+			function validateForm(frm)
+			{			
+				var alertMsg = \"\";
 
+				if (frm.title.value == \"\")
+					alertMsg = alertMsg + \"Title is required.<br>\";
+				
+				if (frm.author.value == \"\")
+					alertMsg = alertMsg + \"Author is required.<br>\";
+										
+				$documentTest				
+				
+				if (!alertMsg == \"\") 
+				{ 
+					document.getElementById('alertMsg').innerHTML = alertMsg;
+					return false;
+				}
+					
+			}
+		//-->
+		</script>	
+	";
+	
+	
 	echo "<form action=\"index.php\" method=\"post\"";
 	if ($type == 'DOCUMENT') echo " ENCTYPE=\"multipart/form-data\"";
-	echo ">\n";
+	echo " onSubmit=\"return validateForm(this);\">\n";
 
 	echo "<input type=\"hidden\" name=\"cmd\" value=\"storeUploaded\">\n";
 	echo "<input type=\"hidden\" name=\"ci\" value=\"$ci\">\n";
@@ -891,24 +923,24 @@ function displayUploadForm($ci, $type)
 	echo "		<td align=\"left\" valign=\"top\" class=\"borders\">\n";
 	echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
 	echo "				<tr valign=\"middle\">\n";
-	echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\">Document Title:</div></td>\n";
+	echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>Document Title:</div></td>\n";
 	echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"title\" SIZE=50></td>\n";
 	echo "				</tr>\n";
 
 	echo "				<tr valign=\"middle\">\n";
-	echo "					<td width=\"35%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\">Author/Composer:</div></td>\n";
+	echo "					<td width=\"35%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>Author/Composer:</div></td>\n";
 	echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"author\" SIZE=50></td>\n";
 	echo "				</tr>\n";
 
 	if ($type == "URL")
 	{
 		echo "				<tr valign=\"middle\">\n";
-		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\">URL:</div></td>\n";
+		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>URL:</div></td>\n";
 		echo "					<td align=\"left\"><input name=\"url\" type=\"text\" size=\"50\"></td>\n";
 		echo "				</tr>\n";
 	} else {
 		echo "				<tr valign=\"middle\">\n";
-		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\">File:</div></td>\n";
+		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>File:</div></td>\n";
 		echo "					<td align=\"left\"><INPUT TYPE=\"file\" NAME=\"userfile\" SIZE=40></td>\n";
 		echo "				</tr>\n";
 

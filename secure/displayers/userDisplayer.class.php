@@ -357,11 +357,9 @@ class userDisplayer
 					errorMsg = 'You are required to enter your last name and a valid e-mail address';
 
 				if (errorMsg) {
-					alert (errorMsg);
+					document.getElementById('alertMsg').innerHTML = errorMsg;
 					return false;
-				} else {
-					return true;
-				}
+				} 
 			}
 		</script>";
 

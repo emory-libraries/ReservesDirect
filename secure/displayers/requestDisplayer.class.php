@@ -200,16 +200,13 @@ class requestDisplayer
 
 		$circRules = new circRules();
 
-		//Added by kawashi on 12.1.04 to replace commented out term logic below
+		//Added by kawashi on 12.1.04
 		//This is so the reserve activation date will match the course instance activation date
 		if (is_array($hidden_fields)){
 			$ci = new courseInstance($hidden_fields['ci']);
 			list($y, $m, $d) = split("-", $ci->getActivationDate());
 		}
 		//End of added code section
-
-		//$terms = new terms();
-		//list($y, $m, $d) = split("-", $terms->getCurrentTerm()->getBeginDate());
 
 		echo "<script languge=\"JavaScript\">\n";
 		echo "	function setBarcode(frm) { if (frm.searchField.options[frm.searchField.selectedIndex] == 'barcode') { frm.barcode.value = frm.searchTerm.value; } }\n";
@@ -232,20 +229,36 @@ class requestDisplayer
 								addTypeValue = frm.addType[i].value;
 						}
 
-						if (frm.title.value == '') { alert ('Please enter a title');  }
-						else if (addTypeValue != 'MANUAL' && frm.euclid_record.checked && copySelected) { alert ('Please select a copy to place on reserve'); }
-						else if (addTypeValue == 'PERSONAL' && frm.selected_owner.selectedIndex == '0') { alert ('Please select a personal owner.'); }
-						else{
+						alertMsg = '';
+						if (frm.title.value == '') { alertMsg = alertMsg + 'Please enter a title.<br>' }
+						if (frm.author.value == '') { alertMsg = alertMsg + 'Please enter an author.<br>';  }
+						if (addTypeValue != 'MANUAL' && frm.euclid_record.checked && copySelected) { alertMsg = alertMsg + 'Please select a copy to place on reserve<br>'; }
+						if (addTypeValue == 'PERSONAL' && frm.selected_owner.selectedIndex == '0') { alertMsg = alertMsg + 'Please select a personal owner.<br>'; }
+						
+						if (alertMsg == '') {
 							frm.cmd.value = 'storeRequest';
 							frm.submit();
+						} else {
+							document.getElementById('alertMsg').innerHTML = alertMsg;
 						}
 					}";
 		} else {
 			echo "	function checkForm(frm) {
-						if (frm.title.value == '') { alert ('Please enter a title');  }
-						else{
+						alertMsg = '';
+						if (frm.title.value == '') { alertMsg = alertMsg + 'Please enter a title.<br>';  }						
+						if (frm.author.value == '') { alertMsg = alertMsg + 'Please enter an author.<br>';  }
+
+						if (frm.documentType[0].checked && frm.userFile.value == '')
+							alertMsg = alertMsg + 'File path is required.<br>'; 
+						
+						if (frm.documentType[1].checked && frm.url.value == '')
+							alertMsg = alertMsg + 'URL is required.<br>'; 							
+							
+						if (alertMsg == '') {
 							frm.cmd.value = 'storeRequest';
 							frm.submit();
+						} else {
+							document.getElementById('alertMsg').innerHTML = alertMsg;
 						}
 					}";
 		}
@@ -289,12 +302,13 @@ class requestDisplayer
 			echo "						<table width=\"100%\" border=\"0\" cellpadding=\"3\" cellspacing=\"0\" bgcolor=\"#CCCCCC\">\n";
 			echo "							<tr class=\"borders\">\n";
 			echo "								<td align=\"left\" valign=\"top\">\n";
-			echo "									<input type=\"radio\" name=\"documentType\" value=\"DOCUMENT\" checked onClick=\"this.form.userFile.disabled = !this.checked; this.form.url.disabled = this.checked; this.form.prependURL.disabled = this.checked;\">&nbsp;<span class=\"strong\">Upload&gt;&gt;</span>\n";
+			echo "									<font color=\"#FF0000\"><strong>*</strong></font><input type=\"radio\" name=\"documentType\" value=\"DOCUMENT\" checked onClick=\"this.form.userFile.disabled = !this.checked; this.form.url.disabled = this.checked; this.form.prependURL.disabled = this.checked;\">&nbsp;<span class=\"strong\">Upload&gt;&gt;</span>\n";
 			echo "								</td>\n";
 			echo "								<td align=\"left\" valign=\"top\"><input type=\"file\" name=\"userFile\" size=\"40\"></td>\n";
 			echo "							</tr>\n";
 			echo "							<tr class=\"borders\">\n";
 			echo "								<td align=\"left\" valign=\"top\">\n";
+			echo "									<font color=\"#FF0000\"><strong>*</strong></font>\n";
 			echo "									<input type=\"radio\" name=\"documentType\" value=\"URL\" onClick=\"this.form.url.disabled = !this.checked; this.form.prependURL.disabled = !this.checked; this.form.userFile.disabled = this.checked;\">\n";
 			echo "									<span class=\"strong\"> URL&gt;&gt;</span>\n";
 			echo "								</td>\n";
@@ -470,7 +484,7 @@ class requestDisplayer
 		echo "					<td align=\"left\"><input name=\"title\" type=\"text\" size=\"50\" value=\"".$search_results['title']."\"></td>\n";
 		echo "				</tr>\n";
 		echo "				<tr valign=\"middle\">\n";
-		echo "					<td width=\"35%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\"><font color=\"#FF0000\"></font>Author/Composer:</td>\n";
+		echo "					<td width=\"35%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>Author/Composer:</td>\n";
 		echo "					<td align=\"left\"><input name=\"author\" type=\"text\" size=\"50\" value=\"".$search_results['author']."\"></td>\n";
 		echo "				</tr>\n";
 		echo "				<tr valign=\"middle\">\n";

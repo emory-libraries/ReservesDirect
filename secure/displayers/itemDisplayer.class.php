@@ -44,7 +44,35 @@ class itemDisplayer
 
 		if (!is_a($reserve->item, "reserveItem")) $reserve->getItem();
 		
-		echo "<form name=\"reservesMgr\" action=\"index.php?cmd=editReserve\" method=\"post\">\n";
+		echo "
+		<script language=\"JavaScript\">
+		//<!--
+			function validateForm(frm)
+			{			
+				var alertMsg = \"\";
+
+				if (frm.title.value == \"\")
+					alertMsg = alertMsg + \"Title is required.<br>\";
+				
+				if (frm.author.value == \"\")
+					alertMsg = alertMsg + \"Author is required.<br>\";
+					
+				if (frm.url.value == \"\")
+					alertMsg = alertMsg + \"URL is required.<br>\";				
+				
+				
+				if (!alertMsg == \"\") 
+				{ 
+					document.getElementById('alertMsg').innerHTML = alertMsg;
+					return false;
+				}
+					
+			}
+		//-->
+		</script>	
+		";	
+								
+		echo "<form name=\"reservesMgr\" action=\"index.php?cmd=editReserve\" method=\"post\" onSubmit=\"return validateForm(this);\">\n";
 		echo "<input type=\"hidden\" name=\"ci\" value=\"".$reserve->getCourseInstanceID()."\">\n";
 		echo "<input type=\"hidden\" name=\"rID\" value=\"".$reserve->getReserveID()."\">\n";
 
@@ -196,7 +224,7 @@ class itemDisplayer
 		echo "    	<td><strong><font color=\"#FF0000\">* </font></strong><span class=\"helperText\">=required fields</span></td>\n";
 		echo "	</tr>\n";
 		echo "    <tr>\n";
-		echo "    	<td><div align=\"center\"><input type=\"submit\" name=\"Submit\" value=\"Save Changes\"></div></td>\n";
+		echo "    	<td><div align=\"center\"><input type=\"submit\" name=\"Submit\" value=\"Save Changes\"\"></div></td>\n";
 		echo "	</tr>\n";
 		echo "	<tr><td colspan=\"3\">&nbsp;</td></tr>\n";
 		echo "	<tr><td colspan=\"3\" align=\"center\"> <a href=\"index.php?cmd=editClass&ci=".$reserve->getCourseInstanceID()."\" class=\"strong\">Return to Class</a></div></td></tr>\n";
@@ -224,8 +252,44 @@ class itemDisplayer
 		$contentNotes = $item->getContentNotes();
 		$itemNotes = $item->getNotes(); //Valid note types, associated with an item, are content, copyright, and staff
 
+		echo "
+		<script language=\"JavaScript\">
+		//<!--
+			function validateForm(frm)
+			{			
+				var alertMsg = \"\";
+
+				if (frm.title.value == \"\")
+					alertMsg = alertMsg + \"Title is required.<br>\";
+				
+				if (frm.author.value == \"\")
+					alertMsg = alertMsg + \"Author is required.<br>\";
+		
+				if (frm.documentType[1].checked)
+				{ 
+					if (frm.userFile.value == \"\")
+						alertMsg = alertMsg + \"File path is required.<br>\"
+				} else if (frm.documentType[2].checked) {
+					if (frm.url.value == \"\")
+						alertMsg = alertMsg + \"URL is required.<br>\";				
+				} else {
+					alertMsg = alertMsg + \"URL or File path is required.<br>\";				
+				}
+				
+				if (!alertMsg == \"\") 
+				{ 
+					document.getElementById('alertMsg').innerHTML = alertMsg;
+					return false;
+				}
+					
+			}
+		//-->
+		</script>	
+		";
+		
+		
 		$formEncode = ($item->getItemGroup() == 'ELECTRONIC') ? "enctype=\"multipart/form-data\"" : "";
-		echo "<form name=\"reservesMgr\" action=\"index.php?cmd=editItem\" method=\"post\" $formEncode>\n";
+		echo "<form name=\"reservesMgr\" action=\"index.php?cmd=editItem\" method=\"post\" $formEncode onSubmit=\"return validateForm(this);\">\n";
 		
 		echo "<input type=\"hidden\" name=\"itemID\" value=\"".$item->getItemID()."\">\n";
 		echo "<input type=\"hidden\" name=\"sql\" value=\"".urlencode($sql)."\">\n";		
