@@ -75,7 +75,7 @@ function updateSort(form, oldSort, newSort, elementName)
 	
 function resetForm(form)
 {
-	//Reset the Form Fieldds
+	//Reset the Form Fields
 	form.reset();
 	//Loop through elements to reset the hidden fields.
 	//The Hidden fields contain the oldSortValue, and will be initialized to = the current sortValue
@@ -107,4 +107,5 @@ function openNewWindow(url, size)
 	
 	newWindow = window.open(location, "newWindow", options);
 }
+
 //-->
