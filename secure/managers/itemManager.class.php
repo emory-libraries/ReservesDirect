@@ -30,6 +30,7 @@ require_once("secure/common.inc.php");
 require_once("secure/displayers/itemDisplayer.class.php");
 require_once("secure/managers/classManager.class.php");
 require_once("secure/managers/noteManager.class.php");
+require_once("secure/managers/reservesManager.class.php");
 
 class itemManager
 {
@@ -122,7 +123,6 @@ class itemManager
 			break;
 			
 			case 'editReserve':
-
 				if (!isset($_REQUEST["Submit"]))
 				{
 					$page = "manageClasses";
@@ -182,7 +182,95 @@ class itemManager
 					break;
 				}
 			break;
-		}
+			
+			case 'editHeading':
+				$page = "myReserves";
+				$loc = "edit heading";
+				
+				if (isset($_REQUEST['deleteNote'])) {
+						$note = new note($_REQUEST['deleteNote']);
+						if ($note->getID()) {
+							$note->destroy();
+						}
+					}
+				
+				$ci = $_REQUEST['ci'];
+				if (isset($_REQUEST['headingID']) && $_REQUEST['headingID']!="" && $_REQUEST['headingID']!=null)
+					$headingID = $_REQUEST['headingID'];
+				else 
+					$headingID = null;
+					
+				$heading = new reserve($headingID);
+				
+				$this->displayFunction = 'displayEditHeadingScreen';
+				$this->argList = array($ci, $heading);
+			break;
+			
+			case 'processHeading':
+				$page = "myReserves";
+				$loc = "edit heading";
+				
+				
+				$ci = new courseInstance($_REQUEST['ci']);
+				$nextAction = $_REQUEST['nextAction'];
+				$headingText = $_REQUEST['heading'];
+				$headingID = $_REQUEST['headingID'];
+				
+				if ($headingID="" || $headingID==null) {
+					if ($headingText) {
+						$heading = new item($headingID);
+						$heading->createNewItem();
+						$heading->makeHeading();
+						$reserve = new reserve();
+						$reserve->createNewReserve($ci->courseInstanceID, $heading->itemID);
+						$reserve->setStatus('ACTIVE');
+						$reserve->setActivationDate($ci->activationDate);
+						$reserve->setExpirationDate($ci->expirationDate);
+					}
+				} else {
+					$heading = new item($_REQUEST['headingID']);
+				}
+				
+				if ($headingText)
+					$heading->setTitle($headingText);
+
+				if ($_REQUEST['itemNotes']) {
+					$itemNotes = array_keys($_REQUEST['itemNotes']);
+					foreach ($itemNotes as $itemNote)
+					{
+						$note = new note($itemNote);
+						$note->setText($_REQUEST['itemNotes'][$itemNote]);
+					}
+				}
+
+				if ($_REQUEST['instructorNotes']) {
+					$instructorNotes = array_keys($_REQUEST['instructorNotes']);
+					foreach ($instructorNotes as $instructorNote)
+					{
+						$note = new note($instructorNote);
+						$note->setText($_REQUEST['instructorNotes'][$instructorNote]);
+					}
+				}
+				
+				switch ($nextAction)
+				{
+					case 'editClass':
+						classManager::classManager("editClass", $user, $adminUser=null, $_REQUEST);
+					break;
+					
+					case 'editHeading':
+						$this->displayFunction = 'displayEditHeadingScreen';
+						$heading = new reserve();
+						$this->argList = array($ci->courseInstanceID, $heading);
+					break;
+					
+					case 'customSort':
+						reservesManager::reservesManager("customSort", $user);
+					break;
+				}
+
+			break;
+		}	
 	}
 }
 

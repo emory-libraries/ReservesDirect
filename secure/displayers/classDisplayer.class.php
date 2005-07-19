@@ -193,7 +193,7 @@ class classDisplayer
 		.	 '			<td colspan="2"><div align="center">'
 		.	 '				<table width="40%" border="0" cellpadding="5" cellspacing="0" class="borders">'
 		.	 '              <tr align="left" valign="middle">'
-		.	 '					<td width="50%" valign="top" bgcolor="#CCCCCC" class="borders"><div align="center"><span class="strong">Enrollment:</span> <strong><font color="'.common_getStatusDisplayColor($ci->getEnrollment()).'">'.strtoupper($ci->getEnrollment()).'</font></strong><br>'
+		.	 '					<td width="50%" valign="top" bgcolor="#CCCCCC" class="borders" id="statusText"><div align="center"><span class="strong">Enrollment: </span><span class="'.common_getStatusStyleTag($ci->getEnrollment()).'">'.strtoupper($ci->getEnrollment()).'</span><br>'
 		.	 '						<!--[ <a href="link" class="editlinks">edit enrollment</a> ]--> </div></td>';
             if ($user->dfltRole >= $g_permission['staff']) {
             	echo '<td valign="top" bgcolor="#CCCCCC" class="borders"> <div align="center" class="strong">Class Active Dates: </div>';
@@ -208,7 +208,7 @@ class classDisplayer
 		.	 '			</div></td>'
 		.	 '		</tr>'
 		.	 '		<tr align="left" valign="top">'
-		.	 '			<td height="28" colspan="2"> <div align="left">[ <a href="index.php?cmd=sortReserves&ci='.$ci->getCourseInstanceID().'" class="editlinks">sort materials</a> ] [ <a href="index.php?cmd=displaySearchItemMenu&ci='.$ci->getCourseInstanceID().'" class="editlinks">add new materials</a> ]</div></td>'
+		.	 '			<td height="28" colspan="2"> <div align="left">[ <a href="index.php?cmd=customSort&ci='.$ci->getCourseInstanceID().'" class="editlinks">sort list</a> ] [ <a href="index.php?cmd=displaySearchItemMenu&ci='.$ci->getCourseInstanceID().'" class="editlinks">add new materials</a> ] [ <a href="index.php?cmd=editHeading&ci='.$ci->getCourseInstanceID().'" class="editlinks">add new heading</a> ]</div></td>'
 		.	 '		</tr>'
 		.	 '      </table>'
 		.	 '	</td>'
@@ -239,17 +239,22 @@ class classDisplayer
 		for($i=0;$i<count($ci->reserveList);$i++)
 		{
 			$ci->reserveList[$i]->getItem();
-
-
+			$rowClass = ($rowNumber++ % 2) ? $rowClass = "evenRow" : "oddRow";
+			$status = $ci->reserveList[$i]->getStatus();
+			
+			$reserveItem = $ci->reserveList[$i]->item;
+			
 			if ($ci->reserveList[$i]->item->isHeading())
 			{
 				//echo "headings";
+				$status = "HEADING";
+
+				echo '<tr align="left" valign="middle" class="'.$rowClass.'">'
+				.    '	<td colspan="3" valign="top" id="headingCell2"><span class="headingText">'.$ci->reserveList[$i]->item->getTitle().'</span>';
+	            
 			} else {
 
-				$rowClass = ($rowNumber++ % 2) ? $rowClass = "evenRow" : "oddRow";
-
 				// begin remove
-				$status = $ci->reserveList[$i]->getStatus();
 				$activationDate = $ci->reserveList[$i]->activationDate;
 				//$expirationDate = $ci->reserveList[$i]->expirationDate;
 				$todaysDate = date ('Y-m-d');
@@ -257,8 +262,7 @@ class classDisplayer
 				if (($status == 'ACTIVE') && ($activationDate > $todaysDate)) {$status = 'HIDDEN';}
 				//if (($status == 'ACTIVE') && (($activationDate > $todaysDate) || ($expirationDate <= $todaysDate))) {$status = 'HIDDEN';}
 
-				$reserveItem = $ci->reserveList[$i]->item;
-
+				
 				$itemIcon = $reserveItem->getItemIcon();
 				$itemGroup = $reserveItem->itemGroup;
 
@@ -268,6 +272,7 @@ class classDisplayer
 				$volEdition = $reserveItem->getVolumeEdition();
 				$pagesTimes = $reserveItem->getPagesTimes();
 				$source = $reserveItem->getSource();
+				$author = $ci->reserveList[$i]->item->getAuthor();
 
 				if ($reserveItem->isPhysicalItem()) {
 					$reserveItem->getPhysicalCopy();
@@ -275,26 +280,22 @@ class classDisplayer
 					$reserveDesk = $reserveItem->physicalCopy->getOwningLibrary();
 				}
 
-				$contentNotes = $reserveItem->getContentNotes();
-				$itemNotes = $reserveItem->getNotes();
-				$instructorNotes = $ci->reserveList[$i]->getNotes();
-
-				$statusColor = common_getStatusDisplayColor($status); //add to css -- class = active etc
-				//end remove code
-
 				$viewReserveURL = "reservesViewer.php?viewer=" . $user->getUserID() . "&reserve=" . $ci->reserveList[$i]->getReserveID();// . "&location=" . $ci->reserveList[$i]->item->getURL();
 				if ($reserveItem->isPhysicalItem()) {
 					//move to config file
 					$viewReserveURL = $g_reservesViewer . $ci->reserveList[$i]->item->getLocalControlKey();
 				}
+				
+				
+				
 				echo '<tr align="left" valign="middle" class="'.$rowClass.'">'
 	            .    '	<td width="3%" valign="top" class="itemNumber">'.($i+1).'</td>'
 				.    '	<td width="4%" valign="top"><img src="'.$itemIcon.'" alt="text" width="24" height="20"></td>'
-	            .    '	<td width="69%">'.$ci->reserveList[$i]->item->getAuthor().'&nbsp;';
+	            .    '	<td width="69%">';
 	            if (!$reserveItem->isPhysicalItem()) {
-	            	echo '<a href="'.$viewReserveURL.'" target="_blank">'.$ci->reserveList[$i]->item->getTitle().'</a>';
+	            	echo '<a href="'.$viewReserveURL.'" target="_blank" class="itemTitle">'.$ci->reserveList[$i]->item->getTitle().'</a>';
 	            } else {
-	            	echo '<em>'.$ci->reserveList[$i]->item->getTitle().'</em>.';
+	            	echo '<span class="itemTitleNoLink">'.$ci->reserveList[$i]->item->getTitle().'</span>.';
 	            	if ($callNumber) {echo '<br>'.$callNumber;}
 	            	echo '<br>On Reserve At: '.$reserveDesk;
 	            	if ($ci->reserveList[$i]->item->getLocalControlKey()){
@@ -302,6 +303,11 @@ class classDisplayer
 	            	}
 	            }
 
+	            
+	            if ($author)
+	            {
+	            	echo '<br><span class="itemAuthor">'.$author.'</span>';
+	            }
 	            /*
 	            if ($url)
 
@@ -329,6 +335,16 @@ class classDisplayer
 	            	echo '<br><span class="itemMetaPre">Source/Year:</span><span class="itemMeta"> '.$source.'</span>';
 	            }
 
+			}
+				$statusTag = common_getStatusStyleTag($status); //add to css -- class = active etc
+				$contentNotes = $reserveItem->getContentNotes();
+				$itemNotes = $reserveItem->getNotes();
+				$instructorNotes = $ci->reserveList[$i]->getNotes();
+
+				//end remove code
+
+				
+				
 	            if ($contentNotes)
 	            {
 	            	echo '<br><span class="noteType">Content Note:</span>&nbsp;<span class="noteText">'.$contentNotes.'</span>';
@@ -352,10 +368,16 @@ class classDisplayer
 	            }
 
 	            echo '</td>';
-	            echo    '  <td width="11%" valign="middle" class="borders"><div align="center"><font color="'.$statusColor.'"><strong>'.$status.'</strong></font></div></td>'
+	            echo    '  <td width="11%" valign="middle" id="statusText" class="borders"><div align="center" class="'.$statusTag.'">'.$status.'</div></td>'
 	            .    '	<td width="6%" valign="middle" class="borders"><div align="center">';
+	            
+	            if (!$ci->reserveList[$i]->item->isHeading())
+	            	$editURL = "index.php?cmd=editReserve&reserveID=".$ci->reserveList[$i]->getReserveID();
+	            else
+	            	$editURL = "index.php?cmd=editHeading&ci=".$ci->getCourseInstanceID()."&headingID=".$ci->reserveList[$i]->getReserveID();
+	            	
 	            if (!$reserveItem->isPhysicalItem() || $user->getDefaultRole() >= $g_permission['staff']) {
-	            	echo '<a href="index.php?cmd=editReserve&reserveID='.$ci->reserveList[$i]->getReserveID().'">edit</a>';
+	            	echo '<a href="'.$editURL.'">edit</a>';
 	            } else {
 	            	echo '&nbsp;';
 	            }
@@ -366,7 +388,6 @@ class classDisplayer
 	            	echo    '	<td width="7%" valign="middle" class="borders">&nbsp;</td>';
 	            }
 	            echo '</tr>';
-			}
 		}
 
 		echo '		<tr align="left" valign="middle" class="headingCell1">'
@@ -585,7 +606,7 @@ class classDisplayer
 
 	function displayEditInstructors($ci, $addTableTitle, $dropDownDefault, $userType, $removeTableTitle, $removeButtonText, $request)
 	{
-		echo " <table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">";
+		echo " <table width=\"95%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">";
 		echo "<form name=\"editInstructors\" action=\"index.php?cmd=editInstructors&ci=".$ci->courseInstanceID."\" method=\"post\">";
 		echo "<tr>";
 		echo "<td colspan=\"3\" align=\"right\" valign=\"middle\"><!--<div align=\"right\" class=\"currentClass\">".$ci->course->displayCourseNo()."</div>--></td>";
@@ -826,7 +847,7 @@ class classDisplayer
 
 		$terms = new terms();
 
-	    echo "<form action=\"index.php\" method=\"get\" name=\"reactivate\">\n";
+	    echo "<form action=\"index.php\" method=\"post\" name=\"reactivate\">\n";
 
 		if (is_array($hidden_fields)){
 			$keys = array_keys($hidden_fields);
@@ -1195,12 +1216,14 @@ class classDisplayer
 			$callNumber = $ci->reserveList[$i]->item->physicalCopy->getCallNumber();
 			$reserveDesk = $ci->reserveList[$i]->item->physicalCopy->getOwningLibrary();
 
+			$rowClass = ($rowNumber++ % 2) ? "evenRow" : "oddRow";
+			
 			if ($ci->reserveList[$i]->item->isHeading())
 			{
 				//echo "headings";
+				echo '<tr align="left" valign="middle" class="'.$rowClass.'">'
+				.    '	<td colspan="3" valign="top" id="headingCell2"><span class="headingText">'.$ci->reserveList[$i]->item->getTitle().'</span>';
 			} else {
-
-				$rowClass = ($rowNumber++ % 2) ? "evenRow" : "oddRow";
 
 				$reserveItem = new reserveItem($ci->reserveList[$i]->getItemID());
 				$itemIcon = $reserveItem->getItemIcon();
@@ -1218,71 +1241,77 @@ class classDisplayer
 				.    '			<td width="4%" valign="top"><img src="'.$itemIcon.'" alt="text" width="24" height="20"></td>'
 	            .    '			<td width="93%">';
 	            if (!$reserveItem->isPhysicalItem()) {
-	            	echo '<a href="'.$viewReserveURL.'" target="_blank" class="itemTitle">'.$title.'</a><br>';
-	            	if ($author) {echo '<span class="itemAuthor">'.$author.'</span><br>';}
+	            	echo '<a href="'.$viewReserveURL.'" target="_blank" class="itemTitle">'.$title.'</a>';
+	            	if ($author) {echo '<br><span class="itemAuthor">'.$author.'</span>';}
 	            } else {
-	            	echo '<span class="itemTitleNoLink">'.$title.'</span><br>';
-	            	if ($author) {echo '<span class="itemAuthor">'.$author.'</span><br>';}
-                	if ($callNumber) {echo '<span class="itemMeta">'.$callNumber.'</span><br>';}
-					echo '<span class="itemMetaPre">On Reserve at:</span> <span class="itemMeta"> '.$reserveDesk.'</span>';
+	            	echo '<br><span class="itemTitleNoLink">'.$title.'</span>';
+	            	if ($author) {echo '<br><span class="itemAuthor">'.$author.'</span>';}
+                	if ($callNumber) {echo '<br><span class="itemMeta">'.$callNumber.'</span>';}
+					echo '<br><span class="itemMetaPre">On Reserve at:</span> <span class="itemMeta"> '.$reserveDesk.'</span>';
 					if ($ci->reserveList[$i]->item->getLocalControlKey()) {
-						echo ' &gt;&gt; <a href="'.$viewReserveURL.'" target="_blank" class="strong">more info</a><br>';
+						echo ' &gt;&gt; <a href="'.$viewReserveURL.'" target="_blank" class="strong">more info</a>';
 					}
 	            }
 
 
 	            	if ($performer)
 	            	{
-	            		echo '<span class="itemMetaPre">Performed by:</span><span class="itemMeta"> '.$performer.'</span><br>';
+	            		echo '<br><span class="itemMetaPre">Performed by:</span><span class="itemMeta"> '.$performer.'</span>';
 	            	}
 	            	if ($volTitle)
 	            	{
-	            		echo '<span class="itemMetaPre">From:</span><span class="itemMeta"> '.$volTitle.'</span><br>';
+	            		echo '<br><span class="itemMetaPre">From:</span><span class="itemMeta"> '.$volTitle.'</span>';
 	            	}
 	            	if ($volEdition)
 	            	{
-	            		echo '<span class="itemMetaPre">Volume/Edition:</span><span class="itemMeta"> '.$volEdition.'</span><br>';
+	            		echo '<br><span class="itemMetaPre">Volume/Edition:</span><span class="itemMeta"> '.$volEdition.'</span>';
 	            	}
 	            	if ($pagesTimes)
 	            	{
-	            		echo '<span class="itemMetaPre">Pages/Time:</span><span class="itemMeta"> '.$pagesTimes.'</span><br>';
+	            		echo '<br><span class="itemMetaPre">Pages/Time:</span><span class="itemMeta"> '.$pagesTimes.'</span>';
 	            	}
 	            	if ($source)
 	            	{
-	            		echo '<span class="itemMetaPre">Source/Year:</span><span class="itemMeta"> '.$source.'</span><br>';
+	            		echo '<br><span class="itemMetaPre">Source/Year:</span><span class="itemMeta"> '.$source.'</span>';
 	            	}
-	            	if ($contentNotes)
-	            	{
-	            		echo '<span class="noteType">Content Note:</span>&nbsp;<span class="noteText">'.$contentNotes.'</span><br>';
-	            	}
+			}
+			if ($contentNotes)
+      {
+	    	echo '<br><span class="noteType">Content Note:</span>&nbsp;<span class="noteText">'.$contentNotes.'</span>';
+	    }
 
+	    if ($itemNotes)
+	    {
+	    	for ($n=0; $n<count($itemNotes); $n++)
+	      {
+	      	$type = strtolower($itemNotes[$n]->getType());
+	        if ($user->dfltRole >= $g_permission['staff'] || $type == "content") {
+	        	echo '<br><span class="noteType">'.ucfirst($type).' Note:</span>&nbsp;<span class="noteText">'.$itemNotes[$n]->getText().'</span>';
+	        }
+	      }
+	    }
+	    
+	    if ($instructorNotes)
+	    {
 
-	            	if ($itemNotes)
-	            	{
-	            		for ($n=0; $n<count($itemNotes); $n++)
-	            		{
-	            			echo '<span class="noteType">'.$itemNotes[$n]->getType().' Note:</span>&nbsp;<span class="noteText">'.$itemNotes[$n]->getText().'</span><br>';
-	            		}
-	            	}
-	            	if ($instructorNotes)
-	            	{
+	    	for ($n=0; $n<count($instructorNotes); $n++)
+	      {
+	      	echo '<br><span class="noteType">Instructor Note:</span>&nbsp;<span class="noteText">'.$instructorNotes[$n]->getText().'</span>';
+	      }
+	    }
 
-	            		for ($n=0; $n<count($instructorNotes); $n++)
-	            		{
-	            			echo '<span class="noteType">Instructor Note:</span>&nbsp;<span class="noteText">'.$instructorNotes[$n]->getText().'</span><br>';
-	            		}
-	            	}
+	    echo '</td>';
 
-
-	            	echo '</td>';
-
-					if ($ci->reserveList[$i]->item->isPersonalCopy() && $user->getDefaultRole() < $g_permission['staff'])
-					{
-						echo "<td align=\"left\" class=\"failedText\">Personal items can not be reactivated.<br>  Please contact your reserves desk for assistance.</td></tr>";
-					}
-					else
-						echo "<td align=\"right\"><input type=\"checkbox\" name=\"carryReserve[]\" value=\"".$ci->reserveList[$i]->getReserveID()."\" checked></td></tr>";
-
+			if ($ci->reserveList[$i]->item->isPersonalCopy() && $user->getDefaultRole() < $g_permission['staff'])
+			{
+				echo "<td align=\"left\" class=\"failedText\">Personal items can not be reactivated.<br>  Please contact your reserves desk for assistance.</td></tr>";
+			}
+			else {
+				echo "<td align=\"left\"";
+				if ($ci->reserveList[$i]->item->isHeading()) {
+					echo " id=\"headingCell2\"";
+				}
+				echo"><input type=\"checkbox\" name=\"carryReserve[]\" value=\"".$ci->reserveList[$i]->getReserveID()."\" checked></td></tr>";
 			}
 		}
 		//End Loop through Records
@@ -1652,13 +1681,13 @@ class classDisplayer
 		global $u;
         global $g_permission;
 
-		echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">';
+		echo '<table width="95%" border="0" cellspacing="0" cellpadding="0" align="center">';
 		echo '	<tr>';
 		echo '    	<td width="100%"><img src=images/spacer.gif" width="1" height="5"></td>';
 		echo '	</tr>';
 		echo '    <tr>';
 		echo '    	<td align="left" valign="top">';
-		echo '    	<table width="95%" border="0" align="center" cellpadding="0" cellspacing="0">';
+		echo '    	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0">';
 		echo '        	<tr align="left" valign="top" class="headingCell1">';
 		echo '            	<td width="50%">Search by Instructor</td>';
 		echo '                <td width="50%">Search by Department</td>';
@@ -1705,6 +1734,7 @@ class classDisplayer
         echo '                    	<br>';
         echo '</form>';
         echo '              	</div></td>';
+        echo '			/td>';
         echo '			</tr>';
         if ($u->getDefaultRole() >= $g_permission['instructor']) {
 			echo '<tr><td colspan="2">&nbsp;</td></tr>';

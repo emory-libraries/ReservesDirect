@@ -83,7 +83,7 @@ class itemDisplayer
 		$status = $reserve->getStatus();
 		$todaysDate = date ("Y-m-d");
 
-		$statusColor = common_getStatusDisplayColor($status);
+		$statusTag = common_getStatusStyleTag($status);
 
 		$title = $reserve->item->getTitle();
 		$author = $reserve->item->getAuthor();
@@ -124,7 +124,7 @@ class itemDisplayer
 		echo "            	<td colspan=\"2\" align=\"right\" bgcolor=\"#CCCCCC\" class=\"borders\">\n";
 		echo "            	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
 		echo "                	<tr>\n";
-		echo "                  		<td width=\"35%\" height=\"14\"><p><span class=\"strong\">Current Status: </span><strong><font color=\"".$statusColor."\">".$status."</font></strong>\n";
+		echo "                  		<td width=\"35%\" height=\"14\"><p><span class=\"strong\">Current Status: </span><strong><font color=\"".$statusTag."\">".$status."</font></strong>\n";
 
 		if ($status == "ACTIVE") {
 			if ($activationDate > $todaysDate) {
@@ -236,6 +236,143 @@ class itemDisplayer
 		echo "</form>\n";
 	}
 
+	function displayEditHeadingScreen($ci, $heading)
+	{
+		$heading->getItem();
+		
+		$contentNotes = $heading->item->getContentNotes();
+		$itemNotes = $heading->item->getNotes(); //Valid note types, associated with an item, are content, copyright, and staff
+		$instructorNotes = $heading->getNotes();
+		
+		if ($heading->getSortOrder() == 0 || $heading->getSortOrder() == null)
+			$currentSortOrder = "Not Yet Specified";
+		else
+			$currentSortOrder = ($heading->getSortOrder()+1);
+		
+		echo "<script language=\"javaScript\">
+			function processHeading(form, nextAction)
+			{
+				form.nextAction.value = nextAction;
+				form.submit();
+
+			}
+		</script>";
+		
+		echo "<form action=\"index.php\" method=\"post\" name=\"editHeading\">\n";
+		
+		echo "<input type=\"hidden\" name=\"cmd\" value=\"processHeading\">\n";
+		echo "<input type=\"hidden\" name=\"nextAction\" value=\"\">\n";
+		echo "<input type=\"hidden\" name=\"ci\" value=\"$ci\">\n";
+		echo "<input type=\"hidden\" name=\"headingID\" value=\"$heading->itemID\">\n";
+		
+		echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">';
+    	echo ' 	<tr><td width="140%"><img src="/images/spacer.gif" width="1" height="5"> </td></tr>';
+    	echo ' 	<tr>';
+        echo ' 		<td>';
+        echo '		<table width="100%" border="0" cellspacing="0" cellpadding="0">';
+        echo ' 			<tr align="left" valign="top">';
+        echo ' 				<td class="headingCell1"><div align="center">HEADING DETAILS</div></td>';
+        echo ' 				<td width="75%">&nbsp;</td>';
+        echo ' 			</tr>';
+        echo '		</table>';
+        echo '		</td>';
+      	echo '	</tr>';
+      	echo '	<tr>';
+        echo '		<td align="left" valign="top" class="borders">';
+        echo '		<table width="100%" border="0" cellspacing="0" cellpadding="3">';
+        echo '		    <tr valign="middle">';
+        echo '		      	<td colspan="2" align="right" bgcolor="#CCCCCC" class="headingCell1">&nbsp;</td>';
+        echo '		    </tr>';
+        echo '		    <tr valign="middle">';
+        echo '      		<td width="30%" align="right" bgcolor="#CCCCCC"><div align="right" class="strong"><font color="#FF0000"><strong>*</strong></font> Heading Title:</div></td>';
+        echo '				<td align="left"><input name="heading" type="text" size="60" value="'.$heading->item->getTitle().'"></td>';
+        echo '			</tr>';
+        echo '			<tr valign="middle">';
+        echo '				<td width="30%" align="right" bgcolor="#CCCCCC"><strong>Current Sort Position: </strong></td>';
+        //echo '				<td align="left"> &nbsp;'.$heading->getSortOrder().'&nbsp;<!-- <a href="link">change sort position &gt;&gt; </a>--></td>';
+        echo '				<td align="left"> &nbsp;'.$currentSortOrder.'&nbsp;<!-- <a href="link">change sort position &gt;&gt; </a>--></td>';
+        echo '			</tr>';
+        
+        //START
+        if ($contentNotes) {
+
+			echo "            <tr valign=\"middle\">\n";
+			echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Content Note:<br></span></div></td>\n";
+			echo "				<td width=\"100%\" align=\"left\"><textarea name=\"contentNotes\" cols=\"50\" rows=\"3\">".$contentNotes."</textarea></td>\n";
+			echo "			</tr>\n";
+		}
+		if ($itemNotes) {
+
+			for ($i=0; $i<count($itemNotes); $i++) {
+
+				//if ($user->dfltRole >= $g_permission['staff'] || $itemNotes[$i]->getType() == "Instructor" || $itemNotes[$i]->getType() == "Content") {
+					echo "      <tr valign=\"middle\">\n";
+					echo "			";
+					echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">".$itemNotes[$i]->getType()." Note:</span><br><a href=\"index.php?cmd=editHeading&ci=".$ci."&headingID=".$heading->getReserveID()."&deleteNote=".$itemNotes[$i]->getID()."\">Delete this note</a></td>\n";
+					echo "				<td align=\"left\"><textarea name=\"itemNotes[".$itemNotes[$i]->getID()."]\" cols=\"50\" rows=\"3\">".$itemNotes[$i]->getText()."</textarea></td>\n";
+					echo "      </tr>\n";
+				//}
+			}
+		}
+		if ($instructorNotes) {
+
+			for ($i=0; $i<count($instructorNotes); $i++) {
+
+				echo "      <tr valign=\"middle\">\n";
+				echo "			";
+				echo "			<!-- On page load, by default, there is no blank \"Notes\" field showing, only ";
+				echo "			previously created notes, if any, and the \"add Note\" button. Notes should";
+				echo "			be added one after the other at the bottom of the table, but above the \"add Note\" button.-->\n";
+				echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">Instructor Note:</span><br><a href=\"index.php?cmd=editHeading&ci=".$ci."&headingID=".$heading->getReserveID()."&deleteNote=".$instructorNotes[$i]->getID()."\">Delete this note</a></td>\n";
+				echo "				<td align=\"left\"><textarea name=\"instructorNotes[".$instructorNotes[$i]->getID()."]\" cols=\"50\" rows=\"3\">".$instructorNotes[$i]->getText()."</textarea></td>\n";
+				echo "      </tr>\n";
+			}
+		}
+		
+		//END
+        
+        if ($heading->getReserveID())
+        {
+        echo '			<tr valign="middle">';
+        echo '				<td colspan="2" align="left" valign="top" bgcolor="#CCCCCC" class="borders">';
+        echo '					<div align="center"><input type="button" name="addNote" value="Add Note" onClick="openWindow(\'&cmd=addNote&reserve_id='.$heading->getReserveID().'\');"></div>';
+        echo '				</td>';
+        echo '			</tr>';
+      	}
+        echo '		</table>';
+        echo '		</td>';
+      	echo '	</tr>';
+      	echo '	<tr>';
+        echo '		<td>&nbsp;</td>';
+      	echo '	</tr>';
+      	/*
+      	echo '	<tr>';
+        echo '		<td><div align="left">';
+        echo '			<p align="center">';
+        echo '				<input type="submit" name="Submit" value="Save Changes">';
+    	echo '				<br>';
+    	echo '				&gt;&gt; Save changes and return to class';
+    	echo '			</p>';
+        echo '			<p align="center">';
+        echo '				<input type="submit" name="Submit" value="Add another heading">';
+        echo '				<br>';
+        echo '				&gt;&gt; Save changes and create another heading';
+        echo '			</p>';
+        echo '		</div></td>';
+      	echo '	</tr>';
+      	*/
+      	echo '	<tr><td align="left"><a href="javascript:processHeading(document.forms.editHeading,\'editClass\');">&gt;&gt;&nbsp;Save changes and return to class</a></td></tr>';
+      	echo '	<tr><td align="left"><a href="javascript:processHeading(document.forms.editHeading,\'editHeading\');">&gt;&gt;&nbsp;Save changes and create another heading</a></td></tr>';
+      	echo '	<tr><td align="left"><a href="javascript:processHeading(document.forms.editHeading,\'customSort\');">&gt;&gt;&nbsp;Save changes and change heading sort position</a></td></tr>';
+      	echo '	<tr><td align="left">&nbsp;</td></tr>';
+      	echo '	<tr><td align="left"><a href="index.php?cmd=editClass&ci='.$ci.'">&gt;&gt;&nbsp;Cancel and return to class</a></td></tr>';
+      	echo '	<tr>';
+        echo '		<td><img src="/images/spacer.gif" width="1" height="15"></td>';
+      	echo '	</tr>';
+    	echo '</table>';
+    	echo '</form>';
+	}
+	
 	function displayEditItemScreen($item,$user,$sql=null)
 	{
 		
