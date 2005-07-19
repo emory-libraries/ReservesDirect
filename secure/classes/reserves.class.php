@@ -350,8 +350,18 @@ class reserve
 	*/
 	function isHeading()
 	{
+		/*
 		if (is_a($this->item, "reserveItem")) return false;  //reserveItems are not headings
 		else return true;
+		*/
+		
+		if (!is_a($this->item, "reserveItem"))
+			$this->getItem();
+		if ($this->item->itemType == 'HEADING')
+			return true;
+		else
+			return false;
+		
 	}
 
 }

@@ -100,7 +100,7 @@ class item
 			default: //'mysql'
 				$sql = "SELECT i.item_id, i.title, i.item_group, i.last_modified, i.creation_date, i.item_type, i.content_notes, n.note_id "
 					.  "FROM items as i "
-					.  "LEFT JOIN notes as n on n.target_table='items' n.target_id = i.item_id "
+					.  "LEFT JOIN notes as n on n.target_table='items' AND n.target_id = i.item_id "
 					.  "WHERE item_id = !"
 					;
 		}
@@ -214,8 +214,8 @@ class item
 	function getLastModifiedDate() { return htmlentities(stripslashes($this->lastModDate)); }
 	function getCreationDate() { return htmlentities(stripslashes($this->creationDate)); }
 	function getType() { return htmlentities(stripslashes($this->itemType)); }
-	function isHeading() { return $this->itemType == "heading"; }
-	function makeHeading() { $this->setType("heading"); }
+	function isHeading() { return $this->itemType == "HEADING"; }
+	function makeHeading() { $this->setType("HEADING"); }
 
 	function getNotes()
 	{
