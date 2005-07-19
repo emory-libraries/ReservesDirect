@@ -204,7 +204,7 @@ class searchManager
 	
 					if ($search[0]['term'] != '') //if 1st term is not set we are going to ignore all others
 					{
-						$sql_where = "WHERE ";			
+						$sql_where = "WHERE i.item_type != 'HEADING' AND ";			
 						for($i=0;$i<count($search);$i++)
 						{
 							if ($search[$i]['term'] != '')
