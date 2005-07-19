@@ -220,7 +220,9 @@ class classManager
 								foreach($reserves as $r)
 								{
 									$reserve = new reserve($r);
-									$reserve->setStatus('INACTIVE');
+									//Headings always have a status of active
+									if (!$reserve->isHeading())
+										$reserve->setStatus('INACTIVE');
 								}
 							}
 						break;
