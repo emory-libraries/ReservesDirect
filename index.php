@@ -165,6 +165,8 @@ switch ($cmd)
 		$mgr = new userManager($cmd, $u, $adminUser);
 	break;
 
+	case 'editItem':
+	case 'editHeading':
 	case 'editReserve':
 	case 'duplicateReserve';
 		require_once("secure/managers/itemManager.class.php");
