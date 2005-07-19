@@ -46,7 +46,21 @@ $g_permission = array("student"=>0, "custodian"=>1, "proxy"=>2, "instructor"=>3,
 function common_ErrorHandler($errno, $errmsg, $filename, $linenum, $vars)
 {
    global $g_errorEmail, $g_error_log, $u, $cmd;
-
+	/*
+	echo "E_USER_ERROR=".E_USER_ERROR."<br>";
+	echo "E_ERROR=".E_ERROR."<br>";
+	echo "E_WARNING=".E_WARNING."<br>";
+	echo "E_PARSE=".E_PARSE."<br>";
+	echo "E_NOTICE=".E_NOTICE."<br>";
+	echo "E_CORE_ERROR=".E_CORE_ERROR."<br>";
+	echo "E_CORE_WARNING=".E_CORE_WARNING."<br>";
+	echo "E_COMPILE_ERROR=".E_COMPILE_ERROR."<br>";
+	echo "E_COMPILE_WARNING=".E_COMPILE_WARNING."<br>";
+	echo "E_USER_ERROR=".E_USER_ERROR."<br>";
+	echo "E_USER_WARNING=".E_USER_WARNING."<br>";
+	echo "E_USER_NOTICE=".E_USER_NOTICE."<br>";
+	echo "E_STRICT=".E_STRICT."<br>";
+	*/
    //echo "secure/common_ErrorHandler($errno, $errmsg, $filename, $linenum, $vars)<br>";
 
    if ($errno <> E_NOTICE && $errno <> E_STRICT && $errno <> E_WARNING)
@@ -82,7 +96,6 @@ function common_ErrorHandler($errno, $errmsg, $filename, $linenum, $vars)
 	   $err .= "\t<errortype>" . $errortype[$errno] . "</errortype>\n";
 	   $err .= "\t<errormsg>" . $errmsg . "</errormsg>\n";
 	   $err .= "\t<scriptname>" . $filename . "</scriptname>\n";
-
 	   $err .= "\t<scriptlinenum>" . $linenum . "</scriptlinenum>\n";
 
 	   if ($u instanceof user)
@@ -214,30 +227,34 @@ function common_moveFile($src, $dest)
 }
 
 
-function common_getStatusDisplayColor($status)
+function common_getStatusStyleTag($status)
 {
 
 	$status = strtoupper($status);
 	switch ($status) {
 		case 'ACTIVE':
 		case 'PUBLIC':
-			$statusColor = '#009900';
+			$statusTag = 'active';
 		break;
 
 		case 'INACTIVE':
-			$statusColor = '#CC0000';
+			$statusTag = 'inactive';
 		break;
 
 		case 'IN PROCESS':
 		case 'HIDDEN':
-			$statusColor = '#666666';
+			$statusTag = 'inprocess';
+		break;
+		
+		case 'HEADING':
+			$statusTag = 'heading';
 		break;
 
 		default:
-			$statusColor = 'black';
+			$statusTag = 'black';
 	}
 
-	return $statusColor;
+	return $statusTag;
 }
 
 function common_formatDate($d, $format)
