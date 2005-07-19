@@ -150,7 +150,7 @@ class reservesManager
 
 			case 'sortReserves':
 				$page = "myReserves";
-				$loc  = "home";
+				$loc  = "sort reserves list";
 
 				$sortBy=$_REQUEST['sortBy'];
 				$ci = new courseInstance($_REQUEST['ci']);
@@ -169,9 +169,12 @@ class reservesManager
 
 			case 'customSort':
 				$page = "myReserves";
+				$loc  = "sort reserves list";
 
-				if ($_REQUEST['customSort'])
-				{
+				$sortBy=$_REQUEST['sortBy'];
+				$ci = new courseInstance($_REQUEST['ci']);
+
+				if ($_REQUEST['saveOrder']) {
 					//get Post Data that contains the newSortValues assigned by the user
 					$reserveSortIDs = array_keys($_REQUEST['reserveSortIDs']);
 					
@@ -180,15 +183,11 @@ class reservesManager
 						$reserve = new reserve($reserveSortID);
 						$reserve->setSortOrder($_REQUEST['reserveSortIDs'][$reserveSortID]['newSortOrder']);
 					}
-
-					// goto sort Reserves
-					reservesManager::reservesManager('sortReserves', $user);
-					break;
+					$ci->getReserves();
+				} else {
+					$ci->getReserves($sortBy);
 				}
-
-				$ci = new courseInstance($_REQUEST['ci']);
-				$ci->updateSortOrder();
-
+				
 				$this->displayFunction = "displayCustomSort";
 				$this->argList = array($user,$ci);
 			break;
