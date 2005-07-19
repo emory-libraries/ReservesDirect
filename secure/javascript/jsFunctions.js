@@ -22,6 +22,8 @@ function updateSort(form, oldSort, newSort, elementName)
 {
 	var e, i, oldSortValue;
 	
+	//Why do I have to do this now??
+	oldSort = oldSort + "";
 	//Loop through elements to retrieve the oldSort Value from the hidden fields, and to set the oldSortValue = the newSort value
 	for(i=0; i<form.elements.length; i++) {
 		e = form.elements[i];
