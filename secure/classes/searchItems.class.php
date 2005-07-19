@@ -60,7 +60,7 @@ class searchItems
 				$sql_cnt    = "SELECT count(i.item_id) ";
 
 				$sql = "FROM items as i "
-					.  "WHERE ("
+					.  "WHERE (i.item_type != 'HEADING') AND ("
 					;
 
 				for($i=0;$i<count($values);$i++)
@@ -73,7 +73,7 @@ class searchItems
 
 				switch ($term)
 				{
-					case 'author':
+					case 'Author':
 
 						for($i=0;$i<count($values);$i++)
 						{
@@ -86,7 +86,7 @@ class searchItems
 						$sql .= $sql1 . ") " . $sql2 . ")";
 					break;
 
-					case 'title':
+					case 'Title':
 						for($i=0;$i<count($values);$i++)
 						{
 							if ($i == 0) $sql .= " OR (";
@@ -104,7 +104,8 @@ class searchItems
 						.	   "  JOIN course_instances as ci ON ca.course_instance_id = ci.course_instance_id "
 						.	   "  JOIN reserves as r ON ci.course_instance_id = r.course_instance_id "
 						.	   "  JOIN items as i ON r.item_id = i.item_id "
-						.	   "WHERE a.user_id = " . $values[0]
+						//.	   "WHERE a.user_id = " . $values[0]
+						.	   "WHERE i.item_type != 'HEADING' AND a.user_id = " . $values[0]
 						;
 				}
 
