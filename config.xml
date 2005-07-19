@@ -62,7 +62,7 @@ http://coursecontrol.sourceforge.net/
 		<display_reserve>http://www.library.emory.edu/uhtbin/display_reserve</display_reserve>
 	</catalog>
 	
-	<reserves_viewer>http://libcat1.cc.emory.edu/uhtbin/cgisirsi/x/0/5?searchdata1=</reserves_viewer>
+	<reserves_viewer>http://libcat1.cc.emory.edu/uhtbin/cgisirsi/x/0/0/5?searchdata1=</reserves_viewer>
 	
 	<library_url>http://www.library.emory.edu</library_url>
 	
