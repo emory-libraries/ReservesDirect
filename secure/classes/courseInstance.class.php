@@ -58,6 +58,7 @@ class courseInstance
 	public $proxies = array();
 	public $proxyIDs = array();
 	public $students = array();
+	public $containsHeading = false;
 	//public $aliasID;
 
 
@@ -659,6 +660,8 @@ class courseInstance
 
 		while ($row = $rs->fetchRow()) {
             $r = new reserve($row[0]);
+            if ($r->isHeading())
+            	$this->containsHeading=true;
             $this->reserveList[] = $r;
         }
 	}
@@ -674,10 +677,9 @@ class courseInstance
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT r.reserve_id, r.sort_order, i.title, n.note_id "
+				$sql = "SELECT r.reserve_id, r.sort_order, i.title "
 					.  "FROM reserves as r "
 					.  "  JOIN items as i ON r.item_id = i.item_id  "
-					.  "  LEFT JOIN notes as n ON n.target_table = 'reserves' AND r.reserve_id = n.target_id "
 					.  "WHERE course_instance_id = ! "
 					.  "AND r.status='ACTIVE' AND r.activation_date <= ? AND ? <= r.expiration "
 					;
@@ -705,8 +707,6 @@ class courseInstance
 		$this->reserveList = array();
 		while ($row = $rs->fetchRow()) {
 			$r = new reserve($row[0]);
-			if (!is_null($row[3]))
-				$r->notes[] = new note($row[3]);
 			$this->reserveList[] = $r;
 		}
 	}
