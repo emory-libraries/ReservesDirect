@@ -6,7 +6,7 @@ Default implementation for General Libraries
 Emory University
 Atlanta, GA 30322
 
-Last Modified 9/21/2004
+Last Modified 7/19/2005
 */
 
 /*
@@ -72,16 +72,16 @@ HEADER DEFINITIONS
 generally be for the institution logo, UpperRight for the
 program logo (default is 'ReservesDirect' logo). */
 .brandUpperLeft {
-	background-image: url('../images/logo-el-blue.jpg');
+	background-image: url('../images/logo-el-blue2.jpg');
 	background-repeat: no-repeat;
 	background-position: 10px 0 left top;
-	padding-bottom:70px;
+	padding-bottom:100px;
 }
 .brandUpperRight {
-	background-image: url('../images/logo_RD-gold2.jpg');
+	background-image: url('../images/logo-rd-gold-book.jpg');
 	background-repeat: no-repeat;
 	background-position: right top;
-	padding-bottom:70px;
+	padding-bottom:100px;
 }
 
 /* mainNav defines the navigational tabs.
@@ -423,16 +423,20 @@ under the ReservesDirect logo.  */
 	background-color: #333333;
 	text-align: center;
 }
-.headingCell2 {
-	
-	font-size: small;
-	font-weight: bold;
-	color: #333333;
+#headingCell2 {
+
 	background-color: #CCCCFF;
 	text-align: left;
 	padding: 3px;
 	border-top: 1px solid #333333;
 	border-bottom: 1px solid #333333;
+}
+#headingCell2 .headingText{
+	
+	font-size: large;
+	font-weight: bold;
+	color: #333333;
+	
 }
 .headingCell-helpfileActive {
 	
@@ -458,13 +462,14 @@ under the ReservesDirect logo.  */
 	color: #666666;
 }
 
+
 /*
 ************************************************* 
 FORMATTING DEFINITIONS 
 ************************************************* 
 */
 .indent {
-	text-indent: 12px;
+	text-indent: 25px;
 	left: 8px;
 }
 .nobullet {
@@ -516,14 +521,14 @@ itemMetaPre defines how some prefixes to metadata information appear, for exampl
 } 
 
 .noteType {
-	font-size: x-small;
+	font-size: small;
 	font-weight: bold;
 	color: #660000;
 
 }
 
 .noteText {
-	font-size: x-small;
+	font-size: small;
 	font-weight: bold;
 	color: #000000;
 
@@ -584,13 +589,53 @@ itemMetaPre defines how some prefixes to metadata information appear, for exampl
 	color: #CC0000;
 }
 
+.itemNumber {
+	
+	font-size: small;
+	font-weight: bold;
+	font-variant: small-caps;
+	color: #999999;
+}
+
 .user {
 	font-size: small;
 	font-weight: bold;
 	color: #333333;
 	padding-right: 10px;
 }
+.instructionText {
+	display: block;
+	padding: 10px;
 
+/*This is used for any text that gives instructions to users on steps or actions to take.*/
+
+}
+
+/* statusText styles are used on the "Edit Class" page for text that indicates the current status
+of materials on reserve. */
+#statusText .heading {
+	font-weight: bold;
+	color: #000066;
+
+}
+
+#statusText .inProcess {
+	color: #666666;
+	font-weight: bold;
+
+}
+
+#statusText .active {
+	color: #009900;
+	font-weight: bold;
+
+}
+
+#statusText .inactive {
+	color: #CC0000;
+	font-weight: bold;
+
+}
 /*
 ****************************************
 Help Screen Definitions
