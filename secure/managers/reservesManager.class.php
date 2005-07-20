@@ -269,7 +269,7 @@ class reservesManager
 				}
 
 				$this->displayFunction = "displaySearchResults";
-				$this->argList = array($search, 'storeReserve', $_REQUEST['ci'], $HiddenRequests, $HiddenReserves);
+				$this->argList = array($user, $search, 'storeReserve', $_REQUEST['ci'], $HiddenRequests, $HiddenReserves);
 			break;
 			case 'storeReserve':
 				$page = "addReserve";

@@ -631,9 +631,9 @@ function displaySearchItemMenu($ci)
 	 *			open catalog in new window and search for query
 	 *			dependent on page value
 	*/
-	function displaySearchResults($search, $cmd, $ci=null, $hidden_requests=null, $hidden_reserves=null)
+	function displaySearchResults($user, $search, $cmd, $ci=null, $hidden_requests=null, $hidden_reserves=null)
 	{
-		global $g_reservesViewer;
+		global $g_reservesViewer, $g_permission;
 		
 		$showNextLink = false;
 		$showPrevLink = false;
