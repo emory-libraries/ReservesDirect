@@ -60,9 +60,9 @@ http://coursecontrol.sourceforge.net/
 		<reserve_script>https://www.library.emory.edu/uhtbin/create_reserve</reserve_script>
 		<holdings_script>http://www.library.emory.edu/uhtbin/holding_request</holdings_script>
 		<display_reserve>http://www.library.emory.edu/uhtbin/display_reserve</display_reserve>
+        <web_search>http://libcat1.cc.emory.edu/uhtbin/cgisirsi/x/0/0/5?searchdata1=</web_search>
 	</catalog>
 	
-	<reserves_viewer>http://libcat1.cc.emory.edu/uhtbin/cgisirsi/x/0/0/5?searchdata1=</reserves_viewer>
 	
 	<library_url>http://www.library.emory.edu</library_url>
 	
@@ -71,8 +71,15 @@ http://coursecontrol.sourceforge.net/
 	<reservesEmail>jbwhite@emory.edu</reservesEmail>
 	<adminEmail>jbwhite@emory.edu</adminEmail>
 
-	<faxDirectory>/home/httpd/html/incoming/</faxDirectory>  <!-- include trailing / -->
-	<faxURL>http://biliku.library.emory.edu/incoming/</faxURL>  <!-- include trailing / -->
+	<fax>
+        <directory>/home/httpd/html/incoming/</directory>  <!-- include trailing / -->
+        <URL>http://biliku.library.emory.edu/incoming/</URL>  <!-- include trailing / -->
+        <copyright>/home/httpd/html/admin/copyright.pdf</copyright>
+        <log>/var/spool/hylafax/log/rd_faxprocessor_log</log>
+        <fax2pdf_bin>/usr/local/sbin/fax2pdf</fax2pdf_bin>
+        <faxinfo_bin>/usr/sbin/faxinfo</faxinfo_bin>
+        <gs_bin>/usr/bin/gs</gs_bin>
+    </fax>
 	
 	<documentDirectory>/home/httpd/html/uploaded/</documentDirectory>  <!-- include trailing / -->
 	<documentURL>http://biliku.library.emory.edu/uploaded/</documentURL> <!-- include trailing / -->
