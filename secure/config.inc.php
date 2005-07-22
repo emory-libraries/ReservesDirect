@@ -29,7 +29,7 @@ http://www.reservesdirect.org/
 *******************************************************************************/
 	require_once("DB.php");
 
-	$xmlConfig = "/home/jbwhite/configs/biliku_testsite.xml";
+	$xmlConfig = "/home/croddy/faxprocessor/config.xml";
 
 	if (!is_readable($xmlConfig)) { trigger_error("Could not read configure xml file path=$xmlConfig", E_USER_ERROR); }
 
@@ -63,8 +63,14 @@ http://www.reservesdirect.org/
 	$g_adminEmail		 	= (string)$configure->adminEmail;
 	$g_reservesEmail		= (string)$configure->reservesEmail;
 
-	$g_faxDirectory			= (string)$configure->faxDirectory;
-	$g_faxURL				= (string)$configure->faxURL;
+	$g_faxDirectory			= (string)$configure->fax->directory;
+	$g_faxURL				= (string)$configure->fax->URL;
+    $g_faxCopyright         = (string)$configure->fax->copyright;
+    $g_faxLog               = (string)$configure->fax->log;
+
+    $g_fax2pdf_bin          = (string)$configure->fax->fax2pdf_bin;
+    $g_faxinfo_bin          = (string)$configure->fax->faxinfo_bin;
+    $g_gs_bin               = (string)$configure->fax->gs_bin;
 
 	$g_documentDirectory	= (string)$configure->documentDirectory;
 	$g_documentURL			= (string)$configure->documentURL;
@@ -92,7 +98,7 @@ http://www.reservesdirect.org/
 	$g_reserveScript	= (string)$configure->catalog->reserve_script;
 	$g_holdingsScript	= (string)$configure->catalog->holdings_script;
 
-	$g_reservesViewer	= (string)$configure->reserves_viewer;
+	$g_reservesViewer	= (string)$configure->catalog->web_search;
 
 	$g_libraryURL		= (string)$configure->library_url;
 
