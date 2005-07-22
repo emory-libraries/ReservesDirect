@@ -50,18 +50,18 @@ http://coursecontrol.sourceforge.net/
 	    <debug>true</debug>
 	</database>
 	
-	<catalog>
-		<catalogName>EUCLID</catalogName>
-		<useCatalog>yes</useCatalog> <!-- all others may be blank if no -->
-		<zhost>libcat1.cc.emory.edu</zhost>
-		<zport>2200</zport>
-		<zdb>Unicorn</zdb>
-		<zReflector>http://dirac.library.emory.edu/cgi-bin/zGizmo.cgi</zReflector>
-		<reserve_script>https://www.library.emory.edu/uhtbin/create_reserve</reserve_script>
-		<holdings_script>http://www.library.emory.edu/uhtbin/holding_request</holdings_script>
-		<display_reserve>http://www.library.emory.edu/uhtbin/display_reserve</display_reserve>
+    <catalog>
+        <catalogName>EUCLID</catalogName>
+        <useCatalog>yes</useCatalog> <!-- all others may be blank if no -->
+        <zhost>libcat1.cc.emory.edu</zhost>
+        <zport>2200</zport>
+        <zdb>Unicorn</zdb>
+        <zReflector>http://dirac.library.emory.edu/cgi-bin/zGizmo.cgi</zReflector>
+        <reserve_script>https://www.library.emory.edu/uhtbin/create_reserve</reserve_script>
+        <holdings_script>http://www.library.emory.edu/uhtbin/holding_request</holdings_script>
+        <display_reserve>http://www.library.emory.edu/uhtbin/display_reserve</display_reserve>
         <web_search>http://libcat1.cc.emory.edu/uhtbin/cgisirsi/x/0/0/5?searchdata1=</web_search>
-	</catalog>
+    </catalog>
 	
 	
 	<library_url>http://www.library.emory.edu</library_url>
@@ -71,7 +71,7 @@ http://coursecontrol.sourceforge.net/
 	<reservesEmail>jbwhite@emory.edu</reservesEmail>
 	<adminEmail>jbwhite@emory.edu</adminEmail>
 
-	<fax>
+    <fax>
         <directory>/home/httpd/html/incoming/</directory>  <!-- include trailing / -->
         <URL>http://biliku.library.emory.edu/incoming/</URL>  <!-- include trailing / -->
         <copyright>/home/httpd/html/admin/copyright.pdf</copyright>
