@@ -135,7 +135,7 @@ class item
 				$sql = "UPDATE items SET title = ?, last_modified = ? WHERE item_id = !";
 				$d = date("Y-m-d"); //get current date
 		}
-		$rs = $g_dbConn->query($sql, array($title, $d, $this->itemID));
+		$rs = $g_dbConn->query($sql, array(stripslashes($title), $d, $this->itemID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$this->title = $title;
@@ -178,7 +178,7 @@ class item
 				$sql = "UPDATE items SET item_type = ?, last_modified = ? WHERE item_id = !";
 				$d = date("Y-m-d"); //get current date
 		}
-		$rs = $g_dbConn->query($sql, array($type, $d, $this->itemID));
+		$rs = $g_dbConn->query($sql, array(stripslashes($type), $d, $this->itemID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$this->itemType = $type;
@@ -201,7 +201,7 @@ class item
 				$sql = "UPDATE items SET item_group = ?, last_modified = ? WHERE item_id = !";
 				$d = date("Y-m-d"); //get current date
 		}
-		$rs = $g_dbConn->query($sql, array($group, $d, $this->itemID));
+		$rs = $g_dbConn->query($sql, array(stripslashes($group), $d, $this->itemID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$this->itemGroup = $group;
@@ -219,7 +219,6 @@ class item
 
 	function getNotes()
 	{
-		//$this->notes = common_getNotesByTarget("items", $this->itemID);
 		return $this->notes;
 	}
 
