@@ -32,6 +32,7 @@ http://www.reservesdirect.org/
 	require_once("secure/classes/reserves.class.php");
 	require_once("secure/classes/reserveItem.class.php");
 	require_once("secure/classes/user.class.php");
+	require_once("secure/classes/skin.class.php");
 
 	include("secure/session.inc.php");
 
