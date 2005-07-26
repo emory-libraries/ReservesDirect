@@ -872,7 +872,7 @@ function displayReserveAdded($ci)
     echo "</table>\n";
 }
 
-function displayUploadForm($ci, $type)
+function displayUploadForm($ci, $type, $docTypeIcons=null)
 {
 	
 	if ($type == "URL")		
@@ -954,6 +954,26 @@ function displayUploadForm($ci, $type)
 		echo "					<td align=\"left\">Please limit uploaded documents to 25 clear, clean sheets to minimize downloading and printing time.</td>\n";
 		echo "				</tr>\n";
 	}
+	
+	if (!is_null($docTypeIcons))
+	{
+		echo "				<tr valign=\"middle\">\n";
+		echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">Document Type Icon:</span></td>\n";
+		echo "					<td align=\"left\">";
+		echo "						<select name=\"selectedDocIcon\" onChange=\"document.iconImg.src = this[this.selectedIndex].value;\">\n";
+				
+		for ($j = 0; $j<count($docTypeIcons); $j++)
+		{
+			//$selectedIcon = (reserveItem::getItemIcon() == $docTypeIcons[$j]['helper_app_icon']) ? " selected " : "";
+			echo "							<option value=\"" . $docTypeIcons[$j]['helper_app_icon']  . "\" $selectedIcon>" . $docTypeIcons[$j]['helper_app_name'] . "</option>\n";
+		}
+			
+		echo "						</select>\n";
+		echo "					<img name=\"iconImg\" width=\"24\" height=\"20\" border=\"0\" src=\"".reserveItem::getItemIcon()."\">\n";
+		echo "					</td>\n";
+		echo "				</tr>\n";
+	}	
+	
 	echo "				<tr valign=\"middle\">\n";
 	echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Performer </span>(<em>if applicable)</em><span class=\"strong\">:</span></div></td>\n";
 	echo "					<td align=\"left\"><input name=\"performer\" type=\"text\" id=\"Title3\" size=\"50\"></td>\n";
