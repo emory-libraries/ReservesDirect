@@ -319,12 +319,12 @@ class reservesManager
 			case 'uploadDocument':
 				$page="addReserve";
 				$this->displayFunction = "displayUploadForm";
-				$this->argList = array($_REQUEST['ci'], "DOCUMENT");
+				$this->argList = array($_REQUEST['ci'], "DOCUMENT", $user->getAllDocTypeIcons());
 			break;
 			case 'addURL':
 				$page="addReserve";
 				$this->displayFunction = "displayUploadForm";
-				$this->argList = array($_REQUEST['ci'], "URL");
+				$this->argList = array($_REQUEST['ci'], "URL", $user->getAllDocTypeIcons());
 			break;
 			
 			case 'storeUploaded':
@@ -346,6 +346,7 @@ class reservesManager
 	    		$item->setvolumeEdition($_REQUEST['volume']);
 	    		$item->setSource($_REQUEST['source']);
 	    		$item->setContentNotes($_REQUEST['contents']);
+	    		if (isset($_REQUEST['selectedDocIcon'])) $item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
 
 	    		if ($_REQUEST['type'] == 'DOCUMENT'){
 	        		//move file set permissions and store location

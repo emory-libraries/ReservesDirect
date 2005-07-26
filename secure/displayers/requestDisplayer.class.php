@@ -194,7 +194,7 @@ class requestDisplayer
 		echo "</table>\n";
 	}
 
-	function addItem($user, $cmd, $search_results, $owner_list, $lib_list, $request_id=null, $request, $hidden_fields, $isActive=true, $buttonValue="Add Item", $msg="")
+	function addItem($user, $cmd, $search_results, $owner_list, $lib_list, $request_id=null, $request, $hidden_fields, $docTypeIcons=null, $isActive=true, $buttonValue="Add Item", $msg="")
 	{
 		global $g_documentURL;
 
@@ -260,8 +260,10 @@ class requestDisplayer
 						} else {
 							document.getElementById('alertMsg').innerHTML = alertMsg;
 						}
-					}";
+					}					
+			";
 		}
+		
 		echo "</script>\n";
 
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
@@ -438,6 +440,7 @@ class requestDisplayer
 				echo "	<tr><td align=\"center\" valign=\"top\">No Record Found. Search again or enter manually.</td></tr>\n";
 			}
 		} // if == addDigital
+		
 		echo "	<tr><td align=\"left\" valign=\"top\">&nbsp;</td></tr>\n";
 
 		echo "	<tr>\n";
@@ -510,9 +513,30 @@ class requestDisplayer
 		echo "				</tr>\n";
 
 		echo "				<tr valign=\"middle\">\n";
-		echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">Source / Year</span><span class=\"strong\">:</span></td>\n";
+		echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">Source / Year:</span></td>\n";
 		echo "					<td align=\"left\"><input name=\"source\" type=\"text\" size=\"50\" value=\"".$search_results['source']."\"> </td>\n";
 		echo "				</tr>\n";
+
+		if (!is_null($docTypeIcons))
+		{
+			echo "				<tr valign=\"middle\">\n";
+			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">Document Type Icon:</span></td>\n";
+			echo "					<td align=\"left\">";
+			echo "						<select name=\"selectedDocIcon\" onChange=\"document.iconImg.src = this[this.selectedIndex].value;\">\n";
+					
+			for ($j = 0; $j<count($docTypeIcons); $j++)
+			{
+				$selectedIcon = ($search_results['docTypeIcon'] == $docTypeIcons[$j]['helper_app_icon']) ? " selected " : "";
+				echo "							<option value=\"" . $docTypeIcons[$j]['helper_app_icon']  . "\" $selectedIcon>" . $docTypeIcons[$j]['helper_app_name'] . "</option>\n";
+			}
+				
+			echo "						</select>\n";
+			echo "					<img name=\"iconImg\" width=\"24\" height=\"20\" border=\"0\" src=\"".$search_results['docTypeIcon']."\">\n";
+			echo "					</td>\n";
+			echo "				</tr>\n";
+		}	
+		
+		
 		//echo "				<tr align=\"left\" valign=\"middle\">\n";
 		//echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">Call Number:</td>\n";
 		//echo "					<td><input type=\"text\" size=\"30\" name=\"callNumber\" value=\"".$search_results['callNumber'][0]."\"></td>\n";

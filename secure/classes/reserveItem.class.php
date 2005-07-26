@@ -50,7 +50,8 @@ class reserveItem extends item
 	public $privateUser;
 	public $copies = array();
 	public $physicalCopy;
-
+	public $itemIcon;
+	
 	function reserveItem($itemID=NULL)
 	{
 		if (!is_null($itemID)){
@@ -73,7 +74,7 @@ class reserveItem extends item
 		{
 			default: //'mysql'
 				$sql = "SELECT i.item_id, i.title, i.item_group, i.author, i.source, i.content_notes, i.volume_edition, i.pages_times, i.performer, i.local_control_key, "
-					.     "i.creation_date, i.last_modified, i.url, i.mimeType, i.home_library, i.private_user_id, i.item_type, i.volume_title, n.note_id "
+					.     "i.creation_date, i.last_modified, i.url, i.mimeType, i.home_library, i.private_user_id, i.item_type, i.volume_title, i.item_icon, n.note_id "
 					.  "FROM items as i "
 					.  "  LEFT JOIN notes as n ON n.target_table='items' and i.item_id = n.target_id "
 					.  "WHERE item_id = ! "
@@ -102,12 +103,14 @@ class reserveItem extends item
 			$this->privateUserID	= $row[15];
 			$this->itemType			= $row[16];
 			$this->volumeTitle		= $row[17];
-			if (!is_null($row[18]))
-				$this->notes[] = new note($row[18]);
+			$this->itemIcon			= $row[18];
+			
+			if (!is_null($row[19]))
+				$this->notes[] = new note($row[19]);
 
 			while ($row = $rs->fetchRow()) //get additional notes
-				if (!is_null($row[18]))
-					$this->notes[] = new note($row[18]);
+				if (!is_null($row[19]))
+					$this->notes[] = new note($row[19]);
 
 	}
 
@@ -119,42 +122,52 @@ class reserveItem extends item
 	function getItemByLocalControl($local_control_key)
 	{
 		global $g_dbConn;
+		
+		if (!is_null($local_control_key) && $local_control_key != '')
+			switch ($g_dbConn->phptype)
+			{
+				default: //'mysql'
+					$sql = "SELECT i.item_id, i.title, i.item_group, i.author, i.source, i.content_notes, i.volume_edition, i.pages_times, i.performer, i.local_control_key, "
+					.     "i.creation_date, i.last_modified, i.url, i.mimeType, i.home_library, i.private_user_id, i.item_type, i.volume_title, i.item_icon, n.note_id "
+					.  	  "FROM items as i "
+					.     "WHERE i.local_control_key = ?";
+			}
+	
+			$rs = $g_dbConn->query($sql, $local_control_key);
+			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+				
+			while ($row = $rs->fetchRow())
+			{
+				$this->itemID			= $row[0];
+				$this->title			= $row[1];
+				$this->itemGroup		= $row[2];	
+				$this->author			= $row[3];
+				$this->source			= $row[4];
+				$this->contentNotes		= $row[5];
+				$this->volumeEdition	= $row[6];
+				$this->pagesTimes		= $row[7];
+				$this->performer		= $row[8];
+				$this->localControlKey	= $row[9];
+				$this->creationDate		= $row[10];
+				$this->lastModDate		= $row[11];
+				$this->URL				= $row[12];
+				$this->mimeTypeID		= $row[13];
+				$this->homeLibraryID	= $row[14];
+				$this->privateUserID	= $row[15];
+				$this->itemType			= $row[16];
+				$this->volumeTitle		= $row[17];
+				$this->itemIcon			= $row[18];
+				
+				if (!is_null($row[19]))
+					$this->notes[] = new note($row[19]);
+	
+				while ($row = $rs->fetchRow()) //get additional notes
+					if (!is_null($row[19]))
+						$this->notes[] = new note($row[19]);
+				} 
+		
 
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql = "SELECT item_id, title, item_group, author, source, content_notes, volume_edition, pages_times, performer, local_control_key, "
-					.     "creation_date, last_modified, url, mimeType, home_library, private_user_id, item_type, volume_title "
-					.  "FROM items "
-					.  "WHERE local_control_key = ?";
-		}
-
-		$rs = $g_dbConn->query($sql, $local_control_key);
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		while ($row = $rs->fetchRow())
-		{
-			$this->itemID			= $row[0];
-			$this->title			= $row[1];
-			$this->itemGroup		= $row[2];
-			$this->author			= $row[3];
-			$this->source			= $row[4];
-			$this->contentNotes		= $row[5];
-			$this->volumeEdition	= $row[6];
-			$this->pagesTimes		= $row[7];
-			$this->performer		= $row[8];
-			$this->localControlKey	= $row[9];
-			$this->creationDate		= $row[10];
-			$this->lastModDate		= $row[11];
-			$this->URL				= $row[12];
-			$this->mimeTypeID		= $row[13];
-			$this->homeLibraryID	= $row[14];
-			$this->privateUserID	= $row[15];
-			$this->itemType			= $row[16];
-			$this->volumeTitle		= $row[17];
-		}
 	}
-
 
 	/**
 	* @return void
@@ -172,7 +185,7 @@ class reserveItem extends item
 				$sql = "UPDATE items SET author = ?, last_modified = ? WHERE item_id = !";
 				$d = date("Y-m-d"); //get current date
 		}
-		$rs = $g_dbConn->query($sql, array($author, $d, $this->itemID));
+		$rs = $g_dbConn->query($sql, array(stripslashes($author), $d, $this->itemID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$this->author = $author;
@@ -195,7 +208,7 @@ class reserveItem extends item
 				$sql = "UPDATE items SET source = ?, last_modified = ? WHERE item_id = !";
 				$d = date("Y-m-d"); //get current date
 		}
-		$rs = $g_dbConn->query($sql, array($source, $d, $this->itemID));
+		$rs = $g_dbConn->query($sql, array(stripslashes($source), $d, $this->itemID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$this->source = $source;
@@ -218,7 +231,7 @@ class reserveItem extends item
 				$sql = "UPDATE items SET volume_title = ?, last_modified = ? WHERE item_id = !";
 				$d = date("Y-m-d"); //get current date
 		}
-		$rs = $g_dbConn->query($sql, array($volumeTitle, $d, $this->itemID));
+		$rs = $g_dbConn->query($sql, array(stripslashes($volumeTitle), $d, $this->itemID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$this->volumeTitle = $volumeTitle;
@@ -241,7 +254,7 @@ class reserveItem extends item
 				$sql = "UPDATE items SET content_notes = ?, last_modified = ? WHERE item_id = !";
 				$d = date("Y-m-d"); //get current date
 		}
-		$rs = $g_dbConn->query($sql, array($contentNotes, $d, $this->itemID));
+		$rs = $g_dbConn->query($sql, array(stripslashes($contentNotes), $d, $this->itemID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$this->contentNotes = $contentNotes;
@@ -264,7 +277,7 @@ class reserveItem extends item
 				$sql = "UPDATE items SET volume_edition = ?, last_modified = ? WHERE item_id = !";
 				$d = date("Y-m-d"); //get current date
 		}
-		$rs = $g_dbConn->query($sql, array($volumeEdition, $d, $this->itemID));
+		$rs = $g_dbConn->query($sql, array(stripslashes($volumeEdition), $d, $this->itemID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$this->volumeEdition = $volumeEdition;
@@ -287,7 +300,7 @@ class reserveItem extends item
 				$sql = "UPDATE items SET pages_times = ?, last_modified = ? WHERE item_id = !";
 				$d = date("Y-m-d"); //get current date
 		}
-		$rs = $g_dbConn->query($sql, array($pagesTimes, $d, $this->itemID));
+		$rs = $g_dbConn->query($sql, array(stripslashes($pagesTimes), $d, $this->itemID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$this->pagesTimes = $pagesTimes;
@@ -310,7 +323,7 @@ class reserveItem extends item
 				$sql = "UPDATE items SET performer = ?, last_modified = ? WHERE item_id = !";
 				$d = date("Y-m-d"); //get current date
 		}
-		$rs = $g_dbConn->query($sql, array($performer, $d, $this->itemID));
+		$rs = $g_dbConn->query($sql, array(stripslashes($performer), $d, $this->itemID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$this->performer = $performer;
@@ -418,62 +431,81 @@ class reserveItem extends item
 
 		$this->lastModDate = $d;
 	}
+	
+	function setDocTypeIcon($docTypeIcon)
+	{
+		global $g_dbConn;
+
+		$this->volumeEdition = $volumeEdition;
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "UPDATE items SET item_icon = ?, last_modified = ? WHERE item_id = !";
+				$d = date("Y-m-d"); //get current date
+		}
+		
+		$rs = $g_dbConn->query($sql, array($docTypeIcon, $d, $this->itemID));	
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+		$this->itemIcon = $docTypeIcon;
+		$this->lastModDate = $d;
+	}
 
 	function getItemIcon()
 	{
 		global $g_dbConn;
-		switch ($this->mimeTypeID)
-		{
-			case '7':
-			case 'text/html':
-			case null:
-				switch ($this->itemGroup)
-				{
-					case 'MONOGRAPH':
-						return 'images/doc_type_icons/doctype-book.gif';
-					break;
-					case 'MULTIMEDIA':
-						return 'images/doc_type_icons/doctype-disc2.gif';
-					break;
-					case 'ELECTRONIC':
-						return 'images/doc_type_icons/doctype-link.gif';
-					break;
-					default:
+			
+		if (!isset($this))
+			return 'images/doc_type_icons/doctype-clear.gif';
+			
+		if (is_null($this->itemIcon))	
+		{	
+			switch ($this->mimeTypeID)
+			{
+				case '7':
+				case 'text/html':
+				case null:
+					switch ($this->itemGroup)
+					{
+						case 'MONOGRAPH':
+							return 'images/doc_type_icons/doctype-book.gif';
+						break;
+						case 'MULTIMEDIA':
+							return 'images/doc_type_icons/doctype-disc2.gif';
+						break;
+						case 'ELECTRONIC':
+							return 'images/doc_type_icons/doctype-link.gif';
+						break;
+						default:
+							return 'images/doc_type_icons/doctype-clear.gif';
+					}
+				break;
+	
+				case '1': // PDF
+					return 'images/doc_type_icons/doctype-pdf.gif';
+				break;
+	
+				default:
+					switch ($g_dbConn->phptype)
+					{
+						default: //'mysql'
+							$sql = "SELECT helper_app_icon FROM mimetypes WHERE mimetype_id = !";
+					}
+					$rs = $g_dbConn->query($sql, array($this->mimeTypeID));
+					if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+	
+					if ($rs->numRows() < 1)
 						return 'images/doc_type_icons/doctype-clear.gif';
-				}
-			break;
-
-			case '1': // PDF
-				return 'images/doc_type_icons/doctype-pdf.gif';
-			break;
-
-			/*
-			case '2': // Real Audio
-			case '3': // QuickTime
-			case '4': // msword
-			case '5': // excel
-			case '6': // ppt
-				return 'images/doc_type_icons/doctype-clear.gif';
-			break;
-			*/
-			default:
-				switch ($g_dbConn->phptype)
-				{
-					default: //'mysql'
-						$sql = "SELECT helper_app_icon FROM mimetypes WHERE mimetype_id = !";
-				}
-				$rs = $g_dbConn->query($sql, array($this->mimeTypeID));
-				if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-				if ($rs->numRows() < 1)
-					return 'images/doc_type_icons/doctype-clear.gif';
-				else {
-					$row = $rs->fetchRow();
-					return $row[0];
-				}
-		}
+					else {
+						$row = $rs->fetchRow();
+						return $row[0];
+					}
+			}
+		} else 
+			return $this->itemIcon;
 	}
 
+	
 
 	/**
 	* @return void

@@ -75,27 +75,28 @@ class searchManager
 				
 				$items = $this->doSearch($request['search'], $request['limit'], $request['item'], $request['sort']);
 				
-				$hidden_fields = array(
-					'cmd'		=> 'addResultsToClass',
-					'sql' 		=> $this->search_sql_statement, 
-					'search'	=> $request['search'], 
-					'item'		=> $request['item'], 
-					'limit'		=> $request['limit'],
-					'sort' 		=> $request['sort']
-				);
-				
 				$displayQry = '';
-				for($i=0;$i<count($request['search']);$i++)
-				{
-					if ($request['search'][$i]['term'] != '')				
+				if (!isset($request['displayQry']))
+					for($i=0;$i<count($request['search']);$i++)
 					{
-						if ($i > 0) $displayQry .= " " . $request['search'][$i]['conjunct'] . " ";
-						$displayQry .= $request['search'][$i]['term'];
+						if ($request['search'][$i]['term'] != '')				
+						{
+							if ($i > 0) $displayQry .= " " . $request['search'][$i]['conjunct'] . " ";
+							$displayQry .= $request['search'][$i]['term'];
+						}
 					}
-				}
+				else 
+					$displayQry = stripslashes($request['displayQry']);						
 				
+				$hidden_fields = array(
+					'cmd'			=> 'addResultsToClass',
+					'sql' 			=> urlencode($this->search_sql_statement), 
+					'sort' 			=> $request['sort'],
+					'displayQry'	=> $displayQry
+				);
+							
 				$this->displayFunction = 'searchResults';				
-				$this->argList = array($cmd, $items, $hidden_fields, $displayQry);
+				$this->argList = array($cmd, $items, $hidden_fields, stripslashes($displayQry));
 			break;
 			
 			case 'addResultsToClass':
@@ -201,29 +202,41 @@ class searchManager
 									LEFT JOIN access as a ON ca.course_alias_id = a.alias_id 
 									LEFT JOIN users as u ON a.user_id = u.user_id AND a.permission_level = " . $g_permission['instructor'] . " "
 					; 
-	
+						
 					if ($search[0]['term'] != '') //if 1st term is not set we are going to ignore all others
 					{
 						$sql_where = "WHERE i.item_type != 'HEADING' AND ";			
 						for($i=0;$i<count($search);$i++)
 						{
+							//$search[$i]['term'] = stripslashes($search[$i]['term']);
 							if ($search[$i]['term'] != '')
 							{	
 								$conjunction = ($i > 0 && $search[$i-1]['term'] != '') ? $search[$i-1]['conjunct'] . " " : ""; 
-													
-								if ($search[$i]['test'] == '=')
-									$sql_where .= $conjunction . $search[$i]['field'] . " " . $search[$i]['test'] . " '" . $search[$i]['term'] . "' ";
-								else
-									$sql_where .= $conjunction . $search[$i]['field'] . " " . $search[$i]['test'] . " '%" . $search[$i]['term'] . "%' ";
+
+								switch ($search[$i]['test'])
+								{
+									case 'LIKE':
+										$sql_where .= $conjunction . " match(" . $search[$i]['field'] . ") against ( \"" . strtolower($search[$i]['term']) . "\") ";
+									break;
+									
+									case '<>':
+										$sql_where .= $conjunction . " not match(" . $search[$i]['field'] . ") against ( \"" . strtolower($search[$i]['term']) . "\") ";
+									break;
+									
+									case '=':
+										$sql_where .= $conjunction . " lower(" . $search[$i]['field'] . ") " . $search[$i]['test'] . " \"" . strtolower($search[$i]['term']) . "\" ";
+									default:	
+								
+								}
 							}
 						}
 						
 						if ($itemGroup['term'] != '')
 						{
 							if ($itemGroup['test'] == "=")
-								$sql_where .= " AND item_group " . $itemGroup['test'] . " '" . $itemGroup['term'] . "' ";
+								$sql_where .= " AND item_group " . $itemGroup['test'] . " \"" . $itemGroup['term'] . "\" ";
 							else
-								$sql_where .= " AND item_group " . $itemGroup['test'] . " '%" . $itemGroup['term'] . "%' ";
+								$sql_where .= " AND item_group " . $itemGroup['test'] . " \"%" . $itemGroup['term'] . "%\" ";
 						}
 						for($i=0;$i<count($limit);$i++)
 						{
@@ -232,9 +245,9 @@ class searchManager
 							if ($limit[$i]['term'] != '')
 							{		
 								if ($limit[$i]['test'] == '=')
-									$test = $limit[$i]['test'] . " '" . $limit[$i]['term'] . "' ";
+									$test = $limit[$i]['test'] . " \"" . $limit[$i]['term'] . "\" ";
 								else
-									$test = $limit[$i]['test'] . " '%" . $limit[$i]['term'] . "%' ";
+									$test = $limit[$i]['test'] . " \"%" . $limit[$i]['term'] . "%\" ";
 	
 								
 								switch ($limit[$i]['field'])
@@ -261,16 +274,15 @@ class searchManager
 			}
 								
 			$this->search_sql_statement = $sql_select . $sql_from . $sql_where;
-		}
-
+		}	
+		
 		if (isset($sort) && !is_null($sort) && $sort != '')
-			$sql_sort = " ORDER BY i.$sort ";
-		else 
-			$sql_sort = "";
-				
-			
-		$this->search_sql_statement .=  $sql_sort;
-			
+		{
+			$sql_sort = " ORDER BY i.$sort ";			
+			$raw_sql = split("ORDER BY", $this->search_sql_statement);			
+			$this->search_sql_statement = $raw_sql[0] . $sql_sort;
+		}	
+
 		$rs = $g_dbConn->query($this->search_sql_statement);		
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_ERROR); }
 		

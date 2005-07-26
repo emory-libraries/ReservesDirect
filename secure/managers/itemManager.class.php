@@ -51,13 +51,13 @@ class itemManager
 		global $g_permission, $page, $loc, $ci;
 
 		$this->displayClass = "itemDisplayer";
-
-		$itemID = $_REQUEST['itemID'];
-		$item = new reserveItem($itemID);		
 		
 		switch ($cmd)
 		{
 			case 'editItem':
+				$itemID = $_REQUEST['itemID'];
+				$item = new reserveItem($itemID);
+			
 				if (!isset($_REQUEST["Submit"]))		
 				{
 					$page = "manageClasses";
@@ -81,7 +81,8 @@ class itemManager
 					if ($_REQUEST['pagesTimes']) $item->setPagesTimes($_REQUEST['pagesTimes']); else $item->setPagesTimes("");
 					if ($_REQUEST['source']) $item->setSource($_REQUEST['source']); else $item->setSource("");
 					if ($_REQUEST['contentNotes']) $item->setContentNotes($_REQUEST['contentNotes']); else $item->setContentNotes("");
-
+					if ($_REQUEST['selectedDocIcon']) $item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
+					
 					// Check to see if this was a valid file they submitted
 					if ($_REQUEST['documentType'] == 'DOCUMENT')
 					{
@@ -140,8 +141,10 @@ class itemManager
 					$reserve = new reserve($reserveID);
 					$reserve->getItem();
 					
+					$docTypeIcons = $user->getAllDocTypeIcons();
+					
 					$this->displayFunction = 'displayEditReserveScreen';
-					$this->argList = array($reserve, $user);
+					$this->argList = array($reserve, $user, $docTypeIcons);
 				} else {
 					if ($_REQUEST['rID']) {
 						$reserve = new reserve($_REQUEST['rID']);
@@ -158,7 +161,8 @@ class itemManager
 						if ($_REQUEST['pagesTimes']) $reserve->item->setPagesTimes($_REQUEST['pagesTimes']); else $reserve->item->setPagesTimes("");
 						if ($_REQUEST['source']) $reserve->item->setSource($_REQUEST['source']); else $reserve->item->setSource("");
 						if ($_REQUEST['contentNotes']) $reserve->item->setContentNotes($_REQUEST['contentNotes']); else $reserve->item->setContentNotes("");
-
+						if ($_REQUEST['selectedDocIcon']) $reserve->item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
+						
 						if ($_REQUEST['itemNotes']) {
 							$itemNotes = array_keys($_REQUEST['itemNotes']);
 							foreach ($itemNotes as $itemNote)

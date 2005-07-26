@@ -37,7 +37,7 @@ class itemDisplayer
 	* @param courseInstance $ci
 	* @desc display edit course form
 	*/
-	function displayEditReserveScreen($reserve,$user)
+	function displayEditReserveScreen($reserve, $user, $docTypeIcons=null)
 	{
 
 		global $g_permission;
@@ -96,6 +96,7 @@ class itemDisplayer
 		$contentNotes = $reserve->item->getContentNotes();
 		$itemNotes = $reserve->item->getNotes(); //Valid note types, associated with an item, are content, copyright, and staff
 		$instructorNotes = $reserve->getNotes();
+		$docTypeIcon = $reserve->item->getItemIcon();
 
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "	<tr>\n";
@@ -154,10 +155,31 @@ class itemDisplayer
 		echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>URL:</div></td>\n";
 		echo "				<td width=\"100%\" align=\"left\"><input name=\"url\" type=\"text\" size=\"50\" value=\"".urldecode($url)."\"></td>\n";
 		echo "			</tr>\n";
-		echo "            <tr valign=\"middle\">\n";
+		echo "          <tr valign=\"middle\">\n";
 		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Performer </span><span class=\"strong\">:</span></div></td>\n";
 		echo "				<td width=\"100%\" align=\"left\"><input name=\"performer\" type=\"text\" id=\"performer\" size=\"50\" value=\"".$performer."\"></td>\n";
 		echo "			</tr>\n";
+		
+		if (!is_null($docTypeIcons))
+		{
+			echo "				<tr valign=\"middle\">\n";
+			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">Document Type Icon:</span></td>\n";
+			echo "					<td align=\"left\">";
+			echo "						<select name=\"selectedDocIcon\" onChange=\"document.iconImg.src = this[this.selectedIndex].value;\">\n";
+					
+			for ($j = 0; $j<count($docTypeIcons); $j++)
+			{
+				$selectedIcon = ($docTypeIcon == $docTypeIcons[$j]['helper_app_icon']) ? " selected " : "";
+				echo "							<option value=\"" . $docTypeIcons[$j]['helper_app_icon']  . "\" $selectedIcon>" . $docTypeIcons[$j]['helper_app_name'] . "</option>\n";
+			}
+				
+			echo "						</select>\n";
+			echo "					<img name=\"iconImg\" width=\"24\" height=\"20\" src=\"$docTypeIcon\">\n";
+			echo "					</td>\n";
+			echo "				</tr>\n";
+		}	
+		
+		
 		echo "            <tr valign=\"middle\">\n";
 		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Book/Journal/Work Title</span><span class=\"strong\">:</span></div></td>\n";
 		echo "				<td width=\"100%\" align=\"left\"><input name=\"volumeTitle\" type=\"text\" id=\"volumeTitle\" size=\"50\" value=\"".$volTitle."\"></td>\n";

@@ -131,6 +131,7 @@ class requestManager
 				if (isset($request['item_type'])) $item->setGroup($request['item_type']);
 				if (isset($request['volume_title'])) $item->setVolumeTitle($request['volume_title']);
 				if (isset($request['times_pages'])) $item->setPagesTimes($request['times_pages']);
+				if (isset($request['selectedDocIcon'])) $item->setDocTypeIcon($request['selectedDocIcon']);
 
 				if ($request['personal_item'] == "yes")
 					$item->setprivateUserID($request['selected_owner']);
@@ -353,7 +354,6 @@ class requestManager
 				$page = "manageClasses";
 				$loc  = "add item";
 
-
 				if (isset($_REQUEST['searchField']) && (isset($_REQUEST['searchTerm']) && ltrim(rtrim($_REQUEST['searchTerm'])) != ""))
 				{
 					$zQry = new zQuery($_REQUEST['searchTerm'], $_REQUEST['searchField']);
@@ -364,7 +364,7 @@ class requestManager
 
 					//look for existing item in DB
 					$item = new reserveItem();
-					$item->getItemByLocalControl($search_results['controlKey']);
+					$item->getItemByLocalControl($search_results['controlKey']);										
 
 					if ($item->getItemID() != "")
 					{
@@ -379,7 +379,7 @@ class requestManager
 						$search_results['source'] = ($item->getSource() <> "") ? $item->getSource() : "";
 						$search_results['content_note'] = ($item->getContentNotes() <> "") ? $item->getContentNotes() : "";
 						$search_results['controlKey'] = $item->getLocalControlKey();
-						$search_results['personal_owner'] = $item->getPrivateUserID();
+						$search_results['personal_owner'] = $item->getPrivateUserID();												
 					} else {
 						$item_id = null;
 					}
@@ -399,15 +399,18 @@ class requestManager
 
 				//get all Libraries
 				$lib_list = $user->getLibraries();
-				$this->displayFunction = 'addItem';
-
-				//print_r($item);
-				//echo "<hr>";
-				//print_r($search_results);
-				//exit;
-
+				
+				if ($cmd == 'addDigitalItem')
+				{
+					$docTypeIcons = $user->getAllDocTypeIcons();				
+					$search_results['docTypeIcon'] =  (is_a($item, 'reserveItem')) ? $item->getItemIcon() : reserveItem::getItemIcon();
+				} else 
+					$docTypeIcons = null;
+				
+				$this->displayFunction = 'addItem';			
+						
 				//when form is sumbitted for save cmd is set to storeRequest its ugly but it works
-				$this->argList = array($user, $cmd, $search_results, $owner_list, $lib_list, null, $_REQUEST, array('cmd'=>$cmd, 'previous_cmd'=>$cmd, 'ci'=>$_REQUEST['ci'], 'selected_instr'=>$_REQUEST['selected_instr'], 'item_id'=>$item_id));
+				$this->argList = array($user, $cmd, $search_results, $owner_list, $lib_list, null, $_REQUEST, array('cmd'=>$cmd, 'previous_cmd'=>$cmd, 'ci'=>$_REQUEST['ci'], 'selected_instr'=>$_REQUEST['selected_instr'], 'item_id'=>$item_id), $docTypeIcons);
 			break;
 		}
 	}

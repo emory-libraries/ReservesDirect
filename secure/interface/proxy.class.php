@@ -313,5 +313,31 @@ class proxy extends student
 		}
 		return $tmpArray;
 	}
+	
+	function getAllDocTypeIcons()
+	{
+		global $g_dbConn;
+
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "SELECT DISTINCT mimetype_id, helper_app_name, helper_app_icon, file_extentions "
+				.	   "FROM mimetypes "
+				.	   "ORDER BY mimetype_id DESC"	
+				;
+
+		}
+		
+		$rs = $g_dbConn->query($sql);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+		$tmpArray = array();
+		while($row = $rs->fetchRow(DB_FETCHMODE_ASSOC))
+		{
+			$tmpArray[] = $row;
+		}
+
+		return $tmpArray;
+	}
 
 }
