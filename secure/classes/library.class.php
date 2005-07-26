@@ -59,27 +59,7 @@ class library
 
 		list($this->libraryID, $this->library, $this->libraryNickname, $this->ilsPrefix, $this->reserveDesk, $this->libraryURL, $this->contactEmail) = $rs->fetchRow();
 	}
-/*
-	function getAllLibraries()
-	{
-		global $g_dbConn;
 
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql  = "SELECT l.library_id, l.name, l.nickname, l.url, l.contact_email FROM libraries as l";
-		}
-
-		$rs = $g_dbConn->query($sql);
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		$tmpArray = array();
-		while ($row = $rs->fetchRow()) {
-			$tmpArray[] = $row;
-		}
-		return $tmpArray;
-	}
-*/
 	function getLibraryID() { return $this->libraryID; }
 	function getLibrary() { return $this->library; }
 	function getLibraryNickname() { return $this->libraryNickname; }
