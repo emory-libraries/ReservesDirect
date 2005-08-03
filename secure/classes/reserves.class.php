@@ -44,7 +44,8 @@ class reserve
 	public $creationDate;
 	public $lastModDate;
 	public $notes = array();
-
+	public $requested_loan_period;
+	
 	/**
 	* @return reserve
 	* @param int $reserveID
@@ -112,7 +113,7 @@ class reserve
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT reserve_id, course_instance_id, item_id, activation_date, expiration, status, sort_order, date_created, last_modified, n.note_id "
+				$sql = "SELECT reserve_id, course_instance_id, item_id, activation_date, expiration, status, sort_order, date_created, last_modified, n.note_id, requested_loan_period "
 					.  "FROM reserves as r "
 					.  "LEFT JOIN notes as n ON n.target_table='reserves' and r.reserve_id = n.target_id "
 					.  "WHERE reserve_id = ! "
@@ -124,15 +125,16 @@ class reserve
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$row = $rs->fetchRow();
-			$this->reserveID 		= $row[0];
-			$this->courseInstanceID	= $row[1];
-			$this->itemID			= $row[2];
-			$this->activationDate	= $row[3];
-			$this->expirationDate	= $row[4];
-			$this->status	 		= $row[5];
-			$this->sortOrder		= $row[6];
-			$this->creationDate		= $row[7];
-			$this->lastModDate		= $row[8];
+			$this->reserveID 			 = $row[0];
+			$this->courseInstanceID		 = $row[1];
+			$this->itemID				 = $row[2];
+			$this->activationDate		 = $row[3];
+			$this->expirationDate		 = $row[4];
+			$this->status	 			 = $row[5];
+			$this->sortOrder			 = $row[6];
+			$this->creationDate			 = $row[7];
+			$this->lastModDate			 = $row[8];
+			$this->requested_loan_period = $row[10];
 
 
 			if (!is_null($row[9]))
@@ -155,7 +157,7 @@ class reserve
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT reserve_id, course_instance_id, item_id, activation_date, expiration, status, sort_order, date_created, last_modified "
+				$sql = "SELECT reserve_id, course_instance_id, item_id, activation_date, expiration, status, sort_order, date_created, last_modified, requested_loan_period"
 					.  "FROM reserves "
 					.  "WHERE course_instance_id = ! AND item_id = !"
 					;
@@ -174,6 +176,7 @@ class reserve
 			$this->sortOrder		= $row[6];
 			$this->creationDate		= $row[7];
 			$this->lastModDate		= $row[8];
+			$this->requested_loan_period = $row[9];			
 	}
 
 	/**
@@ -294,6 +297,22 @@ class reserve
 		$this->lastModDate = $d;
 	}
 
+	function setRequestedLoanPeriod($lp)
+	{
+		global $g_dbConn;
+
+		$this->requested_loan_period = $lp;
+		
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "UPDATE reserves SET requested_loan_period = ? WHERE reserve_id = !";
+		}
+
+		$rs = $g_dbConn->query($sql, array($lp, $this->reserveID));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }		
+	}	
+	
 	/**
 	* @return void
 	* @param int $userID
@@ -332,7 +351,15 @@ class reserve
 	function getSortOrder() { return $this->sortOrder; }
 	function getCreationDate() { return $this->creationDate; }
 	function getModificationDate() { return $this->lastModDate; }
-
+	
+	function getRequestedLoanPeriod() 
+	{
+		if (!is_null($this->requested_loan_period))
+			return $this->requested_loan_period;
+		else
+			return "";
+	}
+	
 	function getNotes()
 	{
 		//$this->notes = common_getNotesByTarget("reserves", $this->reserveID);

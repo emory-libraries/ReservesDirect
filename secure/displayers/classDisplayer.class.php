@@ -282,7 +282,6 @@ class classDisplayer
 
 				$viewReserveURL = "reservesViewer.php?viewer=" . $user->getUserID() . "&reserve=" . $ci->reserveList[$i]->getReserveID();// . "&location=" . $ci->reserveList[$i]->item->getURL();
 				if ($reserveItem->isPhysicalItem()) {
-					//move to config file
 					$viewReserveURL = $g_reservesViewer . $ci->reserveList[$i]->item->getLocalControlKey();
 				}
 				
@@ -1040,7 +1039,7 @@ class classDisplayer
 	}
 
 
-	function displaySelectReservesToReactivate($ci, $user, $instructor_list, $hidden_fields=null)
+	function displaySelectReservesToReactivate($ci, $user, $instructor_list, $hidden_fields=null, $loan_periods=null)
 	{
 		global $g_permission, $g_reservesViewer;
 		echo "<form action=\"index.php\" method=\"POST\" name=\"reactivateList\">\n";
@@ -1244,7 +1243,7 @@ class classDisplayer
 	            	echo '<a href="'.$viewReserveURL.'" target="_blank" class="itemTitle">'.$title.'</a>';
 	            	if ($author) {echo '<br><span class="itemAuthor">'.$author.'</span>';}
 	            } else {
-	            	echo '<br><span class="itemTitleNoLink">'.$title.'</span>';
+	            	echo '<span class="itemTitleNoLink">'.$title.'</span>';
 	            	if ($author) {echo '<br><span class="itemAuthor">'.$author.'</span>';}
                 	if ($callNumber) {echo '<br><span class="itemMeta">'.$callNumber.'</span>';}
 					echo '<br><span class="itemMetaPre">On Reserve at:</span> <span class="itemMeta"> '.$reserveDesk.'</span>';
@@ -1300,7 +1299,20 @@ class classDisplayer
 	      }
 	    }
 
-	    echo '</td>';
+	    if ($reserveItem->isPhysicalItem() && !is_null($loan_periods)) 
+	    {
+	    	echo "<br>\n";
+	    	echo "<b>Requested Loan Period:<b> ";
+	    	echo "	<select name=\"requestedLoanPeriod_". $ci->reserveList[$i]->getReserveID() ."\">\n";
+			for($n=0; $n < count($loan_periods); $n++)
+			{
+				$selected = ($loan_periods[$n]['default'] == 'true') ? " selected " : "";
+	    		echo "		<option value=\"" . $loan_periods[$n]['loan_period'] . "\" $selected>". $loan_periods[$n]['loan_period'] . "</option>\n";
+			}
+	    	echo "	</select>\n";	    	
+	    }
+	    	    
+	    echo '</td>';	   
 
 			if ($ci->reserveList[$i]->item->isPersonalCopy() && $user->getDefaultRole() < $g_permission['staff'])
 			{

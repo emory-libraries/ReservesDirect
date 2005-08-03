@@ -385,7 +385,7 @@ class instructor extends proxy
 	* @param string $section
 	* @desc creates a new courseInstance in the database with crosslistings and instructor from old courseInstance
 	*/
-	function copyCourseInstance($oldCI, $newTerm, $newYear, $newActivation, $newExpiration, $status="ACTIVE", $section="", $instructorList, $proxyList, $crossList, $reserveList)
+	function copyCourseInstance($oldCI, $newTerm, $newYear, $newActivation, $newExpiration, $status="ACTIVE", $section="", $instructorList, $proxyList, $crossList, $reserveList, $request_loan_periods=null)
 	{
 		global $g_dbConn, $g_permission;
 
@@ -503,8 +503,8 @@ class instructor extends proxy
 						$req->setDateRequested(date('Y-m-d'));
 						$req->setRequestingUser($instructorList[0]);
 						$req->setReserveID($r->getReserveID());
-
-						$r->setStatus("IN PROCESS");
+						$r->setStatus("IN PROCESS");	
+						$r->setRequestedLoanPeriod($request_loan_periods[$srcReserve]); //array is indexed by old reserveID
 					}
 				}
 			}

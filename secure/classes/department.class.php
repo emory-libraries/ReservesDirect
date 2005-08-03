@@ -100,6 +100,35 @@ class department extends library
 	function getDepartmentID() { return $this->deptID; }
 	function getName() { return $this->name; }
 	function getAbbr() { return $this->abbr; }
+	
+	/**
+	 * Return an array of human readable loan periods from the db
+	 */
+	function getInstructorLoanPeriods()
+	{
+		global $g_dbConn;
+
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql  = "SELECT lp.loan_period, lpi.default "
+					  . "FROM inst_loan_periods as lp "
+					  . " JOIN inst_loan_periods_libraries as lpi ON lp.loan_period_id = lpi.loan_period_id "
+					  .	"WHERE lpi.library_id = ! "
+					  . "ORDER BY lp.loan_period_id"
+					  ;
+
+		}
+
+		$rs = $g_dbConn->query($sql, $this->libraryID);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+		$tmpArray = array();
+		while ($row = $rs->fetchRow(DB_FETCHMODE_ASSOC)) {
+			$tmpArray[] = $row;
+		}
+		return $tmpArray;		
+	}
 
 }
 ?>

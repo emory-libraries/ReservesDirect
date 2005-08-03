@@ -106,7 +106,8 @@ class classManager
 						//$courseInstances = $i->getMyCourseInstancesByCourseID($request['course']);
 					} else
 						$courseInstances = null;
-				}
+				}				
+				
 				$this->displayFunction = 'displayReactivate';
 				$this->argList = array($courses, $courseInstances, 'reactivateList', $_REQUEST, array('cmd'=>$cmd));
 			break;
@@ -117,6 +118,9 @@ class classManager
 				$ci->getInstructors();
 				$ci->getReserves();
 
+				$ci->course->getDepartment();
+				$loan_periods = $ci->course->department->getInstructorLoanPeriods();
+				
 				$instructorList = null;
 				if ($user->getDefaultRole() >= $g_permission['staff'])
 				{
@@ -125,11 +129,12 @@ class classManager
 				}
 
 				$this->displayFunction = 'displaySelectReservesToReactivate';
-				$this->argList = array($ci, $user, $instructorList, array('cmd'=>'reactivate', 'instructor'=>$_REQUEST['selected_instr'], 'course'=>$_REQUEST['course'], 'ci'=>$_REQUEST['ci'], 'term'=>$_REQUEST['term']));
+				$this->argList = array($ci, $user, $instructorList, array('cmd'=>'reactivate', 'instructor'=>$_REQUEST['selected_instr'], 
+					'course'=>$_REQUEST['course'], 'ci'=>$_REQUEST['ci'], 'term'=>$_REQUEST['term']), $loan_periods);
 			break;
 
 			case 'reactivate':
-				$page = "manageClasses";
+					$page = "manageClasses";
 					$term = new term($_REQUEST['term']);
 					$srcCI = new courseInstance($_REQUEST['ci']);
 					$srcCI->getPrimaryCourse();
@@ -144,9 +149,21 @@ class classManager
 					$carryReserves = (isset($_REQUEST['carryReserve'])) ? $_REQUEST['carryReserve'] : null;
 
 					$activeStatus = "ACTIVE";
+					
+					
+					//find requested loan periods
+					//for($i=0;$i<count($_REQUEST);$i++)
+					foreach ($_REQUEST as $field => $value)
+					{
+						if (ereg("requestedLoanPeriod_", $field))
+						{
+							list($devnull, $rID) = split("requestedLoanPeriod_", $field);
+							$requested_loan_periods[$rID] =  $value;
+						}
+					}
 
-					$newCI = $user->copyCourseInstance($srcCI, $term->getTermName(), $term->getTermYear(), $term->getBeginDate(), $term->getEndDate(), $activeStatus, $srcCI->course->getSection(), $instructorList, $proxyList, $carryXListing, $carryReserves);
-			
+					$newCI = $user->copyCourseInstance($srcCI, $term->getTermName(), $term->getTermYear(), $term->getBeginDate(), $term->getEndDate(), $activeStatus, $srcCI->course->getSection(), $instructorList, $proxyList, $carryXListing, $carryReserves, $requested_loan_periods);
+
 					if ($newCI instanceof courseInstance ) {
 						$this->displayFunction = 'displaySuccess';
 						$this->argList = array($page, $newCI);

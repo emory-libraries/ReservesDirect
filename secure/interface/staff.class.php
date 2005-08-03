@@ -288,42 +288,54 @@ class staff extends instructor
 	* @param unit default=all unit to get reserves for
 	* @desc get all unprocessed requests
 	*/
-	function getRequests($unit='all')
+	function getRequests($unit='all', $sort=null)
 	{
-		global $g_dbConn;
+		global $g_dbConn, $g_permission;
 
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
 
-			if ($unit == 'all')
+			$sql = "SELECT r.request_id, d.abbreviation, c.course_number, u.last_name "
+				.  "FROM requests AS r "
+				.  	"JOIN items AS i ON r.item_id = i.item_id AND r.date_processed IS NULL "
+				.  	"JOIN course_instances AS ci ON r.course_instance_id = ci.course_instance_id "
+				.  	"JOIN course_aliases AS ca ON ci.primary_course_alias_id = ca.course_alias_id "
+				.  	"JOIN courses AS c ON ca.course_id = c.course_id "
+				.  	"JOIN departments AS d ON c.department_id = d.department_id AND d.status IS NULL "
+				.  	"JOIN libraries AS l ON d.library_id = l.library_id "
+				.	"JOIN access AS a ON ca.course_alias_id = a.alias_id "
+				.	"JOIN users AS u on a.user_id = u.user_id AND a.permission_level = " . $g_permission['instructor'] . " " 
+				;
+
+			
+			if ($unit != 'all')
 			{
-				$sql = "SELECT request_id "
-					.  "FROM requests "
-					.  "WHERE date_processed is null "
-					.  "ORDER BY request_id"
-					;
-			} else {
-				$sql = "SELECT r.request_id "
-					.  "FROM requests AS r "
-					.  	"JOIN items AS i ON r.item_id = i.item_id AND r.date_processed IS NULL "
-					.  	"JOIN course_instances AS ci ON r.course_instance_id = ci.course_instance_id "
-					.  	"JOIN course_aliases AS ca ON ci.primary_course_alias_id = ca.course_alias_id "
-					.  	"JOIN courses AS c ON ca.course_id = c.course_id "
-					.  	"JOIN departments AS d ON c.department_id = d.department_id AND d.status IS NULL "
-					.  	"JOIN libraries AS l ON d.library_id = l.library_id "
-					.  "WHERE "
-					.  	"CASE "
-					.  		"WHEN i.item_group = 'MONOGRAPH'  THEN l.monograph_library_id  = $unit "
-					.  		"WHEN i.item_group = 'MULTIMEDIA' THEN l.multimedia_library_id = $unit "
-					.	"END "
-					.  "ORDER BY r.request_id"
-					;
+				$sql .=  "WHERE "
+					 .  	"CASE "
+					 .  		"WHEN i.item_group = 'MONOGRAPH'  THEN l.monograph_library_id  = $unit "
+					 .  		"WHEN i.item_group = 'MULTIMEDIA' THEN l.multimedia_library_id = $unit "
+					 .	"END "
+				;
 			}
+			
+			switch ($sort)
+			{
+				case "instructor":
+					$sql .= " ORDER BY u.last_name";
+				break;
+				
+				case "class":
+					$sql .= " ORDER BY d.abbreviation, c.course_number";
+				break;
+				
+				case "date":
+				default:
+					$sql .= " ORDER BY r.request_id";					
+			}
+			
 		}
-
 		$rs = $g_dbConn->query($sql);
-
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$tmpArray = array();
@@ -336,7 +348,7 @@ class staff extends instructor
 				$tmpRequest->getCourseInstance();
 				$tmpRequest->courseInstance->getPrimaryCourse();
 				$tmpRequest->courseInstance->getCrossListings();
-
+				$tmpRequest->getHoldings();
 			$tmpArray[] = $tmpRequest;
 		}
 		return $tmpArray;

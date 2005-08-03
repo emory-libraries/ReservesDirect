@@ -64,21 +64,56 @@ class requestManager
 				$reserve->destroy();
 				$requestObj->destroy();
 
-			case 'displayRequest':
+			case 'printRequest':			
 				$page = "manageClasses";
 
 				$loc  = "process request";
 
 				$unit = (!isset($request['unit'])) ? $user->getStaffLibrary() : $request['unit'];
-				$requestList = $user->getRequests($unit);
-
+				
+				for($i=0;$i<count($request['selectedRequest']);$i++)
+				{
+		 			$tmpRequest = new request($request['selectedRequest'][$i]);
+					$tmpRequest->getRequestedItem();
+					$tmpRequest->getRequestingUser();
+					$tmpRequest->getReserve();
+					$tmpRequest->getCourseInstance();
+					$tmpRequest->courseInstance->getPrimaryCourse();
+					$tmpRequest->courseInstance->getCrossListings();
+					$tmpRequest->getHoldings();
+					$requestList[] = $tmpRequest;
+				}					
+				
+			
 				for($i=0;$i<count($requestList);$i++)
 				{
 					$item = $requestList[$i]->requestedItem;
 					$item->getPhysicalCopy();
 
 					$requestList[$i]->courseInstance->getInstructors();
-					$requestList[$i]->courseInstance->getCrossListings();
+					$requestList[$i]->courseInstance->getCrossListings();								
+				}
+
+				$this->displayFunction = 'printSelectedRequest';
+				$this->argList = array($requestList, $user->getLibraries(), $request, $user);				
+			break;
+			case 'displayRequest':			
+				$page = "manageClasses";
+
+				$loc  = "process request";
+
+				$unit = (!isset($request['unit'])) ? $user->getStaffLibrary() : $request['unit'];
+				
+				
+				$requestList = $user->getRequests($unit, $request['sort']);				
+							
+				for($i=0;$i<count($requestList);$i++)
+				{
+					$item = $requestList[$i]->requestedItem;
+					$item->getPhysicalCopy();
+
+					$requestList[$i]->courseInstance->getInstructors();
+					$requestList[$i]->courseInstance->getCrossListings();								
 				}
 
 				$this->displayFunction = 'displayAllRequest';
@@ -346,7 +381,7 @@ class requestManager
 				$lib_list = $user->getLibraries();
 
 				$this->displayFunction = 'addItem';
-				$this->argList = array($user, $cmd, $pre_values, $owner_list, $lib_list, $requestObj->requestID, $_REQUEST, array('cmd'=>$cmd, 'previous_cmd'=>$cmd, 'ci'=>$ci->getCourseInstanceID(), 'request_id'=>$requestObj->requestID), $isActive, 'Process Item', $msg);
+				$this->argList = array($user, $cmd, $pre_values, $owner_list, $lib_list, $requestObj->requestID, $_REQUEST, array('cmd'=>$cmd, 'previous_cmd'=>$cmd, 'ci'=>$ci->getCourseInstanceID(), 'request_id'=>$requestObj->requestID), null, $isActive, 'Process Item', $msg, $reserve->getRequestedLoanPeriod());
 			break;
 
 			case 'addDigitalItem':

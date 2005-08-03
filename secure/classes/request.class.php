@@ -49,6 +49,9 @@ class request
 	public $courseInstanceID;
 	public $courseInstance;
 	public $notes = array();
+	public $holdings = array();
+	
+	private $zQry;
 
 	/**
 	* @return request
@@ -60,6 +63,7 @@ class request
 		if (!is_null($requestID)){
 			$this->getRequestByID($requestID);
 		}
+		$this->zQry = new zQuery(null);
 	}
 
 	/**
@@ -140,6 +144,13 @@ class request
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		list($this->requestID, $this->reserveID, $this->requestedItemID, $this->requestingUserID, $this->requestedDate, $this->processedDate, $this->desiredDate, $this->priority, $this->courseInstanceID) = $rs->fetchRow();
+	}
+	
+	function getHoldings()
+	{
+		$item = new reserveItem($this->requestedItemID);
+				
+		$this->holdings = $this->zQry->getHoldings('control', $item->getLocalControlKey());
 	}
 
 	function destroy()
@@ -308,7 +319,7 @@ class request
 		$rs = $g_dbConn->query($sql, array($priority, $this->requestID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
-
+	
 	function getReserveID()		{ return $this->reserveID; }
 	function getDateRequested() { return $this->requestedDate; }
 	function getProcessedDate() { return $this->processedDate; }

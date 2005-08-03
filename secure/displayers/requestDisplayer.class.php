@@ -36,151 +36,55 @@ class requestDisplayer
 	function displayAllRequest($requestList, $libList, $request, $user, $msg="")
 	{
 
-
-
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "	<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
-		echo "	<tr><td width=\"100%\" class=\"failedText\" align=\"center\">$msg<br></td></tr>\n";
+		//echo "	<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
+		if (!is_null($msg) && $msg != "")
+			echo "	<tr><td width=\"100%\" class=\"failedText\" align=\"center\">$msg<br></td></tr>\n";
 
 		echo "	<form action=\"index.php?cmd=displayRequest\" method=\"POST\">\n";
-		echo "	<tr><td colspan=\"2\">";
-		echo "		<font color=\"#666666\"><strong>View Requests for </strong></font>";
-		echo "			<select name=\"unit\">";
-		echo "				<option value=\"all\">Show All Requests</option>";
+		echo "	<tr><td valign=\"top\">\n";
+		echo "		<font color=\"#666666\"><strong>View Requests for </strong></font>\n";
+		echo "			<select name=\"unit\">\n";
+		echo "				<option value=\"all\">Show All Requests</option>\n";
 
 		$currentUnit = isset($request['unit']) ? $request['unit'] : $user->getStaffLibrary();
 		foreach ($libList as $lib)
 		{
 			$lib_select = ($currentUnit == $lib->getLibraryID()) ? " selected " : "";
-			echo "				<option $lib_select value=\"" . $lib->getLibraryID() . "\">" . $lib->getLibraryNickname() . "</option>";
+			echo "				<option $lib_select value=\"" . $lib->getLibraryID() . "\">" . $lib->getLibraryNickname() . "</option>\n";
 		}
-		echo "			</select>";
-		echo "			<input type=\"submit\" value=\"Go\">";
-		echo "	</td></tr>\n";
-		echo "	</form>\n";
+		echo "			</select>\n";
+		echo "			<input type=\"submit\" value=\"Go\">\n";
+		echo "		</td>\n";
+		echo "		<td bgcolor=\"#CCCCCC\" class=\"borders\"><span class=\"strong\">";
+		echo "			Sort by:</span> ";
+		echo "				[ <a href=\"index.php?cmd=". $request['cmd'] . "&unit=". $request['unit'] ."&sort=date\" class=\"editlinks\">Date/ID# </a>] ";
+		echo "				[ <a href=\"index.php?cmd=". $request['cmd'] . "&unit=". $request['unit'] ."&sort=class\" class=\"editlinks\">Class</a> ] ";
+		echo "				[ <a href=\"index.php?cmd=". $request['cmd'] . "&unit=". $request['unit'] ."&sort=instructor\" class=\"editlinks\">Instructor</a> ] ";
+		echo "		</td>\n";
+        echo "	</tr>\n";
+        echo "	</form>\n";
+        
+        echo "	<form action=\"index.php?sort=\"" . $request['sort'] . "\" method=\"POST\" target=\"print\">\n";
+        echo "	<input type=\"hidden\" name=\"cmd\" value=\"printRequest\">\n";
+        echo "	<input type=\"hidden\" name=\"no_control\">\n";
+        echo "	<tr>\n";
+        echo "		<td><font color=\"#666666\">&nbsp;</font></td>";
+        echo "		<td bgcolor=\"#FFFFFF\" align=\"right\"><input type=\"submit\" value=\"Print Selected Request\">";
+//                    <select name=\"select\">
+//                     <option selected>Selected request</option>
+//                      <option>Selected class</option>
+//                      <option>Selected instructor</option>
+//                    </select>
+//                    <input type=\"submit\" name=\"Submit\" value=\"Go\">
+//          </strong></font></div></td>
+		echo "	</td>\n";
+		echo "</tr>\n";		
 
 		if (is_array($requestList) && !empty($requestList))
-		{
-			echo "	<tr><td>&nbsp;</td></tr>\n";
-
-			echo "	<tr>\n";
-			echo "		<td>\n";
-			echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
-			echo "				<tr align=\"left\" valign=\"top\"><td class=\"headingCell1\" align=\"center\">REQUESTS</td><td width=\"75%\">&nbsp;</td></tr>\n";
-			echo "			</table>\n";
-			echo "		</td>\n";
-			echo "	</tr>\n";
-
-
-			$cnt = 0;
-			foreach ($requestList as $r)
-			{
-				$item = $r->requestedItem;
-				$ci = $r->courseInstance;
-
-				$pCopy = $item->physicalCopy;
-
-				$cnt++;
-
-				$rowClass = ($cnt % 2) ? "evenRow" : "oddRow";
-
-				echo "	<tr>\n";
-				echo "		<td align=\"left\" valign=\"top\" class=\"borders\">\n";
-				echo "			<table width=\"100%\" border=\"0\" cellpadding=\"2\" cellspacing=\"0\" class=\"displayList\">\n";
-				echo "  				<tr align=\"left\" valign=\"middle\" class=\"$rowClass\">\n";
-				echo "    				<td width=\"85%\" valign=\"top\">\n";
-				echo "    					<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
-				echo "					      <tr>\n";
-				echo "					        <td width=\"15%\" valign=\"top\"><span class=\"strong\">Request ID: </span>".sprintf("%06s",$r->requestID)."</td>\n";
-				echo "					        <td width=\"50%\" valign=\"top\" class=\"strong\">". $ci->course->getName() ."</td>\n";
-				echo "					        <td width=\"35%\"><span class=\"strong\">". $ci->course->displayCourseNo() ."</span> <!--| <a href=\"link\">Display All Class Requests for Print</a>--></td>\n";
-				echo "					      </tr>\n";
-
-				echo "						  <tr>";
-				echo "							<td>&nbsp;</td>";
-				echo "							<td colspan='2'>";
-				echo "								<table>";
-
-				echo "					      <tr>\n";
-				echo "					        <td valign=\"top\">&nbsp;</td>\n";
-				echo "					        <td valign=\"top\">". $ci->displayTerm() ."</td>\n";
-				echo "					        <td align=\"left\" valign=\"top\"></td>\n";
-				echo "					      </tr>\n";
-
-				echo "					      <tr>\n";
-				echo "					        <td valign=\"top\">&nbsp;</td>\n";
-				echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Instructors:</td>\n";
-				echo "					        <td align=\"left\" valign=\"top\">". $ci->displayInstructors() ."</td>\n";
-				echo "					      </tr>\n";
-
-				echo "					      <tr>\n";
-				echo "					        <td valign=\"top\">&nbsp;</td>\n";
-				echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Title:</td>\n";
-				echo "					        <td align=\"left\" valign=\"top\">". $item->title ."</td>\n";
-				echo "					      </tr>\n";
-
-				echo "					      <tr>\n";
-				echo "					        <td valign=\"top\">&nbsp;</td>\n";
-				echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Author:</td>\n";
-				echo "					        <td align=\"left\" valign=\"top\">". $item->author ."</td>\n";
-				echo "					      </tr>\n";
-
-
-				echo "					      <tr>\n";
-				echo "					        <td valign=\"top\">&nbsp;</td>\n";
-				echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Location:</td>\n";
-				echo "					        <td align=\"left\" valign=\"top\">". $pCopy->getOwningLibrary() . " " . $pCopy->getStatus() ." ". $pCopy->getCallNumber() ."</td>\n";
-				echo "					      </tr>\n";
-
-
-				echo "					      <tr>\n";
-				echo "					        <td valign=\"top\">&nbsp;</td>\n";
-				echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Cross Listings:</td>\n";
-				echo "					        <td align=\"left\" valign=\"top\">" . $ci->displayCrossListings() . "</td>\n";
-				echo "					      </tr>\n";
-
-				/*
-				echo "					      <tr>\n";
-				echo "					        <td valign=\"top\">&nbsp;</td>\n";
-				echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Notes:</td>\n";
-				echo "					        <td align=\"left\" valign=\"top\">Not Implemeted</td>\n";
-				echo "					      </tr>\n";
-				*/
-
-				echo "					      <tr>\n";
-				echo "					        <td valign=\"top\">&nbsp;</td>\n";
-				echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Activate By:</td>\n";
-				echo "					        <td align=\"left\" valign=\"top\">". common_formatdate($r->getDesiredDate(), "MM-DD-YYYY") ."</td>\n";
-				echo "					      </tr>\n";
-
-				echo "					      <tr>\n";
-				echo "					        <td valign=\"top\">&nbsp;</td>\n";
-				echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Date Requested:</td>\n";
-				echo "					        <td align=\"left\" valign=\"top\">". common_formatdate($r->getDateRequested(), "MM-DD-YYYY") ."</td>\n";
-				echo "					      </tr>\n";
-
-				echo "					      <tr>\n";
-				echo "					        <td valign=\"top\">&nbsp;</td>\n";
-				echo "					        <td valign=\"top\">&nbsp;</td>\n";
-				echo "					        <td align=\"left\" valign=\"top\">&nbsp;</td>\n";
-				echo "					      </tr>\n";
-
-				echo "    					</table>\n";
-				echo "    				</td>\n";
-				echo "    				<td align=\"right\" valign=\"top\">\n";
-				echo "						<form action=\"index.php?cmd=processRequest\" method=\"POST\">\n";
-				echo "							<input type=\"hidden\" name=\"request_id\" value=\"". $r->requestID ."\">\n";
-				echo "							<input type=\"submit\" value=\"Process this Item\">\n";
-				echo "						</form>\n";
-				echo "						&nbsp;<a href=\"index.php?cmd=deleteRequest&request_id=".$r->requestID."\">Delete Request</a>&nbsp;";
-				echo "					</td>\n";
-				echo " 				</tr>\n";
-
-				echo " </table></td></tr>";
-				echo " 			</table>\n";
-
-			}
-		} else echo "<tr><td>No Request to process for this unit.</td></tr>";
+			requestDisplayer::displayRequestList($requestList, $item, $ci);
+		else 
+			echo "<tr><td>No Request to process for this unit.</td></tr>";
 
 
 		echo " 			</table>\n";
@@ -191,10 +95,191 @@ class requestDisplayer
 		echo "		<td align=\"right\">\n";
 		echo "			<img src=\images/spacer.gif\" width=\"1\" height=\"15\">[ <a href=\"index.php\">EXIT &quot;PROCESS REQUESTS&quot;</a> ]</td>\n";
 		echo "	</tr>\n";
-		echo "</table>\n";
+		echo "</table>\n";		
 	}
 
-	function addItem($user, $cmd, $search_results, $owner_list, $lib_list, $request_id=null, $request, $hidden_fields, $docTypeIcons=null, $isActive=true, $buttonValue="Add Item", $msg="")
+	function printSelectedRequest($requestList, $libList, $request, $user, $msg="")
+	{
+
+		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+		//echo "	<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
+		if (!is_null($msg) && $msg != "")
+			echo "	<tr><td width=\"100%\" class=\"failedText\" align=\"center\">$msg<br></td></tr>\n";
+
+        
+		if (is_array($requestList) && !empty($requestList))
+			requestDisplayer::displayRequestList($requestList, $item, $ci, "true");
+		else 
+			echo "<tr><td>No Request selected for printing.</td></tr>";
+
+
+		echo " 			</table>\n";
+		echo "		</td>\n";
+		echo "	</tr>\n";
+		echo "	<tr><td>&nbsp;</td></tr>\n";
+		echo "	<tr>\n";
+		echo "		<td align=\"right\">\n";
+		echo "			<img src=\images/spacer.gif\" width=\"1\" height=\"15\">[ <a href=\"index.php\">EXIT &quot;PROCESS REQUESTS&quot;</a> ]</td>\n";
+		echo "	</tr>\n";
+		echo "</table>\n";		
+	}	
+	
+	function displayRequestList($requestList, $item, $ci, $printView=null)
+	{
+		echo "	<tr><td colspan=\"2\">&nbsp;</td></tr>\n";
+
+		echo "	<tr>\n";
+		echo "		<td colspan=\"2\">\n";
+		echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
+		echo "				<tr align=\"left\" valign=\"top\"><td class=\"headingCell1\" align=\"center\">REQUESTS</td><td width=\"75%\">&nbsp;</td></tr>\n";
+		echo "			</table>\n";
+		echo "		</td>\n";
+		echo "	</tr>\n";
+
+
+		$cnt = 0;
+		foreach ($requestList as $r)
+		{
+			$item = $r->requestedItem;
+			$ci = $r->courseInstance;
+
+			$pCopy = $item->physicalCopy;
+
+			$cnt++;
+
+			$rowClass = ($cnt % 2) ? "evenRow" : "oddRow";
+
+			echo "	<tr>\n";
+			echo "		<td align=\"left\" valign=\"top\" class=\"borders\"  colspan=\"2\">\n";
+			echo "			<table width=\"100%\" border=\"0\" cellpadding=\"2\" cellspacing=\"0\" class=\"displayList\">\n";
+			echo "  				<tr align=\"left\" valign=\"middle\" class=\"$rowClass\">\n";
+			echo "    				<td width=\"85%\" valign=\"top\">\n";
+			echo "    					<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
+			echo "					      <tr>\n";				
+			echo "					        <td width=\"15%\" valign=\"top\">\n";
+			if (is_null($printView) || $printView == "false")
+				echo "								<input type=\"checkbox\" name=\"selectedRequest[]\" value=\"" . $r->requestID . "\">&nbsp;&nbsp;<br>\n";
+			echo "								<span class=\"strong\">Request ID: </span>".sprintf("%06s",$r->requestID)."\n";
+			echo "							</td>\n";
+			echo "					        <td width=\"50%\" valign=\"top\" class=\"strong\">". $ci->course->getName() ."</td>\n";
+			echo "					        <td width=\"35%\"><span class=\"strong\">". $ci->course->displayCourseNo() ."</span> <!--| <a href=\"link\">Display All Class Requests for Print</a>--></td>\n";
+			echo "					      </tr>\n";
+
+			echo "						  <tr>";
+			echo "							<td>&nbsp;</td>";
+			echo "							<td colspan='2'>";
+			echo "								<table>";
+
+			echo "					      <tr>\n";
+			echo "					        <td valign=\"top\">&nbsp;</td>\n";
+			echo "					        <td valign=\"top\">". $ci->displayTerm() ."</td>\n";
+			echo "					        <td align=\"left\" valign=\"top\"></td>\n";
+			echo "					      </tr>\n";
+
+			echo "					      <tr>\n";
+			echo "					        <td valign=\"top\">&nbsp;</td>\n";
+			echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Instructors:</td>\n";
+			echo "					        <td align=\"left\" valign=\"top\">". $ci->displayInstructors() ."</td>\n";
+			echo "					      </tr>\n";
+
+			echo "					      <tr>\n";
+			echo "					        <td valign=\"top\">&nbsp;</td>\n";
+			echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Title:</td>\n";
+			echo "					        <td align=\"left\" valign=\"top\">". $item->title ."</td>\n";
+			echo "					      </tr>\n";
+
+			echo "					      <tr>\n";
+			echo "					        <td valign=\"top\">&nbsp;</td>\n";
+			echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Author:</td>\n";
+			echo "					        <td align=\"left\" valign=\"top\">". $item->author ."</td>\n";
+			echo "					      </tr>\n";
+
+
+			echo "					      <tr>\n";
+			echo "					        <td valign=\"top\">&nbsp;</td>\n";
+			echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Location:</td>\n";
+			//should be able to select no ILS and then display commented code
+//				echo "					        <td align=\"left\" valign=\"top\">". $pCopy->getOwningLibrary() . " " . $pCopy->getStatus() ." ". $pCopy->getCallNumber() ."</td>\n";
+			echo "					        <td align=\"left\" valign=\"top\">\n";
+			if(count($r->holdings) > 0)
+				$cntHolding = 0;
+				foreach ($r->holdings as $h)
+				{
+					if ($cntHolding < 5 && (is_null($printView) || $printView == "false")) //on printview show all 
+						echo $h['library'] . " " . $h['callNum'] . " " . $h['loc'] . " " . $h['type'] . "<br>";					
+					$cntHolding++;
+				}
+				if(count($r->holdings) > 0 && (is_null($printView) || $printView == "false")) //on printview show all 
+					echo "Additional copies are available. View details for all holdings";
+			
+			echo "							</td>\n";
+
+			echo "					      </tr>\n";
+
+
+			echo "					      <tr>\n";
+			echo "					        <td valign=\"top\">&nbsp;</td>\n";
+			echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Cross Listings:</td>\n";
+			echo "					        <td align=\"left\" valign=\"top\">" . $ci->displayCrossListings() . "</td>\n";
+			echo "					      </tr>\n";
+
+			/*
+			echo "					      <tr>\n";
+			echo "					        <td valign=\"top\">&nbsp;</td>\n";
+			echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Notes:</td>\n";
+			echo "					        <td align=\"left\" valign=\"top\">Not Implemeted</td>\n";
+			echo "					      </tr>\n";
+			*/
+
+			echo "					      <tr>\n";
+			echo "					        <td valign=\"top\">&nbsp;</td>\n";
+			echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Activate By:</td>\n";
+			echo "					        <td align=\"left\" valign=\"top\">". common_formatdate($r->getDesiredDate(), "MM-DD-YYYY") ."</td>\n";
+			echo "					      </tr>\n";
+
+			echo "					      <tr>\n";
+			echo "					        <td valign=\"top\">&nbsp;</td>\n";
+			echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Date Requested:</td>\n";
+			echo "					        <td align=\"left\" valign=\"top\">". common_formatdate($r->getDateRequested(), "MM-DD-YYYY") ."</td>\n";
+			echo "					      </tr>\n";
+
+			echo "					      <tr>\n";
+			echo "					        <td valign=\"top\">&nbsp;</td>\n";
+			echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Requested Loan Period:</td>\n";
+			echo "					        <td align=\"left\" valign=\"top\">". $r->reserve->getRequestedLoanPeriod() ."</td>\n";
+			echo "					      </tr>\n";				
+			
+			echo "					      <tr>\n";
+			echo "					        <td valign=\"top\">&nbsp;</td>\n";
+			echo "					        <td valign=\"top\">&nbsp;</td>\n";
+			echo "					        <td align=\"left\" valign=\"top\">&nbsp;</td>\n";
+			echo "					      </tr>\n";
+
+			echo "    					</table>\n";
+			echo "    				</td>\n";
+			echo "    				<td align=\"right\" valign=\"top\">\n";
+			
+			if (is_null($printView) || $printView == "false")
+			{
+				echo "							<input type=\"hidden\" name=\"request_id\" value=\"". $r->requestID ."\">\n";
+				echo "							<input type=\"button\" value=\"Process this Item\" onClick=\"this.form.cmd.value='processRequest'; this.form.submit();\">\n";
+			
+				echo "						&nbsp;<a href=\"index.php?cmd=deleteRequest&request_id=".$r->requestID."\">Delete Request</a>&nbsp;";	
+			}	
+			echo "					&nbsp;</td>\n";
+			echo " 				</tr>\n";
+
+			echo " </table></td></tr>";				
+			//echo " 			</table>\n";
+			echo "<div style=\"page-break-after:always;\"></div>\n";
+
+		}
+		echo "</form>\n";		
+	}
+	
+	
+	
+	function addItem($user, $cmd, $search_results, $owner_list, $lib_list, $request_id=null, $request, $hidden_fields, $docTypeIcons=null, $isActive=true, $buttonValue="Add Item", $msg="", $requestLoanPeriod=null)
 	{
 		global $g_documentURL;
 
@@ -380,7 +465,7 @@ class requestDisplayer
 			echo "	<tr><td align=\"left\" valign=\"top\" class=\"headingCell1\">RESERVE OPTIONS</td><td width=\"75%\">&nbsp;</td></tr>\n";
 			echo "	<tr>\n";
 			echo "		<td align=\"left\" valign=\"top\">\n";
-			echo "			<table width=\"100%\" border=\"0\" cellpadding=\"3\" cellspacing=\"0\" class=\"borders\">\n";
+			echo "			<table width=\"100%\" border=\"1\" cellpadding=\"3\" cellspacing=\"0\" class=\"borders\">\n";
 			echo "				<tr bgcolor=\"#CCCCCC\">\n";
 			echo "					<td width=\"50%\" align=\"left\" valign=\"middle\" class=\"strong\" NOWRAP>Reserve Desk:&nbsp;&nbsp;\n";
 
@@ -414,13 +499,14 @@ class requestDisplayer
 			$itemType_selector = (isset($request['item_type'])) ? $request['item_type'] : "MONOGRAPH";
 			$$itemType_selector = "checked";
 			echo "				<tr bgcolor=\"#CCCCCC\">\n";
-			echo "					<td colspan=\"2\" align=\"left\" valign=\"middle\" class=\"strong\" NOWRAP>";
+			echo "					<td colspan=\"1\" align=\"left\" valign=\"middle\" class=\"strong\" NOWRAP>";
 			echo "						<span class=\"strong\">Item Type:</span>\n";
 			echo "						&nbsp;&nbsp;\n";
 			echo "						<input type=\"radio\" name=\"item_type\" value=\"MONOGRAPH\" CHECKED> Monograph";
 			echo "						&nbsp;";
 			echo "						<input type=\"radio\" name=\"item_type\" value=\"MULTIMEDIA\" $MULTIMEDIA> Multimedia";
 			echo "					</td>\n";
+			echo "					<td align=\"left\" valign=\"middle\" class=\"strong\" NOWRAP>Requested Loan Period: $requestLoanPeriod</td>\n";
 			echo "				</tr>\n";
 
 
@@ -690,6 +776,5 @@ class requestDisplayer
 		echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "</table>\n";
 	}
-
 }
 ?>

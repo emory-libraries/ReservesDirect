@@ -190,6 +190,8 @@ class zQuery
 		if (isset($_SESSION['debug']))
 			echo $g_holdingsScript . "?key=" . $key . "&key_type=$keyType<P>";
 
+		$key = ereg_replace('ocm','o',$key);
+						
 		$fp = fopen($g_holdingsScript . "?key=" . $key . "&key_type=$keyType", "rb");
 		if(!$fp) {
 			trigger_error("zQuery could not get holdings", E_USER_ERROR);
