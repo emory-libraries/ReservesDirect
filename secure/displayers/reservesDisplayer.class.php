@@ -631,7 +631,7 @@ function displaySearchItemMenu($ci)
 	 *			open catalog in new window and search for query
 	 *			dependent on page value
 	*/
-	function displaySearchResults($user, $search, $cmd, $ci=null, $hidden_requests=null, $hidden_reserves=null)
+	function displaySearchResults($user, $search, $cmd, $ci=null, $hidden_requests=null, $hidden_reserves=null, $loan_periods=null)
 	{
 		global $g_reservesViewer, $g_permission;
 		
@@ -806,6 +806,19 @@ function displaySearchItemMenu($ci)
 	            		}
 	            	}
 	            }
+	            
+	        	if ($item->getItemGroup() != "ELECTRONIC" && !is_null($loan_periods)) 
+			    {
+			    	echo "<br>\n";
+			    	echo "<b>Requested Loan Period:<b> ";
+			    	echo "	<select name=\"requestedLoanPeriod_". $item->getItemID() ."\">\n";
+					for($n=0; $n < count($loan_periods); $n++)
+					{
+						$selected = ($loan_periods[$n]['default'] == 'true') ? " selected " : "";
+			    		echo "		<option value=\"" . $loan_periods[$n]['loan_period'] . "\" $selected>". $loan_periods[$n]['loan_period'] . "</option>\n";
+					}
+			    	echo "	</select>\n";	    	
+			    }	        	   
 
             echo "							</td>\n";
 
@@ -832,7 +845,7 @@ function displaySearchItemMenu($ci)
         		echo "<img src=\"images/getPrevious.gif\" onClick=\"javaScript:document.forms.searchResults.cmd.value='searchResults';document.forms.searchResults.f.value=".$fPrev.";document.forms.searchResults.submit();\">&nbsp;&nbsp;";
         	}
         	if ($showNextLink) {
-        		echo "<img src=\"images/getNext.gif\" onClick=\"javaScript:document.forms.searchResults.cmd.value='searchResults';document.forms.searchResults.f.value=".$fNext.";document.forms.searchResults.submit();\">";
+        		echo "<img src=\"images/getNext.gif\" onClick=\"javaScriptreservesDisplayer.class.php:document.forms.searchResults.cmd.value='searchResults';document.forms.searchResults.f.value=".$fNext.";document.forms.searchResults.submit();\">";
         	}
         	echo "</td></tr>\n";
         }

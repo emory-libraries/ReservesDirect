@@ -54,7 +54,7 @@ class reservesManager
 
 	function reservesManager($cmd, $user)
 	{
-		global $g_permission, $page, $loc, $g_faxDirectory, $g_documentURL;
+		global $g_permission, $page, $loc, $g_faxDirectory, $g_documentURL, $ci;
 
 		$this->displayClass = "reservesDisplayer";
 		//$this->user = $user;
@@ -267,9 +267,16 @@ class reservesManager
 				} else {
 					$HiddenReserves = "";
 				}
+								
+				if (!$ci->course instanceof course)
+					$ci->getPrimaryCourse();
+				
+				if (!$ci->course->department instanceof department)
+					$ci->course->getDepartment();
+				$LoanPeriods = $ci->course->department->getInstructorLoanPeriods();
 
 				$this->displayFunction = "displaySearchResults";
-				$this->argList = array($user, $search, 'storeReserve', $_REQUEST['ci'], $HiddenRequests, $HiddenReserves);
+				$this->argList = array($user, $search, 'storeReserve', $_REQUEST['ci'], $HiddenRequests, $HiddenReserves, $LoanPeriods);
 			break;
 			case 'storeReserve':
 				$page = "addReserve";
@@ -303,6 +310,7 @@ class reservesManager
 							$reserve->setStatus("IN PROCESS");
 							$reserve->setActivationDate($ci->getActivationDate());
 							$reserve->setExpirationDate($ci->getExpirationDate());
+							$reserve->setRequestedLoanPeriod($_REQUEST['requestedLoanPeriod_'.$r]);
 
 							//create request
 							$request = new request();
