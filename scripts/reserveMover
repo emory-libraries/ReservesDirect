@@ -1,0 +1,19 @@
+#!/usr/local/bin/php -q
+
+<?php
+
+$src  = $argv[1];
+$dest = $argv[2];
+
+$xmlConfig = "/etc/httpd/conf/reserves2_config.xml";
+	
+if (!is_readable($xmlConfig)) { trigger_error("Could not read configure xml file path=$xmlConfig", E_USER_ERROR); }
+	
+$configure = simplexml_load_file($xmlConfig);
+
+$documentDirectory	= (string)$configure->documentDirectory;
+
+copy($src, $documentDirectory.$dest);
+
+?>
+
