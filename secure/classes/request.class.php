@@ -31,6 +31,7 @@ http://www.reservesdirect.org/
 
 require_once("secure/classes/item.class.php");
 require_once("secure/classes/user.class.php");
+require_once("secure/classes/zQuery.class.php");
 
 class request
 {
