@@ -182,6 +182,7 @@ switch ($cmd)
 	case 'displayRequest':
 	case 'processRequest':
 	case 'storeRequest':
+	case 'deleteRequest':
 	case 'printRequest':
 		require_once("secure/managers/requestManager.class.php");
 		$mgr = new requestManager($cmd, $u, $ci, $_REQUEST);
