@@ -102,7 +102,7 @@ class requestManager
 
 				$loc  = "process request";
 
-				$unit = (!isset($request['unit'])) ? $user->getStaffLibrary() : $request['unit'];
+				$unit = (!isset($request['unit']) || $request['unit'] == "") ? $user->getStaffLibrary() : $request['unit'];
 				
 				
 				$requestList = $user->getRequests($unit, $request['sort']);				
