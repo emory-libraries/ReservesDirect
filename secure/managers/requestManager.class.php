@@ -308,7 +308,7 @@ class requestManager
 
 					$loc  = "add an item";
 					$this->displayFunction = 'addSuccessful';
-					$this->argList = array($ci, $request['selected_instr'], $ilsResult);
+					$this->argList = array($reserve, $ci, $request['selected_instr'], $ilsResult);
 				}
 				break;
 

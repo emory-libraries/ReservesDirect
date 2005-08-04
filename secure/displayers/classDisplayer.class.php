@@ -1746,7 +1746,7 @@ class classDisplayer
         echo '                    	<br>';
         echo '</form>';
         echo '              	</div></td>';
-        echo '			/td>';
+        //echo '			/td>';
         echo '			</tr>';
         if ($u->getDefaultRole() >= $g_permission['instructor']) {
 			echo '<tr><td colspan="2">&nbsp;</td></tr>';

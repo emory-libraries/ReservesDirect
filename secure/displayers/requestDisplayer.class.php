@@ -733,8 +733,10 @@ class requestDisplayer
 		echo "</table>\n";
 	}
 
-	function addSuccessful($ci, $selected_instr, $msg=null)
+	function addSuccessful($reserve, $ci, $selected_instr, $msg=null)
 	{
+		global $g_reservesViewer;
+
 		echo "<table width=\"60%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "	<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
 		echo "	<tr>\n";
@@ -744,6 +746,7 @@ class requestDisplayer
 		if (isset($msg) && !is_null($msg))
 			echo "			<p class=\"successText\">$msg</p>\n";
 
+	  
 		echo "          <p>&gt;&gt;<a href=\"index.php?cmd=editClass&ci=".$ci->getCourseInstanceID()."\"> Go to class</a></p>\n";
 		echo "			<p>&gt;&gt;<a href=\"index.php?cmd=addPhysicalItem&ci=".$ci->getCourseInstanceID()."&selected_instr=$selected_instr\"> Add another physical item to this class.</a><br>\n";
 		echo "			&gt;&gt;<a href=\"index.php?cmd=addDigitalItem&ci=".$ci->getCourseInstanceID()."&selected_instr=$selected_instr\"> Add another digital item to this class.</a><br>\n";
@@ -752,6 +755,87 @@ class requestDisplayer
 		echo "		</td>\n";
 		echo "	</tr>\n";
 		echo "	<tr><td align=\"center\"></td></tr>\n";
+		
+		if ($reserve) {
+			
+			$reserve->getItem();
+    	
+    	$viewReserveURL = "reservesViewer.php?reserve=" . $reserve->getReserveID();
+			if ($reserve->item->isPhysicalItem()) {
+				$reserve->item->getPhysicalCopy();
+				if ($reserve->item->localControlKey)
+					$viewReserveURL = $g_reservesViewer . $reserve->item->getLocalControlKey();
+				else
+					$viewReserveURL = null;
+			}
+
+    	$itemIcon = $reserve->item->getItemIcon();
+    	$title = $reserve->item->getTitle();
+			$author = $reserve->item->getAuthor();
+			$url = $reserve->item->getURL();
+			$performer = $reserve->item->getPerformer();
+			$volTitle = $reserve->item->getVolumeTitle();
+			$volEdition = $reserve->item->getVolumeEdition();
+			$pagesTimes = $reserve->item->getPagesTimes();
+			$source = $reserve->item->getSource();
+			$contentNotes = $reserve->item->getContentNotes();
+			$itemNotes = $reserve->item->getNotes();
+			$instructorNotes = $reserve->getNotes();
+			
+    	echo "				<tr><td>&nbsp;</td></tr>\n";
+    	echo "				<tr><td><strong>Review item:</strong></td></tr>\n";
+    	echo "				<tr><td>&nbsp;</td></tr>\n";
+    	echo '<tr><td><table border="0" cellspacing="0" cellpadding="0">';
+    	echo '<tr align="left" valign="middle" class="oddRow">';
+    	echo '	<td width="5%" valign="top"><img src="'.$itemIcon.'" width="24" height="20"></td>';
+    	if ($viewReserveURL)
+    		echo '	<td width="78%"><a href="'.$viewReserveURL.'" class="itemTitle" target="_blank">'.$title.'</a>';
+    	else
+    		echo '	<td width="78%"><span class="itemTitle">'.$title.'</span>';
+    	if ($author)
+    		echo '		<br> <span class="itemAuthor">'.$author.'</span>';
+    	if ($performer)
+	    	echo '<br><span class="itemMetaPre">Performed by:</span>&nbsp;<span class="itemMeta"> '.$performer.'</span>';
+	    if ($volTitle)
+				echo '<br><span class="itemMetaPre">From:</span>&nbsp;<span class="itemMeta"> '.$volTitle.'</span>';
+	    if ($volEdition)
+	    	echo '<br><span class="itemMetaPre">Volume/Edition:</span>&nbsp;<span class="itemMeta"> '.$volEdition.'</span>';
+	    if ($pagesTimes)
+	    	echo '<br><span class="itemMetaPre">Pages/Time:</span>&nbsp;<span class="itemMeta"> '.$pagesTimes.'</span>';
+	    if ($source)
+	    	echo '<br><span class="itemMetaPre">Source/Year:</span>&nbsp;<span class="itemMeta"> '.$source.'</span>';
+
+    	if ($contentNotes)
+	    {
+	        echo '<br><span class="noteType">Content Note:</span>&nbsp;<span class="noteText">'.$contentNotes.'</span>';
+	    }
+    	if ($itemNotes) 
+	    {
+	    
+	    	for ($n=0; $n<count($itemNotes); $n++)
+	    	{
+            	$type = strtolower($itemNotes[$n]->getType());
+            	//if ($type == "content") {
+            	if ($user->dfltRole >= $g_permission['staff'] || $type == "content") {
+	            	echo '<br><span class="noteType">'.ucfirst($type).' Note:</span>&nbsp;<span class="noteText">'.$itemNotes[$n]->getText().'</span>';
+            	}
+	        }
+	    }
+	    if ($instructorNotes)
+	    {
+	    
+	    	for ($n=0; $n<count($instructorNotes); $n++)
+	        {
+	        	echo '<br><span class="noteType">Instructor Note:</span>&nbsp;<span class="noteText">'.$instructorNotes[$n]->getText().'</span>';
+	        }
+	    }
+    	echo '	</td>';
+    	echo '	<td width="17%" valign="top">[ <a href="index.php?cmd=editReserve&reserveID='.$reserve->getReserveID().'" class="editlinks">edit item</a> ]</td>';
+    	echo ' 	<td width="0%">&nbsp;</td>';
+    	echo '</tr>';
+    	echo '</table></td></tr>';
+		}
+
 		echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "</table>\n";
 	}

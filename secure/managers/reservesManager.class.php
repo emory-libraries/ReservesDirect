@@ -106,15 +106,43 @@ class reservesManager
 				$loc  = "home";
 
 				$ci = new courseInstance($_REQUEST['ci']);
+				
+				if (isset($_REQUEST['hideSelected'])) {
+					$hidden = (isset($_REQUEST['hidden'])) ? $_REQUEST['hidden'] : null;
+					$originalHidden = (isset($_REQUEST['originalHiddenArray'])) ? $_REQUEST['originalHiddenArray'] : null;
 
+					if (is_array($originalHidden)) {
+						if (!is_array($hidden)) $hidden=array();
+						$unhide = array_diff($originalHidden, $hidden);
+						if (is_array($unhide) && !empty($unhide)){
+							foreach($unhide as $r)
+							{
+								$reserve = new reserve($r);
+								$reserve->unhideReserve($user->getUserID());
+							}
+						}
+					}
+					
+					if (is_array($hidden) && !empty($hidden)){
+						foreach($hidden as $r)
+						{
+							$reserve = new reserve($r);
+							$reserve->hideReserve($user->getUserID());
+						}
+					}
+			}
 				$ci->getCourseForUser($user->getUserID());
-				//$ci->getCourseForUser($user->getUserID(),$_REQUEST['ca']);
-				$ci->getActiveReserves();
+
+				if (!$_REQUEST['showAll'])
+					$ci->getActiveReservesForUser($user->getUserID());
+				else
+					$ci->getActiveReservesForUser($user->getUserID(),true);
+
 				$ci->getInstructors();
 				$ci->getCrossListings();
 
 				$this->displayFunction = "displayReserves";
-				$this->argList = array($user, $ci);
+				$this->argList = array($cmd, $user, $ci);
 			break;
 
 			case 'previewReservesList':
@@ -129,7 +157,7 @@ class reservesManager
 				$ci->getPrimaryCourse();
 
 				$this->displayFunction = "displayReserves";
-				$this->argList = array($user, $ci, 'no_exit');
+				$this->argList = array($cmd, $user, $ci, 'no_exit');
 			break;
 
 			case 'previewStudentView':
@@ -144,7 +172,7 @@ class reservesManager
 				$ci->getPrimaryCourse();
 
 				$this->displayFunction = "displayReserves";
-				$this->argList = array($user, $ci, 'no_exit');
+				$this->argList = array($cmd, $user, $ci, 'no_exit');
 			break;
 
 
@@ -321,7 +349,7 @@ class reservesManager
 					}
 				}
 				$this->displayFunction = "displayReserveAdded";
-				$this->argList = array($_REQUEST['ci']);
+				$this->argList = array(null, $_REQUEST['ci']);
 				//$this->argList = array($ci);
 			break;
 			case 'uploadDocument':
@@ -399,7 +427,7 @@ class reservesManager
 				}
 				
 				$this->displayFunction = "displayReserveAdded";
-	    		$this->argList = array($_REQUEST['ci']);
+	    		$this->argList = array($reserve, $_REQUEST['ci']);
 			break;
 			case 'faxReserve':
 				$page="addReserve";
@@ -476,7 +504,7 @@ class reservesManager
 				}
 
 				$this->displayFunction = "displayReserveAdded";
-				$this->argList = array($_REQUEST['ci']);
+				$this->argList = array(null, $_REQUEST['ci']);
 			break;
 
 		}

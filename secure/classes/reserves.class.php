@@ -44,6 +44,7 @@ class reserve
 	public $creationDate;
 	public $lastModDate;
 	public $notes = array();
+	public $hidden = false;
 	public $requested_loan_period;
 	
 	/**
@@ -389,6 +390,46 @@ class reserve
 		else
 			return false;
 		
+	}
+	
+	function hideReserve($userID)
+	{
+		global $g_dbConn;
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "INSERT INTO hidden_readings (user_id, reserve_id) VALUES (!, !)";
+		}
+
+
+		$rs = $g_dbConn->query($sql, array($userID, $this->reserveID));
+		if (DB::isError($rs))
+		{
+
+			if ($rs->getMessage() == 'DB Error: already exists')
+			{
+				return false;
+			}
+			else
+				trigger_error($rs->getMessage(), E_USER_ERROR);
+		}
+
+		$this->hidden=true;
+		return true;
+	}
+	
+	function unhideReserve($userID)
+	{
+		global $g_dbConn;
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "DELETE FROM hidden_readings WHERE user_id = ! AND reserve_id = !";
+		}
+
+		$rs = $g_dbConn->query($sql, array($userID, $this->reserveID));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
 	}
 
 }

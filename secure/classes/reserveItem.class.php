@@ -124,6 +124,7 @@ class reserveItem extends item
 		global $g_dbConn;
 		
 		if (!is_null($local_control_key) && $local_control_key != '')
+		{
 			switch ($g_dbConn->phptype)
 			{
 				default: //'mysql'
@@ -165,7 +166,7 @@ class reserveItem extends item
 					if (!is_null($row[19]))
 						$this->notes[] = new note($row[19]);
 				} 
-		
+		}
 
 	}
 
