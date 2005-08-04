@@ -116,7 +116,15 @@ class item
 			$this->creationDate = $row[4];
 			$this->itemType		= $row[5];
 			$this->contentNotes	= $row[6];
-			$this->notes[] = new note($row[7]);
+			//$this->notes[] = new note($row[7]); This won't work if there are multiple notes... replaced with logic below ... kaw 8.4.05
+			
+			
+			if (!is_null($row[7]))
+				$this->notes[] = new note($row[7]);
+				
+			while ($row = $rs->fetchRow()) //get additional notes
+				if (!is_null($row[7]))
+					$this->notes[] = new note($row[7]);
 	}
 
 	/**
