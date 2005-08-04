@@ -156,7 +156,13 @@ class requestManager
 				$reserve->setStatus($status);
 
 				if (isset($request['author'])) $item->setAuthor($request['author']);
-				if (isset($request['content_note'])) $item->setContentNotes($request['content_note']);
+				//if (isset($request['content_note'])) $item->setContentNotes($request['content_note']);
+	    	if (isset($request['content_note']) && $request['content_note'] != "" && isset($request['noteType']))
+	    			if ($request['noteType'] == "Instructor")
+	    				$reserve->setNote($request['noteType'],$request['content_note']);
+	    			else
+	    				$item->setNote($request['noteType'],$request['content_note']);
+	    				
 				if (isset($request['controlKey'])) $item->setLocalControlKey($request['controlKey']);
 				if (isset($request['performer'])) $item->setPerformer($request['performer']);
 				if (isset($request['source'])) $item->setSource($request['source']);
@@ -279,7 +285,7 @@ class requestManager
 
 						$item_id = $duplicateItem->createNewItem();
 
-						$search_results = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'source'=>'', 'content_note'=>'', 'controlKey'=>'', 'personal_owner'=>null, 'physicalCopy'=>'');
+						$search_results = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'source'=>'', 'content_note'=>'', 'controlKey'=>'', 'personal_owner'=>null, 'physicalCopy'=>'', 'noteType'=>'');
 						$search_results['title'] = ($item->getTitle() <> "") ? $item->getTitle() : "";
 						$search_results['author'] = ($item->getAuthor() <> "") ? $item->getAuthor() : "";
 						$search_results['edition'] = ($item->getVolumeEdition() <> "") ? $item->getVolumeEdition() : "";
@@ -287,7 +293,12 @@ class requestManager
 						$search_results['volume_title'] = ($item->getVolumeTitle() <> "") ? $item->getVolumeTitle() : "";
 						$search_results['times_pages'] = ($item->getPagesTimes() <> "") ? $item->getPagesTimes() : "";
 						$search_results['source'] = ($item->getSource() <> "") ? $item->getSource() : "";
-						$search_results['content_note'] = ($item->getContentNotes() <> "") ? $item->getContentNotes() : "";
+						
+						//$search_results['content_note'] = ($item->getContentNotes() <> "") ? $item->getContentNotes() : "";
+						$item->getNotes();
+						$search_results['noteType'] = ($item->notes[0]->type <> "") ? $item->notes[0]->type : "";
+						$search_results['content_note'] = ($item->notes[0]->text <> "") ? $item->notes[0]->text : "";
+						
 						$search_results['controlKey'] = $item->getLocalControlKey();
 						$search_results['personal_owner'] = $item->getPrivateUserID();
 
@@ -308,7 +319,7 @@ class requestManager
 
 					$loc  = "add an item";
 					$this->displayFunction = 'addSuccessful';
-					$this->argList = array($reserve, $ci, $request['selected_instr'], $ilsResult);
+					$this->argList = array($user, $reserve, $ci, $request['selected_instr'], $ilsResult);
 				}
 				break;
 

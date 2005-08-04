@@ -281,7 +281,7 @@ class requestDisplayer
 	
 	function addItem($user, $cmd, $search_results, $owner_list, $lib_list, $request_id=null, $request, $hidden_fields, $docTypeIcons=null, $isActive=true, $buttonValue="Add Item", $msg="", $requestLoanPeriod=null)
 	{
-		global $g_documentURL;
+		global $g_documentURL, $g_permission;
 
 		$circRules = new circRules();
 
@@ -628,9 +628,51 @@ class requestDisplayer
 		//echo "					<td><input type=\"text\" size=\"30\" name=\"callNumber\" value=\"".$search_results['callNumber'][0]."\"></td>\n";
 		//echo "				</tr>\n";
 		echo "				<tr align=\"left\" valign=\"middle\">\n";
-		echo "					<td align=\"right\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"strong\">Content Notes:</td>\n";
-		echo "					<td><textarea name=\"content_note\" cols=\"50\" rows=\"3\">".$search_results['content_note']."</textarea></td>\n";
-		echo "				</tr>\n";
+		
+		if ($user->dfltRole >= $g_permission['staff']) {
+				
+				$contentChecked="";
+				$instructorChecked="";
+				$staffChecked="";
+				$copyrightChecked="";
+				
+				if ($search_results['noteType'] != "" && $search_results['content_note'] != "") {
+					switch ($search_results['noteType']) {
+						case 'Content':
+							$contentChecked="checked";
+						break;
+						case 'Instructor':
+							$instructorChecked="checked";
+						break;
+						case 'Staff':
+							$staffChecked="checked";
+						break;
+						case 'Copyright':
+							$copyrightChecked="checked";
+						break;
+					}
+				} else {
+					$contentChecked="checked";
+				}
+				
+				echo "					<td align=\"right\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"strong\">Note:</td>\n";
+				echo "					<td><TEXTAREA name=\"content_note\" cols=\"50\" rows=\"3\">".$search_results['content_note']."</TEXTAREA>\n<br>\n";
+	
+  			echo '      			<span class="small">Note Type:';
+    		echo '					<label><input type="radio" name="noteType" value="Content" '.$contentChecked.'>Content Note</label>';
+    		echo '					<label><input type="radio" name="noteType" value="Instructor" '.$instructorChecked.'>Instructor Note</label>';
+    		echo '					<label><input type="radio" name="noteType" value="Staff" '.$staffChecked.'>Staff Note</label>';
+				echo '					<label><input type="radio" name="noteType" value="Copyright" '.$copyrightChecked.'>Copyright Note</label>';
+				echo '					</span>';
+			} else {
+				echo "					<td align=\"right\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"strong\">Instructor Note:</td>\n";
+				echo "					<td><TEXTAREA name=\"content_note\" cols=\"50\" rows=\"3\">".$search_results['content_note']."</TEXTAREA>\n<br>\n";
+				echo '					<input type="hidden" name="noteType" value="Instructor">';
+			}
+		
+		//echo "					<td align=\"right\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"strong\">Content Notes:</td>\n";
+		//echo "					<td><textarea name=\"content_note\" cols=\"50\" rows=\"3\">".$search_results['content_note']."</textarea></td>\n";
+		echo "				</td></tr>\n";
 
 		$personal_item = isset($request['personal_item']) ? $request['personal_item'] : "";
 		echo "				<input type=\"hidden\" name=\"personal_item\" value=\"".$personal_item."\">\n";
@@ -733,9 +775,9 @@ class requestDisplayer
 		echo "</table>\n";
 	}
 
-	function addSuccessful($reserve, $ci, $selected_instr, $msg=null)
+	function addSuccessful($user, $reserve, $ci, $selected_instr, $msg=null)
 	{
-		global $g_reservesViewer;
+		global $g_reservesViewer, $g_permission;
 
 		echo "<table width=\"60%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "	<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";

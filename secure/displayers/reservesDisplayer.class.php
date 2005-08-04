@@ -880,9 +880,9 @@ function displaySearchItemMenu($ci)
 
 	}
 
-function displayReserveAdded($reserve=null, $ci)
+function displayReserveAdded($user, $reserve=null, $ci)
 {
-	global $g_reservesViewer;
+	global $g_reservesViewer, $g_permission;
 
 	echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
   echo "	<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\">&nbsp;</td></tr>\n";
@@ -929,7 +929,7 @@ function displayReserveAdded($reserve=null, $ci)
 			$instructorNotes = $reserve->getNotes();
 			
     	echo "				<tr><td>&nbsp;</td></tr>\n";
-    	echo "				<tr><td><strong>Review items:</strong></td></tr>\n";
+    	echo "				<tr><td><strong>Review item:</strong></td></tr>\n";
     	echo "				<tr><td>&nbsp;</td></tr>\n";
     	echo '<tr><td><table border="0" cellspacing="0" cellpadding="0">';
     	echo '<tr align="left" valign="middle" class="oddRow">';
@@ -968,7 +968,6 @@ function displayReserveAdded($reserve=null, $ci)
 	    }
 	    if ($instructorNotes)
 	    {
-	    
 	    	for ($n=0; $n<count($instructorNotes); $n++)
 	        {
 	        	echo '<br><span class="noteType">Instructor Note:</span>&nbsp;<span class="noteText">'.$instructorNotes[$n]->getText().'</span>';
@@ -990,8 +989,9 @@ function displayReserveAdded($reserve=null, $ci)
   echo "</table>\n";
 }
 
-function displayUploadForm($ci, $type, $docTypeIcons=null)
+function displayUploadForm($user, $ci, $type, $docTypeIcons=null)
 {
+	global $g_permission;
 	
 	if ($type == "URL")		
 		$documentTest = "if (frm.url.value == \"\") alertMsg = alertMsg + \"URL is required.<br>\";\n";
@@ -1123,8 +1123,22 @@ function displayUploadForm($ci, $type, $docTypeIcons=null)
 	echo "				</tr>\n";
 
 	echo "				<tr valign=\"middle\">\n";
-	echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Contents</span>(<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
-	echo "					<td align=\"left\"><TEXTAREA NAME=\"contents\" cols=50 rows=3>\n</TEXTAREA>\n</td>\n";
+	if ($user->dfltRole >= $g_permission['staff']) {
+		echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Note</span>(<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
+		echo "					<td align=\"left\"><TEXTAREA NAME=\"contents\" cols=50 rows=3>\n</TEXTAREA>\n<br>\n";
+	
+  	echo '      			<span class="small">Note Type:';
+    echo '					<label><input type="radio" name="noteType" value="Content" checked>Content Note</label>';
+    echo '					<label><input type="radio" name="noteType" value="Instructor">Instructor Note</label>';
+    echo '					<label><input type="radio" name="noteType" value="Staff">Staff Note</label>';
+		echo '					<label><input type="radio" name="noteType" value="Copyright">Copyright Note</label>';
+		echo '					</span>';
+	} else {
+		echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Instructor Note</span>(<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
+		echo "					<td align=\"left\"><TEXTAREA NAME=\"contents\" cols=50 rows=3>\n</TEXTAREA>\n<br>\n";
+		echo '					<input type="hidden" name="noteType" value="Instructor">';
+	}
+	echo "</td>";
 	echo "				</tr>\n";
 
 	echo "				<tr valign=\"middle\">\n";
@@ -1251,9 +1265,9 @@ function claimFax($faxReader, $ci)
 	echo "</form>\n";
 }
 
-function displayFaxMetadataForm($faxes, $ci)
+function displayFaxMetadataForm($user, $faxes, $ci)
 {
-	global $g_faxURL;
+	global $g_faxURL, $g_permission;
 
 	echo "<FORM METHOD=POST ACTION=\"index.php\">\n";
 	echo "	<INPUT TYPE=\"HIDDEN\" NAME=\"cmd\" VALUE=\"storeFaxMetadata\">\n";
@@ -1340,9 +1354,29 @@ function displayFaxMetadataForm($faxes, $ci)
 			echo "				</tr>\n";
 */
 			echo "				<tr valign=\"middle\">\n";
-			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Contents</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
-			echo "					<td align=\"left\"><textarea NAME=\"" . $fax['file'] . "[contents]\" cols=\"50\" rows=\"3\"></textarea></td>\n";
-			echo "				</tr>\n";
+			
+			
+			if ($user->dfltRole >= $g_permission['staff']) {
+				echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Note</span>(<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
+				echo "					<td align=\"left\"><TEXTAREA NAME=\"" . $fax['file'] . "[contents]\" cols=50 rows=3>\n</TEXTAREA>\n<br>\n";
+	
+  			echo '      			<span class="small">Note Type:';
+    		echo '					<label><input type="radio" name="'.$fax['file'].'[noteType]" value="Content" checked>Content Note</label>';
+    		echo '					<label><input type="radio" name="'.$fax['file'].'[noteType]" value="Instructor">Instructor Note</label>';
+    		echo '					<label><input type="radio" name="'.$fax['file'].'[noteType]" value="Staff">Staff Note</label>';
+				echo '					<label><input type="radio" name="'.$fax['file'].'[noteType]" value="Copyright">Copyright Note</label>';
+				echo '					</span>';
+			} else {
+				echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Instructor Note</span>(<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
+				echo "					<td align=\"left\"><TEXTAREA NAME=\"" . $fax['file'] . "[contents]\" cols=50 rows=3>\n</TEXTAREA>\n<br>\n";
+				echo '					<input type="hidden" name="'.$fax['noteType'].'" value="Instructor">';
+			}
+			
+			
+			
+			//echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Contents</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
+			//echo "					<td align=\"left\"><textarea NAME=\"" . $fax['file'] . "[contents]\" cols=\"50\" rows=\"3\"></textarea></td>\n";
+			echo "				</td></tr>\n";
 
 			echo "				<tr valign=\"middle\">\n";
 			echo "					<td align=\"right\" bgcolor=\"#CCCCCC\">&nbsp;</td>\n";

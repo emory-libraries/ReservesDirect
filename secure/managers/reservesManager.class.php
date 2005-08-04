@@ -349,18 +349,18 @@ class reservesManager
 					}
 				}
 				$this->displayFunction = "displayReserveAdded";
-				$this->argList = array(null, $_REQUEST['ci']);
+				$this->argList = array($user, null, $_REQUEST['ci']);
 				//$this->argList = array($ci);
 			break;
 			case 'uploadDocument':
 				$page="addReserve";
 				$this->displayFunction = "displayUploadForm";
-				$this->argList = array($_REQUEST['ci'], "DOCUMENT", $user->getAllDocTypeIcons());
+				$this->argList = array($user, $_REQUEST['ci'], "DOCUMENT", $user->getAllDocTypeIcons());
 			break;
 			case 'addURL':
 				$page="addReserve";
 				$this->displayFunction = "displayUploadForm";
-				$this->argList = array($_REQUEST['ci'], "URL", $user->getAllDocTypeIcons());
+				$this->argList = array($user, $_REQUEST['ci'], "URL", $user->getAllDocTypeIcons());
 			break;
 			
 			case 'storeUploaded':
@@ -381,7 +381,8 @@ class reservesManager
 	    		$item->setVolumeTitle($_REQUEST['volumetitle']);
 	    		$item->setvolumeEdition($_REQUEST['volume']);
 	    		$item->setSource($_REQUEST['source']);
-	    		$item->setContentNotes($_REQUEST['contents']);
+	    		//$item->setContentNotes($_REQUEST['contents']);
+	    		
 	    		if (isset($_REQUEST['selectedDocIcon'])) $item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
 
 	    		if ($_REQUEST['type'] == 'DOCUMENT'){
@@ -417,8 +418,15 @@ class reservesManager
 				$ci = new courseInstance($_REQUEST['ci'])	;
 
 				$reserve = new reserve();
+				
 				if ($reserve->createNewReserve($ci->getCourseInstanceID(), $item->getItemID()))
 				{
+					if (isset($_REQUEST['contents']) && $_REQUEST['contents'] != "" && isset($_REQUEST['noteType']))
+	    			if ($_REQUEST['noteType'] == "Instructor")
+	    				$reserve->setNote($_REQUEST['noteType'],$_REQUEST['contents']);
+	    			else
+	    				$item->setNote($_REQUEST['noteType'],$_REQUEST['contents']);
+					
 					$reserve->setActivationDate($ci->getActivationDate());
 					$reserve->setExpirationDate($ci->getExpirationDate());
 
@@ -427,7 +435,7 @@ class reservesManager
 				}
 				
 				$this->displayFunction = "displayReserveAdded";
-	    		$this->argList = array($reserve, $_REQUEST['ci']);
+	    		$this->argList = array($user, $reserve, $_REQUEST['ci']);
 			break;
 			case 'faxReserve':
 				$page="addReserve";
@@ -456,7 +464,7 @@ class reservesManager
 				}
 
 				$this->displayFunction = "displayFaxMetadataForm";
-				$this->argList = array($claimedFaxes, $_REQUEST['ci']);
+				$this->argList = array($user, $claimedFaxes, $_REQUEST['ci']);
 			break;
 			case 'storeFaxMetadata':
 				$page="addReserve";
@@ -474,8 +482,8 @@ class reservesManager
 					$item->setAuthor($_REQUEST[$file]['author']);
 					$item->setVolumeTitle($_REQUEST[$file]['volumetitle']);
 					$item->setvolumeEdition($_REQUEST[$file]['volume']);
-					$item->setContentNotes($_REQUEST[$file]['contents']);
-
+					//$item->setContentNotes($_REQUEST[$file]['contents']);
+					
 					//move file and store new location
 					$newFileName = str_replace("&", "_", $filename); 											//remove & in filenames
 					$newFileName = $item->getItemID() ."-". str_replace(" ", "_", $newFileName . "." . $type); 	//remove spaces in filenames
@@ -493,8 +501,15 @@ class reservesManager
 					$item->setType('ITEM');
 
 					$reserve = new reserve();
+
 					if ($reserve->createNewReserve($ci->getCourseInstanceID(), $item->getItemID()))
 					{
+						if (isset($_REQUEST[$file]['contents']) && $_REQUEST[$file]['contents'] != "" && isset($_REQUEST[$file]['noteType']))
+	    				if ($_REQUEST[$file]['noteType'] == "Instructor")
+	    					$reserve->setNote($_REQUEST[$file]['noteType'],$_REQUEST[$file]['contents']);
+	    				else
+	    					$item->setNote($_REQUEST[$file]['noteType'],$_REQUEST[$file]['contents']);
+						
 						$reserve->setActivationDate($ci->getActivationDate());
 						$reserve->setExpirationDate($ci->getExpirationDate());
 
@@ -504,7 +519,7 @@ class reservesManager
 				}
 
 				$this->displayFunction = "displayReserveAdded";
-				$this->argList = array(null, $_REQUEST['ci']);
+				$this->argList = array($user, null, $_REQUEST['ci']);
 			break;
 
 		}
