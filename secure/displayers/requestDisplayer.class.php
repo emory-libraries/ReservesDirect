@@ -65,19 +65,13 @@ class requestDisplayer
         echo "	</tr>\n";
         echo "	</form>\n";
         
-        echo "	<form action=\"index.php?sort=\"" . $request['sort'] . "\" method=\"POST\" target=\"print\">\n";
+        echo "	<form action=\"index.php?sort=\"" . $request['sort'] . "\" method=\"POST\">\n";
         echo "	<input type=\"hidden\" name=\"cmd\" value=\"printRequest\">\n";
+        echo "	<input type=\"hidden\" name=\"sort\" value=\"".$request['sort']."\">\n";
         echo "	<input type=\"hidden\" name=\"no_control\">\n";
         echo "	<tr>\n";
         echo "		<td><font color=\"#666666\">&nbsp;</font></td>";
-        echo "		<td bgcolor=\"#FFFFFF\" align=\"right\"><input type=\"submit\" value=\"Print Selected Request\">";
-//                    <select name=\"select\">
-//                     <option selected>Selected request</option>
-//                      <option>Selected class</option>
-//                      <option>Selected instructor</option>
-//                    </select>
-//                    <input type=\"submit\" name=\"Submit\" value=\"Go\">
-//          </strong></font></div></td>
+        echo "		<td bgcolor=\"#FFFFFF\" align=\"right\"><input type=\"button\" value=\"Print Selected Request\" onClick=\"this.form.cmd.value='printRequest'; this.form.target='printPage'; this.form.submit();\">";
 		echo "	</td>\n";
 		echo "</tr>\n";		
 
@@ -262,7 +256,7 @@ class requestDisplayer
 			if (is_null($printView) || $printView == "false")
 			{
 				echo "							<input type=\"hidden\" name=\"request_id\" value=\"". $r->requestID ."\">\n";
-				echo "							<input type=\"button\" value=\"Process this Item\" onClick=\"this.form.cmd.value='processRequest'; this.form.submit();\">\n";
+				echo "							<input type=\"button\" value=\"Process this Item\" onClick=\"this.form.cmd.value='processRequest'; this.form.target=window.name; this.form.no_control.value='false'; this.form.submit();\">\n";
 			
 				echo "						&nbsp;<a href=\"index.php?cmd=deleteRequest&request_id=".$r->requestID."\">Delete Request</a>&nbsp;";	
 			}	
