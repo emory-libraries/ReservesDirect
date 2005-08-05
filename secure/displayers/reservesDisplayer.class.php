@@ -656,7 +656,7 @@ function displaySearchItemMenu($ci)
 	function displaySearchResults($user, $search, $cmd, $ci=null, $hidden_requests=null, $hidden_reserves=null, $loan_periods=null)
 	{
 		global $g_reservesViewer, $g_permission;
-		
+
 		$showNextLink = false;
 		$showPrevLink = false;
 		$e = 20;

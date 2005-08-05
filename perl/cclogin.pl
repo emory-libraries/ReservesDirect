@@ -40,7 +40,7 @@ my $form = <<HERE;
 </head>
 
 <body onLoad="document.forms[0].credential_0.focus();">
-<FORM METHOD="POST" ACTION="https://$hostname/$action">
+<FORM METHOD="POST" ACTION="https://$hostname/$action$args">
 <INPUT TYPE=hidden NAME=destination VALUE="$uri$args");
 <table width="80%" border="0" align="center" cellpadding="5" cellspacing="0">
   <tr>
@@ -149,12 +149,12 @@ HERE
 if ($reason eq "bad_credentials") 
 {
 	$errorString = "<TR><TD ALIGN=CENTER><P><FONT COLOR=\"#FF0000\">Sorry, you entered an invalid Username or Password, please try again in 4 seconds ...</FONT></P></TD></TR>";
-	$errorString = $errorString . "<TR><TD ALIGN=CENTER><A HREF=\"$loginpath\">(If you are not returned, click here)</A></TD></TR>";
+	$errorString = $errorString . "<TR><TD ALIGN=CENTER><A HREF=\"$loginpath$args\">(If you are not returned, click here)</A></TD></TR>";
         $r->no_cache(1);
 	$r->content_type("text/html");
 	$r->header_out("Pragma", "no-cache");
 	$r->send_http_header;
-	$r->print ("<html><head><META HTTP-EQUIV=\"Refresh\" CONTENT=\"4;URL=$loginpath\"></head><body><br /><br /><table width=50% align=center>$errorString</table></body></html>");
+	$r->print ("<html><head><META HTTP-EQUIV=\"Refresh\" CONTENT=\"4;URL=$loginpath$args\"></head><body><br /><br /><table width=50% align=center>$errorString</table></body></html>");
 
 }
 

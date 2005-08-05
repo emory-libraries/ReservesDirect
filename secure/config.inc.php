@@ -28,8 +28,8 @@ http://www.reservesdirect.org/
 
 *******************************************************************************/
 	require_once("DB.php");
-
-	$xmlConfig = "/home/croddy/faxprocessor/config.xml";
+	
+	$xmlConfig = "/home/jbwhite/configs/biliku_testsite.xml";
 
 	if (!is_readable($xmlConfig)) { trigger_error("Could not read configure xml file path=$xmlConfig", E_USER_ERROR); }
 
@@ -93,11 +93,9 @@ http://www.reservesdirect.org/
 	$g_zport 			= (string)$configure->catalog->zport;
 	$g_zdb	 			= (string)$configure->catalog->zdb;
 	$g_zReflector		= (string)$configure->catalog->zReflector;
-
 	$g_catalogName		= (string)$configure->catalog->catalogName;
 	$g_reserveScript	= (string)$configure->catalog->reserve_script;
 	$g_holdingsScript	= (string)$configure->catalog->holdings_script;
-
 	$g_reservesViewer	= (string)$configure->catalog->web_search;
 
 	$g_libraryURL		= (string)$configure->library_url;

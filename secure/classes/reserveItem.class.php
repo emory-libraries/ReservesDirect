@@ -165,10 +165,10 @@ class reserveItem extends item
 				while ($row = $rs->fetchRow()) //get additional notes
 					if (!is_null($row[19]))
 						$this->notes[] = new note($row[19]);
-				} 
+			} 
 		}
 
-	}
+	}	
 
 	/**
 	* @return void
