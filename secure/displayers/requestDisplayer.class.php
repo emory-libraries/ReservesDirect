@@ -270,7 +270,7 @@ class requestDisplayer
 			echo " 				</tr>\n";
 
 			echo " </table></td></tr>";				
-			//echo " 			</table>\n";
+			echo " 			</table>\n";
 			echo "<div style=\"page-break-after:always;\"></div>\n";
 
 		}
