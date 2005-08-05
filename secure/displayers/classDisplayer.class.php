@@ -1314,7 +1314,7 @@ class classDisplayer
 	    	    
 	    echo '</td>';	   
 
-			if ($ci->reserveList[$i]->item->isPersonalCopy() && $user->getDefaultRole() < $g_permission['staff'])
+			if ($reserveItem->isPhysicalItem() && $ci->reserveList[$i]->item->isPersonalCopy() && $user->getDefaultRole() < $g_permission['staff'])
 			{
 				echo "<td align=\"left\" class=\"failedText\">Personal items can not be reactivated.<br>  Please contact your reserves desk for assistance.</td></tr>";
 			}
