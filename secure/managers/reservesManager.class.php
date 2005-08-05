@@ -83,16 +83,16 @@ class reservesManager
 				$user->getCourseInstances();
 				for ($i=0;$i<count($user->courseInstances);$i++)
 				{
-					$ci = $user->courseInstances[$i];
-					$ci->getInstructors();
-					$ci->getProxies();
+					$my_ci = $user->courseInstances[$i];
+					$my_ci->getInstructors();
+					$my_ci->getProxies();
 
 					//Look at this later - should this logic be handled by ci->getCourseForUser? - kawashi 11.2.2004
-					if (in_array($user->getUserID(),$ci->instructorIDs) || in_array($user->getUserID(),$ci->proxyIDs)) {
-						//$ci->getCourseForInstructor($user->getUserID());
-						$ci->getPrimaryCourse();
+					if (in_array($user->getUserID(),$my_ci->instructorIDs) || in_array($user->getUserID(),$my_ci->proxyIDs)) {
+						//$my_ci->getCourseForInstructor($user->getUserID());
+						$my_ci->getPrimaryCourse();
 					} else {
-						$ci->getCourseForUser($user->getUserID());  //load courses
+						$my_ci->getCourseForUser($user->getUserID());  //load courses
 					}
 				}
 
