@@ -15,10 +15,10 @@ my $skin = "";
 my $docs = "";
 my $img = "";
 my $title = "";
-my $loginpath = "/jbwhite/reserves2/index.php";
-my $css = "/jbwhite/reserves2/css/ReservesStyles.css";
-my $imagepath = "/jbwhite/reserves2/images";
-my $hostname = "biliku.library.emory.edu";
+my $loginpath = "/reserves2test/index.php";
+my $css = "/reserves2test/css/ReservesStyles.css";
+my $imagepath = "/reserves2test/images";
+my $hostname = "ereserves.library.emory.edu";
 
 my $reason = $r->prev->subprocess_env("AuthCookieReason");
 my $errorString = "";
