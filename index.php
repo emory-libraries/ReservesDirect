@@ -247,10 +247,17 @@ switch ($cmd)
 		$mgr = new searchManager($cmd, $u, $_REQUEST);
 	
 
+	case 'reportsTab':
+	case 'viewReport':
+		$page = "reports";
+		require_once("secure/managers/reportManager.class.php");
+		$mgr = new adminManager($cmd, $u, $_REQUEST);
+		
+
 	default:
 		trigger_error("index.php cmd=$cmd case not defined", E_USER_ERROR);
 }
-if (isset($_REQUEST['no_control']))
+
 if (isset($_REQUEST['no_control']) && $_REQUEST['no_control'] != 'false')
 	include "secure/html/no_table.inc.html";
 else
