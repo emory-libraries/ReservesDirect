@@ -348,7 +348,7 @@ class staff extends instructor
 				$tmpRequest->getCourseInstance();
 				$tmpRequest->courseInstance->getPrimaryCourse();
 				$tmpRequest->courseInstance->getCrossListings();
-				$tmpRequest->getHoldings();
+				//$tmpRequest->getHoldings();
 			$tmpArray[] = $tmpRequest;
 		}
 		return $tmpArray;

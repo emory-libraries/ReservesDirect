@@ -119,7 +119,7 @@ class requestDisplayer
 	}	
 	
 	function displayRequestList($requestList, $item, $ci, $printView=null)
-	{
+	{	
 		echo "	<tr><td colspan=\"2\">&nbsp;</td></tr>\n";
 
 		echo "	<tr>\n";
@@ -188,28 +188,25 @@ class requestDisplayer
 			echo "					        <td align=\"left\" valign=\"top\">". $item->author ."</td>\n";
 			echo "					      </tr>\n";
 
-
-			echo "					      <tr>\n";
-			echo "					        <td valign=\"top\">&nbsp;</td>\n";
-			echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Location:</td>\n";
-			//should be able to select no ILS and then display commented code
-//				echo "					        <td align=\"left\" valign=\"top\">". $pCopy->getOwningLibrary() . " " . $pCopy->getStatus() ." ". $pCopy->getCallNumber() ."</td>\n";
-			echo "					        <td align=\"left\" valign=\"top\">\n";
 			if(count($r->holdings) > 0)
-				$cntHolding = 0;
+			{			
+				echo "					      <tr>\n";
+				echo "					        <td valign=\"top\">&nbsp;</td>\n";
+				echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Location:</td>\n";
+				//should be able to select no ILS and then display commented code
+//				echo "					        <td align=\"left\" valign=\"top\">". $pCopy->getOwningLibrary() . " " . $pCopy->getStatus() ." ". $pCopy->getCallNumber() ."</td>\n";
+				echo "					        <td align=\"left\" valign=\"top\">\n";
+
 				foreach ($r->holdings as $h)
 				{
-					if ($cntHolding < 5 && (is_null($printView) || $printView == "false")) //on printview show all 
-						echo $h['library'] . " " . $h['callNum'] . " " . $h['loc'] . " " . $h['type'] . "<br>";					
-					$cntHolding++;
+					echo $h['library'] . " " . $h['callNum'] . " " . $h['loc'] . " " . $h['type'] . "<br>";					
 				}
 				if(count($r->holdings) > 0 && (is_null($printView) || $printView == "false")) //on printview show all 
 					echo "Additional copies are available. View details for all holdings";
 			
-			echo "							</td>\n";
-
-			echo "					      </tr>\n";
-
+				echo "							</td>\n";
+				echo "					      </tr>\n";
+			}
 
 			echo "					      <tr>\n";
 			echo "					        <td valign=\"top\">&nbsp;</td>\n";
