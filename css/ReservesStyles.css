@@ -596,7 +596,11 @@ itemMetaPre defines how some prefixes to metadata information appear, for exampl
 	font-variant: small-caps;
 	color: #999999;
 }
-
+#hiddenItem .itemTitle, .itemMetaPre, .itemMeta, .itemAuthor, .noteType, .noteText {    
+		color: #999999
+}
+/*hiddenItem defines the appearance of reserve materials 
+that students have chosen to hide from view. */
 .user {
 	font-size: small;
 	font-weight: bold;
@@ -607,7 +611,7 @@ itemMetaPre defines how some prefixes to metadata information appear, for exampl
 	display: block;
 	padding: 10px;
 
-/*This is used for any text that gives instructions to users on steps or actions to take.*/
+/*instructionText is used for any text that gives instructions to users on steps or actions to take.*/
 
 }
 
