@@ -436,7 +436,7 @@ under the ReservesDirect logo.  */
 	background-color: #003300;
 	text-align: center;
 }
-.headingCell2 {
+#headingCell2 {
 	
 	font-size: small;
 	font-weight: bold;
@@ -446,6 +446,12 @@ under the ReservesDirect logo.  */
 	padding: 3px;
 	border-top: 1px solid #666666;
 	border-bottom: 1px solid #666666;
+}
+#headingCell2 .headingText{
+	
+	font-size: small;
+	font-weight: bold;
+	color: #333333;
 }
 .headingCell-helpfileActive {
 	
@@ -596,12 +602,51 @@ itemMetaPre defines how some prefixes to metadata information appear, for exampl
 	font-weight: bold;
 	color: #CC0000;
 }
+.itemNumber {
+	
+	font-size: small;
+	font-weight: bold;
+	font-variant: small-caps;
+	color: #999999;
+}
+#hiddenItem .itemTitle, .itemMetaPre, .itemMeta, .itemAuthor, .noteType, .noteText {    
+		color: #999999
+}
+/*hiddenItem defines the appearance of reserve materials 
+that students have chosen to hide from view. */
 
 .user {
 	font-size: small;
 	font-weight: bold;
 	color: #333333;
 	padding-right: 10px;
+}
+
+
+/* statusText styles are used on the "Edit Class" page for text that indicates the current status
+of materials on reserve. */
+#statusText .heading {
+	font-weight: bold;
+	color: #000066;
+
+}
+
+#statusText .inProcess {
+	color: #666666;
+	font-weight: bold;
+
+}
+
+#statusText .active {
+	color: #009900;
+	font-weight: bold;
+
+}
+
+#statusText .inactive {
+	color: #CC0000;
+	font-weight: bold;
+
 }
 
 /*
