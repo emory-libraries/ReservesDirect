@@ -257,7 +257,7 @@ class reservesDisplayer
 				.    '			<td width="4%" valign="top"><img src="'.$itemIcon.'" alt="text" width="24" height="20"></td>'
 	            .    '			<td width="88%">';
 	            if ($ci->reserveList[$i]->hidden) {
-	            	echo '<span class="hiddenItem">';
+	            	echo '<div id="hiddenItem">';
 	            }
 	            if (!$reserveItem->isPhysicalItem()) {
 	            	echo '<a href="'.$viewReserveURL.'" target="_blank" class="itemTitle">'.$title.'</a>';
@@ -323,7 +323,7 @@ class reservesDisplayer
 	    	}
 	    }
 	    if ($ci->reserveList[$i]->hidden) {
-	            	echo '</span>';
+	            	echo '</div>';
 	            }
 	    echo '</td>';
 
