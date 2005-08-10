@@ -236,7 +236,7 @@ class reservesManager
 				if ($user->getDefaultRole() >= $g_permission['staff']) {
 					//$courseInstances = $user->getCourseInstances($_REQUEST['u']);
 					$this->displayFunction = "displayStaffAddReserve";
-					$this->argList = array();
+					$this->argList = array($_REQUEST);
 					break;
 				} elseif ($user->getDefaultRole() >= $g_permission['proxy']) { //2 = proxy
 					$courseInstances = $user->getCourseInstances();

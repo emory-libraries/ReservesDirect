@@ -207,9 +207,12 @@ class classDisplayer
 		.	 '				</table>'
 		.	 '			</div></td>'
 		.	 '		</tr>'
-		.	 '		<tr align="left" valign="top">'
-		.	 '			<td height="28" colspan="2"> <div align="left">[ <a href="index.php?cmd=customSort&ci='.$ci->getCourseInstanceID().'" class="editlinks">sort list</a> ] [ <a href="index.php?cmd=displaySearchItemMenu&ci='.$ci->getCourseInstanceID().'" class="editlinks">add new materials</a> ] [ <a href="index.php?cmd=editHeading&ci='.$ci->getCourseInstanceID().'" class="editlinks">add new heading</a> ]</div></td>'
-		.	 '		</tr>'
+		.	 '		<tr align="left" valign="top">';
+		if ($user->dfltRole < $g_permission['staff']) 
+			echo	 '			<td height="28" colspan="2"> <div align="left">[ <a href="index.php?cmd=customSort&ci='.$ci->getCourseInstanceID().'" class="editlinks">sort list</a> ] [ <a href="index.php?cmd=displaySearchItemMenu&ci='.$ci->getCourseInstanceID().'" class="editlinks">add new materials</a> ] [ <a href="index.php?cmd=editHeading&ci='.$ci->getCourseInstanceID().'" class="editlinks">add new heading</a> ]</div></td>';
+		else
+			echo	 '			<td height="28" colspan="2"> <div align="left">[ <a href="index.php?cmd=customSort&ci='.$ci->getCourseInstanceID().'" class="editlinks">sort list</a> ] [ <a href="index.php?cmd=addReserve&ci='.$ci->getCourseInstanceID().'&selected_instr='.$ci->instructorList[0]->getUserID().'" class="editlinks">add new materials</a> ] [ <a href="index.php?cmd=editHeading&ci='.$ci->getCourseInstanceID().'" class="editlinks">add new heading</a> ]</div></td>';
+		echo	 '		</tr>'
 		.	 '      </table>'
 		.	 '	</td>'
 		.	 '</tr>'
