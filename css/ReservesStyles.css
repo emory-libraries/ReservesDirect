@@ -596,7 +596,7 @@ itemMetaPre defines how some prefixes to metadata information appear, for exampl
 	font-variant: small-caps;
 	color: #999999;
 }
-#hiddenItem .itemTitle, .itemMetaPre, .itemMeta, .itemAuthor, .noteType, .noteText {    
+#hiddenItem .itemTitle, #hiddenItem .itemTitleNoLink, #hiddenItem .itemMetaPre, #hiddenItem .itemMeta, #hiddenItem .itemAuthor, #hiddenItem .noteType, #hiddenItem .noteText {    
 		color: #999999
 }
 /*hiddenItem defines the appearance of reserve materials 
