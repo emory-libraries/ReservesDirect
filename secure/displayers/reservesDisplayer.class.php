@@ -117,7 +117,7 @@ class reservesDisplayer
 		echo '<tr>'
 		.	'	<td height="14"><img src="images/spacer.gif" width="1" height="15"></td>'
 		.	'</tr>';
-		if ($permissionLvl >= $g_permission['proxy']) {
+		if ($user->getDefaultRole() >= $g_permission['proxy']) {
 	    	echo '<tr>'
 	    	.   '	<td height="14" align="left" valign="middle" colspan="4"><img src="images/pencil.gif" alt="Edit" width="24" height="20"><span class="small"> = classes you may edit</span></td>'
 	    	.   '</tr>';
