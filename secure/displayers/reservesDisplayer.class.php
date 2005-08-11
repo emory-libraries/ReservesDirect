@@ -1014,9 +1014,6 @@ function displayUploadForm($user, $ci, $type, $docTypeIcons=null)
 				if (frm.title.value == \"\")
 					alertMsg = alertMsg + \"Title is required.<br>\";
 				
-				if (frm.author.value == \"\")
-					alertMsg = alertMsg + \"Author is required.<br>\";
-										
 				$documentTest				
 				
 				if (!alertMsg == \"\") 
@@ -1057,7 +1054,7 @@ function displayUploadForm($user, $ci, $type, $docTypeIcons=null)
 	echo "				</tr>\n";
 
 	echo "				<tr valign=\"middle\">\n";
-	echo "					<td width=\"35%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>Author/Composer:</div></td>\n";
+	echo "					<td width=\"35%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\">Author/Composer:</div></td>\n";
 	echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"author\" SIZE=50></td>\n";
 	echo "				</tr>\n";
 

@@ -307,7 +307,6 @@ class requestDisplayer
 
 						alertMsg = '';
 						if (frm.title.value == '') { alertMsg = alertMsg + 'Please enter a title.<br>' }
-						if (frm.author.value == '') { alertMsg = alertMsg + 'Please enter an author.<br>';  }
 						if (addTypeValue != 'MANUAL' && frm.euclid_record.checked && copySelected) { alertMsg = alertMsg + 'Please select a copy to place on reserve<br>'; }
 						if (addTypeValue == 'PERSONAL' && frm.selected_owner.selectedIndex == '0') { alertMsg = alertMsg + 'Please select a personal owner.<br>'; }
 						
@@ -322,7 +321,6 @@ class requestDisplayer
 			echo "	function checkForm(frm) {
 						alertMsg = '';
 						if (frm.title.value == '') { alertMsg = alertMsg + 'Please enter a title.<br>';  }						
-						if (frm.author.value == '') { alertMsg = alertMsg + 'Please enter an author.<br>';  }
 
 						if (frm.documentType[0].checked && frm.userFile.value == '')
 							alertMsg = alertMsg + 'File path is required.<br>'; 
@@ -564,7 +562,7 @@ class requestDisplayer
 		echo "					<td align=\"left\"><input name=\"title\" type=\"text\" size=\"50\" value=\"".$search_results['title']."\"></td>\n";
 		echo "				</tr>\n";
 		echo "				<tr valign=\"middle\">\n";
-		echo "					<td width=\"35%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>Author/Composer:</td>\n";
+		echo "					<td width=\"35%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">Author/Composer:</td>\n";
 		echo "					<td align=\"left\"><input name=\"author\" type=\"text\" size=\"50\" value=\"".$search_results['author']."\"></td>\n";
 		echo "				</tr>\n";
 		echo "				<tr valign=\"middle\">\n";

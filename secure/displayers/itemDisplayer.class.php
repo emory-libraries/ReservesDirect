@@ -47,18 +47,17 @@ class itemDisplayer
 		echo "
 		<script language=\"JavaScript\">
 		//<!--
-			function validateForm(frm)
+			function validateForm(frm,physicalCopy)
 			{			
 				var alertMsg = \"\";
 
 				if (frm.title.value == \"\")
 					alertMsg = alertMsg + \"Title is required.<br>\";
 				
-				if (frm.author.value == \"\")
-					alertMsg = alertMsg + \"Author is required.<br>\";
-					
-				if (frm.url.value == \"\")
-					alertMsg = alertMsg + \"URL is required.<br>\";				
+				if (!physicalCopy) {
+					if (frm.url.value == \"\")
+						alertMsg = alertMsg + \"URL is required.<br>\";				
+				}
 				
 				
 				if (!alertMsg == \"\") 
@@ -72,7 +71,10 @@ class itemDisplayer
 		</script>	
 		";	
 								
-		echo "<form name=\"reservesMgr\" action=\"index.php?cmd=editReserve\" method=\"post\" onSubmit=\"return validateForm(this);\">\n";
+		if (!$reserve->item->isPhysicalItem())
+			echo "<form name=\"reservesMgr\" action=\"index.php?cmd=editReserve\" method=\"post\" onSubmit=\"return validateForm(this,false);\">\n";
+		else
+			echo "<form name=\"reservesMgr\" action=\"index.php?cmd=editReserve\" method=\"post\" onSubmit=\"return validateForm(this,true);\">\n";
 		echo "<input type=\"hidden\" name=\"ci\" value=\"".$reserve->getCourseInstanceID()."\">\n";
 		echo "<input type=\"hidden\" name=\"rID\" value=\"".$reserve->getReserveID()."\">\n";
 
@@ -148,13 +150,15 @@ class itemDisplayer
 		echo "				<td width=\"100%\" align=\"left\"><input name=\"title\" type=\"text\" id=\"title\" size=\"50\" value=\"$title\"></td>\n";
 		echo "			</tr>\n";
 		echo "            <tr valign=\"middle\">\n";
-		echo "            	<td width=\"25%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>Author/Composer:</div></td>\n";
+		echo "            	<td width=\"25%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\">Author/Composer:</div></td>\n";
 		echo "				<td width=\"100%\" align=\"left\"><input name=\"author\" type=\"text\" id=\"author\" size=\"50\" value=\"".$author."\"></td>\n";
 		echo "			</tr>\n";
-		echo "            <tr valign=\"middle\">\n";
-		echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>URL:</div></td>\n";
-		echo "				<td width=\"100%\" align=\"left\"><input name=\"url\" type=\"text\" size=\"50\" value=\"".urldecode($url)."\"></td>\n";
-		echo "			</tr>\n";
+		if (!$reserve->item->isPhysicalItem()) {
+			echo "            <tr valign=\"middle\">\n";
+			echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>URL:</div></td>\n";
+			echo "				<td width=\"100%\" align=\"left\"><input name=\"url\" type=\"text\" size=\"50\" value=\"".urldecode($url)."\"></td>\n";
+			echo "			</tr>\n";
+		}
 		echo "          <tr valign=\"middle\">\n";
 		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Performer </span><span class=\"strong\">:</span></div></td>\n";
 		echo "				<td width=\"100%\" align=\"left\"><input name=\"performer\" type=\"text\" id=\"performer\" size=\"50\" value=\"".$performer."\"></td>\n";
@@ -421,9 +425,6 @@ class itemDisplayer
 				if (frm.title.value == \"\")
 					alertMsg = alertMsg + \"Title is required.<br>\";
 				
-				if (frm.author.value == \"\")
-					alertMsg = alertMsg + \"Author is required.<br>\";
-		
 				if (frm.documentType[1].checked)
 				{ 
 					if (frm.userFile.value == \"\")
@@ -549,7 +550,7 @@ class itemDisplayer
 		echo "				<td width=\"100%\" align=\"left\"><input name=\"title\" type=\"text\" id=\"title\" size=\"50\" value=\"$title\"></td>\n";
 		echo "			</tr>\n";
 		echo "            <tr valign=\"middle\">\n";
-		echo "            	<td width=\"25%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>Author/Composer:</div></td>\n";
+		echo "            	<td width=\"25%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\">Author/Composer:</div></td>\n";
 		echo "				<td width=\"100%\" align=\"left\"><input name=\"author\" type=\"text\" id=\"author\" size=\"50\" value=\"".$author."\"></td>\n";
 		echo "			</tr>\n";
 
