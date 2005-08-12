@@ -477,6 +477,11 @@ under the ReservesDirect logo.  */
 	color: #666666;
 }
 
+/* printRequest controls how physical item requests appear when printed,
+whether there should be page breaks or no page breaks. */
+#printRequest {
+	page-break-after:always;
+
 /*
 ************************************************* 
 FORMATTING DEFINITIONS 
