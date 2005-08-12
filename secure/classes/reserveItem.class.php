@@ -131,6 +131,7 @@ class reserveItem extends item
 					$sql = "SELECT i.item_id, i.title, i.item_group, i.author, i.source, i.content_notes, i.volume_edition, i.pages_times, i.performer, i.local_control_key, "
 					.     "i.creation_date, i.last_modified, i.url, i.mimeType, i.home_library, i.private_user_id, i.item_type, i.volume_title, i.item_icon, n.note_id "
 					.  	  "FROM items as i "
+					.	  " LEFT JOIN notes as n ON i.item_id = n.target_id AND n.target_table = 'items' "
 					.     "WHERE i.local_control_key = ?";
 			}
 	

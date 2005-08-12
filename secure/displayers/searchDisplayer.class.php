@@ -252,7 +252,7 @@ class searchDisplayer
 		echo "						[<a href=\"javascript:sort('title');\" class=\"editlinks\">title</a> ]\n";
 		echo "					</td>\n";
 		echo "					<td width=\"49%\" align=\"right\" valign=\"top\">\n";
-		echo "						[ <a href=\"index.php?cmd=searchTab\" class=\"editlinks\">Revise Search</a> ] \n";
+		echo "						[ <a href=\"index.php?cmd=searchTab\" class=\"editlinks\">New Search</a> ] \n";
 		echo "						[ <a href=\"index.php\" class=\"editlinks\">Cancel Search</a> ] \n";
 		echo "					</td>\n";
 		echo "				</tr>\n";

@@ -375,11 +375,11 @@ class reservesDisplayer
 		echo "					<td width=\"40%\">\n";
 		echo "						<ul>\n";
 		echo "							<li><a href=\"index.php?cmd=displayRequest\" align=\"center\">Process Requests</a></li>\n";
-		if ((!$request['ci']) || (!$request['selected_instr']))
+		if (!isset($request['ci']) || (!isset($request['selected_instr'])))
 			echo "							<li><a href=\"index.php?cmd=addDigitalItem\" align=\"center\">Add an Electronic Item</a></li>\n";
 		else if ($request['ci'] && $request['selected_instr'])
 			echo "							<li><a href=\"index.php?cmd=addDigitalItem&ci=".$request['ci']."&selected_instr=".$request['selected_instr']."\" align=\"center\">Add an Electronic Item</a></li>\n";
-		if ((!$request['ci']) || (!$request['selected_instr']))
+		if (!isset($request['ci']) || !isset($request['selected_instr']))
 			echo "							<li><a href=\"index.php?cmd=addPhysicalItem\">Add a Physical Item</a></li>\n";
 		else if ($request['ci'] && $request['selected_instr'])
 			echo "							<li><a href=\"index.php?cmd=addPhysicalItem&ci=".$request['ci']."&selected_instr=".$request['selected_instr']."\">Add a Physical Item</a></li>\n";
