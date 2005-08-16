@@ -68,7 +68,7 @@ class requestDisplayer
         echo "	<form action=\"index.php?sort=\"" . $request['sort'] . "\" method=\"POST\">\n";
         echo "	<input type=\"hidden\" name=\"cmd\" value=\"printRequest\">\n";
         echo "	<input type=\"hidden\" name=\"sort\" value=\"".$request['sort']."\">\n";
-        echo "	<input type=\"hidden\" name=\"no_control\">\n";
+        echo "	<input type=\"hidden\" name=\"no_table\">\n";
         echo "	<tr>\n";
         echo "		<td><font color=\"#666666\">&nbsp;</font></td>";
         echo "		<td bgcolor=\"#FFFFFF\" align=\"right\"><input type=\"button\" value=\"Print Selected Request\" onClick=\"this.form.cmd.value='printRequest'; this.form.target='printPage'; this.form.submit();\">";
@@ -96,7 +96,25 @@ class requestDisplayer
 	{
 
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		//echo "	<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
+		
+
+		echo "	<tr>\n";
+		echo "		<td align=\"left\">Request List</td>\n";
+		echo "	</tr>\n";		
+		
+		echo "	<tr>\n";
+		echo "		<td align=\"left\">". date('g:i A D m-d-Y') ."</td>\n";
+		echo "	</tr>\n";
+		
+		echo "	<tr>\n";
+		echo "		<td align=\"right\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\">[ <a href=\"javascript:window.close();\">Close Window</a> ]</td>\n";
+		echo "	</tr>\n";		
+		
+		echo "	<tr>\n";
+		echo "		<td align=\"right\"><input type=\"button\" value=\"Print\" onClick=\"window.print();\"></td>\n";
+		echo "	</tr>\n";
+		
+		
 		if (!is_null($msg) && $msg != "")
 			echo "	<tr><td width=\"100%\" class=\"failedText\" align=\"center\">$msg<br></td></tr>\n";
 
@@ -110,11 +128,7 @@ class requestDisplayer
 		echo " 			</table>\n";
 		echo "		</td>\n";
 		echo "	</tr>\n";
-		echo "	<tr><td>&nbsp;</td></tr>\n";
-		echo "	<tr>\n";
-		echo "		<td align=\"right\">\n";
-		echo "			<img src=\images/spacer.gif\" width=\"1\" height=\"15\">[ <a href=\"index.php\">EXIT &quot;PROCESS REQUESTS&quot;</a> ]</td>\n";
-		echo "	</tr>\n";
+
 		echo "</table>\n";		
 	}	
 	
@@ -145,7 +159,8 @@ class requestDisplayer
 
 			echo "	<tr>\n";
 			echo "		<td align=\"left\" valign=\"top\" class=\"borders\"  colspan=\"2\">\n";
-			echo "			<table width=\"100%\" border=\"0\" cellpadding=\"2\" cellspacing=\"0\" class=\"displayList\">\n";
+			//echo "			<table width=\"100%\" border=\"0\" cellpadding=\"2\" cellspacing=\"0\" class=\"displayList\">\n";
+			echo "			<table width=\"100%\" border=\"0\" cellpadding=\"2\" cellspacing=\"0\" class=\"printRequest\">\n";
 			echo "  				<tr align=\"left\" valign=\"middle\" class=\"$rowClass\">\n";
 			echo "    				<td width=\"85%\" valign=\"top\">\n";
 			echo "    					<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
@@ -253,7 +268,7 @@ class requestDisplayer
 			if (is_null($printView) || $printView == "false")
 			{
 				echo "							<input type=\"hidden\" name=\"request_id\" value=\"". $r->requestID ."\">\n";
-				echo "							<input type=\"button\" value=\"Process this Item\" onClick=\"this.form.cmd.value='processRequest'; this.form.target=window.name; this.form.no_control.value='false'; this.form.submit();\">\n";
+				echo "							<input type=\"button\" value=\"Process this Item\" onClick=\"this.form.cmd.value='processRequest'; this.form.target=window.name; this.form.no_table.value='false'; this.form.submit();\">\n";
 			
 				echo "						&nbsp;<a href=\"index.php?cmd=deleteRequest&request_id=".$r->requestID."\">Delete Request</a>&nbsp;";	
 			}	
@@ -262,7 +277,7 @@ class requestDisplayer
 
 			echo " </table></td></tr>";				
 			echo " 			</table>\n";
-			echo "<div style=\"page-break-after:always;\"></div>\n";
+			//echo "<div style=\"page-break-after:always;\"></div>\n";
 
 		}
 		echo "</form>\n";		
@@ -307,6 +322,7 @@ class requestDisplayer
 
 						alertMsg = '';
 						if (frm.title.value == '') { alertMsg = alertMsg + 'Please enter a title.<br>' }
+						if (frm.author.value == '') { alertMsg = alertMsg + 'Please enter an author.<br>';  }
 						if (addTypeValue != 'MANUAL' && frm.euclid_record.checked && copySelected) { alertMsg = alertMsg + 'Please select a copy to place on reserve<br>'; }
 						if (addTypeValue == 'PERSONAL' && frm.selected_owner.selectedIndex == '0') { alertMsg = alertMsg + 'Please select a personal owner.<br>'; }
 						
@@ -321,6 +337,7 @@ class requestDisplayer
 			echo "	function checkForm(frm) {
 						alertMsg = '';
 						if (frm.title.value == '') { alertMsg = alertMsg + 'Please enter a title.<br>';  }						
+						if (frm.author.value == '') { alertMsg = alertMsg + 'Please enter an author.<br>';  }
 
 						if (frm.documentType[0].checked && frm.userFile.value == '')
 							alertMsg = alertMsg + 'File path is required.<br>'; 
@@ -562,7 +579,7 @@ class requestDisplayer
 		echo "					<td align=\"left\"><input name=\"title\" type=\"text\" size=\"50\" value=\"".$search_results['title']."\"></td>\n";
 		echo "				</tr>\n";
 		echo "				<tr valign=\"middle\">\n";
-		echo "					<td width=\"35%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">Author/Composer:</td>\n";
+		echo "					<td width=\"35%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>Author/Composer:</td>\n";
 		echo "					<td align=\"left\"><input name=\"author\" type=\"text\" size=\"50\" value=\"".$search_results['author']."\"></td>\n";
 		echo "				</tr>\n";
 		echo "				<tr valign=\"middle\">\n";
