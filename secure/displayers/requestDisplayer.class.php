@@ -320,7 +320,7 @@ class requestDisplayer
 								addTypeValue = frm.addType[i].value;
 						}
 
-						alertMsg = '';
+						var alertMsg = '';
 						if (frm.title.value == '') { alertMsg = alertMsg + 'Please enter a title.<br>' }
 						if (frm.author.value == '') { alertMsg = alertMsg + 'Please enter an author.<br>';  }
 						if (addTypeValue != 'MANUAL' && frm.euclid_record.checked && copySelected) { alertMsg = alertMsg + 'Please select a copy to place on reserve<br>'; }
@@ -335,7 +335,7 @@ class requestDisplayer
 					}";
 		} else {
 			echo "	function checkForm(frm) {
-						alertMsg = '';
+						var alertMsg = '';
 						if (frm.title.value == '') { alertMsg = alertMsg + 'Please enter a title.<br>';  }						
 						if (frm.author.value == '') { alertMsg = alertMsg + 'Please enter an author.<br>';  }
 
