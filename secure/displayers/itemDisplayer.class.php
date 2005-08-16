@@ -432,9 +432,7 @@ class itemDisplayer
 				} else if (frm.documentType[2].checked) {
 					if (frm.url.value == \"\")
 						alertMsg = alertMsg + \"URL is required.<br>\";				
-				} else {
-					alertMsg = alertMsg + \"URL or File path is required.<br>\";				
-				}
+				} 
 				
 				if (!alertMsg == \"\") 
 				{ 
