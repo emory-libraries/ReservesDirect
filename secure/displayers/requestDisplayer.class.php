@@ -118,18 +118,17 @@ class requestDisplayer
 		if (!is_null($msg) && $msg != "")
 			echo "	<tr><td width=\"100%\" class=\"failedText\" align=\"center\">$msg<br></td></tr>\n";
 
-        
-		if (is_array($requestList) && !empty($requestList))
-			requestDisplayer::displayRequestList($requestList, $item, $ci, "true");
-		else 
-			echo "<tr><td>No Request selected for printing.</td></tr>";
-
-
 		echo " 			</table>\n";
 		echo "		</td>\n";
 		echo "	</tr>\n";
 
 		echo "</table>\n";		
+		if (is_array($requestList) && !empty($requestList))
+			requestDisplayer::displayRequestList($requestList, $item, $ci, "true");
+		else 
+			echo "<p style=\"text-align: center\">No Request selected for printing.</p>";
+
+
 	}	
 	
 	function displayRequestList($requestList, $item, $ci, $printView=null)
@@ -277,7 +276,7 @@ class requestDisplayer
 
 			echo " </table></td></tr>";				
 			echo " 			</table>\n";
-			//echo "<div style=\"page-break-after:always;\"></div>\n";
+			echo "<div style=\"page-break-after: always;\"></div>\n";
 
 		}
 		echo "</form>\n";		
