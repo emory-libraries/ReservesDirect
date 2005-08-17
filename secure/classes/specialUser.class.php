@@ -125,11 +125,11 @@ class specialUser extends user
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "INSERT INTO special_users_audit (user_id, creator_user_id, email_sent_to) 
-						VALUES (!, !, ?);";
+				$sql = "INSERT INTO special_users_audit (user_id, creator_user_id, email_sent_to, date_created) 
+						VALUES (!, !, ?, ?);";
 		}
 
-		$rs = $g_dbConn->query($sql, array($this->getUserID(), $creator, $email));
+		$rs = $g_dbConn->query($sql, array($this->getUserID(), $creator, $email, strftime("%Y-%m-%d %H:%M:%S")));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 	}
