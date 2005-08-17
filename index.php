@@ -259,6 +259,8 @@ switch ($cmd)
 }
 
 if (isset($_REQUEST['no_control']) && $_REQUEST['no_control'] != 'false')
+	include "secure/html/no_control.inc.html";
+elseif (isset($_REQUEST['no_table']) && $_REQUEST['no_table'] != 'false')
 	include "secure/html/no_table.inc.html";
 else
 	include "secure/html/index.inc.html";
