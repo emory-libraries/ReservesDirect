@@ -85,7 +85,7 @@ class searchDisplayer
 			echo "						<option value='pages_times'>Pages/Time</option>\n";
 			echo "						<option value='url'>URL</option>\n";
 			echo "						<option value='source'>Source/Year</option>\n";
-			echo "						<option value='content_notes'>Content Notes</option>\n";
+			echo "						<option value='n.note'>Content Notes</option>\n";
 			echo "					</select>\n";
 			echo "				</td>\n";
 			echo "				<td align='left' bgcolor='#CCCCCC'>\n";

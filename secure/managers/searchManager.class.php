@@ -202,13 +202,23 @@ class searchManager
 									LEFT JOIN access as a ON ca.course_alias_id = a.alias_id 
 									LEFT JOIN users as u ON a.user_id = u.user_id AND a.permission_level = " . $g_permission['instructor'] . " "
 					; 
+					
+					$sql_add = "";
+					for($i=0;$i<count($search);$i++)
+					{
+						if ($search[$i]['field'] == 'n.note')
+						{
+							$sql_add .= "LEFT JOIN notes as n ON n.target_table='items' AND n.type = 'content' AND n.target_id = i.item_id ";
+						}
+					}
+					$sql_from .= $sql_add;
+					
 						
 					if ($search[0]['term'] != '') //if 1st term is not set we are going to ignore all others
 					{
 						$sql_where = "WHERE i.item_type != 'HEADING' AND ";			
 						for($i=0;$i<count($search);$i++)
-						{
-							//$search[$i]['term'] = stripslashes($search[$i]['term']);
+						{							
 							if ($search[$i]['term'] != '')
 							{	
 								$conjunction = ($i > 0 && $search[$i-1]['term'] != '') ? $search[$i-1]['conjunct'] . " " : ""; 
@@ -273,7 +283,7 @@ class searchManager
 					else $sql_where = "";
 			}
 								
-			$this->search_sql_statement = $sql_select . $sql_from . $sql_where;
+			//$this->search_sql_statement = $sql_select . $sql_from . $sql_where;
 		}	
 		
 		if (isset($sort) && !is_null($sort) && $sort != '')
@@ -286,6 +296,8 @@ class searchManager
 		$rs = $g_dbConn->query($this->search_sql_statement);		
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_ERROR); }
 		
+		
+		echo $this->search_sql_statement . "<br>";
 		
 		$results = null;
 		while ($row = $rs->fetchRow())
