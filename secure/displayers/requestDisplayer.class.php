@@ -159,7 +159,7 @@ class requestDisplayer
 			echo "	<tr>\n";
 			echo "		<td align=\"left\" valign=\"top\" class=\"borders\"  colspan=\"2\">\n";
 			//echo "			<table width=\"100%\" border=\"0\" cellpadding=\"2\" cellspacing=\"0\" class=\"displayList\">\n";
-			echo "			<table width=\"100%\" border=\"0\" cellpadding=\"2\" cellspacing=\"0\" class=\"printRequest\">\n";
+			echo "			<table width=\"100%\" border=\"0\" cellpadding=\"2\" cellspacing=\"0\" id=\"printRequest\">\n";
 			echo "  				<tr align=\"left\" valign=\"middle\" class=\"$rowClass\">\n";
 			echo "    				<td width=\"85%\" valign=\"top\">\n";
 			echo "    					<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
@@ -276,7 +276,8 @@ class requestDisplayer
 
 			echo " </table></td></tr>";				
 			echo " 			</table>\n";
-			echo "<div style=\"page-break-after: always;\"></div>\n";
+//			echo "<div style=\"page-break-after: always;\"></div>\n";
+// we don't need this anymore, page-break-before:always is set in the stylesheet
 
 		}
 		echo "</form>\n";		
