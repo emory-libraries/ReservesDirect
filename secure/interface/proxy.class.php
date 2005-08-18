@@ -323,15 +323,20 @@ class proxy extends student
 			default: //'mysql'
 				$sql = "SELECT DISTINCT mimetype_id, helper_app_name, helper_app_icon, file_extentions "
 				.	   "FROM mimetypes "
-				.	   "ORDER BY mimetype_id DESC"	
+				.	   "ORDER BY mimetype_id ASC"	
 				;
 
 		}
 		
+		
 		$rs = $g_dbConn->query($sql);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
-		$tmpArray = array();
+		//$tmpArray = array();
+		
+		//$tmpArray[0] = array ('mimetype_id' => null, 'helper_app_name' => 'Default', 'helper_app_icon' => 'images/doc_type_icons/doctype-clear.gif', 'file_extensions' => null);
+		$tmpArray[0] = array ('mimetype_id' => null, 'helper_app_name' => 'Default', 'helper_app_icon' => null, 'file_extensions' => null);
+		
 		while($row = $rs->fetchRow(DB_FETCHMODE_ASSOC))
 		{
 			$tmpArray[] = $row;

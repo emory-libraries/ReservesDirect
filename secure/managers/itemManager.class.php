@@ -81,7 +81,8 @@ class itemManager
 					if ($_REQUEST['pagesTimes']) $item->setPagesTimes($_REQUEST['pagesTimes']); else $item->setPagesTimes("");
 					if ($_REQUEST['source']) $item->setSource($_REQUEST['source']); else $item->setSource("");
 					if ($_REQUEST['contentNotes']) $item->setContentNotes($_REQUEST['contentNotes']); else $item->setContentNotes("");
-					if ($_REQUEST['selectedDocIcon']) $item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
+					
+					$item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
 					
 					// Check to see if this was a valid file they submitted
 					if ($_REQUEST['documentType'] == 'DOCUMENT')
@@ -161,7 +162,8 @@ class itemManager
 						if ($_REQUEST['pagesTimes']) $reserve->item->setPagesTimes($_REQUEST['pagesTimes']); else $reserve->item->setPagesTimes("");
 						if ($_REQUEST['source']) $reserve->item->setSource($_REQUEST['source']); else $reserve->item->setSource("");
 						if ($_REQUEST['contentNotes']) $reserve->item->setContentNotes($_REQUEST['contentNotes']); else $reserve->item->setContentNotes("");
-						if ($_REQUEST['selectedDocIcon']) $reserve->item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
+						
+						$reserve->item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
 						
 						if ($_REQUEST['itemNotes']) {
 							$itemNotes = array_keys($_REQUEST['itemNotes']);

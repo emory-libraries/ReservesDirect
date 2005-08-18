@@ -382,8 +382,8 @@ class reservesManager
 	    		$item->setvolumeEdition($_REQUEST['volume']);
 	    		$item->setSource($_REQUEST['source']);
 	    		//$item->setContentNotes($_REQUEST['contents']);
-	    		
-	    		if (isset($_REQUEST['selectedDocIcon'])) $item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
+	    			    
+	    		$item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
 
 	    		if ($_REQUEST['type'] == 'DOCUMENT'){
 	        		//move file set permissions and store location

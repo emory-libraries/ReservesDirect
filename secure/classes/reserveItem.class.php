@@ -446,7 +446,8 @@ class reserveItem extends item
 				$d = date("Y-m-d"); //get current date
 		}
 		
-		$rs = $g_dbConn->query($sql, array($docTypeIcon, $d, $this->itemID));	
+		$rs = $g_dbConn->query($sql, array($docTypeIcon, $d, $this->itemID));		
+
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$this->itemIcon = $docTypeIcon;
@@ -460,7 +461,7 @@ class reserveItem extends item
 		if (!isset($this))
 			return 'images/doc_type_icons/doctype-clear.gif';
 			
-		if (is_null($this->itemIcon))	
+		if (is_null($this->itemIcon) || $this->itemIcon == "")	
 		{	
 			switch ($this->mimeTypeID)
 			{

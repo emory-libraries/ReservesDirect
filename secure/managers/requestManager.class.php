@@ -172,7 +172,8 @@ class requestManager
 				if (isset($request['item_type'])) $item->setGroup($request['item_type']);
 				if (isset($request['volume_title'])) $item->setVolumeTitle($request['volume_title']);
 				if (isset($request['times_pages'])) $item->setPagesTimes($request['times_pages']);
-				if (isset($request['selectedDocIcon'])) $item->setDocTypeIcon($request['selectedDocIcon']);
+				
+				$item->setDocTypeIcon($request['selectedDocIcon']);
 
 				if ($request['personal_item'] == "yes")
 					$item->setprivateUserID($request['selected_owner']);
