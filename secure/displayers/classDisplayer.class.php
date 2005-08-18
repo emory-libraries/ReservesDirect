@@ -693,7 +693,11 @@ class classDisplayer
 						$rowClass = ($rowNumber++ % 2) ? "evenRow" : "oddRow\n";
 						echo "                 	<tr align=\"left\" valign=\"middle\" class=\"".$rowClass."\">";
 						echo "                   		<td>".$instruct[$i]->getName()."</td>";
-						echo "                   		<td width=\"8%\" valign=\"top\" class=\"borders\"><div align=\"center\"><input type=\"checkbox\" name=\"".$userType."[".$instruct[$i]->userID."]\" value=\"".$instruct[$i]->userID."\"></div></td>";
+						echo "                   		<td width=\"8%\" valign=\"top\" class=\"borders\"><div align=\"center\">";
+						if ($userType=="Instructor" && $i>0)
+							echo "<input type=\"checkbox\" name=\"".$userType."[".$instruct[$i]->userID."]\" value=\"".$instruct[$i]->userID."\">";
+						echo "&nbsp;</div></td>";
+							
 						echo "                 	</tr>";
 					}
 		echo "                 	<tr align=\"left\" valign=\"middle\">";
