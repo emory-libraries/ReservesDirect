@@ -255,7 +255,7 @@ class userDisplayer
 				$$select = " SELECTED ";
 
 				echo "					<td>\n";
-				echo "						<select name=\"user[defaultRole]\" onChange=\"this.form.cmd.value='".$hidden_fields['cmd']."'; this.form.submit();\">\n";
+				echo "						<select name=\"user[defaultRole]\" onChange=\"this.form.cmd.value='".$hidden_fields['previous_cmd']."'; this.form.submit();\">\n";
 				echo "							<option value=\"0\" $SELECT_0>STUDENT</option>\n";
 				echo "							<option value=\"1\" $SELECT_1>CUSTODIAN</option>\n";
 				echo "							<option value=\"2\" $SELECT_2>PROXY</option>\n";
