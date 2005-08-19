@@ -296,7 +296,7 @@ class staff extends instructor
 		{
 			default: //'mysql'
 
-			$sql = "SELECT r.request_id, d.abbreviation, c.course_number, u.last_name "
+			$sql = "SELECT DISTINCT r.request_id, d.abbreviation, c.course_number, u.last_name "
 				.  "FROM requests AS r "
 				.  	"JOIN items AS i ON r.item_id = i.item_id AND r.date_processed IS NULL "
 				.  	"JOIN course_instances AS ci ON r.course_instance_id = ci.course_instance_id "
