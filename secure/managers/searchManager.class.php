@@ -283,7 +283,7 @@ class searchManager
 					else $sql_where = "";
 			}
 								
-			//$this->search_sql_statement = $sql_select . $sql_from . $sql_where;
+			$this->search_sql_statement = $sql_select . $sql_from . $sql_where;
 		}	
 		
 		if (isset($sort) && !is_null($sort) && $sort != '')
@@ -292,13 +292,10 @@ class searchManager
 			$raw_sql = split("ORDER BY", $this->search_sql_statement);			
 			$this->search_sql_statement = $raw_sql[0] . $sql_sort;
 		}	
-
+		
 		$rs = $g_dbConn->query($this->search_sql_statement);		
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_ERROR); }
-		
-		
-		echo $this->search_sql_statement . "<br>";
-		
+
 		$results = null;
 		while ($row = $rs->fetchRow())
 			$results[] = new reserveItem($row[0]);			
