@@ -157,13 +157,14 @@ class searchManager
 							}
 						}
 					}
-				}
-				$ci->getPrimaryCourse();
 				
-				//$loc  = "search for documents";			
+					$ci->getPrimaryCourse();
+				
+					//$loc  = "search for documents";			
 								
-				$this->displayFunction = 'addComplete';				
-				$this->argList = array($cmd, $ci, "$reserveCnt item(s) were successfully added to ". $ci->course->displayCourseNo() . " " . $ci->course->getName());
+					$this->displayFunction = 'addComplete';				
+					$this->argList = array($cmd, $ci, "$reserveCnt item(s) were successfully added to ". $ci->course->displayCourseNo() . " " . $ci->course->getName());
+				}
 			break;
 				
 			case 'searchTab':		
