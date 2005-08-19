@@ -52,7 +52,7 @@ class requestManager
 
 	function requestManager($cmd, $user, $ci, $request)
 	{
-		global $g_permission, $page, $loc, $ci;
+		global $g_permission, $page, $loc, $ci, $alertMsg;
 
 		$this->displayClass = "requestDisplayer";
 
@@ -282,6 +282,8 @@ class requestManager
 					$this->argList = array($ci, $ilsResult);
 					break;
 				} elseif ($request['addDuplicate'] == 'addDuplicate') { //user had requested a duplicate copy
+						$alertMsg = $item->getTitle() . " was successfully added to the class. Please enter information for the next item below."; 
+				
 						$duplicateItem = new reserveItem();
 
 						$item_id = $duplicateItem->createNewItem();
