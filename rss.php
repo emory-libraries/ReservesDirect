@@ -59,7 +59,7 @@ if (!isset($_REQUEST['ci']))
 	$ci->getCrossListings();
 	$ci->getInstructors();
 	$ci->getPrimaryCourse();
-	$ci->getReserves();
+	$ci->getActiveReserves();
 
 	flush;
 
