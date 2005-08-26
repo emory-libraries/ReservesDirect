@@ -618,7 +618,7 @@ class requestDisplayer
 					
 			for ($j = 0; $j<count($docTypeIcons); $j++)
 			{
-				$selectedIcon = ($search_results['docTypeIcon'] == $docTypeIcons[$j]['helper_app_icon']) ? " selected " : "";
+				//$selectedIcon = ($search_results['docTypeIcon'] == $docTypeIcons[$j]['helper_app_icon']) ? " selected " : "";
 				echo "							<option value=\"" . $docTypeIcons[$j]['helper_app_icon']  . "\" $selectedIcon>" . $docTypeIcons[$j]['helper_app_name'] . "</option>\n";
 			}
 				
