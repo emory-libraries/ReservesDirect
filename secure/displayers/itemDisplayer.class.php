@@ -664,7 +664,7 @@ class itemDisplayer
 		echo "	                <tr>\n";
 		echo "	                	<td align=\"left\" valign=\"top\">\n";
 		echo "	                		<ul>\n";
-		echo "	                			<li><a href=\"index.php?cmd=doSearch&sql=". urlencode($sql) ."\">Return to Search Results</a></li>\n";
+		echo "	                			<li><a href=\"index.php?cmd=doSearch&sql=". $sql ."\">Return to Search Results</a></li>\n";
 		echo "	                			<li><a href=\"index.php\">Return to myReserves</a><br></li>\n";
 		echo "	                		</ul>\n";
 		echo "	                	</td>\n";
