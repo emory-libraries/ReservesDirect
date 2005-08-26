@@ -69,6 +69,7 @@ class requestDisplayer
         echo "	<input type=\"hidden\" name=\"cmd\" value=\"printRequest\">\n";
         echo "	<input type=\"hidden\" name=\"sort\" value=\"".$request['sort']."\">\n";
         echo "	<input type=\"hidden\" name=\"no_table\">\n";
+        echo "	<input type=\"hidden\" name=\"request_id\">\n";
         echo "	<tr>\n";
         echo "		<td><font color=\"#666666\">&nbsp;</font></td>";
         echo "		<td bgcolor=\"#FFFFFF\" align=\"right\"><input type=\"button\" value=\"Print Selected Request\" onClick=\"this.form.cmd.value='printRequest'; this.form.target='printPage'; this.form.submit();\">";
@@ -266,8 +267,7 @@ class requestDisplayer
 			
 			if (is_null($printView) || $printView == "false")
 			{
-				echo "							<input type=\"hidden\" name=\"request_id\" value=\"". $r->requestID ."\">\n";
-				echo "							<input type=\"button\" value=\"Process this Item\" onClick=\"this.form.cmd.value='processRequest'; this.form.target=window.name; this.form.no_table.value='false'; this.form.submit();\">\n";
+				echo "							<input type=\"button\" value=\"Process this Item\" onClick=\"this.form.cmd.value='processRequest'; this.form.target=window.name; this.form.no_table.value='false'; this.form.request_id.value=".$r->requestID.";this.form.submit();\">\n";
 			
 				echo "						&nbsp;<a href=\"index.php?cmd=deleteRequest&request_id=".$r->requestID."\">Delete Request</a>&nbsp;";	
 			}	
