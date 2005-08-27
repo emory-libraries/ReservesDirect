@@ -381,8 +381,10 @@ class reservesDisplayer
 			echo "							<li><a href=\"index.php?cmd=addDigitalItem&ci=".$request['ci']."&selected_instr=".$request['selected_instr']."\" align=\"center\">Add an Electronic Item</a></li>\n";
 		if (!isset($request['ci']) || !isset($request['selected_instr']))
 			echo "							<li><a href=\"index.php?cmd=addPhysicalItem\">Add a Physical Item</a></li>\n";
-		else if ($request['ci'] && $request['selected_instr'])
+		else if ($request['ci'] && $request['selected_instr']) {
 			echo "							<li><a href=\"index.php?cmd=addPhysicalItem&ci=".$request['ci']."&selected_instr=".$request['selected_instr']."\">Add a Physical Item</a></li>\n";
+			echo "							<li><a href=\"index.php?cmd=faxReserve&ci=".$request['ci']."&selected_instr=".$request['selected_instr']."\">Fax a Document</a></li>\n";
+		}
 		echo "							<!--<li><a href=\"index.php?cmd=physicalItemXListing\">Physical Item Cross-listings </a>--><!--Goes to staff-mngClass-phys-XList1.html --></li>\n";
 		echo "						</ul>\n";
 		echo "					</td>\n";
