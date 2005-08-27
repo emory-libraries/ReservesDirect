@@ -79,7 +79,7 @@ program logo (default is 'ReservesDirect' logo). */
 */
 	background-image: url('../images/logo-el-blue2.jpg');
 	background-repeat: no-repeat;
-	background-position: 10px 0 left top;
+	background-position: 0px 0px;
 	padding-bottom:100px;
 }
 .brandUpperRight {
@@ -665,7 +665,7 @@ Help Screen Definitions
     float:left;
     width:100%;
     background-color:#FFFFFF;
-	font:Arial, Helvetica, sans-serif;
+	font-family: Arial, Helvetica, sans-serif;
 	font-size:small;
     } 
 	
@@ -783,7 +783,7 @@ a.helpsubtopic:active {
 
 #index {
 	font-size: small;
-	font:Arial, Helvetica, sans-serif;
+	font-family: Arial, Helvetica, sans-serif;
 	list-style: none;
 }
 #index #broadTopic a {

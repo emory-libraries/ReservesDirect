@@ -81,7 +81,7 @@ program logo (default is 'ReservesDirect' logo). */
 .brandUpperLeft {
 	background-image:  url('../images/skins/bus/header-leftslice.gif');
 	background-repeat: no-repeat;
-	background-position: 0px 0;
+	background-position: left 0px;
 	padding-bottom:10px;
 	height: 95px;
 }
@@ -481,6 +481,7 @@ under the ReservesDirect logo.  */
 whether there should be page breaks or no page breaks. */
 #printRequest {
 	page-break-after:always;
+}
 
 /*
 ************************************************* 
@@ -664,7 +665,7 @@ Help Screen Definitions
     float:left;
     width:100%;
     background-color:#FFFFFF;
-	font:Arial, Helvetica, sans-serif;
+	font-family: Arial, Helvetica, sans-serif;
 	font-size:small;
     } 
 	
@@ -782,7 +783,7 @@ a.helpsubtopic:active {
 
 #index {
 	font-size: small;
-	font:Arial, Helvetica, sans-serif;
+	font-family: Arial, Helvetica, sans-serif;
 	list-style: none;
 }
 #index #broadTopic a {
