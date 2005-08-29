@@ -58,12 +58,6 @@ class requestManager
 
 		switch ($cmd)
 		{
-			case 'deleteRequest':
-				$requestObj = new request($request['request_id']);
-				$reserve = new reserve($requestObj->getReserveID());
-				$reserve->destroy();
-				$requestObj->destroy();
-
 			case 'printRequest':			
 				$page = "manageClasses";
 
@@ -97,6 +91,13 @@ class requestManager
 				$this->displayFunction = 'printSelectedRequest';
 				$this->argList = array($requestList, $user->getLibraries(), $request, $user);				
 			break;
+			
+			case 'deleteRequest':
+				$requestObj = new request($request['request_id']);
+				$reserve = new reserve($requestObj->getReserveID());
+				$reserve->destroy();
+				$requestObj->destroy();
+
 			case 'displayRequest':			
 				$page = "manageClasses";
 
