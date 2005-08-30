@@ -577,7 +577,7 @@ class requestDisplayer
 		echo "					<td align=\"left\"><input name=\"title\" type=\"text\" size=\"50\" value=\"".$search_results['title']."\"></td>\n";
 		echo "				</tr>\n";
 		echo "				<tr valign=\"middle\">\n";
-		echo "					<td width=\"35%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>Author/Composer:</td>\n";
+		echo "					<td width=\"35%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\"><font color=\"#FF0000\"></font>Author/Composer:</td>\n";
 		echo "					<td align=\"left\"><input name=\"author\" type=\"text\" size=\"50\" value=\"".$search_results['author']."\"></td>\n";
 		echo "				</tr>\n";
 		echo "				<tr valign=\"middle\">\n";
