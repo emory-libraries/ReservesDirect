@@ -869,16 +869,20 @@ function displaySearchItemMenu($ci)
         echo "         	</tr>";
         echo "       	<tr><td colspan=\"2\">&nbsp;</td></tr>\n";
 
-        if ($showNextLink || $showPrevLink) {
+	    if ($showNextLink || $showPrevLink) {
+	   		echo "       	<tr><td colspan=\"2\">&nbsp;</td></tr>\n";
         	echo "			<tr><td colspan=\"2\" align='right'>";
         	if ($showPrevLink) {
         		echo "<img src=\"images/getPrevious.gif\" onClick=\"javaScript:document.forms.searchResults.cmd.value='searchResults';document.forms.searchResults.f.value=".$fPrev.";document.forms.searchResults.submit();\">&nbsp;&nbsp;";
         	}
         	if ($showNextLink) {
-        		echo "<img src=\"images/getNext.gif\" onClick=\"javaScriptreservesDisplayer.class.php:document.forms.searchResults.cmd.value='searchResults';document.forms.searchResults.f.value=".$fNext.";document.forms.searchResults.submit();\">";
+        		echo "<img src=\"images/getNext.gif\" onClick=\"javaScript:document.forms.searchResults.cmd.value='searchResults';document.forms.searchResults.f.value=".$fNext.";document.forms.searchResults.submit();\">";
         	}
         	echo "</td></tr>\n";
-        }
+        } else {
+        	echo "<tr><td>&nbsp;</tr></td>\n";
+        }        
+        
 
 		echo "			<tr><td colspan=\"2\">&nbsp;</td></tr>\n";
 		echo "			<tr><td colspan=\"2\" align=\"right\"><input type=\"submit\" name=\"Submit2\" value=\"Add Selected Materials\"></td></tr>\n";
