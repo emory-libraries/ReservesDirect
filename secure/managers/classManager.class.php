@@ -581,8 +581,8 @@ class classManager
 				$loc = "create class";
 			
 				$checkDuplicates = new checkDuplicates();
-				$duplicateClasses = $checkDuplicates->checkDuplicateClass($request['department'],$request['course_number'], $request['section']);
-				//$duplicateClasses = $ci->checkDuplicate($request['department'],$request['course_number'], $request['section']);
+				$duplicateClasses = $checkDuplicates->checkDuplicateClass($request['department'],$request['course_number'], $request['section'], $user->getUserID());
+
 				if ($duplicateClasses) {
 					
 					// goto check Duplicates

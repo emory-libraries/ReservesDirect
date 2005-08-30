@@ -398,7 +398,7 @@ class instructor extends proxy
 		$oldCI->getPrimaryCourse();
 		
 		$checkDuplicates = new checkDuplicates();
-		$duplicateReactivations = $checkDuplicates->checkDuplicateReactivation($oldCI->course->deptID, $oldCI->course->getCourseNo(), $section, $newTerm, $newYear);
+		$duplicateReactivations = $checkDuplicates->checkDuplicateReactivation($oldCI->course->deptID, $oldCI->course->getCourseNo(), $section, $newTerm, $newYear, null);
 		
 		if ($duplicateReactivations) {
 					

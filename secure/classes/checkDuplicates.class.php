@@ -43,7 +43,7 @@ class checkDuplicates
 	 * @param int $section 
 	 * @desc Checks for duplicate courseInstances in the DB
 	*/
-	function checkDuplicateClass($dept, $courseNumber, $section)
+	function checkDuplicateClass($dept, $courseNumber, $section, $instructor)
 	{
 	
 		//If match on dept, #, section AND course instance is currently active, 
@@ -56,12 +56,20 @@ class checkDuplicates
 			//If instructor=user or user role=staff, display link "Reactivate class." 
 			//If instructor does not = user, display "Contact your reserves staff for assistance with this class."
 
-		global $g_dbConn;
+		global $g_dbConn, $g_permission;
 
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql_checkCourse	= "SELECT course_id FROM courses WHERE department_id = ! and course_number = ?";
+				$sql_checkCourse	= "SELECT c.course_id 
+									   FROM courses as c
+									   JOIN course_aliases as ca on c.course_id = ca.course_id ";
+				if (!is_null($instructor))
+					$sql_checkCourse	.= "JOIN access as a on a.alias_id = ca.course_alias_id and a.user_id = $instructor and a.permission_level >= " . $g_permission['instructor'] . " ";
+
+				$sql_checkCourse	.= "WHERE c.department_id = ! and c.course_number = ?";
+				
+				
 				$sql_checkCI	 	= "SELECT course_instance_id FROM course_aliases WHERE course_id IN ! AND section = ?";
 		}
 
@@ -84,7 +92,7 @@ class checkDuplicates
 		if ($courseIDs!='()') {
 			
 			$duplicateCourseInstances = array();
-			
+
 			$rs2 = $g_dbConn->query($sql_checkCI, array($courseIDs, $section));		
 			if (DB::isError($rs2)) { trigger_error($rs2->getMessage(), E_USER_ERROR); }
 			
@@ -114,7 +122,7 @@ class checkDuplicates
 	 * @param int $year 
 	 * @desc Checks for duplicate reactivation of courseInstances in the DB
 	*/
-	function checkDuplicateReactivation($dept, $courseNumber, $section, $term, $year)
+	function checkDuplicateReactivation($dept, $courseNumber, $section, $term, $year, $instructor)
 	{
 	
 		//If match on dept, #, section AND course instance is currently active, 
@@ -135,11 +143,12 @@ class checkDuplicates
 				$sql_checkCI	 	= "SELECT course_instance_id FROM course_instances WHERE term = ? AND year = ! AND course_instance_id = !";
 		}
 
-		$tempDuplicateCIs = $this->checkDuplicateClass($dept, $courseNumber, $section);
+		$tempDuplicateCIs = $this->checkDuplicateClass($dept, $courseNumber, $section, $instructor);
 		$duplicateReactivations = array();
 		
 		if ($tempDuplicateCIs) {
 			for ($i=0; $i<count($tempDuplicateCIs); $i++) {
+
 				$rs = $g_dbConn->query($sql_checkCI, array($term, $year, $tempDuplicateCIs[$i]->getCourseInstanceID()));		
 				if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 				
