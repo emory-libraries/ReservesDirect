@@ -727,6 +727,8 @@ class requestDisplayer
 			echo "				</tr>\n";
 		}
 
+		$barcode_value = (isset($barcode) && (isset($request['searchTerm']) && $request['searchTerm'] != "")) ? $request['searchTerm'] : $search_results['physicalCopy'][0]['bar'];			
+		
 		echo "				<tr align=\"left\" valign=\"middle\">\n";
 		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">Barcode:</td>\n";
 		echo "					<td><input name=\"barcode\" type=\"text\" size=\"12\" value=\"$barcode_value\"></td>\n";
