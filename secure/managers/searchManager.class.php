@@ -71,18 +71,19 @@ class searchManager
 			case 'doSearch':
 				$loc  = "search for documents";
 			
-				$this->search_sql_statement = (isset($request['sql']) && $request['sql'] != '') ? stripslashes(urldecode($request['sql'])) : null;
+//				$this->search_sql_statement = (isset($request['sql']) && $request['sql'] != '') ? stripslashes(urldecode($request['sql'])) : null;
+        $search_array = (isset($_GET['search'])) ? unserialize(urldecode($_GET['search'])) : $request['search'];
 				
-				$items = $this->doSearch($request['search'], $request['limit'], $request['item'], $request['sort']);
+				$items = $this->doSearch($search_array, $request['limit'], $request['item'], $request['sort']);
 				
 				$displayQry = '';
 				if (!isset($request['displayQry']))
-					for($i=0;$i<count($request['search']);$i++)
+					for($i=0;$i<count($search_array);$i++)
 					{
-						if ($request['search'][$i]['term'] != '')				
+						if ($search_array[$i]['term'] != '')				
 						{
-							if ($i > 0) $displayQry .= " " . $request['search'][$i]['conjunct'] . " ";
-							$displayQry .= $request['search'][$i]['term'];
+							if ($i > 0) $displayQry .= " " . $search_array[$i]['conjunct'] . " ";
+							$displayQry .= $search_array[$i]['term'];
 						}
 					}
 				else 
@@ -90,7 +91,7 @@ class searchManager
 				
 				$hidden_fields = array(
 					'cmd'			=> 'addResultsToClass',
-					'sql' 			=> urlencode($this->search_sql_statement), 
+					'search' 			=> urlencode(serialize($search_array)), 
 					'sort' 			=> $request['sort'],
 					'displayQry'	=> $displayQry
 				);

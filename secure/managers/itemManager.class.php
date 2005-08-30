@@ -71,7 +71,7 @@ class itemManager
 					}
 									
 					$this->displayFunction = 'displayEditItemScreen';
-					$this->argList = array($item, $user, $_REQUEST['sql']);
+					$this->argList = array($item, $user, $_GET['search']);
 				} else {
 					if ($_REQUEST['title']) $item->setTitle($_REQUEST['title']);
 					if ($_REQUEST['author']) $item->setAuthor($_REQUEST['author']); else $item->setAuthor("");					
@@ -119,7 +119,7 @@ class itemManager
 					
 					// display success
 					$this->displayFunction = 'displayItemSuccessScreen';
-					$this->argList = array($_REQUEST['sql'], $user);
+					$this->argList = array(urlencode($_POST['search']), $user);
 					break;
 				}			
 			break;

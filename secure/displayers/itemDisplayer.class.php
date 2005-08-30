@@ -399,7 +399,7 @@ class itemDisplayer
     	echo '</form>';
 	}
 	
-	function displayEditItemScreen($item,$user,$sql=null)
+	function displayEditItemScreen($item,$user,$search_serial=null)
 	{
 		
 		global $g_permission, $g_documentURL;
@@ -450,7 +450,7 @@ class itemDisplayer
 		echo "<form name=\"reservesMgr\" action=\"index.php?cmd=editItem\" method=\"post\" $formEncode onSubmit=\"return validateForm(this);\">\n";
 		
 		echo "<input type=\"hidden\" name=\"itemID\" value=\"".$item->getItemID()."\">\n";
-		echo "<input type=\"hidden\" name=\"sql\" value=\"".urlencode($sql)."\">\n";		
+		echo "<input type=\"hidden\" name=\"search\" value=\"".$search_serial."\">\n";		
 
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "	  <tr>\n";
@@ -646,7 +646,7 @@ class itemDisplayer
 		echo "</form>\n";
 	}
 
-	function displayItemSuccessScreen($sql,$user)
+	function displayItemSuccessScreen($search_serial,$user)
 	{
 		
 		global $g_permission;
@@ -664,7 +664,7 @@ class itemDisplayer
 		echo "	                <tr>\n";
 		echo "	                	<td align=\"left\" valign=\"top\">\n";
 		echo "	                		<ul>\n";
-		echo "	                			<li><a href=\"index.php?cmd=doSearch&sql=". $sql ."\">Return to Search Results</a></li>\n";
+		echo "	                			<li><a href=\"index.php?cmd=doSearch&search=". $search_serial ."\">Return to Search Results</a></li>\n";
 		echo "	                			<li><a href=\"index.php\">Return to myReserves</a><br></li>\n";
 		echo "	                		</ul>\n";
 		echo "	                	</td>\n";
