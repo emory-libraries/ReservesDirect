@@ -322,7 +322,6 @@ class requestDisplayer
 
 						var alertMsg = '';
 						if (frm.title.value == '') { alertMsg = alertMsg + 'Please enter a title.<br>' }
-						if (frm.author.value == '') { alertMsg = alertMsg + 'Please enter an author.<br>';  }
 						if (addTypeValue != 'MANUAL' && frm.euclid_record.checked && copySelected) { alertMsg = alertMsg + 'Please select a copy to place on reserve<br>'; }
 						if (addTypeValue == 'PERSONAL' && frm.selected_owner.selectedIndex == '0') { alertMsg = alertMsg + 'Please select a personal owner.<br>'; }
 						
@@ -337,7 +336,6 @@ class requestDisplayer
 			echo "	function checkForm(frm) {
 						var alertMsg = '';
 						if (frm.title.value == '') { alertMsg = alertMsg + 'Please enter a title.<br>';  }						
-						if (frm.author.value == '') { alertMsg = alertMsg + 'Please enter an author.<br>';  }
 
 						if (frm.documentType[0].checked && frm.userFile.value == '')
 							alertMsg = alertMsg + 'File path is required.<br>'; 
@@ -533,7 +531,7 @@ class requestDisplayer
 			}
 		} // if == addDigital
 		
-		echo "	<tr><td align=\"left\" valign=\"top\">&nbsp;</td></tr>\n";
+		echo "	<tr><td align=\"left\" valign=\"top\">&nbsp;</div></td></tr>\n";
 
 		echo "	<tr>\n";
 		echo "		<td align=\"left\" valign=\"top\">\n";
