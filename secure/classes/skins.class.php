@@ -42,14 +42,23 @@ class skins {
 
         switch ($g_dbConn->phptype) {
             default: //'mysql'
-                $sql =  "SELECT skin_stylesheet FROM skins WHERE skin_name=\"$skinName\"";
+                $skin_sql =  "SELECT skin_stylesheet FROM skins WHERE skin_name=\"$skinName\" LIMIT 1";
+                $default_sql =  "SELECT skin_stylesheet FROM skins WHERE default_selected='yes' LIMIT 1";
         }
 
-        $rs = $g_dbConn->query($sql);
-        if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_ERROR); }
-
+        $rs = $g_dbConn->query($skin_sql);
         $row = $rs->fetchRow();
-        return $row[0]; // relative pathname of CSS stylesheed
+        
+        if (count($row) != 1) {
+            $rs = $g_dbConn->query($default_sql);
+            $row = $rs->fetchRow();
+        }
+
+        if (count($row) != 1) { 
+            trigger_error("No usable skin configuration: ".$rs->getMessage(), E_ERROR);
+        }
+
+        return $row[0]; // relative pathname of CSS stylesheet
 
     }
 }
