@@ -13,9 +13,18 @@ $args = explode(':', $_REQUEST[$keys[$ndx]]); //split out username
 $_SESSION['authKey'] = $keys[$ndx];
 $user = new user();
 	
-if (!$user->getUserByUserName($args[0]))
+$userName = $args[0];
+
+if (trim($userName) == "")
 {
-	$user->createUser($args[0], "", "", "", 0);  //we allow any authorized user to enter with default role of student
+	//invalid user account direct to logout.php to destroy session and return to login
+	header("Location: secure/logout.php");
+	exit;
+}	
+
+if (!$user->getUserByUserName($userName))
+{
+	$user->createUser($userName, "", "", "", 0);  //we allow any authorized user to enter with default role of student
 }
 	
 
