@@ -115,7 +115,7 @@ if (!isset($_REQUEST['ci']))
     			elseif ($n->getType() == 'Content') echo htmlentities($n->getText()) . "&lt;br/&gt;";
 
     		}
-    	echo 			htmlentities("&lt;hr noshade/&gt;");
+//    	echo 			htmlentities("&lt;hr noshade/&gt;");
     	echo "			</description>\n";
     	echo "		</item>\n";
     }
