@@ -34,8 +34,6 @@ http://www.reservesdirect.org/
 
 require_once(dirname(__FILE__) . "/../secure/config.inc.php");
 
-//$log = fopen("$g_faxLog", w) || exit("Fatal error: Could not open log file '$g_faxLog' for writing\n"); //broken on sagan for some reason, we'll print errors to stout :-(
-
 if($argv[1] == "")
     exit("Usage: faxProcessor.php <filename.tif>\n");
 
@@ -90,8 +88,6 @@ if (!chmod("$g_faxDirectory/$newFile.pdf", 0664)) {
 if (!chmod("$g_faxDirectory/$newFile.tif", 0664)) {
     echo("Processing $inFile: Cannot change permissions of $g_faxDirectory/$newFile.tif\n");
 }
-
-//fclose($log);
 
 ?>
 
