@@ -29,7 +29,7 @@ http://www.reservesdirect.org/
 *******************************************************************************/
 	require_once("DB.php");
 	
-	$xmlConfig = "/home/jbwhite/configs/biliku_testsite.xml";
+	$xmlConfig = "/CHANGEME/etc/reservesdirect/config.xml";
 
 	if (!is_readable($xmlConfig)) { trigger_error("Could not read configure xml file path=$xmlConfig", E_USER_ERROR); }
 
