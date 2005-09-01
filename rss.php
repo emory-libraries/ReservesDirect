@@ -75,7 +75,7 @@ if (!isset($_REQUEST['ci']))
     foreach($ci->instructorList as $instr)
     	echo "		<managingEditor>" . htmlentities($instr->getEmail() . " (" . $instr->getName()) . ")</managingEditor>\n";
 
-    echo "		<webMaster>reservesdesk@listserv.cc.emory.edu (Reserves Desk)</webMaster>\n";
+    echo "		<webMaster>$g_reservesEmail (Reserves Desk)</webMaster>\n";
 
     echo "		<description>";
     echo 		"Course Reserves for" . htmlentities($ci->course->displayCourseNo() . " " . $ci->course->name . " " . $ci->displayTerm()) . "&lt;br/&gt;";
