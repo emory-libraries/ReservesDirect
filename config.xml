@@ -37,10 +37,10 @@ http://coursecontrol.sourceforge.net/
 <configuration>
 	<database>
 	    <dbtype>mysql</dbtype>
-	    <username>reserves_user</username>
-	    <pwd>30322</pwd>
+	    <username>CHANGEME</username>
+	    <pwd>CHANGEME</pwd>
 	    <host>localhost</host>
-	    <dbname>reserves</dbname>
+	    <dbname>CHANGEME</dbname>
 	    <dbkey>client-key.pem</dbkey>
 	    <dbcert>client-cert.pem</dbcert>
 	    <dbca>cacert.pem</dbca>
@@ -51,54 +51,54 @@ http://coursecontrol.sourceforge.net/
 	</database>
 	
     <catalog>
-        <catalogName>EUCLID</catalogName>
+        <catalogName>CHANGEME</catalogName>
         <useCatalog>yes</useCatalog> <!-- all others may be blank if no -->
-        <zhost>libcat1.cc.emory.edu</zhost>
+        <zhost>CHANGEME.example.edu</zhost>
         <zport>2200</zport>
         <zdb>Unicorn</zdb>
-        <zReflector>http://dirac.library.emory.edu/cgi-bin/zGizmo.cgi</zReflector>
-        <reserve_script>https://www.library.emory.edu/uhtbin/create_reserve</reserve_script>
-        <holdings_script>http://www.library.emory.edu/uhtbin/holding_request</holdings_script>
-        <display_reserve>http://www.library.emory.edu/uhtbin/display_reserve</display_reserve>
-        <web_search>http://libcat1.cc.emory.edu/uhtbin/cgisirsi/x/0/0/5?searchdata1=</web_search>
+        <zReflector>http://CHANGEME.example.edu/cgi-bin/zGizmo.cgi</zReflector>
+        <reserve_script>https://CHANGEME.example.edu/uhtbin/create_reserve</reserve_script>
+        <holdings_script>http://CHANGEME.example.edu/uhtbin/holding_request</holdings_script>
+        <display_reserve>http://CHANGEME.example.edu/uhtbin/display_reserve</display_reserve>
+        <web_search>http://CHANGEME.example.edu/uhtbin/cgisirsi/a/1/2/3/?searchdata1=</web_search>
     </catalog>
 	
 	
-	<library_url>http://www.library.emory.edu</library_url>
+	<library_url>http://CHANGEME.example.edu</library_url>
 	
-	<error_log>/home/httpd/html/jbwhite/projects/reserves2_1/error.log</error_log>
-	<errorEmail>jbwhite@emory.edu</errorEmail>
-	<reservesEmail>jbwhite@emory.edu</reservesEmail>
-	<adminEmail>jbwhite@emory.edu</adminEmail>
+	<error_log>/var/log/apache2/CHANGEME.log</error_log>
+	<errorEmail>developer@example.edu</errorEmail>
+	<reservesEmail>reserves@example.edu</reservesEmail>
+	<adminEmail>webmaster@example.edu</adminEmail>
 
     <fax>
-        <directory>/home/httpd/html/incoming/</directory>  <!-- include trailing / -->
-        <URL>http://biliku.library.emory.edu/incoming/</URL>  <!-- include trailing / -->
-        <copyright>/home/httpd/html/admin/copyright.pdf</copyright>
-        <log>/var/spool/hylafax/log/rd_faxprocessor_log</log>
-        <fax2pdf_bin>/usr/local/sbin/fax2pdf</fax2pdf_bin>
-        <faxinfo_bin>/usr/sbin/faxinfo</faxinfo_bin>
-        <gs_bin>/usr/bin/gs</gs_bin>
+        <directory>/var/www/html/CHANGEME/incoming/</directory>  <!-- include trailing / -->
+        <URL>http://CHANGEME.example.edu/CHANGEME/incoming/</URL>  <!-- include trailing / -->
+        <copyright>/var/www/CHANGEME/copyright.pdf</copyright>
+        <log>/var/spool/hylafax/log/CHANGEME.log</log>
+        <fax2pdf_bin>/CHANGEME/path/to/fax2pdf</fax2pdf_bin>
+        <faxinfo_bin>/CHANGEME/path/to/faxinfo</faxinfo_bin>
+        <gs_bin>/CHANGEME/path/to/gs</gs_bin>
     </fax>
 	
-	<documentDirectory>/home/httpd/html/uploaded/</documentDirectory>  <!-- include trailing / -->
-	<documentURL>http://biliku.library.emory.edu/uploaded/</documentURL> <!-- include trailing / -->
-	<documentCover>/home/jbwhite/html/projects/reserves2_1/admin/copyright.pdf</documentCover>  
+	<documentDirectory>/var/www/html/CHANGEME/uploaded/</documentDirectory>  <!-- include trailing / -->
+	<documentURL>http://CHANGEME.example.edu/uploaded/</documentURL> <!-- include trailing / -->
+	<documentCover>/var/www/CHANGEME/copyright.pdf</documentCover>  
 	
-	<siteURL>https://biliku/jbwhite/projects/reserves2_1</siteURL>
+	<siteURL>https://CHANGEME.example.edu/CHANGEME/</siteURL>
 
         <newUserEmail>
                 <subject>New Account Created</subject>
                 <msg>
 Welcome to ReservesDirect. A new account has been created
-for you or your email address has been updated. ReservesDirect allows you
-to access all of your course materials online. 
+for you, or your email address has been updated. ReservesDirect 
+allows you to access all of your course materials online. 
 For further assistance on how to use the system, click on
-the "Help" link, send an email to ?deskemail, or
-contact the reserves staff at your home library.
+the "Help" link, send an email to ?deskemail, or contact the 
+reserves staff at your home library.
 
-
-Your username is ?username to login please visit ?url		
+Your username is ?username . to log in, please visit:
+?url		
 		</msg>
         </newUserEmail>
 	
@@ -106,9 +106,8 @@ Your username is ?username to login please visit ?url
 		<subject>Temporary Password Created</subject>
 		<msg>
 A temporary password has been created for you to log into the
-
-ReservesDirect system, presumably because your standard Eagle/Dooley
-netID or GBSnet id and password are not working properly. This
+ReservesDirect system, presumably because your standard CHANGEME
+CHANGEME username and password are not working properly. This
 password will allow you to access the ReservesDirect system until your
 regular campus password is working again. To change your password once
 you log in, click on the "Edit Profile" link just under the
@@ -116,8 +115,8 @@ ReservesDirect logo. If you believe you have received this message in
 error, or if you did not request your password to be changed, please
 send an email to ?deskemail.
 
-
-Please log into ?url as ?username password ?password
+Please log into ?url 
+as username ?username , password ?password
 		</msg>
 	</specialUserEmail>
        
@@ -125,10 +124,10 @@ Please log into ?url as ?username password ?password
 	
 	<EmailRegExp>^(.+)@(.+)$</EmailRegExp>
 	
-	<no_javascript_msg>A scan of your computer shows that javascript is disabled, some features of Reserves2.1 require javascript.<br/> Please contact ITD support at 7-8888 or 78888@emory.edu if you require assistance to enable javascript.</no_javascript_msg>
+	<no_javascript_msg>A scan of your computer shows that javascript is disabled, some features of ReservesDirect require javascript.<br/> Please contact CHANGEME at CHANGEME or CHANGEME@example.edu if you require assistance to enable javascript.</no_javascript_msg>
 	
 	<request_notifier>
-		<last_run>2004-12-21</last_run>
+		<last_run>1970-01-01</last_run>
 	</request_notifier>
 	
 </configuration>
