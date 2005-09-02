@@ -152,6 +152,7 @@ switch ($cmd)
 	case 'newProfile':
 	case 'editProfile':
 	case 'storeUser':
+	case 'editUser':
 	case 'mergeUsers':
 	case 'addUser':
 	case 'assignProxy':

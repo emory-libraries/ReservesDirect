@@ -390,6 +390,7 @@ class userDisplayer
 		echo "							<li><a href=\"index.php?cmd=editUser\">Edit a user profile</a></li>\n";
 		echo "							<li><a href=\"index.php?cmd=resetPwd\">Reset Override Password</a></li>\n";
 		echo "							<li><a href=\"index.php?cmd=removePwd\">Remove Override Password</a></li>\n";
+		echo "							<li><a href=\"index.php?cmd=mergeUsers\">Merge Users</a></li>\n";
 		echo "							<br>\n";
 		echo "							<li><a href=\"index.php?cmd=editProfile\">Edit my profile</a></li>\n";
 		echo "						</ul>\n";
@@ -416,4 +417,37 @@ class userDisplayer
 			$usersObj->displayUserSearch($cmd, $msg, $label, $usersObj->userList, false, $request);
 	}
 
+	
+	function displayMergeUser($request, $hidden_fields, $userObj, $cmd)
+	{
+		echo "<form action=\"index.php\" method=\"post\">\n";
+			if (is_array($hidden_fields)){
+				$keys = array_keys($hidden_fields);
+				foreach($keys as $key){
+					if (is_array($hidden_fields[$key])){
+						foreach ($hidden_fields[$key] as $field){
+							echo "<input type=\"hidden\" name=\"".$key."[]\" value=\"". $field ."\">\n";
+						}
+					} else {
+						echo "<input type=\"hidden\" name=\"$key\" value=\"". $hidden_fields[$key] ."\">\n";
+					}
+				}
+			}	
+			
+			if (isset($_REQUEST['userToKeep_'.'select_user_by']) && isset($_REQUEST['userToKeep_'.'user_qryTerm']))
+				$userObj->search($_REQUEST['userToKeep_'.'select_user_by'], $_REQUEST['userToKeep_'.'user_qryTerm']);
+
+			$userObj->displayUserSelect($cmd, "", "Select User to Keep", $userObj->userList, false, $request, "userToKeep_", false);
+			
+			$userObj->userList = null;
+			
+			if (isset($_REQUEST['userToMerge_'.'select_user_by']) && isset($_REQUEST['userToMerge_'.'user_qryTerm']))
+				$userObj->search($_REQUEST['userToMerge_'.'select_user_by'], $_REQUEST['userToMerge_'.'user_qryTerm']);
+			
+			$userObj->displayUserSelect($cmd, "", "Select User to Merge", $userObj->userList, false, $request, "userToMerge_", false);
+
+					
+					
+		echo "</form>\n";
+	}
 }

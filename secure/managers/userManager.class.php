@@ -46,7 +46,7 @@ class userManager
 
 	function userManager($cmd, $user, $adminUser, $msg="")
 	{
-		global $page, $loc, $g_permission, $ci;
+		global $page, $loc, $g_permission, $ci, $alertMsg;
 
 		$this->displayClass = "userDisplayer";
 
@@ -95,6 +95,33 @@ class userManager
 				
 				$this->displayFunction = 'displayEditUser';
 				$this->argList = array($user, $user, null, $_REQUEST, null, $hidden_fields);
+			break;
+			
+			case "mergeUsers":				
+				$page = "manageUser";
+
+				$userObj = new users();
+				
+				if (isset($_REQUEST['userToKeep_selectedUser']) && isset($_REQUEST['userToMerge_selectedUser']))
+				{
+					
+					$userObj->mergeUsers($_REQUEST['userToKeep_selectedUser'], $_REQUEST['userToMerge_selectedUser']);
+					
+					$alertMsg = "Users successfully merged.";
+					
+					$this->displayFunction = 'displayStaffHome';
+					$this->argList = array(null);
+				
+				} else {
+					$hidden_fields = array (
+						'cmd' 			=> $cmd, 
+					);				
+					
+					
+									
+					$this->displayFunction = 'displayMergeUser';
+					$this->argList = array($_REQUEST, $hidden_fields, $userObj, $cmd);			
+				}
 			break;
 
 			case 'addUser':

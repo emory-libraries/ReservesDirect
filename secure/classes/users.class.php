@@ -108,7 +108,7 @@ class users
 
 		unset ($this->userList);
 		while($row = $rs->fetchRow())
-			$this->userList[] = new user($row[0]);
+			$this->userList[] = new user($row[0]);			
 	}
 
 	function getUsersByUsername($username, $role=null)
@@ -135,6 +135,71 @@ class users
 			$this->userList[] = new user($row[0]);
 	}
 
+	function mergeUsers($keep, $merge)
+	{
+		global $g_dbConn, $g_permission;
+		
+		//select values from access table
+		//merge access records maintaining highest permission_level
+		//delete merged user
+		
+		$accessArray = array();
+		
+		switch ($g_dbConn->phptype)
+		{
+
+			/* By joining users and access we can get staff and admin who have registered in any class at the given level */
+
+			default: //'mysql'
+				$sql_find 	= "SELECT alias_id, permission_level FROM access WHERE user_id in (!,!) ORDER BY alias_id";
+				$sql_delete_access = "DELETE FROM access WHERE user_id in (!,!)";
+				$sql_delete_user   = "DELETE FROM users WHERE user_id = !";
+		}
+
+		$rs = $g_dbConn->query($sql_find, array($keep, $merge));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		while($row =  $rs->fetchRow(DB_FETCHMODE_ASSOC))
+		{
+			$key = $row['alias_id'];
+			if (key_exists($key, $accessArray))			
+				//replace permission level with new value only if it is greater
+				$accessArray[$key] = ($accessArray[$key] < $row['permission_level']) ? $row['permission_level'] : $accessArray[$key];
+			else 
+				$accessArray[$key] = $row['permission_level'];
+			
+		}
+		
+		//delete existing records
+		$rs = $g_dbConn->query($sql_delete_access, array($keep, $merge));
+
+		$rs = $g_dbConn->query($sql_delete_user, $merge);
+
+		if(count($accessArray) > 0)
+		{
+			//replace with condensed values
+			switch ($g_dbConn->phptype)
+			{
+	
+				/* By joining users and access we can get staff and admin who have registered in any class at the given level */
+	
+				default: //'mysql'
+					$sql = "INSERT INTO access (user_id, alias_id, permission_level) VALUES ";
+					
+					$cnt = 0;
+					foreach ($accessArray as $alias_id => $permission)
+					{
+						if ($cnt > 0) 
+							$sql_values .= ", ";
+							
+						$sql_values .= "($keep, $alias_id, $permission)";
+						$cnt++;
+					}									
+			}
+			
+			$rs = $g_dbConn->query($sql . $sql_values);
+		}
+	}
+	
 	function getUsersByRole($strRole)
 	{
 		global $g_dbConn, $g_permission;
@@ -192,10 +257,17 @@ class users
 	}
 
 	function displayUserSearch($cmd, $msg="", $label="", $selection_list, $allowAddUser=false, $request)
-	{
+	{	
 		echo "<form action=\"index.php\" method=\"POST\">\n";
 		echo "<input type=\"hidden\" name=\"cmd\" value=\"$cmd\">\n";
+	
+		$this->displayUserSelect($cmd, $msg, $label, $selection_list, $allowAddUser, $request, "");
 
+		echo "</form>\n";
+	}
+	
+	function displayUserSelect($cmd, $msg="", $label="", $selection_list, $allowAddUser=false, $request, $elementPrefix)
+	{
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "	<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
 		echo "	<tr><td align=\"center\" valign=\"top\" class=\"helperText\">$msg&nbsp;</td></tr>\n";
@@ -221,25 +293,25 @@ class users
 		//set selected
 		$last_name = "";
 		$username = "";
-		$selector = (isset($request['select_user_by'])) ? $request['select_user_by'] : "last_name";
+		$selector = (isset($request[$elementPrefix.'select_user_by'])) ? $request[$elementPrefix.'select_user_by'] : "last_name";
 		$$selector = "selected";
 
-		$qryTerm = isset($request['user_qryTerm']) ? stripcslashes($request['user_qryTerm']) : "";
+		$qryTerm = isset($request[$elementPrefix.'user_qryTerm']) ? stripcslashes($request[$elementPrefix.'user_qryTerm']) : "";
 
-		echo "		<select name=\"select_user_by\">\n";
+		echo "		<select name=\"".$elementPrefix."select_user_by\">\n";
 		echo "			<option value=\"last_name\" $last_name>Last Name</option>\n";
 		echo "			<option value=\"username\" $username>User Name</option>\n";
-		echo "		</select> &nbsp; <input name=\"user_qryTerm\" type=\"text\" value=\"".$qryTerm."\" size=\"15\"  onBlur=\"this.form.submit();\">\n";
+		echo "		</select> &nbsp; <input name=\"".$elementPrefix."user_qryTerm\" type=\"text\" value=\"".$qryTerm."\" size=\"15\"  onBlur=\"this.form.submit();\">\n";
 		echo "		&nbsp;\n";
-		echo "		<input type=\"submit\" name=\"user_search\" value=\"Search\" onClick=\"this.form.select_course.selectedIndex=-1; this.form.selected_user.selectedIndex=-1;\">\n"; //by setting selectedIndex to -1 we can clear the selectbox or previous values
+		echo "		<input type=\"submit\" name=\"".$elementPrefix."user_search\" value=\"Search\" onClick=\"this.form.".$elementPrefix."select_course.selectedIndex=-1; this.form.".$elementPrefix."selected_user.selectedIndex=-1;\">\n"; //by setting selectedIndex to -1 we can clear the selectbox or previous values
 		echo "		&nbsp;\n";
 
 		if (is_array($selection_list) && !empty($selection_list))
 		{
-			echo "		<select name=\"selectedUser\" onClick=\"this.form.butSubmit.disabled=false;\">\n";
+			echo "		<select name=\"".$elementPrefix."selectedUser\" onClick=\"this.form.".$elementPrefix."butSubmit.disabled=false;\">\n";
 			for($i=0;$i<count($selection_list);$i++)
 			{
-				$selector = (isset($request['selectedUser']) && $request['selectedUser'] == $selection_list[$i]->getUserID()) ? "selected" : "";
+				$selector = (isset($request[$elementPrefix.'selectedUser']) && $request[$elementPrefix.'selectedUser'] == $selection_list[$i]->getUserID()) ? "selected" : "";
 				echo "		<option $selector value=\"". $selection_list[$i]->getUserID() ."\"> ". $selection_list[$i]->getName() . " - " . $selection_list[$i]->getUsername() ."</option>";
 			}
 			echo "		</select>\n";
@@ -247,11 +319,10 @@ class users
 		}
 		echo "	<tr bgcolor=\"#CCCCCC\"><td colspan=\"2\">&nbsp;</td></tr>\n";
 
-		$disabled = (isset($request['selectedUser'])) ? "" : "DISABLED";
-		echo "	<tr bgcolor=\"#CCCCCC\"><td colspan=\"2\" align=\"center\"><input type=\"submit\" name=\"butSubmit\" value=\"Select User\" $disabled></td></tr>\n";
+		$disabled = (isset($request[$elementPrefix.'selectedUser'])) ? "" : "DISABLED";
+		echo "	<tr bgcolor=\"#CCCCCC\"><td colspan=\"2\" align=\"center\"><input type=\"submit\" name=\"".$elementPrefix."butSubmit\" value=\"Select User\" $disabled></td></tr>\n";
 		echo "	<tr bgcolor=\"#CCCCCC\"><td colspan=\"2\">&nbsp;</td></tr>\n";
-		echo "</table>\n";
-		echo "</form>\n";
+		echo "</table>\n";		
 	}
 
 
