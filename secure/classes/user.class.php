@@ -444,5 +444,36 @@ class user
 		
 		mail($to, $subject, $msg, $headers);
 	}
+	
+	function getCurrentClassesFor($user_id, $role=null)
+	{
+		global $g_dbConn;
+
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "SELECT DISTINCT ca.course_instance_id "
+					.  "FROM course_instances AS ci "
+					.  	 " JOIN course_aliases AS ca ON ca.course_instance_id = ci.course_instance_id "
+					.    " JOIN access AS a ON a.alias_id = ca.course_alias_id "
+					.    " JOIN users as u ON a.user_id = u.user_id AND u.user_id = ! "
+					.  "WHERE ci.activation_date <= ? AND ? <= ci.expiration_date AND ci.status = 'ACTIVE' "					
+					;
+					
+				if (!is_null($role))
+					$sql .= " AND a.permission_level = $role";
+
+				$d = date("Y-m-d"); //get current date
+		}
+		
+		$rs = $g_dbConn->query($sql, array($user_id, $d, $d));
+
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+		unset($this->courseInstances);  // clean array
+		while ($row = $rs->fetchRow()) {
+			$this->courseInstances[] = new courseInstance($row[0]);
+		}
+	}
 }
 ?>
