@@ -496,23 +496,14 @@ class classManager
 				$dept = $_REQUEST['dept'];
 
 				if ($prof) {
-					
-					$tempUser = new user($prof);
-					
-					$instructor = new instructor($tempUser->userName);
-					unset($tempUser);
-					$instructor->getCurrentCourseInstancesByRole($g_permission['instructor']); 
-					
 					$courseList = array ();
-
-					for ($i=0;$i<count($instructor->courseInstances);$i++)
+					
+					$user->getCurrentClassesFor($prof, $g_permission['instructor']);
+					
+					for ($i=0;$i<count($user->courseInstances);$i++)
 					{
-						$ci = $instructor->courseInstances[$i];
-
-						//PROBLEM - What if instructor is teaching a crosslisted course
-						//this query won't suffice
-						//$ci->getCourseForUser($instructor->getUserID());
-						$ci->getCoursesForInstructor($instructor->getUserID());
+						$ci = $user->courseInstances[$i];						
+						$ci->getCourses();
 
 						for ($j=0; $j<count($ci->courseList); $j++)
 						{
@@ -520,13 +511,13 @@ class classManager
 						}
 
 					}
-					$searchParam = $instructor;
+					$searchParam = new instructor();
+					$searchParam->getUserByID($prof);		
 				} elseif ($dept) {
 					$user->getCoursesByDept($dept);
 					$courseList = $user->courseList;
-					$department = new department($dept);
 
-					$searchParam = $department;
+					$searchParam = new department($dept);
 				} else {
 					echo ("<br><span class=helpertext>Error - You must choose either an Instructor Name or a Department</span>");
 					return;
@@ -542,7 +533,7 @@ class classManager
 				if ($user->getDefaultRole() < $g_permission['proxy']) {
 					$user->getCourseInstances();
 				} else {
-					$user->getCurrentCourseInstancesByRole($g_permission['student']);
+					$user->getCurrentClassesFor($user->getUserID());
 				}
 				for ($i=0;$i<count($user->courseInstances);$i++)
 				{
