@@ -162,34 +162,6 @@ class proxy extends student
 		return $this->courseInstances;
 	}
 
-	function getCurrentCourseInstancesByRole($permissionLvl)
-	{
-		global $g_dbConn;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql = "SELECT DISTINCT ca.course_instance_id "
-					.  "FROM course_instances AS ci "
-					.  	 "LEFT  JOIN course_aliases AS ca ON ca.course_instance_id = ci.course_instance_id "
-					.    "LEFT  JOIN access AS a ON a.alias_id = ca.course_alias_id "
-					.  "WHERE a.user_id = ! AND ci.activation_date <= ? AND ? <= ci.expiration_date AND ci.status = 'ACTIVE' "
-					.  "AND a.permission_level = !"
-					;
-
-				$d = date("Y-m-d"); //get current date
-		}
-
-		$rs = $g_dbConn->query($sql, array($this->getUserID(), $d, $d, $permissionLvl));
-
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		unset($this->courseInstances);  // clean array
-		while ($row = $rs->fetchRow()) {
-			$this->courseInstances[] = new courseInstance($row[0]);
-		}
-	}
-
 	/**
 	* @return $errorMsg
 	* @desc remove a cross listing from the database
