@@ -55,7 +55,7 @@ $skins = new skins();
  */
 
 if (!isset($_SESSION['css'])){
-	$userSkin = isset($_REQUEST['skin']) ? $_REQUEST['skin'] : 'general';
+	$userSkin = isset($_COOKIE['skin']) ? $_COOKIE['skin'] : $_GET['skin'];
     setcookie("skin", $userSkin);
 	$_SESSION['css'] = $skins->getSkin($userSkin);
 }
