@@ -46,12 +46,10 @@ if (!isset($_SESSION['pageStack'])) {
 $skins = new skins();
 
 /* if their session doesn't have the stylesheet set, set it here.
- * $_REQUEST['skin'] will prefer the *cookie* called 'skin' over the
- * GET arguments -- if they show up with a cookie, but no session,
- * the contents of the cookie will be used to write $_SESSION['css'].
- * if they show up with no cookie and no session, the contents of
- * $_GET['skin'] will be used. if this breaks, it's probably because the
- * GPC priority has changed!
+ * first we look for a cookie that we may have set in a previous and
+ * now-expired session. if that's not there, pull it from the get args.
+ * it's okay if it's blank, we just get the default skin from getSkin()
+ * in that case.
  */
 
 if (!isset($_SESSION['css'])){
