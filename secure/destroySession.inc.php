@@ -12,4 +12,7 @@ session_unset();
 if(isset($PHPSESSID)) {
 	session_destroy();
 }
+
+setcookie("skin", "", time()-42000, "/");
+
 ?>
