@@ -14,5 +14,6 @@ if(isset($PHPSESSID)) {
 }
 
 setcookie("skin", "", time()-42000, "/");
+ob_flush();
 
 ?>
