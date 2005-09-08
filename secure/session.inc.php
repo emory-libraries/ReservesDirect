@@ -13,8 +13,7 @@ $args = explode(':', $_REQUEST[$keys[$ndx]]); //split out username
 $_SESSION['authKey'] = $keys[$ndx];
 $user = new user();
 	
-$croddy ='croddy';
-$userName = $croddy;
+$userName = $args[0];
 
 if (trim($userName) == "")
 {
