@@ -13,7 +13,4 @@ if(isset($PHPSESSID)) {
 	session_destroy();
 }
 
-setcookie("skin", "", time()-42000, "/");
-ob_flush();
-
 ?>
