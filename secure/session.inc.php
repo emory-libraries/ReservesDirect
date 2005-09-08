@@ -13,7 +13,8 @@ $args = explode(':', $_REQUEST[$keys[$ndx]]); //split out username
 $_SESSION['authKey'] = $keys[$ndx];
 $user = new user();
 	
-$userName = $args[0];
+$croddy ='croddy';
+$userName = $croddy;
 
 if (trim($userName) == "")
 {
@@ -45,9 +46,19 @@ if (!isset($_SESSION['pageStack'])) {
 
 $skins = new skins();
 
-if (!isset($_SESSION['skin'])){
-	$_SESSION['skin'] = isset($_REQUEST['skin']) ? $_REQUEST['skin'] : 'general';
-	$_SESSION['css'] = $skins->getSkin($_SESSION['skin']);
+/* if their session doesn't have the stylesheet set, set it here.
+ * $_REQUEST['skin'] will prefer the *cookie* called 'skin' over the
+ * GET arguments -- if they show up with a cookie, but no session,
+ * the contents of the cookie will be used to write $_SESSION['css'].
+ * if they show up with no cookie and no session, the contents of
+ * $_GET['skin'] will be used. if this breaks, it's probably because the
+ * GPC priority has changed!
+ */
+
+if (!isset($_SESSION['css'])){
+	$userSkin = isset($_REQUEST['skin']) ? $_REQUEST['skin'] : 'general';
+    setcookie("skin", $userSkin);
+	$_SESSION['css'] = $skins->getSkin($userSkin);
 }
 
 if (!isset($_SESSION['debug']) && isset($_REQUEST['debug'])) $_SESSION['debug'] = true; 
