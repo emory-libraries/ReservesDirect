@@ -456,8 +456,7 @@ class user
 					.  "FROM course_instances AS ci "
 					.  	 " JOIN course_aliases AS ca ON ca.course_instance_id = ci.course_instance_id "
 					.    " JOIN access AS a ON a.alias_id = ca.course_alias_id "
-					.    " JOIN users as u ON a.user_id = u.user_id AND u.user_id = ! "
-					.  "WHERE ci.activation_date <= ? AND ? <= ci.expiration_date AND ci.status = 'ACTIVE' "					
+					.  "WHERE a.user_id = ! AND ci.activation_date <= ? AND ? <= ci.expiration_date AND ci.status = 'ACTIVE' "					
 					;
 					
 				if (!is_null($role))
