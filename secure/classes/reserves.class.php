@@ -163,8 +163,7 @@ class reserve
 					.  "WHERE course_instance_id = ! AND item_id = !"
 					;
 		}
-echo "reserves::getReserveByCI_Item($course_instance_id, $item_id)<br>";
-echo "sql [$sql, $course_instance_id, $item_id]<br>";
+
 		$rs = $g_dbConn->query($sql, array($course_instance_id, $item_id));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
