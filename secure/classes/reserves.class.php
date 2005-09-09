@@ -158,12 +158,13 @@ class reserve
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT reserve_id, course_instance_id, item_id, activation_date, expiration, status, sort_order, date_created, last_modified, requested_loan_period"
+				$sql = "SELECT reserve_id, course_instance_id, item_id, activation_date, expiration, status, sort_order, date_created, last_modified, requested_loan_period "
 					.  "FROM reserves "
 					.  "WHERE course_instance_id = ! AND item_id = !"
 					;
 		}
-
+echo "reserves::getReserveByCI_Item($course_instance_id, $item_id)<br>";
+echo "sql [$sql, $course_instance_id, $item_id]<br>";
 		$rs = $g_dbConn->query($sql, array($course_instance_id, $item_id));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
