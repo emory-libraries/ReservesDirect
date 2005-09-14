@@ -46,7 +46,7 @@ class searchItems
 	*/
 	function search($term, $value, $f=0, $e=20)
 	{
-		global $g_dbConn;
+		global $g_dbConn, $u;
 
 		$this->query = rtrim(ltrim($value));
 		$this->field = $term;
@@ -60,7 +60,9 @@ class searchItems
 				$sql_cnt    = "SELECT count(i.item_id) ";
 
 				$sql = "FROM items as i "
-					.  "WHERE (i.item_type != 'HEADING') AND ("
+					.  "WHERE (i.item_type != 'HEADING') "
+					.  "AND ( i.private_user_id IS NULL OR i.private_user_id = " . $u->getUserID() . " ) "
+					.  "AND ("
 					;
 
 				for($i=0;$i<count($values);$i++)
@@ -106,6 +108,7 @@ class searchItems
 						.	   "  JOIN items as i ON r.item_id = i.item_id "
 						//.	   "WHERE a.user_id = " . $values[0]
 						.	   "WHERE i.item_type != 'HEADING' AND a.user_id = " . $values[0]
+						.	   "  AND ( i.private_user_id IS NULL OR i.private_user_id = " . $u->getUserID() . " ) "
 						;
 				}
 
