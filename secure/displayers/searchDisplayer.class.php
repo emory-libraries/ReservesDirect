@@ -293,13 +293,16 @@ class searchDisplayer
 			{
 				$rowClass = ($i % 2) ? "evenRow" : "oddRow";	
 				$item = $itemArray[$i];	
+
+				//marks items as 'personal' if they are such
+				$personal_label = $item->isPersonal() ? '(Personal) ' : '' ;
 				
 				$previewItemURL = ($item->isPhysicalItem()) ?	$g_reservesViewer . $item->getLocalControlKey() : $item->getURL();
 				
 				echo "				<tr align=\"left\" valign=\"middle\">\n";
 				echo "					<td width=\"4%\" valign=\"top\" class=\"$rowClass\"><img src=\"". $item->getitemIcon() ."\" width=\"24\" height=\"20\"></td>\n";
 				echo "					<td width=\"72%\" valign=\"top\" class=\"$rowClass\">\n";
-				echo "						<span class=\"strong\">" . $item->getTitle() ."</span>. <br> ". $item->getAuthor() ."\n";
+				echo "						<span class=\"strong\">" . $personal_label . $item->getTitle() ."</span>. <br> ". $item->getAuthor() ."\n";
 				echo "					</td>\n";
 				echo "					<td width=\"8%\" align=\"center\" valign=\"middle\" class=\"$rowClass\" class=\"borders\">\n";
 				echo "						<a href=\"$previewItemURL\" target=\"preview\">preview</a>\n";
