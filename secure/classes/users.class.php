@@ -151,11 +151,38 @@ class users
 			/* By joining users and access we can get staff and admin who have registered in any class at the given level */
 
 			default: //'mysql'
-				$sql_find 	= "SELECT alias_id, permission_level FROM access WHERE user_id in (!,!) ORDER BY alias_id";
-				$sql_delete_access = "DELETE FROM access WHERE user_id in (!,!)";
-				$sql_delete_user   = "DELETE FROM users WHERE user_id = !";
+				$sql_find_user			= "SELECT  user_id, dflt_permission_level FROM users WHERE user_id in (!,!)";
+				$sql_find 				= "SELECT alias_id, permission_level FROM access WHERE user_id in (!,!) ORDER BY alias_id";
+				$sql_delete_access 		= "DELETE FROM access WHERE user_id in (!,!)";
+				$sql_delete_user   		= "DELETE FROM users WHERE user_id = !";
+				$sql_update_user		= "UPDATE users set dflt_permission_level = ! WHERE user_id = !";
+
+				$sql_find_staff_lib		= "SELECT user_id FROM staff_libraries WHERE user_id in (!,!)";				
+				$sql_update_staff_lib	= "UPDATE staff_libraries SET user_id = ! WHERE user_id = !";
+				$sql_delete_staff_lib	= "DELETE FROM staff_libraries WHERE user_id = !";
+
+				$sql_find_instr_attr	= "SELECT user_id FROM instructor_attributes WHERE user_id in (!,!)";				
+				$sql_update_instr_attr	= "UPDATE instructor_attributes SET user_id = ! WHERE user_id = !";
+				$sql_delete_instr_attr	= "DELETE FROM instructor_attributes WHERE user_id = !";
+				
+				$sql_find_not_trained	= "SELECT user_id FROM not_trained WHERE user_id in (!,!)";
+				$sql_update_not_trained	= "UPDATE not_trained SET user_id = ! WHERE user_id = !";
+				$sql_delete_not_trained	= "DELETE FROM not_trained WHERE user_id = !";
+				
+				$sql_update_personal_copies	= "UPDATE items set private_user_id = ! WHERE private_user_id = !";
+				$sql_update_user_view_log	= "UPDATE user_view_log set user_id = ! WHERE user_id = !";
+				$sql_update_special_users	= "UPDATE special_users set user_id = ! WHERE user_id = !";
 		}
 
+		$rs = $g_dbConn->query($sql_find_user, array($keep, $merge));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		while($row =  $rs->fetchRow(DB_FETCHMODE_ASSOC))
+			$userData[$row['user_id']] = $row;
+
+		//maintain highest permission level
+		$dflt_permission_lvl = ($userData[$keep]['dflt_permission_level'] < $userData[$merge]['dflt_permission_level']) ? $userData[$merge]['dflt_permission_level'] : $userData[$keep]['dflt_permission_level'];
+		$g_dbConn->query($sql_find_user, array($dflt_permission_lvl, $keep));
+		
 		$rs = $g_dbConn->query($sql_find, array($keep, $merge));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		while($row =  $rs->fetchRow(DB_FETCHMODE_ASSOC))
@@ -174,6 +201,7 @@ class users
 
 		$rs = $g_dbConn->query($sql_delete_user, $merge);
 
+		//merge Access Records
 		if(count($accessArray) > 0)
 		{
 			//replace with condensed values
@@ -198,6 +226,45 @@ class users
 			
 			$rs = $g_dbConn->query($sql . $sql_values);
 		}
+			
+		//Staff libraries
+		//if none exist do nothing
+		//if more than 1 entry exists simple delete the one to not keep
+		//if only 1 exists update so user_id = keep
+		$rs = $g_dbConn->query($sql_find_staff_lib, array($keep, $merge));
+		if ($rs->numRows() > 1)
+			$g_dbConn->query($sql_delete_staff_lib, array($merge));	
+		else 
+			$g_dbConn->query($sql_update_staff_lib, array($keep,$merge));	
+
+		//instructor_attributes
+		//if none exist do nothing
+		//if more than 1 entry exists simple delete the one to not keep
+		//if only 1 exists update so user_id = keep
+		$rs = $g_dbConn->query($sql_find_instr_attr, array($keep, $merge));
+		if ($rs->numRows() > 1)
+			$g_dbConn->query($sql_delete_instr_attr, array($merge));	
+		else 
+			$g_dbConn->query($sql_update_instr_attr, array($keep,$merge));					
+
+		//not_trained
+		//if none exist do nothing
+		//if more than 1 entry exists simple delete the one to not keep
+		//if only 1 exists update so user_id = keep
+		$rs = $g_dbConn->query($sql_find_not_trained, array($keep, $merge));
+		if ($rs->numRows() > 1)
+			$g_dbConn->query($sql_delete_not_trained, array($merge));	
+		else 
+			$g_dbConn->query($sql_update_not_trained, array($keep,$merge));								
+			
+		//personal_copies
+		$g_dbConn->query($sql_update_personal_copies, array($keep,$merge));								
+		
+		//special_users
+		$g_dbConn->query($sql_update_special_users, array($keep,$merge));								
+		
+		//user_view_log
+		$g_dbConn->query($sql_update_user_view_log, array($keep,$merge));								
 	}
 	
 	function getUsersByRole($strRole)

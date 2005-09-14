@@ -102,23 +102,28 @@ class userManager
 
 				$userObj = new users();
 				
-				if (isset($_REQUEST['userToKeep_selectedUser']) && isset($_REQUEST['userToMerge_selectedUser']))
+				if (isset($_REQUEST['userToKeep_selectedUser']) && isset($_REQUEST['userToMerge_selectedUser']) && isset($_REQUEST['subMerge']))
 				{
-					
-					$userObj->mergeUsers($_REQUEST['userToKeep_selectedUser'], $_REQUEST['userToMerge_selectedUser']);
-					
-					$alertMsg = "Users successfully merged.";
-					
-					$this->displayFunction = 'displayStaffHome';
-					$this->argList = array(null);
-				
+					if ($_REQUEST['userToKeep_selectedUser'] != $_REQUEST['userToMerge_selectedUser'])
+					{						
+						$userObj->mergeUsers($_REQUEST['userToKeep_selectedUser'], $_REQUEST['userToMerge_selectedUser']);
+						
+						$alertMsg = "Users successfully merged.";
+						
+						$this->displayFunction = 'displayStaffHome';
+						$this->argList = array(null);
+					} else {
+						$alertMsg = "User to keep and User to merge must be different users.";
+
+						$this->displayFunction = 'displayMergeUser';
+						$this->argList = array($_REQUEST, $hidden_fields, $userObj, $cmd);	
+					}
 				} else {
 					$hidden_fields = array (
 						'cmd' 			=> $cmd, 
 					);				
 					
-					
-									
+														
 					$this->displayFunction = 'displayMergeUser';
 					$this->argList = array($_REQUEST, $hidden_fields, $userObj, $cmd);			
 				}

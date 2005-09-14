@@ -446,7 +446,7 @@ class userDisplayer
 			
 			$userObj->displayUserSelect($cmd, "", "Select User to Merge", $userObj->userList, false, $request, "userToMerge_", false);
 
-					
+			echo "<center><input type=\"submit\" name=\"subMerge\" value=\"Merge Users\"></center>\n";
 					
 		echo "</form>\n";
 	}
