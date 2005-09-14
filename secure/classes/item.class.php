@@ -41,6 +41,7 @@ class item
 	public $itemType;
 	public $notes = array();
 	public $contentNotes;
+	public $privateUserID;
 
 	/**
 	* @return item
@@ -98,7 +99,7 @@ class item
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT i.item_id, i.title, i.item_group, i.last_modified, i.creation_date, i.item_type, i.content_notes, n.note_id "
+				$sql = "SELECT i.item_id, i.title, i.item_group, i.last_modified, i.creation_date, i.item_type, i.content_notes, n.note_id, i.private_user_id "
 					.  "FROM items as i "
 					.  "LEFT JOIN notes as n on n.target_table='items' AND n.target_id = i.item_id "
 					.  "WHERE item_id = !"
@@ -117,6 +118,7 @@ class item
 			$this->itemType		= $row[5];
 			$this->contentNotes	= $row[6];
 			//$this->notes[] = new note($row[7]); This won't work if there are multiple notes... replaced with logic below ... kaw 8.4.05
+			$this->privateUserID = $row[8];
 			
 			
 			if (!is_null($row[7]))
@@ -238,6 +240,10 @@ class item
 	function setNote($type, $text)
 	{
 		$this->notes[] = common_setNote($noteID=null, $type, $text, "items", $this->itemID);
+	}
+
+	function isPersonal() {
+		return isset($this->privateUserID);
 	}
 }
 ?>
