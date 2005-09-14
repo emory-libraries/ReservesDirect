@@ -5,7 +5,8 @@
 $src  = $argv[1];
 $dest = $argv[2];
 
-$xmlConfig = "/etc/httpd/conf/reserves2_config.xml";
+//sets $xmlConfig to path of config.xml file
+require_once(realpath(dirname(__FILE__) . "/../config_loc.inc.php"));
 	
 if (!is_readable($xmlConfig)) { trigger_error("Could not read configure xml file path=$xmlConfig", E_USER_ERROR); }
 	

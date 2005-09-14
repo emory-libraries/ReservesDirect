@@ -3,7 +3,9 @@ unset($error);
 
 if ($_REQUEST['Submit'] == "Send")
 {	
-	$xmlConfig = "config.xml";		
+	//sets $xmlConfig to path of config.xml file
+	require_once("config_loc.inc.php");
+		
 	if (!is_readable($xmlConfig)) { trigger_error("Could not read configure xml file path=$xmlConfig", E_USER_ERROR); }	
 		$configure = simplexml_load_file($xmlConfig);		
 		

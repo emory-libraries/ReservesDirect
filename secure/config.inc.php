@@ -29,7 +29,8 @@ http://www.reservesdirect.org/
 *******************************************************************************/
 	require_once("DB.php");
 	
-	$xmlConfig = "/CHANGEME/etc/reservesdirect/config.xml";
+	//sets $xmlConfig to path of config.xml file
+	require_once(realpath(dirname(__FILE__) . "/../config_loc.inc.php"));
 
 	if (!is_readable($xmlConfig)) { trigger_error("Could not read configure xml file path=$xmlConfig", E_USER_ERROR); }
 
