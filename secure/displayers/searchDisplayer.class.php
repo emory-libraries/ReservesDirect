@@ -295,7 +295,7 @@ class searchDisplayer
 				$item = $itemArray[$i];	
 
 				//marks items as 'personal' if they are such
-				$personal_label = $item->isPersonal() ? '(Personal) ' : '' ;
+				$personal_label = $item->isPersonalCopy() ? '(Personal) ' : '' ;
 				
 				$previewItemURL = ($item->isPhysicalItem()) ?	$g_reservesViewer . $item->getLocalControlKey() : $item->getURL();
 				
