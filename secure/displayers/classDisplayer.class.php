@@ -464,7 +464,7 @@ class classDisplayer
 		echo "          <td width=\"35%\" align=\"left\" valign=\"top\">&nbsp;</td>\n";
 		echo "          <td width=\"11%\" align=\"center\" valign=\"middle\">Delete</td>\n";
 		echo "		</tr>\n";
-		echo "		<tr bgcolor=\"#CCCCCC\"> \n";
+		echo "		<tr class=\"evenRow\">\n";
 		echo "			<td align=\"center\" valign=\"middle\"><input name=\"primaryCourse\" type=\"radio\" value=\"".$ci->course->courseAliasID."\" checked></td>\n";
 		echo"			<INPUT TYPE=\"HIDDEN\" NAME=\"oldPrimaryCourse\" VALUE=\"".$ci->course->courseAliasID."\">\n";
 		echo "          <td align=\"right\" valign=\"middle\" class=\"strong\">Dept:</td>\n";
@@ -491,35 +491,39 @@ class classDisplayer
 		echo "          <td align=\"left\" valign=\"middle\"> <input name=\"primaryCourseName\" type=\"text\" size=\"25\" value=\"".$ci->course->getName()."\"></td>\n";
 		echo "          <td align=\"center\" valign=\"middle\"></td>\n";
 		echo "		</tr>\n";
+		
 		$rowNumber = 0;
-		for ($i=0; $i<count($ci->crossListings); $i++) {
-			$rowClass = ($rowNumber++ % 2) ? "evenRow" : "oddRow\n";
-		echo "		<tr class=\"".$rowClass."\"> \n";
-		echo "			<td align=\"center\" valign=\"middle\"><!--<input type=\"radio\" name=\"primaryCourse\" value=\"".$ci->crossListings[$i]->courseAliasID."\">--></td>\n";
-		echo "			<td align=\"right\" valign=\"middle\" class=\"strong\">Dept:</td>\n";
-		echo "			<td align=\"left\" valign=\"middle\"> <select name=\"cross_listings[".$ci->crossListings[$i]->courseAliasID."][dept]\">\n";
-		echo "			<option value=\"\">--Select-- \n";
-			foreach($deptList as $department)
-			{
-					echo "<option value=\"" . $department[0] . "\"\n";
-
-					if ($department[0] == $ci->crossListings[$i]->deptID) {
-						echo " selected\n";
-					}
-					echo ">" . $department[1] . "</option>\n\n";
-			}
-
-
-		echo "			            </select></td>\n";
-		echo "			<td align=\"right\" valign=\"middle\">Course#:</td>\n";
-		echo "			<td align=\"left\" valign=\"middle\"> <input name=\"cross_listings[".$ci->crossListings[$i]->courseAliasID."][courseNo]\" type=\"text\" size=\"5\" maxlength=\"8\" value=\"".$ci->crossListings[$i]->courseNo."\"></td>\n";
-		echo "			<td align=\"right\" valign=\"middle\">Section:</td>\n";
-		echo "			<td align=\"left\" valign=\"middle\"> <input name=\"cross_listings[".$ci->crossListings[$i]->courseAliasID."][section]\" type=\"text\" size=\"5\" maxlength=\"8\" value=\"".$ci->crossListings[$i]->section."\"></td>\n";
-		echo "			<td align=\"right\" valign=\"middle\">Title:</td>\n";
-		echo "			<td align=\"left\" valign=\"middle\"> <input name=\"cross_listings[".$ci->crossListings[$i]->courseAliasID."][courseName]\" type=\"text\" size=\"25\" value=\"".$ci->crossListings[$i]->getName()."\"></td>\n";
-		echo "			<td align=\"center\" valign=\"middle\"><input type=\"checkbox\" name=\"deleteCrossListing[".$ci->crossListings[$i]->courseAliasID."]\" value=\"".$ci->crossListings[$i]->courseAliasID."\"></td>\n";
-		echo "		</tr>\n";
+		for ($i=0; $i<count($ci->crossListings); $i++) 
+		{
+			$rowClass = ($rowNumber % 2) ? "evenRow" : "oddRow\n";
+			echo "		<tr class=\"".$rowClass."\"> \n";
+			echo "			<td align=\"center\" valign=\"middle\"><!--<input type=\"radio\" name=\"primaryCourse\" value=\"".$ci->crossListings[$i]->courseAliasID."\">--></td>\n";
+			echo "			<td align=\"right\" valign=\"middle\" class=\"strong\">Dept:</td>\n";
+			echo "			<td align=\"left\" valign=\"middle\"> <select name=\"cross_listings[".$ci->crossListings[$i]->courseAliasID."][dept]\">\n";
+			echo "			<option value=\"\">--Select-- \n";
+				foreach($deptList as $department)
+				{
+						echo "<option value=\"" . $department[0] . "\"\n";
+	
+						if ($department[0] == $ci->crossListings[$i]->deptID) {
+							echo " selected\n";
+						}
+						echo ">" . $department[1] . "</option>\n\n";
+				}
+	
+	
+			echo "			            </select></td>\n";
+			echo "			<td align=\"right\" valign=\"middle\">Course#:</td>\n";
+			echo "			<td align=\"left\" valign=\"middle\"> <input name=\"cross_listings[".$ci->crossListings[$i]->courseAliasID."][courseNo]\" type=\"text\" size=\"5\" maxlength=\"8\" value=\"".$ci->crossListings[$i]->courseNo."\"></td>\n";
+			echo "			<td align=\"right\" valign=\"middle\">Section:</td>\n";
+			echo "			<td align=\"left\" valign=\"middle\"> <input name=\"cross_listings[".$ci->crossListings[$i]->courseAliasID."][section]\" type=\"text\" size=\"5\" maxlength=\"8\" value=\"".$ci->crossListings[$i]->section."\"></td>\n";
+			echo "			<td align=\"right\" valign=\"middle\">Title:</td>\n";
+			echo "			<td align=\"left\" valign=\"middle\"> <input name=\"cross_listings[".$ci->crossListings[$i]->courseAliasID."][courseName]\" type=\"text\" size=\"25\" value=\"".$ci->crossListings[$i]->getName()."\"></td>\n";
+			echo "			<td align=\"center\" valign=\"middle\"><input type=\"checkbox\" name=\"deleteCrossListing[".$ci->crossListings[$i]->courseAliasID."]\" value=\"".$ci->crossListings[$i]->courseAliasID."\"></td>\n";
+			echo "		</tr>\n";
+			$rowNumber++;
 		}
+		
 		echo "		<tr class=\"headingCell1\">\n";
 		echo "			<td align=\"left\" valign=\"top\">&nbsp;</td>\n";
 		echo "			<td align=\"left\" valign=\"top\">&nbsp;</td>\n";

@@ -53,7 +53,7 @@ class classManager
 
 	function classManager($cmd, $user, $adminUser, $request)
 	{
-		global $g_permission, $page, $loc, $ci;
+		global $g_permission, $page, $loc, $ci, $alertMsg;
 		
 //echo "classManager($cmd, $user, $adminUser)<P>"; //classManager
 
@@ -291,13 +291,11 @@ class classManager
 					$section = $_REQUEST['newSection'];
 					$courseName = $_REQUEST['newCourseName'];
 
-					if ($dept==NULL || $courseNo==NULL || $section==NULL || $courseName==NULL) {
-						echo '<br><span class="helpertext">'
-						.	'Please supply a Department, Course#, Section, and Title before adding the Cross Listing.'
-						.	'</span>';
-					} else {
+					if ($dept==NULL || $courseNo==NULL || $courseName==NULL)	
+						$alertMsg =	'Please supply a Department, Course#, Section, and Title before adding the Cross Listing.';
+					else 
 						$user->addCrossListing($ci, $dept, $courseNo, $section, $courseName);
-					}
+					
 
 				}
 
