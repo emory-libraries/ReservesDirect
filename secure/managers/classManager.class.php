@@ -502,13 +502,9 @@ class classManager
 					{
 						$ci = $user->courseInstances[$i];						
 						$ci->getCourses();
-
-						for ($j=0; $j<count($ci->courseList); $j++)
-						{
-							$courseList[] = $ci->courseList[$j];
-						}
-
+						$courseList = $ci->courseList;
 					}
+					
 					$searchParam = new instructor();
 					$searchParam->getUserByID($prof);		
 				} elseif ($dept) {
@@ -517,7 +513,7 @@ class classManager
 
 					$searchParam = new department($dept);
 				} else {
-					echo ("<br><span class=helpertext>Error - You must choose either an Instructor Name or a Department</span>");
+					$alertMsg = "You must choose either an Instructor Name or a Department";
 					return;
 				}
 
