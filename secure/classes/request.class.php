@@ -124,7 +124,7 @@ class request
 	}
 
 	/**
-	* @return void
+	* @return requestID on success or null on failure
 	* @param id $reserveID
 	* @desc get data by id
 	*/
@@ -144,7 +144,13 @@ class request
 		$rs = $g_dbConn->query($sql, $reserveID);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
-		list($this->requestID, $this->reserveID, $this->requestedItemID, $this->requestingUserID, $this->requestedDate, $this->processedDate, $this->desiredDate, $this->priority, $this->courseInstanceID) = $rs->fetchRow();
+		if( ($row = $rs->fetchRow()) != null ) {
+			list($this->requestID, $this->reserveID, $this->requestedItemID, $this->requestingUserID, $this->requestedDate, $this->processedDate, $this->desiredDate, $this->priority, $this->courseInstanceID) = $rs->fetchRow();
+			
+			return $this->requestID;
+		}
+		else
+			return null;
 	}
 	
 	function getHoldings()
