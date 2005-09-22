@@ -213,9 +213,7 @@ class classManager
 									if ($reserve->item->isPhysicalItem()) {
 										$reqst = new request();
 										$reqst->getRequestByReserveID($r);
-										if (!$reqst->getProcessedDate()) {
-											$reqst->destroy();
-										}
+										$reqst->destroy();
 									}
 									$reserve->destroy();
 								}
