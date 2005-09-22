@@ -302,57 +302,147 @@ class requestDisplayer
 		echo "<script languge=\"JavaScript\">\n";
 		echo "	function setBarcode(frm) { if (frm.searchField.options[frm.searchField.selectedIndex] == 'barcode') { frm.barcode.value = frm.searchTerm.value; } }\n";
 
-		if ($cmd != "addDigitalItem")
-		{
-			echo "	function checkForm(frm) {
-						var addTypeValue;
-						var copySelected = 1;
+		if( $cmd == 'addPhysicalItem' ):
+?>
 
-						for (i=0;i<frm.elements.length;i++){
-							e = frm.elements[i];
-							if (e.type == 'checkbox' && e.name=='physical_copy[]' && e.checked) {
-								copySelected = 0;
-							}
-						}
+	function checkForm(frm) {
+		var addTypeValue;
+		var copySelected = 1;
 
-						for (i=0;i<frm.addType.length;i++){
-							if (frm.addType[i].checked==true)
-								addTypeValue = frm.addType[i].value;
-						}
+		for (i=0;i<frm.elements.length;i++) {
+			e = frm.elements[i];
+			if (e.type == 'checkbox' && e.name=='physical_copy[]' && e.checked) {
+				copySelected = 0;
+			}
+		}
 
-						var alertMsg = '';
-						if (frm.title.value == '') { alertMsg = alertMsg + 'Please enter a title.<br>' }
-						if (addTypeValue != 'MANUAL' && frm.euclid_record.checked && copySelected) { alertMsg = alertMsg + 'Please select a copy to place on reserve<br>'; }
-						if (addTypeValue == 'PERSONAL' && frm.selected_owner.selectedIndex == '0') { alertMsg = alertMsg + 'Please select a personal owner.<br>'; }
-						
-						if (alertMsg == '') {
-							frm.cmd.value = 'storeRequest';
-							frm.submit();
-						} else {
-							document.getElementById('alertMsg').innerHTML = alertMsg;
-						}
-					}";
+		for (i=0;i<frm.addType.length;i++) {
+			if (frm.addType[i].checked==true)
+				addTypeValue = frm.addType[i].value;
+		}
+
+		var alertMsg = '';
+		if (frm.title.value == '') { alertMsg = alertMsg + 'Please enter a title.<br>' }
+		if (addTypeValue != 'MANUAL' && frm.euclid_record.checked && copySelected) { alertMsg = alertMsg + 'Please select a copy to place on reserve<br>'; }
+		if (addTypeValue == 'PERSONAL' && frm.selected_owner.selectedIndex == '0') { alertMsg = alertMsg + 'Please select a personal owner.<br>'; }
+		
+		if (alertMsg == '') {
+			frm.cmd.value = 'storeRequest';
+			frm.submit();
 		} else {
-			echo "	function checkForm(frm) {
-						var alertMsg = '';
-						if (frm.title.value == '') { alertMsg = alertMsg + 'Please enter a title.<br>';  }						
+			document.getElementById('alertMsg').innerHTML = alertMsg;
+		}
+	}
 
-						if (frm.documentType[0].checked && frm.userFile.value == '')
-							alertMsg = alertMsg + 'File path is required.<br>'; 
-						
-						if (frm.documentType[1].checked && frm.url.value == '')
-							alertMsg = alertMsg + 'URL is required.<br>'; 							
-							
-						if (alertMsg == '') {
-							frm.cmd.value = 'storeRequest';
-							frm.submit();
-						} else {
-							document.getElementById('alertMsg').innerHTML = alertMsg;
-						}
-					}					
-			";
+	//disables/enables ILS elements
+	function toggleILS(enable) {
+		var frm = document.getElementById('additem_form');
+		var dspl;
+		if(enable) {
+			frm.searchTerm.disabled=false;
+			frm.searchField.disabled=false;
+			frm.euclid_record.disabled=false; 
+			frm.euclid_record.checked=true;
+			dspl = '';
+		}
+		else {
+			frm.searchTerm.disabled=true;
+			frm.searchField.disabled=true;				
+			frm.euclid_record.disabled=true; 
+			frm.euclid_record.checked=false;
+			dspl = 'none';
+		}
+
+		document.getElementById('ils_search').style.display = dspl;
+		document.getElementById('ils_record').style.display = dspl;
+	}
+
+	//shows/hides non-manual entry elements
+	function toggleNonManual(show) {
+		var dspl;
+		if(show) {
+			dspl = ''
+		}
+		else {
+			dspl = 'none';
+		}
+		document.getElementById('nonman_barcode').style.display = dspl;
+		document.getElementById('nonman_control').style.display = dspl;
+		
+		//these ones do not always exist
+		if(	document.getElementById('nonman_physcopy') != null )
+			document.getElementById('nonman_physcopy').style.display = dspl;
+		if(	document.getElementById('nonman_note') != null )
+			document.getElementById('nonman_note').style.display = dspl;
+	}
+
+<?php
+		else:
+?>
+
+	function checkForm(frm) {
+		var alertMsg = '';
+		if (frm.title.value == '') { alertMsg = alertMsg + 'Please enter a title.<br>';  }						
+
+		if (frm.documentType[0].checked && frm.userFile.value == '')
+			alertMsg = alertMsg + 'File path is required.<br>'; 
+		
+		if (frm.documentType[1].checked && frm.url.value == '')
+			alertMsg = alertMsg + 'URL is required.<br>'; 							
+			
+		if (alertMsg == '') {
+			frm.cmd.value = 'storeRequest';
+			frm.submit();
+		} else {
+			document.getElementById('alertMsg').innerHTML = alertMsg;
+		}
+	}
+	
+<?php
+		endif;	//endif($cmd == 'addPhysicalItem')
+?>
+
+
+	//shows/hides personal item elements; marks them as required or not
+	function togglePersonal(enable, req) {
+		//show block or not?
+		if(enable) {
+			document.getElementById('personal_item_row').style.display = '';
+		}
+		else {
+			document.getElementById('personal_item').value = 'no';
+			document.getElementById('personal_item_row').style.display = 'none';
+			return;
 		}
 		
+		//if required, show just the name search and red *
+		if(req) {
+			document.getElementById('personal_req_mark').style.display = '';
+			document.getElementById('personal_item_choice').style.display = 'none';
+			document.getElementById('personal_item_owner').style.display = '';
+			document.getElementById('personal_item_owner').style.visibility = 'visible';
+			document.getElementById('personal_item').value = 'yes';
+		}
+		else {
+			document.getElementById('personal_req_mark').style.display = 'none';
+			document.getElementById('personal_item_choice').style.display = '';
+			togglePersonalOwnerSearch();			
+		}
+	}
+
+	//shows/hides personal item owner search fields
+	function togglePersonalOwnerSearch() {
+		if(document.getElementById('personal_item_no').checked) {
+			document.getElementById('personal_item_owner').style.visibility = 'hidden';
+			document.getElementById('personal_item').value = 'no';
+		}
+		else if(document.getElementById('personal_item_yes').checked) {
+			document.getElementById('personal_item_owner').style.visibility = 'visible';
+			document.getElementById('personal_item').value = 'yes';
+		}	
+	}
+	
+<?php
 		echo "</script>\n";
 
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
@@ -365,7 +455,7 @@ class requestDisplayer
 
 		$formEncode = ($cmd == "addDigitalItem") ? "enctype=\"multipart/form-data\"" : "";
 
-		echo "<form action=\"index.php\" method=\"POST\" $formEncode>\n";
+		echo "<form action=\"index.php\" method=\"POST\" id=\"additem_form\" name=\"additem_form\" $formEncode>\n";
 
 		if (is_array($hidden_fields)){
 			$keys = array_keys($hidden_fields);
@@ -426,22 +516,22 @@ class requestDisplayer
 			echo "			<table width=\"100%\" border=\"0\" cellpadding=\"3\" cellspacing=\"0\" class=\"borders\">\n";
 			echo "				<tr bgcolor=\"#CCCCCC\">\n";
 			echo "					<td width=\"20%\" align=\"left\" valign=\"middle\">\n";
-			echo "						<input name=\"addType\" type=\"radio\" value=\"EUCLID_ITEM\" $EUCLID_ITEM  onClick=\"this.form.personal_item.value='no'; this.form.searchTerm.disabled=false; this.form.searchField.disabled=false; this.form.euclid_record.checked=false; this.form.euclid_record.disabled=false; this.form.submit();\">\n";
+			echo "						<input name=\"addType\" type=\"radio\" value=\"EUCLID_ITEM\" $EUCLID_ITEM  onClick=\"toggleILS(1); togglePersonal(0,0); toggleNonManual(1);\">\n";
 			echo "						<span class=\"strong\">EUCLID Item</span>\n";
 			echo "					</td>\n";
 			echo "					<td width=\"40%\" align=\"left\" valign=\"top\">\n";
-			echo "						<input type=\"radio\" name=\"addType\" value=\"PERSONAL\" $PERSONAL onClick=\"this.form.personal_item.value='yes'; this.form.searchTerm.disabled=true; this.form.searchField.disabled=true; this.form.euclid_record.checked=true; this.form.euclid_record.disabled=true; this.form.submit();\">\n";
+			echo "						<input type=\"radio\" name=\"addType\" value=\"PERSONAL\" $PERSONAL onClick=\"toggleILS(1); togglePersonal(1,1); toggleNonManual(1); \">\n";
 			echo "						<span class=\"strong\">Personal Copy (EUCLID Item Available)</span>\n";
 			echo "					</td>\n";
 
 			echo "					<td width=\"40%\" align=\"left\" valign=\"top\">\n";
-			echo "						<input type=\"radio\" name=\"addType\" value=\"MANUAL\" $MANUAL onClick=\"this.form.searchTerm.disabled=true; this.form.searchField.disabled=true; this.form.euclid_record.checked=false; this.form.euclid_record.disabled=true;\">\n";
+			echo "						<input type=\"radio\" name=\"addType\" value=\"MANUAL\" $MANUAL onClick=\"toggleILS(0); togglePersonal(1, 0); toggleNonManual(0);\">\n";
 			echo "						<span class=\"strong\">Enter Item Manually (no EUCLID lookup)</span>\n";
 			echo "					</td>\n";
 			echo "				</tr>\n";
 
 			$searchTerm = isset($request['searchTerm']) ? $request['searchTerm'] : "";
-			echo "				<tr bgcolor=\"#CCCCCC\">\n";
+			echo "				<tr bgcolor=\"#CCCCCC\" id=\"ils_search\">\n";
 			echo "					<td colspan=\"2\" align=\"left\" valign=\"middle\" bgcolor=\"#FFFFFF\">\n";
 			echo "						<input name=\"searchTerm\" type=\"text\" size=\"15\" value=\"".$searchTerm."\">\n";
 
@@ -488,7 +578,8 @@ class requestDisplayer
 
 			foreach ($circRules->getCircRules() as $circRule)
 			{
-				$rule = $circRule['circRule'] . "::" . $circRule['alt_circRule'];
+				$rule = urlencode(serialize($circRule));
+				//$rule = $circRule['circRule'] . "::" . $circRule['alt_circRule'];
 				$display_rule = $circRule['circRule']." -- " . $circRule['alt_circRule'];
 				$selected = $circRule['default'];
 				echo "							<option value=\"$rule\" $selected>$display_rule</option>\n";
@@ -514,7 +605,7 @@ class requestDisplayer
 			echo "				</tr>\n";
 
 
-			echo "				<tr bgcolor=\"#CCCCCC\">\n";
+			echo "				<tr bgcolor=\"#CCCCCC\" id=\"ils_record\">\n";
 			echo "					<td colspan=\"2\" align=\"left\" valign=\"middle\">\n";
 			echo "						<input type=\"checkbox\" name=\"euclid_record\" value=\"yes\" checked>\n";
 			echo "						<span class=\"strong\">Create EUCLID Reserve Record</span>\n";
@@ -572,6 +663,59 @@ class requestDisplayer
 		echo "						</table>\n";
 		echo "					</td>\n";
 		echo "				</tr>\n";
+
+		//personal item block
+		//output html, but hide by default with css
+
+		//set search-by selected
+		$username = "";
+		$last_name = "";
+		$selector = (isset($request['select_owner_by'])) ? $request['select_owner_by'] : "last_name";
+		$$selector = 'selected="selected"';
+		
+		//set search term
+		$owner_qryTerm = (isset($request['owner_qryTerm'])) ? $request['owner_qryTerm'] : "";
+
+		//set name selected
+		$inst_DISABLED = (is_null($owner_list)) ? 'disabled="disabled"' : '';
+
+		//personal item block
+?>
+				<input type="hidden" name="personal_item" id="personal_item" value="no" />
+				
+				<tr align="left" valign="top" id="personal_item_row">
+					<td align="right" bgcolor="#CCCCCC" class="strong">
+						<span id="personal_req_mark" style="color:#FF0000;">*</span>
+						Personal Copy Owner:
+						<br />&nbsp;
+					</td>
+					<td>
+						<div id="personal_item_choice">
+							<input type="radio" name="personal_item_choose" id="personal_item_no" value="no" checked="checked" onChange="togglePersonalOwnerSearch();" /> No
+							&nbsp;&nbsp;
+							<input type="radio" name="personal_item_choose" id="personal_item_yes" value="Yes" onChange="togglePersonalOwnerSearch();" /> Yes
+						</div>
+						<div id="personal_item_owner" style="margin-top:2px; margin-bottom:15px;">
+							<select name="select_owner_by">
+								<option value="last_name" <?=$last_name?>>Last Name</option>
+								<option value="username" <?=$username?>>User Name</option>
+							</select>
+							&nbsp; <input id="owner_qryTerm" name="owner_qryTerm" type="text" value="<?=$owner_qryTerm?>" size="15"  onBlur="this.form.submit();">
+							&nbsp; <input type="submit" name="owner_search" value="Search">
+							&nbsp;
+							<select name="selected_owner" <?=$inst_DISABLED?>>
+								<option value="null">-- Choose Item Owner -- </option>
+<?php
+		for($i=0;$i<count($owner_list);$i++) {
+			$inst_selector = ($request['selected_owner'] == $owner_list[$i]->getUserID() || $search_results['personal_owner'] == $owner_list[$i]->getUserID()  ) ? 'selected="selected"' : '';
+			echo "\t\t\t\t\t\t\t".'<option value="'. $owner_list[$i]->getUserID() .'" '.$owner_selector.'>'.$owner_list[$i]->getName().'</option>'."\n";
+		}
+?>
+							</select>
+						</div>
+					</td>
+				</tr>
+<?php
 		echo "				<tr valign=\"middle\">\n";
 		echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>Title:</td>\n";
 		echo "					<td align=\"left\"><input name=\"title\" type=\"text\" size=\"50\" value=\"".$search_results['title']."\"></td>\n";
@@ -678,86 +822,43 @@ class requestDisplayer
 		//echo "					<td><textarea name=\"content_note\" cols=\"50\" rows=\"3\">".$search_results['content_note']."</textarea></td>\n";
 		echo "				</td></tr>\n";
 
-		$personal_item = isset($request['personal_item']) ? $request['personal_item'] : "";
-		echo "				<input type=\"hidden\" name=\"personal_item\" value=\"".$personal_item."\">\n";
-
-		if (isset($request['personal_item']) && ($request['personal_item'] == "yes") || !is_null($search_results['personal_owner']))
-		{
-			echo "				<tr align=\"left\" valign=\"middle\">\n";
-			echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">\n";
-			echo "						<span class=\"strong\">Personal Copy Owner:</span>\n";
-			echo "					</td>\n";
-
-
-			//set selected
-			$username = "";
-			$last_name = "";
-			$selector = (isset($request['select_owner_by'])) ? $request['select_owner_by'] : "last_name";
-			$$selector = "selected";
-
-			$owner_qryTerm = (isset($request['owner_qryTerm'])) ? $request['owner_qryTerm'] : "";
-
-			echo "					</td>\n";
-			echo "					<td>\n";
-			echo "						<select name=\"select_owner_by\">\n";
-			echo "							<option value=\"last_name\" $last_name>Last Name</option>\n";
-			echo "							<option value=\"username\" $username>User Name</option>\n";
-			echo "						</select> &nbsp; <input name=\"owner_qryTerm\" type=\"text\" value=\"".$owner_qryTerm."\" size=\"15\"  onBlur=\"this.form.submit();\">\n";
-			echo "						&nbsp;\n";
-			echo "						<input type=\"submit\" name=\"owner_search\" value=\"Search\">\n";
-			echo "						&nbsp;\n";
-
-			//set selected
-			$inst_DISABLED = (is_null($owner_list)) ? "DISABLED" : "";
-
-			echo "						<font color=\"#FF0000\"><strong>*</strong>\n";
-			echo "						<select name=\"selected_owner\" $inst_DISABLED\">\n";
-			echo "							<option value=\"null\">-- Choose Item Owner -- </option>\n";
-
-			for($i=0;$i<count($owner_list);$i++)
-			{
-				$inst_selector = ($request['selected_owner'] == $owner_list[$i]->getUserID() || $search_results['personal_owner'] == $owner_list[$i]->getUserID()  ) ? "selected" : "";
-				echo "							<option value=\"". $owner_list[$i]->getUserID() ."\" $owner_selector>". $owner_list[$i]->getName() ."</option>\n";
-			}
-
-			echo "						</select>\n";
-			echo "					</td>\n";
+		//only show this stuff for physical items
+		if ($cmd == 'addPhysicalItem') {
+			$barcode_value = (isset($barcode) && (isset($request['searchTerm']) && $request['searchTerm'] != "")) ? $request['searchTerm'] : $search_results['physicalCopy'][0]['bar'];			
+			
+			echo "				<tr align=\"left\" valign=\"middle\" id=\"nonman_barcode\">\n";
+			echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">Barcode:</td>\n";
+			echo "					<td><input name=\"barcode\" type=\"text\" size=\"12\" value=\"$barcode_value\"></td>\n";
 			echo "				</tr>\n";
-		}
 
-		$barcode_value = (isset($barcode) && (isset($request['searchTerm']) && $request['searchTerm'] != "")) ? $request['searchTerm'] : $search_results['physicalCopy'][0]['bar'];			
-		
-		echo "				<tr align=\"left\" valign=\"middle\">\n";
-		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">Barcode:</td>\n";
-		echo "					<td><input name=\"barcode\" type=\"text\" size=\"12\" value=\"$barcode_value\"></td>\n";
-		echo "				</tr>\n";
-
-		echo "				<tr align=\"left\" valign=\"middle\">\n";
-		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">Control Number:</td>\n";
-		echo "					<td>".$search_results['controlKey']."<input name=\"controlKey\" type=\"hidden\" size=\"10\" value=\"".$search_results['controlKey']."\"></td>\n";
-		echo "				</tr>\n";
-
-		if (is_array($search_results['physicalCopy']))
-		{
-			echo "				<tr align=\"left\" valign=\"top\">\n";
-			echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">Select Copy:</td>\n";
-			echo "					<td>\n";
-			echo "						<table class=\"strong\" border=\"0\" width=\"100%\">\n";
-
-			for ($i=0;$i<count($search_results['physicalCopy']);$i++)
-			{
-				$copySelect = (count($search_results['physicalCopy']) == 1 || $search_results['physicalCopy'][$i]['bar'] == $barcode_value) ? "checked" : "";
-				$phyCopy = $search_results['physicalCopy'][$i];
-				echo "							<tr>\n";
-				echo "								<td><input type=\"checkbox\" $copySelect name=\"physical_copy[]\" value=\"".$phyCopy['type']."::".$phyCopy['library']."::".$phyCopy['callNum']."::".$phyCopy['loc']."::".$phyCopy['bar']."::".$phyCopy['copy']."\"></td>\n";
-				echo "								<td>".$phyCopy['type']." ".$phyCopy['library']." ".$phyCopy['loc']." ".$phyCopy['callNum']."</td>\n";
-				echo "							</tr>\n";
-			}
-			echo "						</table>\n";
-			echo "					</td>\n";
+			echo "				<tr align=\"left\" valign=\"middle\" id=\"nonman_control\">\n";
+			echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">Control Number:</td>\n";
+			echo "					<td>".$search_results['controlKey']."<input name=\"controlKey\" type=\"hidden\" size=\"10\" value=\"".$search_results['controlKey']."\"></td>\n";
 			echo "				</tr>\n";
-		} //else
+
+			if (is_array($search_results['physicalCopy']))
+			{
+				echo "				<tr align=\"left\" valign=\"top\" id=\"nonman_physcopy\">\n";
+				echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">Select Copy:</td>\n";
+				echo "					<td>\n";
+				echo "						<table class=\"strong\" border=\"0\" width=\"100%\">\n";
+
+				for ($i=0;$i<count($search_results['physicalCopy']);$i++)
+				{
+					$copySelect = (count($search_results['physicalCopy']) == 1 || $search_results['physicalCopy'][$i]['bar'] == $barcode_value) ? "checked" : "";
+					$phyCopy = $search_results['physicalCopy'][$i];
+					echo "							<tr>\n";
+					echo '								<td><input type="checkbox" '.$copySelect.' name="physical_copy[]" value="'.urlencode(serialize($phyCopy)).'" /></td>'."\n";
+					//echo "								<td><input type=\"checkbox\" $copySelect name=\"physical_copy[]\" value=\"".$phyCopy['type']."::".$phyCopy['library']."::".$phyCopy['callNum']."::".$phyCopy['loc']."::".$phyCopy['bar']."::".$phyCopy['copy']."\"></td>\n";
+					echo "								<td>".$phyCopy['type']." ".$phyCopy['library']." ".$phyCopy['loc']." ".$phyCopy['callNum']."</td>\n";
+					echo "							</tr>\n";
+				}
+				echo "						</table>\n";
+				echo "					</td>\n";
+				echo "				</tr>\n";
+			} //else
 			//echo "	<tr><td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">COULD NOT RETRIEVE HOLDING INFORMATION</td><td>". $search_results['physicalCopy']['error'] . "</td></tr>\n";
+		}
 
 		echo "				<tr align=\"left\" valign=\"middle\">\n";
 		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">&nbsp;</td>\n";
@@ -773,15 +874,97 @@ class requestDisplayer
 		echo "	</tr>\n";
 		echo "	<tr><td><strong><font color=\"#FF0000\">* </font></strong><span class=\"helperText\">= required fields</span></td></tr>\n";
 
-		echo "	<tr><td align=\"center\"><input type=\"checkbox\" name=\"addDuplicate\" value=\"addDuplicate\">&nbsp;<span class=\"small\">Create Item Duplicate</span></td></tr>\n";
+		//decide if we want to show multiple copies instruction screen
+		//if there is an array of physical items, show it.
+		if( is_array($search_results['physicalCopy']) ):
+?>
+	<tr>
+				<td align="center" id="nonman_note">
+					<div class="instructionText">
+						<!--Show this div only if multiple items are brought back in the holdings from the ILS for the scanned barcode. -->
+						<span class="helperText">NOTE: Submitting this form will add all items you have selected to the class reserve list.<br />If you have selected multiple items, would you like to:</span>
+						<p />
+						<label>
+							<!--If this radio button selected, loop through all selected items and set reserve status to active. -->
+							<input name="selectItemsToDisplay" type="radio" value="all" checked="checked" /> 
+						</label>
+						<span class="strong">Display all</span> selected items in the reserve list (for example, multi-volume work)
+						<br>
+						<label>
+							<!--If this radio button is selected, loop through all selected items and set status of first reserve to ACTIVE, status of all others to HIDDEN. -->
+							<input type="radio" name="selectItemsToDisplay" value="one" /> 
+						</label>
+						<span class="strong">Show only one</span> item and <span class="strong">hide the others</span> from view (for example, multiple copies of the same book)
+					</div>
+					<br />
+				</td>
+			</tr>
+<?php
+		endif; //end showing multiple item instructions
+
+//		echo "	<tr><td align=\"center\"><input type=\"checkbox\" name=\"addDuplicate\" value=\"addDuplicate\">&nbsp;<span class=\"small\">Create Item Duplicate</span></td></tr>\n";
 
 		echo "	<tr><td align=\"center\"><input type=\"button\" name=\"store_request\" value=\"$buttonValue\" onClick=\"checkForm(this.form);\"></td></tr>\n";
 		echo "</form\n";
 		echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "</table>\n";
+
+		//if we are adding a physical item, we need to set the proper visibility defaults, based on type of item
+		//we do this w/ jscript
+?>
+	<script language="JavaScript">
+		//if we are searching for a name, enable personal item
+		if(document.getElementById('owner_qryTerm').value != '') {
+			document.getElementById('personal_item_yes').checked = true;
+		}
+
+<?php
+		if($cmd == 'addPhysicalItem'):
+?>
+
+		//run some code to set up the form in the beginning
+		var frm = document.getElementById('additem_form');
+		var addTypeValue;
+		
+		for (i=0;i<frm.addType.length;i++) {
+			if (frm.addType[i].checked==true)
+				addTypeValue = frm.addType[i].value;
+		}
+
+		if( addTypeValue == 'MANUAL' ) {
+			toggleILS(0);
+			togglePersonal(1, 0);
+			toggleNonManual(0);
+		}
+		else if( addTypeValue == 'PERSONAL' ) {
+			toggleILS(1);
+			togglePersonal(1, 1);
+			toggleNonManual(1);
+		}
+		else {
+			toggleILS(1);
+			togglePersonal(0, 0);
+			toggleNonManual(1);
+		}
+
+<?php
+
+		else:
+?>
+
+		//run code to set up the form in the beginning
+		togglePersonal(1, 0);
+
+<?php
+		endif; //endif($cmd=='addPhysicalItem')
+?>
+
+	</script>
+
+<?php
 	}
 
-	function addSuccessful($user, $reserve, $ci, $selected_instr, $msg=null)
+	function addSuccessful($user, $reserves, $ci, $selected_instr, $duplicate_link=false, $msg=null)
 	{
 		global $g_reservesViewer, $g_permission;
 
@@ -804,85 +987,94 @@ class requestDisplayer
 		echo "	</tr>\n";
 		echo "	<tr><td align=\"center\"></td></tr>\n";
 		
-		if ($reserve) {
+		if( !empty($reserves) ) {
+			echo "				<tr><td>&nbsp;</td></tr>\n";
+			echo "				<tr><td><strong>Review item(s):</strong></td></tr>\n";
 			
-			$reserve->getItem();
+			foreach($reserves as $reserve) {
+				$reserve->getItem();
     	
-    	$viewReserveURL = "reservesViewer.php?reserve=" . $reserve->getReserveID();
-			if ($reserve->item->isPhysicalItem()) {
-				$reserve->item->getPhysicalCopy();
-				if ($reserve->item->localControlKey)
-					$viewReserveURL = $g_reservesViewer . $reserve->item->getLocalControlKey();
+				$viewReserveURL = "reservesViewer.php?reserve=" . $reserve->getReserveID();
+				if ($reserve->item->isPhysicalItem()) {
+					$reserve->item->getPhysicalCopy();
+					if ($reserve->item->localControlKey)
+						$viewReserveURL = $g_reservesViewer . $reserve->item->getLocalControlKey();
+					else
+						$viewReserveURL = null;
+					//get call number
+					$callnum = $reserve->item->physicalCopy->getCallNumber();
+				}
+
+				$itemIcon = $reserve->item->getItemIcon();
+				$title = $reserve->item->getTitle();	
+				$author = $reserve->item->getAuthor();
+				$url = $reserve->item->getURL();
+				$performer = $reserve->item->getPerformer();
+				$volTitle = $reserve->item->getVolumeTitle();
+				$volEdition = $reserve->item->getVolumeEdition();
+				$pagesTimes = $reserve->item->getPagesTimes();
+				$source = $reserve->item->getSource();
+				$contentNotes = $reserve->item->getContentNotes();
+				$itemNotes = $reserve->item->getNotes();
+				$instructorNotes = $reserve->getNotes();
+				
+				echo "				<tr><td>&nbsp;</td></tr>\n";
+				echo '<tr><td><table border="0" cellspacing="0" cellpadding="0">';
+				echo '<tr align="left" valign="middle" class="oddRow">';
+				echo '	<td width="5%" valign="top"><img src="'.$itemIcon.'" width="24" height="20"></td>';
+				if ($viewReserveURL)
+					echo '	<td width="78%"><a href="'.$viewReserveURL.'" class="itemTitle" target="_blank">'.$title.'</a>';
 				else
-					$viewReserveURL = null;
-			}
+					echo '	<td width="78%"><span class="itemTitle">'.$title.'</span>';
+				if ($author)
+					echo '		<br> <span class="itemAuthor">'.$author.'</span>';
+				if ($callnum)
+					echo '<br /><span class="itemMetaPre">Call Number:</span>&nbsp;<span class="itemMeta"> '.$callnum.'</span>';
+				if ($performer)
+					echo '<br><span class="itemMetaPre">Performed by:</span>&nbsp;<span class="itemMeta"> '.$performer.'</span>';
+				if ($volTitle)
+						echo '<br><span class="itemMetaPre">From:</span>&nbsp;<span class="itemMeta"> '.$volTitle.'</span>';
+				if ($volEdition)
+					echo '<br><span class="itemMetaPre">Volume/Edition:</span>&nbsp;<span class="itemMeta"> '.$volEdition.'</span>';
+				if ($pagesTimes)
+					echo '<br><span class="itemMetaPre">Pages/Time:</span>&nbsp;<span class="itemMeta"> '.$pagesTimes.'</span>';
+				if ($source)
+					echo '<br><span class="itemMetaPre">Source/Year:</span>&nbsp;<span class="itemMeta"> '.$source.'</span>';
 
-    	$itemIcon = $reserve->item->getItemIcon();
-    	$title = $reserve->item->getTitle();
-			$author = $reserve->item->getAuthor();
-			$url = $reserve->item->getURL();
-			$performer = $reserve->item->getPerformer();
-			$volTitle = $reserve->item->getVolumeTitle();
-			$volEdition = $reserve->item->getVolumeEdition();
-			$pagesTimes = $reserve->item->getPagesTimes();
-			$source = $reserve->item->getSource();
-			$contentNotes = $reserve->item->getContentNotes();
-			$itemNotes = $reserve->item->getNotes();
-			$instructorNotes = $reserve->getNotes();
-			
-    	echo "				<tr><td>&nbsp;</td></tr>\n";
-    	echo "				<tr><td><strong>Review item:</strong></td></tr>\n";
-    	echo "				<tr><td>&nbsp;</td></tr>\n";
-    	echo '<tr><td><table border="0" cellspacing="0" cellpadding="0">';
-    	echo '<tr align="left" valign="middle" class="oddRow">';
-    	echo '	<td width="5%" valign="top"><img src="'.$itemIcon.'" width="24" height="20"></td>';
-    	if ($viewReserveURL)
-    		echo '	<td width="78%"><a href="'.$viewReserveURL.'" class="itemTitle" target="_blank">'.$title.'</a>';
-    	else
-    		echo '	<td width="78%"><span class="itemTitle">'.$title.'</span>';
-    	if ($author)
-    		echo '		<br> <span class="itemAuthor">'.$author.'</span>';
-    	if ($performer)
-	    	echo '<br><span class="itemMetaPre">Performed by:</span>&nbsp;<span class="itemMeta"> '.$performer.'</span>';
-	    if ($volTitle)
-				echo '<br><span class="itemMetaPre">From:</span>&nbsp;<span class="itemMeta"> '.$volTitle.'</span>';
-	    if ($volEdition)
-	    	echo '<br><span class="itemMetaPre">Volume/Edition:</span>&nbsp;<span class="itemMeta"> '.$volEdition.'</span>';
-	    if ($pagesTimes)
-	    	echo '<br><span class="itemMetaPre">Pages/Time:</span>&nbsp;<span class="itemMeta"> '.$pagesTimes.'</span>';
-	    if ($source)
-	    	echo '<br><span class="itemMetaPre">Source/Year:</span>&nbsp;<span class="itemMeta"> '.$source.'</span>';
-
-    	if ($contentNotes)
-	    {
-	        echo '<br><span class="noteType">Content Note:</span>&nbsp;<span class="noteText">'.$contentNotes.'</span>';
-	    }
-    	if ($itemNotes) 
-	    {
-	    
-	    	for ($n=0; $n<count($itemNotes); $n++)
-	    	{
-            	$type = strtolower($itemNotes[$n]->getType());
-            	//if ($type == "content") {
-            	if ($user->dfltRole >= $g_permission['staff'] || $type == "content") {
-	            	echo '<br><span class="noteType">'.ucfirst($type).' Note:</span>&nbsp;<span class="noteText">'.$itemNotes[$n]->getText().'</span>';
-            	}
-	        }
-	    }
-	    if ($instructorNotes)
-	    {
-	    
-	    	for ($n=0; $n<count($instructorNotes); $n++)
-	        {
-	        	echo '<br><span class="noteType">Instructor Note:</span>&nbsp;<span class="noteText">'.$instructorNotes[$n]->getText().'</span>';
-	        }
-	    }
-    	echo '	</td>';
-    	echo '	<td width="17%" valign="top">[ <a href="index.php?cmd=editReserve&reserveID='.$reserve->getReserveID().'" class="editlinks">edit item</a> ]</td>';
-    	echo ' 	<td width="0%">&nbsp;</td>';
-    	echo '</tr>';
-    	echo '</table></td></tr>';
-		}
+				if ($contentNotes)
+				{
+					echo '<br><span class="noteType">Content Note:</span>&nbsp;<span class="noteText">'.$contentNotes.'</span>';
+				}
+				if ($itemNotes) 
+				{
+				
+					for ($n=0; $n<count($itemNotes); $n++)
+					{
+						$type = strtolower($itemNotes[$n]->getType());
+						//if ($type == "content") {
+						if ($user->dfltRole >= $g_permission['staff'] || $type == "content") {
+							echo '<br><span class="noteType">'.ucfirst($type).' Note:</span>&nbsp;<span class="noteText">'.$itemNotes[$n]->getText().'</span>';
+						}
+					}
+				}
+				if ($instructorNotes)
+				{
+				
+					for ($n=0; $n<count($instructorNotes); $n++)
+					{
+						echo '<br><span class="noteType">Instructor Note:</span>&nbsp;<span class="noteText">'.$instructorNotes[$n]->getText().'</span>';
+					}
+				}
+				echo '	</td>';
+				echo '	<td width="17%" valign="top" align="right" nowrap="nowrap">[ <a href="index.php?cmd=editReserve&reserveID='.$reserve->getReserveID().'" class="editlinks">edit item</a> ]';
+				if($duplicate_link)
+					echo '&nbsp;[ <a href="index.php?cmd=duplicateReserve&amp;reserveID='.$reserve->getReserveID().'&amp;selected_instr='.$selected_instr.'" class="editlinks">duplicate item</a> ]';
+				echo '</td>';
+				echo ' 	<td width="0%">&nbsp;</td>';
+				echo '</tr>';
+				echo '</table></td></tr>';
+			}	//end foreach
+		}	//end reserves if
 
 		echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "</table>\n";
