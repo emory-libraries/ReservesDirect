@@ -85,6 +85,36 @@ class physicalCopy
 		$this->physicalCopyID = $row[0]; //return physical_copy_id of newly created record
 	}
 
+
+	/**
+	* @return physicalCopyID on success or null if no item found
+	* @param string $itemBarcode
+	* @desc searches for an physItem based on barcode and populates object
+	*/
+	function getByBarcode($itemBarcode) {
+		global $g_dbConn;
+
+		switch($g_dbConn->phptype) {
+			default: //'mysql'
+				$sql = "SELECT item_id FROM physical_copies WHERE barcode = ?";
+		}
+
+		//query db
+		$rs = $g_dbConn->query($sql, $itemBarcode);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+		//check to see if item found
+		if( ($row = $rs->fetchRow()) != null ) {
+			$this->getByItemID($row[0]);
+			return $this->physicalCopyID;
+		}
+		else {
+			return null;
+		}
+	}
+
+
+
 	function getByItemID($itemID)
 	{
 		global $g_dbConn;
