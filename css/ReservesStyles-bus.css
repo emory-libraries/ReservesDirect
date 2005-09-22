@@ -627,7 +627,18 @@ that students have chosen to hide from view. */
 	color: #333333;
 	padding-right: 10px;
 }
+.instructionText {
+	display: block;
+	text-align: left;
+	float: none;
+	padding: 10px;
+	width: 650px;
+	margin: auto;
+	border: 1px solid black;
 
+/*instructionText is used for any text that gives instructions to users on steps or actions to take.*/
+
+}
 
 /* statusText styles are used on the "Edit Class" page for text that indicates the current status
 of materials on reserve. */

@@ -624,7 +624,12 @@ that students have chosen to hide from view. */
 }
 .instructionText {
 	display: block;
+	text-align: left;
+	float: none;
 	padding: 10px;
+	width: 650px;
+	margin: auto;
+	border: 1px solid black;
 
 /*instructionText is used for any text that gives instructions to users on steps or actions to take.*/
 
