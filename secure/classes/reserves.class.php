@@ -147,7 +147,7 @@ class reserve
 	}
 
 	/**
-	* @return void
+	* @return itemID on success or null on failure
 	* @param int $course_instance_id, int item_id
 	* @desc get reserve info from the database by ci and item
 	*/
@@ -168,6 +168,11 @@ class reserve
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$row = $rs->fetchRow();
+
+		if($row==null) {	//no reserve found
+			return null;
+		}
+		else {
 			$this->reserveID 		= $row[0];
 			$this->courseInstanceID	= $row[1];
 			$this->itemID			= $row[2];
@@ -177,7 +182,10 @@ class reserve
 			$this->sortOrder		= $row[6];
 			$this->creationDate		= $row[7];
 			$this->lastModDate		= $row[8];
-			$this->requested_loan_period = $row[9];			
+			$this->requested_loan_period = $row[9];
+
+			return $this->reserveID;
+		}
 	}
 
 	/**
