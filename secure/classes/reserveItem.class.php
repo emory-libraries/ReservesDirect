@@ -45,7 +45,6 @@ class reserveItem extends item
 	public $URL;
 	public $mimeTypeID;
 	public $homeLibraryID;
-	//public $homeLibrary;
 	public $privateUserID;
 	public $privateUser;
 	public $copies = array();
@@ -587,7 +586,7 @@ class reserveItem extends item
 		return $mimetype;
 	}
 
-	function getHomeLibrary() { return $this->homeLibrary; }
+	function getHomeLibraryID() { return $this->homeLibraryID; }
 
 	function getPrivateUser()
 	{
