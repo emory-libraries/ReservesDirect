@@ -33,11 +33,13 @@ class itemDisplayer
 {
 	/**
 	* @return void
+	* @param reserve current reserve object
 	* @param user $user
-	* @param courseInstance $ci
+	* @param docTypeIcons
+	* @param new_reserve new reserve object if duplicating
 	* @desc display edit course form
 	*/
-	function displayEditReserveScreen($reserve, $user, $docTypeIcons=null)
+	function displayEditReserveScreen($reserve, $user, $docTypeIcons=null, $new_reserve=null)
 	{
 
 		global $g_permission;
@@ -78,6 +80,12 @@ class itemDisplayer
 		echo "<input type=\"hidden\" name=\"ci\" value=\"".$reserve->getCourseInstanceID()."\">\n";
 		echo "<input type=\"hidden\" name=\"rID\" value=\"".$reserve->getReserveID()."\">\n";
 
+		//pass destination reserveID for duplication
+		if(!empty($new_reserve)) {
+			echo "<input type=\"hidden\" name=\"new_rID\" value=\"".$new_reserve->getReserveID()."\">\n";
+			echo "<input type=\"hidden\" name=\"selected_instr\" value=\"".$_REQUEST['selected_instr']."\">\n";
+		}
+
 
 		$activationDate = $reserve->getActivationDate();
 		list($year, $month, $day) = split("-", $activationDate);
@@ -96,9 +104,22 @@ class itemDisplayer
 		$pagesTimes = $reserve->item->getPagesTimes();
 		$source = $reserve->item->getSource();
 		$contentNotes = $reserve->item->getContentNotes();
-		$itemNotes = $reserve->item->getNotes(); //Valid note types, associated with an item, are content, copyright, and staff
-		$instructorNotes = $reserve->getNotes();
 		$docTypeIcon = $reserve->item->getItemIcon();
+
+		//pull notes from new reserve/item if duplicating
+		if(!empty($new_reserve)) {
+			$itemNotes = $new_reserve->item->getNotes(); //Valid note types, associated with an item, are content, copyright, and staff
+			$instructorNotes = $new_reserve->getNotes();
+		}
+		else {	//not duplicating, get notes from original
+			$itemNotes = $reserve->item->getNotes(); //Valid note types, associated with an item, are content, copyright, and staff
+			$instructorNotes = $reserve->getNotes();
+		}
+		
+		//output a message about duplicating
+		if(!empty($new_reserve)) {
+			echo '<div style="width:100%; text-align:center;"><strong>EDIT THE DUPLICATE</strong></div>';
+		}
 
 		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "	<tr>\n";
@@ -240,7 +261,15 @@ class itemDisplayer
 		echo "          <tr valign=\"middle\">\n";
 		//echo "            	<td colspan=\"2\" align=\"left\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"borders\" align=\"center\"><a href='index.php?cmd=addNote&reserveID=".$reserve->getReserveID()."'><input type=\"button\" name=\"addNote\" value=\"Add Note\"></a></td>\n";
 		echo "            	<td colspan=\"2\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"borders\" align=\"center\">\n";
-		echo "					<input type=\"button\" name=\"addNote\" value=\"Add Note\" onClick=\"openWindow('&cmd=addNote&reserve_id=".$reserve->getReserveID()."');\">\n";
+
+		//if duplicating, add note to new reserve
+		if(!empty($new_reserve)) {
+			echo "					<input type=\"button\" name=\"addNote\" value=\"Add Note\" onClick=\"openWindow('&cmd=addNote&reserve_id=".$new_reserve->getReserveID()."');\">\n";
+		}
+		else {
+			echo "					<input type=\"button\" name=\"addNote\" value=\"Add Note\" onClick=\"openWindow('&cmd=addNote&reserve_id=".$reserve->getReserveID()."');\">\n";
+		}
+
 		echo "				</td>\n";
 		echo "			</tr>\n";
 		echo "		</table>\n";
@@ -261,6 +290,7 @@ class itemDisplayer
 		echo "</table>\n";
 		echo "</form>\n";
 	}
+
 
 	function displayEditHeadingScreen($ci, $heading)
 	{
