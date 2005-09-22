@@ -168,6 +168,7 @@ switch ($cmd)
 
 	case 'editItem':
 	case 'editHeading':
+	case 'processHeading':
 	case 'editReserve':
 	case 'duplicateReserve';
 		require_once("secure/managers/itemManager.class.php");
