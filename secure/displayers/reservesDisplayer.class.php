@@ -231,6 +231,12 @@ class reservesDisplayer
 			$callNumber = $ci->reserveList[$i]->item->physicalCopy->getCallNumber();
 			$reserveDesk = $ci->reserveList[$i]->item->physicalCopy->getOwningLibrary();
 
+			//manual entries will have no physicalCopy entry, so must get owning lib from items table
+			if(empty($reserveDesk)) {
+				$lib = new library($ci->reserveList[$i]->item->getHomeLibraryID());
+				$reserveDesk = $lib->getReserveDesk();
+			}
+
 
 			$rowClass = ($rowNumber++ % 2) ? "evenRow" : "oddRow";
 			if ($ci->reserveList[$i]->item->isHeading())
