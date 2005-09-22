@@ -124,6 +124,58 @@ class itemManager
 				}			
 			break;
 			
+			case 'duplicateReserve':	//utilize editReserve as much as possible
+				//initialize source reserve
+				$reserve = new reserve($_REQUEST['reserveID']);
+				$reserve->getItem();
+				//get course instance from reserve
+				$ci = new courseInstance($reserve->getCourseInstanceID());
+
+				//create new item and reserve
+				$new_item = new item();
+				$new_item->createNewItem();
+				$new_reserve = new reserve();
+				$new_reserve->createNewReserve($ci->getCourseInstanceID(), $new_item->getItemID());
+
+				//duplicate reserve notes
+				foreach($reserve->getNotes() as $note) {
+					$new_note = new note();
+					$new_note->setTarget($new_reserve->getReserveID(), 'reserves');
+					$new_note->setType($note->getType());
+					$new_note->setText($note->getText());
+					unset($new_note);
+				}
+				
+				//duplicate item notes
+				foreach($reserve->item->getNotes() as $note) {
+					$new_note = new note();
+					$new_note->setTarget($new_item->getItemID(), 'items');
+					$new_note->setType($note->getType());
+					$new_note->setText($note->getText());
+					unset($new_note);
+				}
+
+				//instantiate reserveItem objects (needed to transfer some data)
+				$RI = new reserveItem($reserve->getItemID());
+				$new_RI = new reserveItem($new_item->getItemID());
+
+				//set data
+				$new_item->setTitle($reserve->item->getTitle().' (Duplicate)');	//set title manually, in case they never submit the form
+				$new_RI->setHomeLibraryID($RI->getHomeLibraryID());				//home library
+				if(!is_null($RI->getPrivateUserID()))
+					$new_RI->setPrivateUserID($RI->getPrivateUserID());			//private user
+				$new_item->setGroup($reserve->item->getItemGroup());			//item group
+				$new_reserve->setExpirationDate($reserve->getExpirationDate());	//expiration date
+
+				//set status to inactive until they submit the form
+				$new_reserve->setStatus('INACTIVE');
+				
+				//refresh item and reserve (for the notes)
+				$new_reserve->getReserveByID($new_reserve->getReserveID());
+				$new_reserve->getItem();
+
+				//process the rest of data by case 'editReserve'
+			//no break!
 			case 'editReserve':
 				if (!isset($_REQUEST["Submit"]))
 				{
@@ -137,19 +189,34 @@ class itemManager
 						}
 					}
 
-					$reserveID = $_REQUEST['reserveID'];
-
-					$reserve = new reserve($reserveID);
+					$reserve = new reserve($_REQUEST['reserveID']);
 					$reserve->getItem();
+
+					//refresh new_reserve if duplicating
+					if(!empty($_REQUEST['new_rID'])) {
+						$new_reserve = new reserve($_REQUEST['new_rID']);
+						$new_reserve->getItem();
+					}
 					
 					$docTypeIcons = $user->getAllDocTypeIcons();
 					
 					$this->displayFunction = 'displayEditReserveScreen';
-					$this->argList = array($reserve, $user, $docTypeIcons);
+					$this->argList = array($reserve, $user, $docTypeIcons, $new_reserve);
 				} else {
 					if ($_REQUEST['rID']) {
-						$reserve = new reserve($_REQUEST['rID']);
-						$reserve->getItem();
+						//if duplicating, set data for new reserve/item
+						if(!empty($_REQUEST['new_rID'])) {
+							$reserve = new reserve($_REQUEST['new_rID']);
+							$reserve->getItem();
+
+							//since this item was marked as INACTIVE by duplicateItem, need to mark it ACTIVE now (default)
+							$reserve->setStatus('ACTIVE');
+						}
+						else {	//set data for original reserve
+							$reserve = new reserve($_REQUEST['rID']);
+							$reserve->getItem();
+						}
+
 						if ($_REQUEST['deactivateReserve']) $reserve->setStatus('INACTIVE');
 						if ($_REQUEST['activateReserve']) $reserve->setStatus('ACTIVE');
 						if ($_REQUEST['month'] || $_REQUEST['day'] || $_REQUEST['year']) $reserve->setActivationDate($_REQUEST['year'] . '-' . $_REQUEST['month'] . '-' . $_REQUEST['day']);
@@ -183,8 +250,28 @@ class itemManager
 							}
 						}
 					}
-					// goto edit class
-					classManager::classManager("editClass", $user, $adminUser=null, $_REQUEST);
+
+					//if duplicating, show a different success screen
+					if(!empty($_REQUEST['new_rID'])) {
+						//reserve needs to be in an array
+						$reserves = array();
+						$reserves[] =& $reserve;
+
+						//get course instance
+						$ci = new courseInstance($reserve->getCourseInstanceID());
+						$ci->getPrimaryCourse();
+
+						//call requestDisplayer method
+						require_once("secure/displayers/requestDisplayer.class.php");
+						$loc = 'add an item';
+						$this->displayClass = 'requestDisplayer';
+						$this->displayFunction = 'addSuccessful';
+						$this->argList = array($user, $reserves, $ci, $_REQUEST['selected_instr'], true);
+					}
+					else {	// goto edit class
+						classManager::classManager("editClass", $user, $adminUser=null, $_REQUEST);
+					}
+
 					break;
 				}
 			break;
