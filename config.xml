@@ -35,6 +35,9 @@ http://coursecontrol.sourceforge.net/
 *******************************************************************************/
 -->
 <configuration>
+    <authentication>
+        <type>StandAlone</type>
+    </authentication>
 	<database>
 	    <dbtype>mysql</dbtype>
 	    <username>CHANGEME</username>

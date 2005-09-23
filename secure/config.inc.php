@@ -36,7 +36,9 @@ http://www.reservesdirect.org/
 
 	$configure = simplexml_load_file($xmlConfig);
 
-	//will be moved to xmlfile and parsed here
+	
+	$g_authenticationType = (string)$configure->authentication->type;
+	
 	$dsn = array(
 	    'phptype'  => (string)$configure->database->dbtype,
 	    'username' => (string)$configure->database->username,

@@ -83,6 +83,38 @@ class user
 	}
 
 	/**
+	* @return void
+	* @param string $userName, string encrypted pwd
+	* @desc retrieve user by username and encrypted pwd
+	*/
+	function getUserByUserName_Pwd($userName, $pwd)
+	{
+		global $g_dbConn;
+
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "SELECT u.user_id 
+						FROM users as u join special_users as sp ON u.user_id = sp.user_id 
+						WHERE u.username = ? AND sp.password = ? AND (expiration <= ? OR expiration IS NULL)
+					   ";
+				$d = date("Y-m-d");
+		}		
+		$rs = $g_dbConn->query($sql, array($userName, $pwd, $d));		
+
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+		if ($rs->numRows() == 1)
+		{
+			$row = $rs->fetchRow();
+			$this->user($row[0]);
+			return true;
+		} else return false;
+
+	}
+	
+	
+	/**
 	* @returns false if user already exists
 	* @desc Insert new user record into the DB and return the new userID
 	*/

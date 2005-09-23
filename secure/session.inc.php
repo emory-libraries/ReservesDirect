@@ -2,30 +2,57 @@
 session_start();
 //session_unset();
 
-//find AuthCookieHandler
-$keys = array_keys($_REQUEST);
-
-for($ndx=0;$ndx<count($keys);$ndx++){
-	if (eregi("AuthCookieHandler", $keys[$ndx])){ 	break;	}
-}
-$args = explode(':', $_REQUEST[$keys[$ndx]]); //split out username
-
-$_SESSION['authKey'] = $keys[$ndx];
 $user = new user();
+
+switch ($g_authenticationType)
+{
+	case 'AuthCookie':
+		//find AuthCookieHandler
+		$keys = array_keys($_REQUEST);
+		
+		for($ndx=0;$ndx<count($keys);$ndx++){
+			if (eregi("AuthCookieHandler", $keys[$ndx])){ 	break;	}
+		}
+		$args = explode(':', $_REQUEST[$keys[$ndx]]); //split out username
+		
+		$_SESSION['authKey'] = $keys[$ndx];
+		
+		$userName = $args[0];
+		
+		if (trim($userName) == "")
+		{
+			//invalid user account direct to logout.php to destroy session and return to login
+			header("Location: secure/logout.php");
+			exit;
+		}	
+		
+		if (!$user->getUserByUserName($userName))
+		{
+			$user->createUser($userName, "", "", "", 0);  //we allow any authorized user to enter with default role of student
+		}
+	break;
 	
-$userName = $args[0];
+	case 'StandAlone':
+	default:
+		$userName = (isset($_REQUEST['username'])) ? $_REQUEST['username'] : $_SESSION['username'];
+		$pwd	  = (isset($_REQUEST['pwd'])) ? md5($_REQUEST['pwd']) : $_SESSION['pwd'];
 
-if (trim($userName) == "")
-{
-	//invalid user account direct to logout.php to destroy session and return to login
-	header("Location: secure/logout.php");
-	exit;
-}	
-
-if (!$user->getUserByUserName($userName))
-{
-	$user->createUser($userName, "", "", "", 0);  //we allow any authorized user to enter with default role of student
+		if (!isset($_SESSION['pwd'])) {
+			$_SESSION['pwd'] = $pwd;
+		}
+		
+		if (!$user->getUserByUserName_Pwd($userName, $pwd))
+		{
+			if (isset($_REQUEST['username']))
+				$error = "?1";
+			
+			header("Location: login.php$error");
+			exit;
+		}	
 }
+
+
+
 	
 
 // Use $HTTP_SESSION_VARS with PHP 4.0.6 or less
