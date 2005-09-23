@@ -41,7 +41,9 @@ require_once("secure/interface/instructor.class.php");
 require_once("secure/interface/staff.class.php");
 require_once("secure/interface/admin.class.php");
 
-include("secure/session.inc.php");
+require_once ("secure/functional_permissions.inc.php");
+
+require_once("secure/session.inc.php");
 
 // we will do our own error handling
 if (isset($_SESSION['debug']))
@@ -53,14 +55,25 @@ if (isset($_SESSION['debug']))
 	$old_error_handler = set_error_handler("common_ErrorHandler");
 }
 
-
 $userName = $_SESSION['username'];
 $userClass = $_SESSION['userClass'];
 
 //init user based on type
+$u = new user();
 $usersObject = new users();
 $u = $usersObject->initUser($userClass, $userName);
 require_once('secure/auth.inc.php');
+
+//read cmd
+$cmd = $_REQUEST['cmd'];
+
+if (!key_exists($cmd, $functional_permissions) || ($u->getDefaultRole() < $functional_permissions[$cmd])) //user does not have permission kick to default page
+if (!key_exists($cmd, $functional_permissions) || ($u->getRole() < $functional_permissions[$cmd])) //user does not have permission kick to default page
+{
+	$cmd = "viewCourseList";
+	if ($_SESSION['debug'])
+		echo "<B>Failed Permission check</B><hr>\n";
+}
 
 $adminUser = null;
 if (isset($_REQUEST['u']))
@@ -79,9 +92,6 @@ if (!empty($_REQUEST['ci']))
 	$ci = new courseInstance($_REQUEST['ci']);
 	$ci->getPrimaryCourse();
 } else
-
-//set cmd default to viewCourseList
-$cmd = (isset($_REQUEST['cmd'])) ? $_REQUEST['cmd'] : 'viewCourseList';
 	$ci = null;
 
 
