@@ -136,6 +136,8 @@ class itemManager
 				$new_item->createNewItem();
 				$new_reserve = new reserve();
 				$new_reserve->createNewReserve($ci->getCourseInstanceID(), $new_item->getItemID());
+				//init the reserveItem
+				$new_reserve->getItem();
 
 				//duplicate reserve notes
 				foreach($reserve->getNotes() as $note) {
@@ -155,16 +157,32 @@ class itemManager
 					unset($new_note);
 				}
 
-				//instantiate reserveItem objects (needed to transfer some data)
-				$RI = new reserveItem($reserve->getItemID());
-				$new_RI = new reserveItem($new_item->getItemID());
+				//check to see if we are duplicating a physical copy record too
+				if($reserve->item->getPhysicalCopy()) {		//returns true if record exists, false if not
+					//create new physical copy
+					$physCopy = new physicalCopy();
+					$physCopy->createPhysicalCopy();
+					
+					//populate fields
+					$physCopy->setItemID($new_item->getItemID());
+					$physCopy->setReserveID($new_reserve->getReserveID());					
+					$physCopy->setStatus($reserve->item->physicalCopy->getStatus());
+					$physCopy->setItemType($reserve->item->physicalCopy->getItemType());
 
+					if (!is_null($reserve->item->getPrivateUserID()))
+						$physCopy->setOwnerUserID($reserve->item->getPrivateUserID());
+
+					$reserveDesk = new library($reserve->item->getHomeLibraryID());
+					$physCopy->setOwningLibrary($reserveDesk->getReserveDesk());							
+				}
+				
 				//set data
 				$new_item->setTitle($reserve->item->getTitle().' (Duplicate)');	//set title manually, in case they never submit the form
-				$new_RI->setHomeLibraryID($RI->getHomeLibraryID());				//home library
-				if(!is_null($RI->getPrivateUserID()))
-					$new_RI->setPrivateUserID($RI->getPrivateUserID());			//private user
-				$new_item->setGroup($reserve->item->getItemGroup());			//item group
+				$new_reserve->item->setLocalControlKey($reserve->item->getLocalControlKey());	//local control key
+				$new_reserve->item->setHomeLibraryID($reserve->item->getHomeLibraryID());	//home library
+				if(!is_null($reserve->item->getPrivateUserID()))
+					$new_reserve->item->setPrivateUserID($reserve->item->getPrivateUserID());		//private user
+				$new_item->setGroup($reserve->item->getItemGroup());	//item group
 				$new_reserve->setExpirationDate($reserve->getExpirationDate());	//expiration date
 
 				//set status to inactive until they submit the form
@@ -231,6 +249,14 @@ class itemManager
 						if ($_REQUEST['contentNotes']) $reserve->item->setContentNotes($_REQUEST['contentNotes']); else $reserve->item->setContentNotes("");
 						
 						$reserve->item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
+
+						//physical items
+						if($reserve->item->getPhysicalCopy()) {		//returns true if record exists, false if not
+							if($_REQUEST['barcode'])
+								$reserve->item->physicalCopy->setBarcode($_REQUEST['barcode']);
+							if($_REQUEST['call_num'])
+								$reserve->item->physicalCopy->setCallNumber($_REQUEST['call_num']);
+						}
 						
 						if ($_REQUEST['itemNotes']) {
 							$itemNotes = array_keys($_REQUEST['itemNotes']);
