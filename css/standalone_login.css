@@ -1,0 +1,87 @@
+/* 
+ReservesDirect Style Sheet  
+standalone_login.css
+
+Default implementation for the stand alone login page
+Emory University
+Atlanta, GA 30322
+
+*/
+
+/*
+ ************************************************* 
+ DEFAULT HTML TAG DEFINITIONS 
+ ************************************************* 
+*/
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	background-color: #FFFFFF;
+    color:#000000;
+    font-size:x-small;
+}
+p {
+	font-style: normal;
+	font-size: small;
+}
+tr {
+	font-size: small;
+}
+td {
+	font-size: small;
+}
+h1 {
+	color: #333399;
+	font-size: 24px;
+	text-align: left;
+	font-variant: small-caps;
+}
+h2 {
+	color: #000066;
+	font-size: 16px;
+	text-transform: capitalize;
+}
+h3 {
+	text-transform: uppercase;
+	color: #990033;
+	font-size: 16px;
+} 
+a:link {
+	color: #0000FF;
+	text-decoration: none;
+}
+a:visited {
+	color: #0000FF;
+	text-decoration: none;
+}
+a:hover {
+	color: #999900;
+}
+.indent {
+	text-indent: 25px;
+	left: 8px;
+}
+.nobullet {
+	list-style-type: none;
+}
+.borders {
+	border: medium inset #666666;
+}
+.borders2 {
+	border: 1px solid #666666;
+}
+.loginBox {
+
+	border: 1px solid #003366;
+	background-color: #C7D3DE;
+}
+#loginText {
+	padding:10px 90px 10px ;
+	float:middle;
+}
+.border-helpfile {
+	border: 1px solid #000066;
+}
+.small {
+	border: none;
+	font-size: 12px;
+}
