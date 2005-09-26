@@ -1,6 +1,6 @@
 <?
 /*******************************************************************************
-Reserves Direct 2.0
+ReservesDirect
 
 Copyright (c) 2004 Emory University General Libraries
 
@@ -25,7 +25,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 Created by Kathy A. Washington (kawashi@emory.edu)
 
-Reserves Direct 2.0 is located at:
+ReservesDirect is located at:
 http://coursecontrol.sourceforge.net/
 
 *******************************************************************************/

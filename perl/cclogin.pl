@@ -28,7 +28,7 @@ if ($reason eq "no_cookie")
        $errorString = "";
 #	$errorString = "<TR><TD ALIGN=CENTER>\n<P><FONT COLOR=\"#FF0000\">You don't have a cookie yet. Sign in and you get one!</P></TD></TD></TR>";
 	my $action = $r->prev->dir_config('FormAction');
-	$title = "Reserves Direct";
+	$title = "ReservesDirect";
 
 my $form = <<HERE;
 

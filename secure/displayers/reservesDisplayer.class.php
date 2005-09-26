@@ -5,25 +5,25 @@ reservesDisplayer.class.php
 
 Created by Kathy Washington (kawashi@emory.edu)
 
-This file is part of GNU ReservesDirect 2.1
+This file is part of ReservesDirect
 
 Copyright (c) 2004-2005 Emory University, Atlanta, Georgia.
 
-ReservesDirect 2.1 is free software; you can redistribute it and/or modify
+ReservesDirect is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 
-ReservesDirect 2.1 is distributed in the hope that it will be useful,
+ReservesDirect is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with ReservesDirect 2.1; if not, write to the Free Software
+along with ReservesDirect; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-Reserves Direct 2.1 is located at:
+ReservesDirect is located at:
 http://www.reservesdirect.org/
 
 *******************************************************************************/
@@ -1187,7 +1187,7 @@ function displayFaxInfo($ci)
     echo "				<tr>\n";
     echo "					<td align=\"left\" valign=\"top\">\n";
     echo "						<blockquote>\n";
-    echo "							<p class=\"helperText\">Reserves Direct allows you to fax in a document and will automatically convert it to PDF. Please limit faxed documents to 25 clear, clean sheets to minimize downloading and printing time. To proceed, please fax each document individually (with no cover sheet!) to: </p>\n";
+    echo "							<p class=\"helperText\">ReservesDirect allows you to fax in a document and will automatically convert it to PDF. Please limit faxed documents to 25 clear, clean sheets to minimize downloading and printing time. To proceed, please fax each document individually (with no cover sheet!) to: </p>\n";
     echo "							<p><span class=\"strong\">(404) 727-9089</span> (On-campus may dial <span class=\"strong\">7-9089</span> )</p>\n";
     echo "							<p class=\"helperText\">Please note that faxes make take up to a minute per page to process during peak times. For best results, wait for a confirmation sheet to print from your fax machine before faxing another document.</p>\n";
     echo "						</blockquote>\n";
