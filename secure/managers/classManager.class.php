@@ -274,8 +274,7 @@ class classManager
 					if (is_array($courses) && !empty($courses)){
 						foreach($courses as $c)
 						{
-							$errorMsg = $user->removeCrossListing($c);
-							echo '<span class="helpertext">'.$errorMsg.'</span>';
+							$alertMsg = $user->removeCrossListing($c);
 						}
 					}
 				}
