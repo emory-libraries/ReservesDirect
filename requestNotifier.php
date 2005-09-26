@@ -7,25 +7,25 @@ send email when new requests are generated
 
 Created by Jason White (jbwhite@emory.edu)
 
-This file is part of GNU ReservesDirect 2.1
+This file is part of ReservesDirect
 
 Copyright (c) 2004-2005 Emory University, Atlanta, Georgia.
 
-ReservesDirect 2.1 is free software; you can redistribute it and/or modify
+ReservesDirect is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation; either version 2 of the License, or
 (at your option) any later version.
 
-ReservesDirect 2.1 is distributed in the hope that it will be useful,
+ReservesDirect is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with ReservesDirect 2.1; if not, write to the Free Software
+along with ReservesDirect; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-Reserves Direct 2.1 is located at:
+ReservesDirect 2.1 is located at:
 http://www.reservesdirect.org/
 
 *******************************************************************************/
@@ -75,9 +75,9 @@ foreach ($libraries as $library)
 		if ($row[0] > 0) //if count of requests is greater than 0
 		{
 			$msg = "There are " . $row[0] . " new request(s) generated for " .$library->getLibrary(). " since $g_request_notifier_lastrun\n";
-			$msg .= "Please login to Reserves Direct and check your requests queue <a href=\"$g_siteURL/index.php\">$g_siteURL/index.php</a>";
+			$msg .= "Please login to ReservesDirect and check your requests queue <a href=\"$g_siteURL/index.php\">$g_siteURL/index.php</a>";
 
-			if (!mail($library->getContactEmail(), 'Reserves Direct Requests Notification', $msg))
+			if (!mail($library->getContactEmail(), 'ReservesDirect Requests Notification', $msg))
 			{
 				$err = "Notification Email not sent for " . $library->getContactEmail() . "\n";
 				report_error($err);
@@ -99,7 +99,7 @@ function report_error($err)
 {
 	global $g_error_log, $g_errorEmail;
 	error_log($err, 3, $g_error_log);
-	mail($g_errorEmail, "Reserves Direct Notifications Error", $err);
+	mail($g_errorEmail, "ReservesDirect Notifications Error", $err);
 }
 
 ?>
