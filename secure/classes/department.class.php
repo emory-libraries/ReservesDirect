@@ -123,7 +123,7 @@ class department extends library
 		$rs = $g_dbConn->query($sql, $this->libraryID);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
-		$tmpArray = array();
+		$tmpArray = null;
 		while ($row = $rs->fetchRow(DB_FETCHMODE_ASSOC)) {
 			$tmpArray[] = $row;
 		}
