@@ -56,7 +56,13 @@ class itemDisplayer
 				if (frm.title.value == \"\")
 					alertMsg = alertMsg + \"Title is required.<br>\";
 				
-				if (!physicalCopy) {
+				if (physicalCopy) {
+					//make sure this physical copy is supposed to have a barcode
+					//	if it is, there will be an input element for it in the form
+					if( (document.getElementById('barcode') != null) && (document.getElementById('barcode').value == '') )
+						alertMsg = alertMsg + \"Barcode is required.<br />\";
+				}
+				else {
 					if (frm.url.value == \"\")
 						alertMsg = alertMsg + \"URL is required.<br>\";				
 				}
@@ -72,11 +78,11 @@ class itemDisplayer
 		//-->
 		</script>	
 		";	
-								
-		if (!$reserve->item->isPhysicalItem())
-			echo "<form name=\"reservesMgr\" action=\"index.php?cmd=editReserve\" method=\"post\" onSubmit=\"return validateForm(this,false);\">\n";
-		else
+	
+		if ($reserve->item->isPhysicalItem())
 			echo "<form name=\"reservesMgr\" action=\"index.php?cmd=editReserve\" method=\"post\" onSubmit=\"return validateForm(this,true);\">\n";
+		else
+			echo "<form name=\"reservesMgr\" action=\"index.php?cmd=editReserve\" method=\"post\" onSubmit=\"return validateForm(this,false);\">\n";
 		echo "<input type=\"hidden\" name=\"ci\" value=\"".$reserve->getCourseInstanceID()."\">\n";
 		echo "<input type=\"hidden\" name=\"rID\" value=\"".$reserve->getReserveID()."\">\n";
 
@@ -167,7 +173,7 @@ class itemDisplayer
 		echo "              	</td>\n";
 		echo "			</tr>\n";
 		echo "            <tr valign=\"middle\">\n";
-		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>Document Title:</div></td>\n";
+		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>&nbsp;Document Title:</div></td>\n";
 		echo "				<td width=\"100%\" align=\"left\"><input name=\"title\" type=\"text\" id=\"title\" size=\"50\" value=\"$title\"></td>\n";
 		echo "			</tr>\n";
 		echo "            <tr valign=\"middle\">\n";
@@ -221,6 +227,32 @@ class itemDisplayer
 		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Source/ Year</span><span class=\"strong\">:</span></div></td>\n";
 		echo "				<td width=\"100%\" align=\"left\"><input name=\"source\" type=\"text\" id=\"source\" size=\"50\" value=\"".$source."\"></td>\n";
 		echo "			</tr>\n";
+		
+		//items w/ ILS records require a barcode and optional call number
+		//only allow this for staff
+		if( ($user->dfltRole >= $g_permission['staff']) && $reserve->item->getPhysicalCopy()) {
+			//set barcode to itself if editing, to '' if duplicating
+			$barcode = ($new_reserve instanceof reserve) ? '' : $reserve->item->physicalCopy->getBarcode();
+?>
+			<tr valign="middle">		
+				<td width="25%" align="right" bgcolor="#CCCCCC">
+					<strong><font color="#FF0000">*</font>&nbsp;Barcode:</strong>
+				</td>
+				<td width="100%" align="left">
+					<input name="barcode" type="text" id="barcode" size="20" value="<?=$barcode?>" />
+				</td>
+			</tr>
+			<tr valign="middle">		
+				<td width="25%" align="right" bgcolor="#CCCCCC">
+					<strong>Call Number:</strong>
+				</td>
+				<td width="100%" align="left">
+					<input name="call_num" type="text" id="call_num" size="30" value="<?=$reserve->item->physicalCopy->getCallNumber()?>" />
+				</td>
+			</tr>
+<?php
+		}
+		
 		if ($contentNotes) {
 
 			echo "            <tr valign=\"middle\">\n";
