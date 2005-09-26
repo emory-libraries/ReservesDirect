@@ -351,9 +351,7 @@ class requestManager
 					$this->displayFunction = 'addSuccessful';
 
 					//duplicate links for digital/manual items?
-//logic not implemented as of yet 2005.09.23
-//					if( ($request['previous_cmd'] == 'addDigitalItem') || ($request['addType']=='MANUAL') || ($request['addType']=='PERSONAL') )
-					if( ($request['previous_cmd'] == 'addDigitalItem') || ($request['addType']=='MANUAL') )
+					if( ($request['previous_cmd'] == 'addDigitalItem') || ($request['addType']=='MANUAL') || ($request['addType']=='PERSONAL') )
 						$duplicate = true;
 
 					$this->argList = array($user, $reserves, $ci, $request['selected_instr'], $duplicate, $ilsResults);
