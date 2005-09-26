@@ -5,7 +5,7 @@
 </head>
 
 <body bgcolor="#FFFFFF" text="#000000">
-<form action="index.php">
+<form action="index.php" method="POST">
 	<center>
 	<table width="80%" border="0" cellspacing="5" cellpadding="0">
 		<tr>
