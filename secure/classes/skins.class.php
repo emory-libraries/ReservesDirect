@@ -47,6 +47,8 @@ class skins {
         }
 
         $rs = $g_dbConn->query($skin_sql);
+        if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
         $row = $rs->fetchRow();
         
         if (count($row) != 1) {
