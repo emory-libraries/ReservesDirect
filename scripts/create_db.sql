@@ -5,7 +5,7 @@
 --
 -- Created by Chris Roddy (croddy@emory.edu)
 --
--- This file is part of ReservesDirect 2
+-- This file is part of ReservesDirect
 --
 -- Copyright (c) 2004-2005 Emory University, Atlanta, Georgia.
 -- 
@@ -23,7 +23,7 @@
 -- along with ReservesDirect; if not, write to the Free Software
 -- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 -- 
--- ReservesDirect 2 is located at:
+-- ReservesDirect is located at:
 -- http://www.reservesdirect.org
 -- 
 
