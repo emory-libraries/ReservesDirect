@@ -723,33 +723,23 @@ class courseInstance
 		{
 			default: //'mysql'
 				$sql = "SELECT r.reserve_id, r.sort_order, i.title, hr.reserve_id, hr.user_id "
-					.  "FROM reserves as r "
-					.  "  JOIN items as i ON r.item_id = i.item_id  "
-					.	 "	LEFT JOIN hidden_readings as hr on (hr.reserve_id = r.reserve_id "
-					.	 "	AND hr.user_id = ! ) "
-					.  "WHERE course_instance_id = ! "
-					.  "AND r.status='ACTIVE' AND r.activation_date <= ? AND ? <= r.expiration "
-					.  "AND isnull(hr.reserve_id) AND isnull(hr.user_id) "
-					.	 "ORDER BY r.sort_order, i.title"
-					;
-				$sql_showAll = "SELECT r.reserve_id, r.sort_order, i.title, hr.reserve_id, hr.user_id "
-					.  "FROM reserves as r "
-					.  "  JOIN items as i ON r.item_id = i.item_id  "
-					.	 "	LEFT JOIN hidden_readings as hr on (hr.reserve_id = r.reserve_id "
-					.	 "	AND hr.user_id = ! ) "
-					.  "WHERE course_instance_id = ! "
-					.  "AND r.status='ACTIVE' AND r.activation_date <= ? AND ? <= r.expiration "
-					.	 "ORDER BY r.sort_order, i.title"
-					;
-				
+					 .  "FROM reserves as r "
+					 .  "  JOIN items as i ON r.item_id = i.item_id  "
+					 .	 "	LEFT JOIN hidden_readings as hr on (hr.reserve_id = r.reserve_id "
+					 .	 "	AND hr.user_id = ! ) "
+					 .  "WHERE course_instance_id = ! "
+					 .  "AND r.status='ACTIVE' AND r.activation_date <= ? AND ? <= r.expiration "
+					 ;
+				if (!$showAll)	 
+					 $sql .=  "AND hr.reserve_id IS NULL AND hr.user_id IS NULL ";
+					 
+				$sql .= "ORDER BY r.sort_order, i.title"
+					 ;
+			
 				$d = date("Y-m-d"); //get current date
 		}
 
-		if (!$showAll) {
 			$rs = $g_dbConn->query($sql, array($userID, $this->courseInstanceID, $d, $d));
-		} else {
-			$rs = $g_dbConn->query($sql_showAll, array($userID, $this->courseInstanceID, $d, $d));
-		}
 		
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
@@ -757,7 +747,7 @@ class courseInstance
 		
 		while ($row = $rs->fetchRow()) {
 			$r = new reserve($row[0]);
-			if ($row[3]!=null && $row[4]==$userID) {
+			if (!is_null($row[4])) { //if hr.user_id is not null then this is in the Hidden_readings table and should be hidden 
 				$r->hidden=true;
 			}
 			$this->reserveList[] = $r;
