@@ -598,7 +598,7 @@ class reserveItem extends item
 	function getPhysicalCopy()
 	{
 		$this->physicalCopy = new physicalCopy();
-		$this->physicalCopy->getByItemID($this->getItemID());
+		return $this->physicalCopy->getByItemID($this->getItemID());
 	}
 
 	function isPhysicalItem()
