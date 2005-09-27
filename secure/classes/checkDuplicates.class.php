@@ -29,7 +29,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 Created by Kathy Washingon (kawashi@emory.edu)
 
 ReservesDirect is located at:
-http://coursecontrol.sourceforge.net/
+http://www.reservesdirect.org/
 
 *******************************************************************************/
 

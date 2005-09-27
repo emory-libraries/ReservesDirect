@@ -27,7 +27,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 Created by Jason White (jbwhite@emory.edu)
 
 ReservesDirect is located at:
-http://coursecontrol.sourceforge.net/
+http://www.reservesdirect.org/
 
 *******************************************************************************/
 require_once("secure/common.inc.php");
