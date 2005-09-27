@@ -306,7 +306,7 @@ class requestManager
 
 							//clean up filename - convert spaces to underscores and strip any non A-z, 0-9, or _ characters
 							$filename = preg_replace('[\W]', '', str_replace(' ', '_', $file_path['basename']));
-print_r($file_path);
+
 							//format filename for storage (ID-name.ext)
 							$filename = $item->getItemID().'-'.$filename.'.'.$file_path['extension'];
 
