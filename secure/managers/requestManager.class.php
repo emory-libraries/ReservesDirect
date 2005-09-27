@@ -297,24 +297,25 @@ class requestManager
 
 							//get filename/ext
 							$file_path = pathinfo($_FILES['userFile']['name']);
+							$file_path['basename'] = basename($file_path['basename'], '.'.$file_path['extension']);
 
 							//move file, set permissions and store location
 							//position uploaded file so that common_move can move it
-							move_uploaded_file($_FILES['userFile']['tmp_name'], '_'.$_FILES['userFile']['tmp_name']);
-							chmod('_'.$_FILES['userFile']['tmp_name'], 0644);
+							move_uploaded_file($_FILES['userFile']['tmp_name'], $_FILES['userFile']['tmp_name'].'_');
+							chmod($_FILES['userFile']['tmp_name'].'_', 0644);
 
 							//clean up filename - convert spaces to underscores and strip any non A-z, 0-9, or _ characters
 							$filename = preg_replace('[\W]', '', str_replace(' ', '_', $file_path['basename']));
-
+print_r($file_path);
 							//format filename for storage (ID-name.ext)
 							$filename = $item->getItemID().'-'.$filename.'.'.$file_path['extension'];
 
 							//store file
-							common_moveFile('_'.$_FILES['userFile']['tmp_name'],  $newFileName );
+							common_moveFile($_FILES['userFile']['tmp_name'].'_',  $filename );
 
 							//set electronic item data
-							$item->setURL($g_documentURL . $newFileName);
-							$item->setMimeTypeByFileExt($type);
+							$item->setURL($g_documentURL . $filename);
+							$item->setMimeTypeByFileExt($file_path['extension']);
 						}
 						else {	//adding a URL
 							$item->setURL($request['url']);
