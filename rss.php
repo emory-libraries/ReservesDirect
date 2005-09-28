@@ -70,7 +70,8 @@ if (!isset($_REQUEST['ci']))
     echo "	<channel>\n";
 
     echo "		<title>" .  htmlentities(stripslashes($ci->course->displayCourseNo() . " " . $ci->course->name . " " . $ci->displayTerm())) . " Reserve List</title>\n";
-    echo "		<link>".htmlentities($g_siteURL)."/index.php?cmd=viewReservesList&amp;ci=".$_REQUEST['ci']."</link>\n";
+    //echo "		<link>".htmlentities($g_siteURL)."/index.php?cmd=viewReservesList&amp;ci=".$_REQUEST['ci']."</link>\n";
+    echo "		<link>".htmlentities($g_siteURL)."</link>\n";
 
     foreach($ci->instructorList as $instr)
     	echo "		<managingEditor>" . htmlentities($instr->getEmail() . " (" . $instr->getName()) . ")</managingEditor>\n";
