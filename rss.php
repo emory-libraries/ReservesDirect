@@ -69,8 +69,8 @@ if (!isset($_REQUEST['ci']))
     echo "<rss version=\"2.0\">\n";
     echo "	<channel>\n";
 
-    echo "		<title>" . htmlentities($ci->course->displayCourseNo() . " " . $ci->course->name . " " . $ci->displayTerm()) . " Reserve List</title>\n";
-    echo "		<link>".htmlentities($g_siteURL)."</link>\n";
+    echo "		<title>" .  htmlentities(stripslashes($ci->course->displayCourseNo() . " " . $ci->course->name . " " . $ci->displayTerm())) . " Reserve List</title>\n";
+    echo "		<link>".htmlentities($g_siteURL)."/index.php?cmd=viewReservesList&amp;ci=".$_REQUEST['ci']."</link>\n";
 
     foreach($ci->instructorList as $instr)
     	echo "		<managingEditor>" . htmlentities($instr->getEmail() . " (" . $instr->getName()) . ")</managingEditor>\n";
@@ -78,12 +78,12 @@ if (!isset($_REQUEST['ci']))
     echo "		<webMaster>$g_reservesEmail (Reserves Desk)</webMaster>\n";
 
     echo "		<description>";
-    echo 		"Course Reserves for" . htmlentities($ci->course->displayCourseNo() . " " . $ci->course->name . " " . $ci->displayTerm()) . "&lt;br/&gt;";
-    echo 		"taught by: ";
+    echo 		"Course Reserves for " . htmlentities(stripslashes($ci->course->displayCourseNo() . " " . $ci->course->name . " " . $ci->displayTerm())) . ", ";
+    echo 		"taught by:";
     foreach($ci->instructorList as $instr)
-    	echo htmlentities($instr->getEmail() . " (" . $instr->getName()) . ")&lt;br/&gt;";
+    	echo " " . $instr->getName() . " (" . $instr->getEmail() . ") ";
 
-    echo		"Helper Applications required for viewing reserves: &lt;a href=\"http://www.adobe.com/products/acrobat/readstep2.html\"&gt;Adobe Acrobat Reader&lt;/a&gt;";
+    echo		". Helper application for viewing reserves: Adobe Acrobat Reader, http://www.adobe.com/products/acrobat/readstep2.html .";
     echo 		"</description>\n";
 
     //$rItem = new reserveItem();
@@ -94,25 +94,31 @@ if (!isset($_REQUEST['ci']))
     	$rItem->getNotes();
 
     	echo "		<item>";
-    	echo "			<link>" . htmlentities($g_siteURL."/reservesViewer.php?viewer=-115&reserve=". $rItem->getReserveID() ."&location=" . $rItem->item->getURL()) . "</link>\n";
-    	echo "			<title>".htmlentities($rItem->item->getTitle())."</title>\n";
+        
+        if ($rItem->item->isPhysicalItem()) {
+            echo "          <link>" . htmlentities($g_reservesViewer . $rItem->item->getLocalControlKey()) . "</link>";
+        } else {
+            echo "			<link>" . htmlentities($g_siteURL."/reservesViewer.php?viewer=-115&reserve=". $rItem->getReserveID() ."&location=" . $rItem->item->getURL()) . "</link>\n";
+        }
+    	
+        echo "			<title>".htmlentities($rItem->item->getTitle())."</title>\n";
 
     	echo "			<description>";
 
     	//ouput what we have as the description
-    		if ($rItem->item->getAuthor() != "") 				echo htmlentities($rItem->item->getAuthor()) . "&lt;br/&gt;";
-    		if ($rItem->item->getPerformer() != "") 			echo "preformed by: " . htmlentities($rItem->item->getPerformer()) . "&lt;br/&gt;";
+    		if ($rItem->item->getAuthor() != "") 				echo htmlentities($rItem->item->getAuthor()) . ". ";
+    		if ($rItem->item->getPerformer() != "") 			echo "performed by: " . htmlentities($rItem->item->getPerformer()) . ". ";
 
-    		if ($rItem->item->getVolumeTitle() != "")			echo htmlentities($rItem->item->getVolumeTitle() . " " . $rItem->item->getVolumeEdition() . " " . $rItem->item->getPagesTimes()) . "&lt;br/&gt;";
-    		elseif ($rItem->item->getVolumeEdition() != "")		echo htmlentities($rItem->item->getVolumeEdition() . " " . $rItem->item->getPagesTimes()) . "&lt;br/&gt;";
-    		elseif ($rItem->item->getPagesTimes() != "")		echo htmlentities($rItem->item->getPagesTimes()) . "&lt;br/&gt;";
+    		if ($rItem->item->getVolumeTitle() != "")			echo htmlentities($rItem->item->getVolumeTitle() . " " . $rItem->item->getVolumeEdition() . " " . $rItem->item->getPagesTimes()) . ". ";
+    		elseif ($rItem->item->getVolumeEdition() != "")		echo htmlentities($rItem->item->getVolumeEdition() . " " . $rItem->item->getPagesTimes()) . ". ";
+    		elseif ($rItem->item->getPagesTimes() != "")		echo htmlentities($rItem->item->getPagesTimes()) . ". ";
 
-    		if ($rItem->item->getSource() != "") 				echo htmlentities($rItem->item->getSource()) . "&lt;br/&gt;";
+    		if ($rItem->item->getSource() != "") 				echo htmlentities($rItem->item->getSource()) . ". ";
 
     		foreach ($rItem->item->notes as $n)
     		{
-    			if ($n->getType() == 'Instructor') echo htmlentities($n->getText()) . "&lt;br/&gt;";
-    			elseif ($n->getType() == 'Content') echo htmlentities($n->getText()) . "&lt;br/&gt;";
+    			if ($n->getType() == 'Instructor') echo htmlentities($n->getText()) . ". ";
+    			elseif ($n->getType() == 'Content') echo htmlentities($n->getText()) . ". ";
 
     		}
 //    	echo 			htmlentities("&lt;hr noshade/&gt;");
