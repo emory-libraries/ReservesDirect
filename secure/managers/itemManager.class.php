@@ -69,9 +69,17 @@ class itemManager
 							$note->destroy();
 						}
 					}
-									
+					
+					//populate personal owners
+					if( !empty($_REQUEST['owner_qryTerm']) )	//user is searching for an owner
+					{
+						$users = new users();
+						$users->search($_REQUEST['select_owner_by'], $_REQUEST['owner_qryTerm'], 'student'); //any registered user could own an item
+						$owner_list = $users->userList;
+					} else $owner_list = null;
+								
 					$this->displayFunction = 'displayEditItemScreen';
-					$this->argList = array($item, $user, $_GET['search']);
+					$this->argList = array($item, $user, $owner_list, $_REQUEST['search']);
 				} else {
 					if ($_REQUEST['title']) $item->setTitle($_REQUEST['title']);
 					if ($_REQUEST['author']) $item->setAuthor($_REQUEST['author']); else $item->setAuthor("");					
@@ -82,7 +90,20 @@ class itemManager
 					if ($_REQUEST['source']) $item->setSource($_REQUEST['source']); else $item->setSource("");
 					if ($_REQUEST['contentNotes']) $item->setContentNotes($_REQUEST['contentNotes']); else $item->setContentNotes("");
 					
-					$item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
+					//personal copies
+					if( $_REQUEST['personal_item'] == 'no' ) {	//do not want a private owner
+						$item->setPrivateUserID('null');
+					}
+					elseif( $_REQUEST['personal_item'] == 'yes' ) {	//we want a private owner
+						//if we are choosing a new private owner, set it
+						if( !empty($_REQUEST['selected_owner']) ) {
+							$item->setprivateUserID($_REQUEST['selected_owner']);
+						}
+						//else we are keeping old private owner, so no change necessary
+					}
+					
+//this is not set by the form, should it be?
+//					$item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
 					
 					// Check to see if this was a valid file they submitted
 					if ($_REQUEST['documentType'] == 'DOCUMENT')

@@ -461,7 +461,7 @@ class itemDisplayer
     	echo '</form>';
 	}
 	
-	function displayEditItemScreen($item,$user,$search_serial=null)
+	function displayEditItemScreen($item,$user,$owner_list=null,$search_serial=null)
 	{
 		
 		global $g_permission, $g_documentURL;
@@ -476,38 +476,65 @@ class itemDisplayer
 		$source = $item->getSource();
 		$contentNotes = $item->getContentNotes();
 		$itemNotes = $item->getNotes(); //Valid note types, associated with an item, are content, copyright, and staff
+		//private user
+		if( !is_null($item->getPrivateUserID()) ) {
+			$privateUserID = $item->getPrivateUserID();
+			$item->getPrivateUser();
+			$privateUser = $item->privateUser->getName(). ' ('.$item->privateUser->getUsername().')';
+		}
+?>
+	<script language="JavaScript">
+	//<!--
+		function validateForm(frm)
+		{			
+			var alertMsg = "";
 
-		echo "
-		<script language=\"JavaScript\">
-		//<!--
-			function validateForm(frm)
-			{			
-				var alertMsg = \"\";
-
-				if (frm.title.value == \"\")
-					alertMsg = alertMsg + \"Title is required.<br>\";
+			if (frm.title.value == "")
+				alertMsg = alertMsg + "Title is required.<br />";
 				
-				if (frm.documentType[1].checked)
-				{ 
-					if (frm.userFile.value == \"\")
-						alertMsg = alertMsg + \"File path is required.<br>\"
-				} else if (frm.documentType[2].checked) {
-					if (frm.url.value == \"\")
-						alertMsg = alertMsg + \"URL is required.<br>\";				
-				} 
+			if (frm.documentType[1].checked)
+			{ 
+				if (frm.userFile.value == "")
+					alertMsg = alertMsg + "File path is required.<br>"
+			} else if (frm.documentType[2].checked) {
+				if (frm.url.value == "")
+					alertMsg = alertMsg + "URL is required.<br>";				
+			} 
 				
-				if (!alertMsg == \"\") 
-				{ 
-					document.getElementById('alertMsg').innerHTML = alertMsg;
-					return false;
-				}
-					
+			if (!alertMsg == "") 
+			{ 
+				document.getElementById('alertMsg').innerHTML = alertMsg;
+				return false;
 			}
-		//-->
-		</script>	
-		";
+		}
 		
 		
+		//shows/hides personal item elements; marks them as required or not
+		function togglePersonal(enable) {
+			if(enable) {
+				document.getElementById('personal_item_yes').checked = true;
+				document.getElementById('personal_item_owner_block').style.display ='';
+				togglePersonalOwnerSearch();
+			}
+			else {
+				document.getElementById('personal_item_no').checked = true;
+				document.getElementById('personal_item_owner_block').style.display ='none';
+			}
+		}
+	
+		//shows/hides personal item owner search fields
+		function togglePersonalOwnerSearch() {
+			//if no personal owner set, 
+			if(document.getElementById('personal_item_owner_curr').checked) {
+				document.getElementById('personal_item_owner_search').style.visibility = 'hidden';
+			}
+			else if(document.getElementById('personal_item_owner_new').checked) {
+				document.getElementById('personal_item_owner_search').style.visibility = 'visible';
+			}	
+		}
+	//-->
+	</script>			
+<?php
 		$formEncode = ($item->getItemGroup() == 'ELECTRONIC') ? "enctype=\"multipart/form-data\"" : "";
 		echo "<form name=\"reservesMgr\" action=\"index.php?cmd=editItem\" method=\"post\" $formEncode onSubmit=\"return validateForm(this);\">\n";
 		
@@ -661,6 +688,72 @@ class itemDisplayer
 		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Source/ Year</span><span class=\"strong\">:</span></div></td>\n";
 		echo "				<td width=\"100%\" align=\"left\"><input name=\"source\" type=\"text\" id=\"source\" size=\"50\" value=\"".$source."\"></td>\n";
 		echo "			</tr>\n";
+		
+		//personal copy/private user block
+		
+		//set search-by selected
+		$username = "";
+		$last_name = "";
+		$selector = (isset($_REQUEST['select_owner_by'])) ? $_REQUEST['select_owner_by'] : "last_name";
+		$$selector = 'selected="selected"';
+		
+		//set search term
+		$owner_qryTerm = (isset($_REQUEST['owner_qryTerm'])) ? $_REQUEST['owner_qryTerm'] : "";
+
+		//set name selected
+		$inst_DISABLED = (is_null($owner_list)) ? 'disabled="disabled"' : '';
+
+		//show the form elements
+?>
+			<tr align="left" valign="top" id="personal_item_row">
+				<td align="right" bgcolor="#CCCCCC" class="strong">
+					Personal Copy Owner:
+				</td>
+				<td>
+					<div id="personal_item_choice">
+						<input type="radio" name="personal_item" id="personal_item_no" value="no" onChange="togglePersonal(0);" /> No
+						&nbsp;&nbsp;
+						<input type="radio" name="personal_item" id="personal_item_yes" value="yes" onChange="togglePersonal(1);" /> Yes
+					</div>
+					<div id="personal_item_owner_block" style="margin-top:2px; margin-bottom:15px;">
+<?php
+	//if there is an existing owner, give a choice of picking new one
+	if(isset($privateUser)):
+?>
+						<input type="radio" name="personal_item_owner" id="personal_item_owner_curr" value="old" checked="checked" onChange="togglePersonalOwnerSearch();" /> Current - <strong><?=$privateUser?></strong>
+						<br />
+						<input type="radio" name="personal_item_owner" id="personal_item_owner_new" value="new" onChange="togglePersonalOwnerSearch();" /> New &nbsp;
+<?php
+	else:	//if not, then just assume we are searching for a new one
+?>
+						<input type="hidden" name="personal_item_owner" id="personal_item_owner_new" value="new" />
+<?php
+	endif;
+?>
+						<span id="personal_item_owner_search">
+							<select name="select_owner_by">
+								<option value="last_name" <?=$last_name?>>Last Name</option>
+								<option value="username" <?=$username?>>User Name</option>
+							</select>
+							&nbsp; <input id="owner_qryTerm" name="owner_qryTerm" type="text" value="<?=$owner_qryTerm?>" size="15"  onBlur="this.form.submit();">
+							&nbsp; <input type="submit" name="owner_search" value="Search">
+							&nbsp;
+							<select name="selected_owner" <?=$inst_DISABLED?>>
+								<option value="null">-- Choose Item Owner -- </option>
+<?php
+		for($i=0;$i<count($owner_list);$i++) {
+			$inst_selector = ($_REQUEST['selected_owner'] == $owner_list[$i]->getUserID() || $search_results['personal_owner'] == $owner_list[$i]->getUserID()  ) ? 'selected="selected"' : '';
+			echo "\t\t\t\t\t\t\t".'<option value="'. $owner_list[$i]->getUserID() .'" '.$owner_selector.'>'.$owner_list[$i]->getName().'</option>'."\n";
+		}
+?>
+							</select>
+						</span>
+					</div>
+				</td>
+			</tr>
+<?php
+		//notes
+		
 		if ($contentNotes) {
 		
 			echo "            <tr valign=\"middle\">\n";
@@ -706,6 +799,29 @@ class itemDisplayer
 		echo "	</tr>\n";
 		echo "</table>\n";
 		echo "</form>\n";
+?>
+	<script language="JavaScript">
+		//set up some fields on load
+		
+		//if we are searching for a new owner
+		if( document.getElementById('owner_qryTerm').value != '') {
+			//select new owner
+			document.getElementById('personal_item_owner_new').checked = true;
+			//show private owner block
+			togglePersonal(1);
+		}
+		else if( document.getElementById('personal_item_owner_curr') != null ) {	//if there is already a private owner
+			//select current owner
+			document.getElementById('personal_item_owner_curr').checked = true;
+			//show private owner block
+			togglePersonal(1);			
+		}
+		else {
+			//default to no private owner
+			togglePersonal(0);
+		}
+	</script>
+<?php
 	}
 
 	function displayItemSuccessScreen($search_serial,$user)
