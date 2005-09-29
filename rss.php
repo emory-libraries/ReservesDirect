@@ -44,7 +44,10 @@ if (!isset($_REQUEST['ci']))
 	{
 		flush;
 		echo "<?xml version=\"1.0\"?>\n";
-		echo "<!DOCTYPE rss ["; include('rss/ansel_unicode.ent');  echo "]>\n";
+		echo "<!DOCTYPE rss ["; 
+// these entities are not valid in rss 2.0, and a lot of readers choke on them
+//      include('rss/ansel_unicode.ent');  
+        echo "]>\n";
     	echo "<rss version=\"2.0\">\n";
     	echo "	<channel>\n";
     	echo "		<error>Data could not be retrieved from rss.php ci not set. Please contact the systems administrator.</error>";
@@ -65,36 +68,38 @@ if (!isset($_REQUEST['ci']))
 
 	header("Content-Type: application/xml");
     echo "<?xml version=\"1.0\"?>\n";
-    echo "<!DOCTYPE rss ["; include('rss/ansel_unicode.ent');  echo "]>\n";
+    echo "<!DOCTYPE rss ["; 
+//  include('rss/ansel_unicode.ent');  
+    echo "]>\n";
     echo "<rss version=\"2.0\">\n";
-    echo "	<channel>\n";
+    echo "	<channel>\n\n";
 
-    echo "		<title>" .  htmlentities(stripslashes($ci->course->displayCourseNo() . " " . $ci->course->name . " " . $ci->displayTerm())) . " Reserve List</title>\n";
-    //echo "		<link>".htmlentities($g_siteURL)."/index.php?cmd=viewReservesList&amp;ci=".$_REQUEST['ci']."</link>\n";
-    echo "		<link>".htmlentities($g_siteURL)."</link>\n";
+    echo "		<title>" .  stripslashes($ci->course->displayCourseNo() . " " . $ci->course->name . " " . $ci->displayTerm()) . " - Reserve List</title>\n";
+// mantis #429
+//    echo "		<link>".$g_siteURL."/index.php?cmd=viewReservesList&amp;ci=".$_REQUEST['ci']."</link>\n";
+    echo "		<link>$g_siteURL</link>\n";
 
+// having multiple managingEditors is also invalid, but most readers handle it gracefully
     foreach($ci->instructorList as $instr)
-    	echo "		<managingEditor>" . htmlentities($instr->getEmail() . " (" . $instr->getName()) . ")</managingEditor>\n";
+        echo "		<managingEditor>" . $instr->getEmail() . " (" .  $instr->getName() . ") </managingEditor>\n" ;
 
     echo "		<webMaster>$g_reservesEmail (Reserves Desk)</webMaster>\n";
 
     echo "		<description>";
-    echo 		"Course Reserves for " . htmlentities(stripslashes($ci->course->displayCourseNo() . " " . $ci->course->name . " " . $ci->displayTerm())) . ", ";
+    echo 		"Course Reserves for " . stripslashes($ci->course->displayCourseNo() . " " . $ci->course->name . " " . $ci->displayTerm()) . ", ";
     echo 		"taught by:";
     foreach($ci->instructorList as $instr)
     	echo " " . $instr->getName() . " (" . $instr->getEmail() . ") ";
 
     echo		". Helper application for viewing reserves: Adobe Acrobat Reader, http://www.adobe.com/products/acrobat/readstep2.html .";
-    echo 		"</description>\n";
-
-    //$rItem = new reserveItem();
+    echo 		"</description>\n\n";
 
     foreach ($ci->reserveList as $rItem)
     {
     	$rItem->getItem();
     	$rItem->getNotes();
 
-    	echo "		<item>";
+    	echo "		<item>\n";
         
         if ($rItem->item->isPhysicalItem()) {
             echo "          <link>" . htmlentities($g_reservesViewer . $rItem->item->getLocalControlKey()) . "</link>";
@@ -102,29 +107,38 @@ if (!isset($_REQUEST['ci']))
             echo "			<link>" . htmlentities($g_siteURL."/reservesViewer.php?viewer=-115&reserve=". $rItem->getReserveID() ."&location=" . $rItem->item->getURL()) . "</link>\n";
         }
     	
-        echo "			<title>".htmlentities($rItem->item->getTitle())."</title>\n";
+        echo "			<title>" . $rItem->item->getTitle() . "</title>\n";
 
     	echo "			<description>";
 
     	//ouput what we have as the description
-    		if ($rItem->item->getAuthor() != "") 				echo htmlentities($rItem->item->getAuthor()) . ". ";
-    		if ($rItem->item->getPerformer() != "") 			echo "performed by: " . htmlentities($rItem->item->getPerformer()) . ". ";
+    		if ($rItem->item->getAuthor() != "")
+                    echo trim($rItem->item->getAuthor()) . ". ";
+                    
+    		if ($rItem->item->getPerformer() != "")
+                    echo "performed by: " . trim($rItem->item->getPerformer()) . ". ";
 
-    		if ($rItem->item->getVolumeTitle() != "")			echo htmlentities($rItem->item->getVolumeTitle() . " " . $rItem->item->getVolumeEdition() . " " . $rItem->item->getPagesTimes()) . ". ";
-    		elseif ($rItem->item->getVolumeEdition() != "")		echo htmlentities($rItem->item->getVolumeEdition() . " " . $rItem->item->getPagesTimes()) . ". ";
-    		elseif ($rItem->item->getPagesTimes() != "")		echo htmlentities($rItem->item->getPagesTimes()) . ". ";
+    		if ($rItem->item->getVolumeTitle() != "")
+                    echo trim($rItem->item->getVolumeTitle() . " " . $rItem->item->getVolumeEdition() . " " . $rItem->item->getPagesTimes()) . ". ";
+                    
+    		elseif ($rItem->item->getVolumeEdition() != "")
+                    echo trim($rItem->item->getVolumeEdition() . " " . $rItem->item->getPagesTimes()) . ". ";
+                    
+    		elseif ($rItem->item->getPagesTimes() != "")
+                    echo trim($rItem->item->getPagesTimes()) . ". ";
 
-    		if ($rItem->item->getSource() != "") 				echo htmlentities($rItem->item->getSource()) . ". ";
+    		if ($rItem->item->getSource() != "")
+                    echo trim($rItem->item->getSource()) . ". ";
 
     		foreach ($rItem->item->notes as $n)
     		{
-    			if ($n->getType() == 'Instructor') echo htmlentities($n->getText()) . ". ";
-    			elseif ($n->getType() == 'Content') echo htmlentities($n->getText()) . ". ";
+    			if ($n->getType() == 'Instructor') echo $n->getText() . ". ";
+    			elseif ($n->getType() == 'Content') echo $n->getText() . ". ";
 
     		}
-//    	echo 			htmlentities("&lt;hr noshade/&gt;");
-    	echo "			</description>\n";
-    	echo "		</item>\n";
+
+    	echo "</description>\n";
+    	echo "		</item>\n\n";
     }
 
 
