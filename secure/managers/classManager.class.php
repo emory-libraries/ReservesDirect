@@ -499,7 +499,7 @@ class classManager
 					{
 						$ci = $user->courseInstances[$i];						
 						$ci->getCourses();
-						$courseList = $ci->courseList;
+						$courseList = array_merge($courseList, $ci->courseList);
 					}
 					
 					$searchParam = new instructor();
