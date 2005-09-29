@@ -410,7 +410,7 @@ class reservesManager
 				if ($p != " - ") $item->setPagesTimes($p);
 				elseif ($t != " - ") $item->setPagesTimes($t);
 
-				if ($_REQUEST['personal'] == "on") $item->setprivateUserID($user->getUserID());
+				if ($_REQUEST['personal'] == "on") $item->setPrivateUserID($user->getUserID());
 
 				$item->setGroup('ELECTRONIC');
 				$item->setType('ITEM');
@@ -495,7 +495,7 @@ class reservesManager
 					$p = $_REQUEST[$file]['pagefrom'] . "-" . $_REQUEST[$file]['pageto'];
 					if ($p != "-") $item->setPagesTimes($p);
 
-					if ($_REQUEST[$file]['personal'] == "on") $item->setprivateUserID($user->getUserID());
+					if ($_REQUEST[$file]['personal'] == "on") $item->setPrivateUserID($user->getUserID());
 
 					$item->setGroup('ELECTRONIC');
 					$item->setType('ITEM');

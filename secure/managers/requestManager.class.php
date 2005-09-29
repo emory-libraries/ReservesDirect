@@ -238,7 +238,7 @@ class requestManager
 					if (isset($request['selectedDocIcon'])) $item->setDocTypeIcon($request['selectedDocIcon']);
 					//check personal item owner
 					if( ($request['personal_item'] == 'yes') && !empty($request['selected_owner']) ) {
-						$item->setprivateUserID($request['selected_owner']);
+						$item->setPrivateUserID($request['selected_owner']);
 					}
 
 					//set physical item data (but not for manual entries)
