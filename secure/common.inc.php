@@ -254,26 +254,6 @@ function common_storeUploaded($src, $item_id) {
 }
 
 
-/**
- * @return void
- * @param string $src source file
- * @param string $dest file destination location
- * @desc moves a file to the specified destination within the documentDirectory defined in the configuration
-*/
-function common_moveFile($src, $dest)
-{
-	global $g_documentDirectory;
-	exec("/usr/bin/sudo -u coursecontrol /usr/local/bin/reserveMover $src $dest", $stat);
-
-	if (isset($_SESSION['debug']))
-	{
-		echo "src=$src, dest=$dest<br> stat<br>";print_r($stat); echo "<hr>";
-	}
-	//if the new file is not readable something went wrong
-	if (!is_readable($g_documentDirectory.$dest)) trigger_error("file $src could not be moved to $dest" . $stat, E_USER_ERROR);
-}
-
-
 function common_getStatusStyleTag($status)
 {
 
