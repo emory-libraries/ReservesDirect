@@ -73,7 +73,6 @@ function common_ErrorHandler($errno, $errmsg, $filename, $linenum, $vars)
 	   // consider are E_WARNING, E_NOTICE, E_USER_ERROR,
 	   // E_USER_WARNING and E_USER_NOTICE
 	   $errortype = array (
-	               E_USER_ERROR		=> "SQL Error",
 	   			   E_ERROR          => "Error",
 	               E_WARNING        => "Warning",
 	               E_PARSE          => "Parsing Error",
