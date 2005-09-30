@@ -207,6 +207,39 @@ function common_getDepartments()
 	return $deptList;
 }
 
+
+/**
+ * @return array (name, ext) of new filename and ext
+ * @param string $src element of $_FILES[]; uploaded file info array
+ * @param int $item_id necessary to format the proper destination path
+ * @desc cleans up filename and moves uploaded file to a destination set in the config
+*/
+function common_storeUploaded($src, $item_id) {
+	global $g_documentDirectory;
+	
+	//check for errors
+	if( $src['error'] ) {
+		echo 'If you are trying to load a very large file (> 10 MB) contact Reserves to add the file.';
+		trigger_error("Possible file upload attack. Filename: " . $src['name'], E_USER_ERROR);
+	}
+
+	//get filename/ext
+	$file_path = pathinfo($src['name']);
+	//get the filename w/o extension
+	$filename = basename($file_path['basename'], '.'.$file_path['extension']);
+	//clean up filename - convert spaces to underscores and strip any non A-z, 0-9, or _ characters
+	$filename = preg_replace('[\W]', '', str_replace(' ', '_', $filename));
+	//format filename for storage (ID-name.ext)
+	$filename = $item_id.'-'.$filename.'.'.$file_path['extension'];
+	
+	//store file
+	move_uploaded_file($src['tmp_name'], $g_documentDirectory.$filename);
+	
+	//return destination filename/ext to store in DB
+	return array('name'=>$filename, 'ext'=>$file_path['extension']);
+}
+
+
 /**
  * @return void
  * @param string $src source file
