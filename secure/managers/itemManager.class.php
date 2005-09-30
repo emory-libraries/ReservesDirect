@@ -48,7 +48,7 @@ class itemManager
 
 	function itemManager($cmd, $user)
 	{
-		global $g_permission, $page, $loc, $ci;
+		global $g_permission, $g_documentURL, $page, $loc, $ci;
 
 		$this->displayClass = "itemDisplayer";
 		
@@ -108,23 +108,9 @@ class itemManager
 					// Check to see if this was a valid file they submitted
 					if ($_REQUEST['documentType'] == 'DOCUMENT')
 					{
-						if ($_FILES['userFile']['error'])
-							trigger_error("Possible file upload attack. Filename: " . $_FILES['userFile']['name'] . "If you are trying to load a very large file (> 10 MB) contact Reserves to add the file.", E_USER_ERROR);
-
-						list($filename, $type) = split("\.", $_FILES['userFile']['name']);
-						//move file set permissions and store location
-						//position uploaded file so that common_move and move it
-						move_uploaded_file($_FILES['userFile']['tmp_name'], $_FILES['userFile']['tmp_name'] . "." . $type);
-						chmod($_FILES['userFile']['tmp_name'] . "." . $type, 0644);
-
-						$newFileName = ereg_replace('[^A-Za-z0-9]*','',$filename); //strip any non A-z or 0-9 characters
-
-						//$newFileName = str_replace("&", "_", $filename); 											//remove & in filenames
-						//$newFileName = str_replace(".", "", $newFileName); 											//remove . in filenames
-						$newFileName = $item->getItemID() ."-". str_replace(" ", "_", $newFileName . "." . $type); 	//remove spaces in filenames
-						common_moveFile($_FILES['userFile']['tmp_name'] . "." . $type,  $newFileName );
-						$item->setURL($g_documentURL . $newFileName);
-						$item->setMimeTypeByFileExt($type);
+						$file = common_storeUploaded($_FILES['userFile'], $item->getItemID());
+						$item->setURL($g_documentURL.$file['name']);
+						$item->setMimeTypeByFileExt($file['ext']);
 					} else {
 						if ($_REQUEST['url']) $item->setURL($_REQUEST['url']); else $item->setURL("");
 					}			

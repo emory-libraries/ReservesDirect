@@ -54,7 +54,7 @@ class reservesManager
 
 	function reservesManager($cmd, $user)
 	{
-		global $g_permission, $page, $loc, $g_faxDirectory, $g_documentURL, $ci;
+		global $g_permission, $page, $loc, $g_faxDirectory, $g_documentDirectory, $g_documentURL, $ci;
 
 		$this->displayClass = "reservesDisplayer";
 		//$this->user = $user;
@@ -372,7 +372,6 @@ class reservesManager
 	    			}
 	    		}
 
-			    list($filename, $type) = split("\.", $_FILES['userfile']['name']);
 			    $item = new reserveItem();
 			    $item->createNewItem();
 	    		$item->setTitle($_REQUEST['title']);
@@ -386,23 +385,15 @@ class reservesManager
 	    		$item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
 
 	    		if ($_REQUEST['type'] == 'DOCUMENT'){
-	        		//move file set permissions and store location
-	        		//position uploaded file so that common_move and move it
-	        		move_uploaded_file($_FILES['userfile']['tmp_name'], $_FILES['userfile']['tmp_name'] . "." . $type);
-	        		chmod($_FILES['userfile']['tmp_name'] . "." . $type, 0644);
-
-	        		$newFileName = ereg_replace('[^A-Za-z0-9]*','',$filename); //strip any non A-z or 0-9 characters
-	        		//$newFileName = str_replace("&", "_", $filename); 											//remove & in filenames
-	        		//$newFileName = str_replace(".", "", $newFileName); 											//remove . in filenames
-					$newFileName = $item->getItemID() ."-". str_replace(" ", "_", $newFileName . "." . $type); 	//remove spaces in filenames
-
-	        		common_moveFile($_FILES['userfile']['tmp_name'] . "." . $type,  $newFileName );
-	        		$item->setURL($g_documentURL . $newFileName);
+	    			$file = common_storeUploaded($_FILES['userFile'], $item->getItemID());
+					$item->setURL($g_documentURL.$file['name']);
+					$item->setMimeTypeByFileExt($file['ext']);
 	    		} else {
+	    			$file_path = pathinfo($_FILES['userFile']['name']);
 	    			$item->setURL($_REQUEST['url']);
+	    			$item->setMimeTypeByFileExt($file_path['extension']);
 	    		}
-	    		$item->setMimeTypeByFileExt($type);
-
+	    		
 				$p = $_REQUEST['pagefrom'] . " - " . $_REQUEST['pageto'];
 				$t = $_REQUEST['timefrom'] . " - " . $_REQUEST['timeto'];
 
@@ -484,12 +475,13 @@ class reservesManager
 					$item->setvolumeEdition($_REQUEST[$file]['volume']);
 					//$item->setContentNotes($_REQUEST[$file]['contents']);
 					
-					//move file and store new location
-					$newFileName = str_replace("&", "_", $filename); 											//remove & in filenames
-					$newFileName = $item->getItemID() ."-". str_replace(" ", "_", $newFileName . "." . $type); 	//remove spaces in filenames
-
-					common_moveFile($g_faxDirectory.$_REQUEST['file'][$file], $newFileName);
-					$item->setURL($g_documentURL . $newFileName);
+					//store the fax
+					$dst_fname = $item->getItemID().'-fax.pdf';
+					if(!copy($g_faxDirectory.$_REQUEST['file'][$file], $g_documentDirectory.$dst_fname)) {
+						trigger_error('Failed to copy file '.$g_faxDirectory.$_REQUEST['file'][$file].' to '.$g_documentDirectory.$dst_fname, E_USER_ERROR);
+					}
+	
+					$item->setURL($g_documentURL.$dst_fname);
 					$item->setMimeType('application/pdf');
 
 					$p = $_REQUEST[$file]['pagefrom'] . "-" . $_REQUEST[$file]['pageto'];

@@ -290,32 +290,9 @@ class requestManager
 					elseif( $request['previous_cmd'] == 'addDigitalItem' ) {	//set electronic item data
 						//uploading a file
 						if( $request['documentType'] == 'DOCUMENT' ) {
-							//check for errors
-							if( $_FILES['userFile']['error'] ) {
-								trigger_error("Possible file upload attack. Filename: " . $_FILES['userFile']['name'] . "If you are trying to load a very large file (> 10 MB) contact Reserves to add the file.", E_USER_ERROR);
-							}
-
-							//get filename/ext
-							$file_path = pathinfo($_FILES['userFile']['name']);
-							$file_path['basename'] = basename($file_path['basename'], '.'.$file_path['extension']);
-
-							//move file, set permissions and store location
-							//position uploaded file so that common_move can move it
-							move_uploaded_file($_FILES['userFile']['tmp_name'], $_FILES['userFile']['tmp_name'].'_');
-							chmod($_FILES['userFile']['tmp_name'].'_', 0644);
-
-							//clean up filename - convert spaces to underscores and strip any non A-z, 0-9, or _ characters
-							$filename = preg_replace('[\W]', '', str_replace(' ', '_', $file_path['basename']));
-
-							//format filename for storage (ID-name.ext)
-							$filename = $item->getItemID().'-'.$filename.'.'.$file_path['extension'];
-
-							//store file
-							common_moveFile($_FILES['userFile']['tmp_name'].'_',  $filename );
-
-							//set electronic item data
-							$item->setURL($g_documentURL . $filename);
-							$item->setMimeTypeByFileExt($file_path['extension']);
+							$file = common_storeUploaded($_FILES['userFile'], $item->getItemID());
+							$item->setURL($g_documentURL.$file['name']);
+							$item->setMimeTypeByFileExt($file['ext']);
 						}
 						else {	//adding a URL
 							$item->setURL($request['url']);
