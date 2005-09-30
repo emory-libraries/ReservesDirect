@@ -208,6 +208,25 @@ function common_getDepartments()
 
 
 /**
+ * @return assoc array (name, ext) of new filename.ext and ext (ext used to set mimetypes)
+ * @param string $src_name filename to be formatted
+ * @param int $item_id necessary to format the proper destination path
+ * @desc cleans up filename and formats the destination filename
+*/
+function common_formatFilename($src_name, $item_id) {
+	//get filename/ext
+	$file_path = pathinfo($src_name);
+	//get the filename w/o extension
+	$filename = basename($file_path['basename'], '.'.$file_path['extension']);
+	//clean up filename - convert spaces to underscores and strip any non A-z, 0-9, or _ characters
+	$filename = preg_replace('[\W]', '', str_replace(' ', '_', $filename));
+	//format filename for storage (ID-name.ext)
+	$filename = $item_id.'-'.$filename.'.'.$file_path['extension'];
+	//return formatted filename/ext
+	return array('name'=>$filename, 'ext'=>$file_path['extension']);
+}
+
+/**
  * @return array (name, ext) of new filename and ext
  * @param string $src element of $_FILES[]; uploaded file info array
  * @param int $item_id necessary to format the proper destination path
@@ -221,21 +240,17 @@ function common_storeUploaded($src, $item_id) {
 		echo 'If you are trying to load a very large file (> 10 MB) contact Reserves to add the file.';
 		trigger_error("Possible file upload attack. Filename: " . $src['name'], E_USER_ERROR);
 	}
-
-	//get filename/ext
-	$file_path = pathinfo($src['name']);
-	//get the filename w/o extension
-	$filename = basename($file_path['basename'], '.'.$file_path['extension']);
-	//clean up filename - convert spaces to underscores and strip any non A-z, 0-9, or _ characters
-	$filename = preg_replace('[\W]', '', str_replace(' ', '_', $filename));
-	//format filename for storage (ID-name.ext)
-	$filename = $item_id.'-'.$filename.'.'.$file_path['extension'];
+	
+	//format the filename; extract extension
+	$file = common_formatFilename($src['name'], $item_id);
 	
 	//store file
-	move_uploaded_file($src['tmp_name'], $g_documentDirectory.$filename);
+	if( !move_uploaded_file($src['tmp_name'], $g_documentDirectory.$file['name']) ) {
+		trigger_error('Failed to move uploaded file '.$src['tmp_name'].' to '.$g_documentDirectory.$file['name'], E_USER_ERROR);
+	}
 	
 	//return destination filename/ext to store in DB
-	return array('name'=>$filename, 'ext'=>$file_path['extension']);
+	return $file;
 }
 
 
