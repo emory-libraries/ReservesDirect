@@ -302,7 +302,7 @@ class requestDisplayer
 		echo "<script languge=\"JavaScript\">\n";
 		echo "	function setBarcode(frm) { if (frm.searchField.options[frm.searchField.selectedIndex] == 'barcode') { frm.barcode.value = frm.searchTerm.value; } }\n";
 
-		if( $cmd == 'addPhysicalItem' ):
+		if( ($cmd == 'addPhysicalItem') || ($cmd == 'processRequest') ):
 ?>
 
 	function checkForm(frm) {
@@ -399,7 +399,7 @@ class requestDisplayer
 	}
 	
 <?php
-		endif;	//endif($cmd == 'addPhysicalItem')
+		endif;	//endif($cmd == 'addPhysicalItem' || $cmd == 'processRequest')
 ?>
 
 
@@ -823,7 +823,7 @@ class requestDisplayer
 		echo "				</td></tr>\n";
 
 		//only show this stuff for physical items
-		if ($cmd == 'addPhysicalItem') {
+		if( ($cmd == 'addPhysicalItem') || ($cmd == 'processRequest') ) {
 			$barcode_value = (isset($barcode) && (isset($request['searchTerm']) && $request['searchTerm'] != "")) ? $request['searchTerm'] : $search_results['physicalCopy'][0]['bar'];			
 			
 			echo "				<tr align=\"left\" valign=\"middle\" id=\"nonman_barcode\">\n";
@@ -875,8 +875,8 @@ class requestDisplayer
 		echo "	<tr><td><strong><font color=\"#FF0000\">* </font></strong><span class=\"helperText\">= required fields</span></td></tr>\n";
 
 		//decide if we want to show multiple copies instruction screen
-		//if there is an array of physical items, show it.
-		if( is_array($search_results['physicalCopy']) ):
+		//if there is an array of physical items and there is more than one element, show it.
+		if( is_array($search_results['physicalCopy']) && (count($search_results['physicalCopy']) > 1) ):
 ?>
 	<tr>
 				<td align="center" id="nonman_note">
@@ -919,7 +919,7 @@ class requestDisplayer
 		}
 
 <?php
-		if($cmd == 'addPhysicalItem'):
+		if( ($cmd == 'addPhysicalItem') || ($cmd == 'processRequest') ):
 ?>
 
 		//run some code to set up the form in the beginning
@@ -956,7 +956,7 @@ class requestDisplayer
 		togglePersonal(1, 0);
 
 <?php
-		endif; //endif($cmd=='addPhysicalItem')
+		endif; //endif( ($cmd == 'addPhysicalItem') || ($cmd == 'processRequest') )
 ?>
 
 	</script>
