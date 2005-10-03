@@ -176,8 +176,8 @@ class requestManager
 							$item->getItemByID($physCopy->getItemID());
 							//get reserve by item and course
 							if( $reserve->getReserveByCI_Item($ci->getCourseInstanceID(), $item->getItemID()) != null ) {
-								//look for a request for this reserve item
 								$requestObj = new request();
+								//look for a request for this reserve item
 								if( $requestObj->getRequestByReserveID($reserve->getReserveID()) != null ) {
 									//process request
 									$requestObj->setDateProcessed(date('Y-m-d'));
@@ -201,6 +201,14 @@ class requestManager
 							//store some stats
 							$itemAudit = new itemAudit();
 							$itemAudit->createNewItemAudit($item->getItemID(),$user->getUserID());
+						}
+						
+						//if request_id is set, process it
+						//this is needed if the physical copy was not found (creating new), or staff chose a different item from the list
+						if(isset($_REQUEST['request_id'])) {
+							$requestObj = new request();
+							$requestObj->getRequestByID($_REQUEST['request_id']);
+							$requestObj->setDateProcessed(date('Y-m-d'));
 						}
 					}
 
