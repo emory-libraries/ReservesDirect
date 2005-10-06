@@ -59,7 +59,7 @@ class exportManager
 			$classList = null;
 			if ($u instanceof instructor)
 			{
-				$classList = $u->getAllCourseInstances();
+				$classList = $u->getCourseInstances($u->user_id);
 
 				for($i=0;$i<count($classList);$i++)
 					$classList[$i]->getPrimaryCourse();
