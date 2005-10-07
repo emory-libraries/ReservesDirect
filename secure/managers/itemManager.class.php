@@ -112,7 +112,7 @@ class itemManager
 						$item->setURL($g_documentURL.$file['name']);
 						$item->setMimeTypeByFileExt($file['ext']);
 					} else {
-						if ($_REQUEST['url']) $item->setURL($_REQUEST['url']); else $item->setURL("");
+						if ($_REQUEST['url']) $item->setURL($_REQUEST['url']);
 					}			
 					
 					if ($_REQUEST['itemNotes']) {
