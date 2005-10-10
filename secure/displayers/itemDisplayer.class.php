@@ -664,7 +664,7 @@ class itemDisplayer
 			$pc->getByItemID($item->getItemID());
 			echo "          <tr valign=\"middle\">\n";
 			echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>Barcode:</div></td>\n";
-			echo "				<td width=\"100%\" align=\"left\"><input name=\"url\" type=\"text\" size=\"50\" value=\"". $pc->getBarcode() ."\"></td>\n";
+			echo "				<td width=\"100%\" align=\"left\"><input name=\"barcode\" type=\"text\" size=\"50\" value=\"". $pc->getBarcode() ."\"></td>\n";
 			echo "			</tr>\n";
 		}
 		
