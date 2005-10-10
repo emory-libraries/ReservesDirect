@@ -85,7 +85,7 @@ if (!isset($_SESSION['css'])){
 	$_SESSION['css'] = $skins->getSkin($userSkin);
 }
 
-if (!isset($_SESSION['debug']) && isset($_REQUEST['debug']) && $user->getDefaultRole() == $g_permission['admin']) $_SESSION['debug'] = true; 
+if (!isset($_SESSION['debug']) && isset($_REQUEST['debug'])) $_SESSION['debug'] = true; 
 
 $user->setLastLogin();
 
