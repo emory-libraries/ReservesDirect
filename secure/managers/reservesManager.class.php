@@ -385,11 +385,11 @@ class reservesManager
 	    		$item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
 
 	    		if ($_REQUEST['type'] == 'DOCUMENT'){
-	    			$file = common_storeUploaded($_FILES['userFile'], $item->getItemID());
+	    			$file = common_storeUploaded($_FILES['userfile'], $item->getItemID());
 					$item->setURL($g_documentURL.$file['name']);
 					$item->setMimeTypeByFileExt($file['ext']);
 	    		} else {
-	    			$file_path = pathinfo($_FILES['userFile']['name']);
+	    			$file_path = pathinfo($_FILES['userfile']['name']);
 	    			$item->setURL($_REQUEST['url']);
 	    			$item->setMimeTypeByFileExt($file_path['extension']);
 	    		}
