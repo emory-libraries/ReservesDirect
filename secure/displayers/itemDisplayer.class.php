@@ -742,7 +742,7 @@ class itemDisplayer
 								<option value="null">-- Choose Item Owner -- </option>
 <?php
 		for($i=0;$i<count($owner_list);$i++) {
-			$inst_selector = ($_REQUEST['selected_owner'] == $owner_list[$i]->getUserID() || $search_results['personal_owner'] == $owner_list[$i]->getUserID()  ) ? 'selected="selected"' : '';
+			$owner_selector = ($_REQUEST['selected_owner'] == $owner_list[$i]->getUserID() || $search_results['personal_owner'] == $owner_list[$i]->getUserID()  ) ? 'selected="selected"' : '';
 			echo "\t\t\t\t\t\t\t".'<option value="'. $owner_list[$i]->getUserID() .'" '.$owner_selector.'>'.$owner_list[$i]->getName().'</option>'."\n";
 		}
 ?>
