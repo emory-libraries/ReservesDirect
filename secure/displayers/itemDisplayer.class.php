@@ -771,7 +771,9 @@ class itemDisplayer
 					echo "			<!-- On page load, by default, there is no blank \"Notes\" field showing, only ";
 					echo "			previously created notes, if any, and the \"add Note\" button. Notes should";
 					echo "			be added one after the other at the bottom of the table, but above the \"add Note\" button.-->\n";
-					echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">".$itemNotes[$i]->getType()." Note:</span><br><a href=\"index.php?cmd=editReserve&reserveID=".$reserve->getReserveID()."&deleteNote=".$itemNotes[$i]->getID()."\">Delete this note</a></td>\n";
+//cannot delete notes (no ReserveID)
+echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">".$itemNotes[$i]->getType()." Note:</span></td>\n";
+//					echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">".$itemNotes[$i]->getType()." Note:</span><br><a href=\"index.php?cmd=editReserve&reserveID=".$reserve->getReserveID()."&deleteNote=".$itemNotes[$i]->getID()."\">Delete this note</a></td>\n";
 					echo "				<td align=\"left\"><textarea name=\"itemNotes[".$itemNotes[$i]->getID()."]\" cols=\"50\" rows=\"3\">".$itemNotes[$i]->getText()."</textarea></td>\n";
 					echo "      </tr>\n";
 				}
