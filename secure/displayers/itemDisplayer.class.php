@@ -776,12 +776,18 @@ class itemDisplayer
 					echo "      </tr>\n";
 				}
 			}
-		}			
-		echo "          <tr valign=\"middle\">\n";	
-		echo "            	<td colspan=\"2\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"borders\" align=\"center\">\n";
-		echo "					<input type=\"button\" name=\"addNote\" value=\"Add Note\" onClick=\"openWindow('&cmd=addNote&item_id=".$item->getitemID()."');\">\n";
-		echo "				</td>\n";
-		echo "			</tr>\n";
+		}
+
+##############################
+// cannot add notes by itemID
+//
+//		echo "          <tr valign=\"middle\">\n";	
+//		echo "            	<td colspan=\"2\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"borders\" align=\"center\">\n";
+//		echo "					<input type=\"button\" name=\"addNote\" value=\"Add Note\" onClick=\"openWindow('&cmd=addNote&item_id=".$item->getitemID()."');\">\n";
+//		echo "				</td>\n";
+//		echo "			</tr>\n";
+##############################
+
 		echo "		</table>\n";
 		echo "		</td>\n";
 		echo "	</tr>\n";
