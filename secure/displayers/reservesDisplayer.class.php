@@ -184,7 +184,7 @@ class reservesDisplayer
 		.	'				<td align="left" valign="top">&nbsp;</td>'
 		.	'			</tr>'
 		.	'			<tr>'
-		.	'				<td align="left" valign="top"> <p class="small"><span class="strong">Helper Applications:</span> <a href="http://www.adobe.com/products/acrobat/readstep2.html">Adobe Acrobat</a>, <a href="http://www.real.com">RealPlayer</a>, <a href="http://www.apple.com/quicktime/download/ ">QuickTime</a>, <a href="http://office.microsoft.com/Assistance/9798/viewerscvt.aspx">Microsoft Word</a></p></td>'
+		.	'				<td align="left" valign="top"> <p class="small"><span class="strong">Helper Applications:</span> <a href="http://www.adobe.com/products/acrobat/readstep2.html" target="_new">Adobe Acrobat</a>, <a href="http://www.real.com" target="_new">RealPlayer</a>, <a href="http://www.apple.com/quicktime/download/" target="_new">QuickTime</a>, <a href="http://office.microsoft.com/Assistance/9798/viewerscvt.aspx" target="_new">Microsoft Word</a></p></td>'
 		.	'			</tr>'
 		.	'			<tr>'
 		.	'				<td align="left" valign="top">&nbsp;</td>'
