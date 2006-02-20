@@ -35,9 +35,8 @@ class admin extends staff
 {
 	//Attributes
 
-	function admin($userName)
+	function admin($userName=null)
 	{
-		if (is_null($userName)) trigger_error($userName . " has not been authorized as Admin", E_ERROR);
-		else $this->getUserByUserName($userName);
+		if (!is_null($userName)) $this->getUserByUserName($userName);
 	}
 }

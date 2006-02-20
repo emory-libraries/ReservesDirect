@@ -37,7 +37,6 @@ class reserveItem extends item
 	public $author;
 	public $source;
 	public $volumeTitle;
-	public $contentNotes;
 	public $volumeEdition;
 	public $pagesTimes;
 	public $performer;
@@ -47,14 +46,12 @@ class reserveItem extends item
 	public $homeLibraryID;
 	public $privateUserID;
 	public $privateUser;
-	public $copies = array();
 	public $physicalCopy;
 	public $itemIcon;
 	
 	function reserveItem($itemID=NULL)
 	{
 		if (!is_null($itemID)){
-			$this->itemID = $itemID;
 			$this->getItemByID($itemID);
 		}
 	}
@@ -63,55 +60,34 @@ class reserveItem extends item
 	/**
 	* @return void
 	* @param int $itemID
-	* @desc get item info from the database
+	* @desc get item info from the database. This is meant to replace the parent method.
 	*/
 	function getItemByID($itemID)
 	{
 		global $g_dbConn;
+		
+		if(empty($itemID))
+			return;	//no ID	
 
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT i.item_id, i.title, i.item_group, i.author, i.source, i.content_notes, i.volume_edition, i.pages_times, i.performer, i.local_control_key, "
-					.     "i.creation_date, i.last_modified, i.url, i.mimeType, i.home_library, i.private_user_id, i.item_type, i.volume_title, i.item_icon, n.note_id "
-					.  "FROM items as i "
-					.  "  LEFT JOIN notes as n ON n.target_table='items' and i.item_id = n.target_id "
-					.  "WHERE item_id = ! "
-					.  "ORDER BY n.type, n.note_id";
+				$sql = "SELECT item_id, title, item_group, last_modified, creation_date, item_type, author, source, volume_edition, pages_times, performer, local_control_key, url, mimeType, home_library, private_user_id, volume_title, item_icon
+						FROM items
+						WHERE item_id = !";
 		}
-
-		$rs = $g_dbConn->query($sql, $itemID);
+		
+		$rs = $g_dbConn->getRow($sql, array($itemID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		$row = $rs->fetchRow();
-			$this->itemID			= $row[0];
-			$this->title			= $row[1];
-			$this->itemGroup		= $row[2];
-			$this->author			= $row[3];
-			$this->source			= $row[4];
-			$this->contentNotes		= $row[5];
-			$this->volumeEdition	= $row[6];
-			$this->pagesTimes		= $row[7];
-			$this->performer		= $row[8];
-			$this->localControlKey	= $row[9];
-			$this->creationDate		= $row[10];
-			$this->lastModDate		= $row[11];
-			$this->URL				= $row[12];
-			$this->mimeTypeID		= $row[13];
-			$this->homeLibraryID	= $row[14];
-			$this->privateUserID	= $row[15];
-			$this->itemType			= $row[16];
-			$this->volumeTitle		= $row[17];
-			$this->itemIcon			= $row[18];
-			
-			if (!is_null($row[19]))
-				$this->notes[] = new note($row[19]);
-
-			while ($row = $rs->fetchRow()) //get additional notes
-				if (!is_null($row[19]))
-					$this->notes[] = new note($row[19]);
-
+		
+		//pull the info
+		list($this->itemID, $this->title, $this->itemGroup, $this->lastModDate, $this->creationDate, $this->itemType, $this->author, $this->source, $this->volumeEdition, $this->pagesTimes, $this->performer, $this->localControlKey, $this->URL, $this->mimeTypeID, $this->homeLibraryID, $this->privateUserID, $this->volumeTitle, $this->itemIcon) = $rs;
+				
+		//get the notes
+		$this->setupNotes('items', $this->itemID);
+		$this->fetchNotes();
 	}
+	
 
 	/**
 	* @return void
@@ -122,53 +98,22 @@ class reserveItem extends item
 	{
 		global $g_dbConn;
 		
-		if (!is_null($local_control_key) && $local_control_key != '')
-		{
-			switch ($g_dbConn->phptype)
-			{
-				default: //'mysql'
-					$sql = "SELECT i.item_id, i.title, i.item_group, i.author, i.source, i.content_notes, i.volume_edition, i.pages_times, i.performer, i.local_control_key, "
-					.     "i.creation_date, i.last_modified, i.url, i.mimeType, i.home_library, i.private_user_id, i.item_type, i.volume_title, i.item_icon, n.note_id "
-					.  	  "FROM items as i "
-					.	  " LEFT JOIN notes as n ON i.item_id = n.target_id AND n.target_table = 'items' "
-					.     "WHERE i.local_control_key = ?";
-			}
-	
-			$rs = $g_dbConn->query($sql, $local_control_key);
-			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-				
-			while ($row = $rs->fetchRow())
-			{
-				$this->itemID			= $row[0];
-				$this->title			= $row[1];
-				$this->itemGroup		= $row[2];	
-				$this->author			= $row[3];
-				$this->source			= $row[4];
-				$this->contentNotes		= $row[5];
-				$this->volumeEdition	= $row[6];
-				$this->pagesTimes		= $row[7];
-				$this->performer		= $row[8];
-				$this->localControlKey	= $row[9];
-				$this->creationDate		= $row[10];
-				$this->lastModDate		= $row[11];
-				$this->URL				= $row[12];
-				$this->mimeTypeID		= $row[13];
-				$this->homeLibraryID	= $row[14];
-				$this->privateUserID	= $row[15];
-				$this->itemType			= $row[16];
-				$this->volumeTitle		= $row[17];
-				$this->itemIcon			= $row[18];
-				
-				if (!is_null($row[19]))
-					$this->notes[] = new note($row[19]);
-	
-				while ($row = $rs->fetchRow()) //get additional notes
-					if (!is_null($row[19]))
-						$this->notes[] = new note($row[19]);
-			} 
+		if(empty($local_control_key))
+			return;	//no key
+		
+		switch($g_dbConn->phptype) {
+			default:	//mysql
+				$sql = "SELECT item_id FROM items WHERE local_control_key = ?";
 		}
-
-	}	
+		
+		//query to get item ID
+		$rs = $g_dbConn->getOne($sql, array($local_control_key));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		//get item by ID
+		$this->getItemByID($rs);
+	}
+		
 
 	/**
 	* @return void
@@ -179,7 +124,6 @@ class reserveItem extends item
 	{
 		global $g_dbConn;
 
-		$this->author = $author;
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
@@ -202,7 +146,6 @@ class reserveItem extends item
 	{
 		global $g_dbConn;
 
-		$this->source = $source;
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
@@ -225,7 +168,6 @@ class reserveItem extends item
 	{
 		global $g_dbConn;
 
-		$this->source = $volumeTitle;
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
@@ -239,39 +181,16 @@ class reserveItem extends item
 		$this->lastModDate = $d;
 	}
 
-	/**
-	* @return void
-	* @param string $contentNotes
-	* @desc set new contentNotes in database
-	*/
-	function setContentNotes($contentNotes)
-	{
-		global $g_dbConn;
-
-		$this->contentNotes = $contentNotes;
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql = "UPDATE items SET content_notes = ?, last_modified = ? WHERE item_id = !";
-				$d = date("Y-m-d"); //get current date
-		}
-		$rs = $g_dbConn->query($sql, array(stripslashes($contentNotes), $d, $this->itemID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		$this->contentNotes = $contentNotes;
-		$this->lastModDate = $d;
-	}
 
 	/**
 	* @return void
 	* @param string $volumeEdition
 	* @desc set new volumeEdition in database
 	*/
-	function setvolumeEdition($volumeEdition)
+	function setVolumeEdition($volumeEdition)
 	{
 		global $g_dbConn;
 
-		$this->volumeEdition = $volumeEdition;
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
@@ -294,7 +213,6 @@ class reserveItem extends item
 	{
 		global $g_dbConn;
 
-		$this->pagesTimes = $pagesTimes;
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
@@ -317,7 +235,6 @@ class reserveItem extends item
 	{
 		global $g_dbConn;
 
-		$this->performer = $performer;
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
@@ -340,7 +257,6 @@ class reserveItem extends item
 	{
 		global $g_dbConn;
 
-		$this->localControlKey = $localControlKey;
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
@@ -363,7 +279,6 @@ class reserveItem extends item
 	{
 		global $g_dbConn;
 
-		$this->URL = $URL;
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
@@ -385,7 +300,6 @@ class reserveItem extends item
 	function setMimeType($mimeType)
 	{
 		global $g_dbConn;
-
 
 		switch ($g_dbConn->phptype)
 		{
@@ -437,7 +351,6 @@ class reserveItem extends item
 	{
 		global $g_dbConn;
 
-		$this->volumeEdition = $volumeEdition;
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
@@ -445,8 +358,7 @@ class reserveItem extends item
 				$d = date("Y-m-d"); //get current date
 		}
 		
-		$rs = $g_dbConn->query($sql, array($docTypeIcon, $d, $this->itemID));		
-
+		$rs = $g_dbConn->query($sql, array($docTypeIcon, $d, $this->itemID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$this->itemIcon = $docTypeIcon;
@@ -558,7 +470,6 @@ class reserveItem extends item
 	function getAuthor() { return htmlentities(stripslashes($this->author)); }
 	function getSource() { return htmlentities(stripslashes($this->source)); }
 	function getVolumeTitle() { return htmlentities(stripslashes($this->volumeTitle)); }
-	function getContentNotes() { return htmlentities(stripslashes($this->contentNotes)); }
 	function getVolumeEdition() { return htmlentities(stripslashes($this->volumeEdition)); }
 	function getPagesTimes() { return htmlentities(stripslashes($this->pagesTimes)); }
 	function getPerformer() { return htmlentities(stripslashes($this->performer)); }

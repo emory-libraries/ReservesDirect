@@ -17,7 +17,7 @@ switch ($g_authenticationType)
 		
 		$_SESSION['authKey'] = $keys[$ndx];
 		
-		$userName = $args[0];
+        $userName = $args[0];
 		
 		if (trim($userName) == "")
 		{
@@ -31,7 +31,49 @@ switch ($g_authenticationType)
 			$user->createUser($userName, "", "", "", 0);  //we allow any authorized user to enter with default role of student
 		}
 	break;
-	
+
+	case 'LDAP':
+
+        $userName = (isset($_REQUEST['username'])) ? $_REQUEST['username'] : $_SESSION['username'];
+        $pwd      = (isset($_REQUEST['pwd'])) ? ($_REQUEST['pwd']) : $_SESSION['pwd'];
+        // user attributes to seed RD profile with
+	    $attributes = array($ldap["email"], $ldap["canonicalName"], $ldap["lastname"], $ldap["firstname"]);
+        // filter to use when binding to ldap
+	    $filter="(" . $ldap["canonicalName"] . "=" . $userName. ")";
+
+    	// Connect to LDAP 
+	    $connect = ldap_connect($ldap["host"], $ldap["port"])
+	       or die("Couldn't connect to LDAP!");
+
+        // Set ldap protocol version
+    	ldap_set_option($connect, LDAP_OPT_PROTOCOL_VERSION, $ldap["version"])
+            or die("Failed to set LDAP protocol version to" . $ldap["version"]);
+
+        // Bind to LDAP using credentials from login screen
+    	$bind = ldap_bind($connect, $ldap["canonicalName"] . "=" . $userName . "," . $ldap["basedn"],"$pwd")
+    	   or die("Couldn't bind to LDAP!");
+
+        if (trim($userName) == "")  
+        {
+            //invalid user account direct to logout.php to destroy session and return to login
+            header("Location: secure/logout.php");
+            exit;
+        }
+
+        if (!$user->getUserByUserName($userName)) 
+        {
+            // retrieve user ldap attributes for new user profile
+        	$result = ldap_search($connect, $ldap["basedn"], $filter, $attributes);
+        	$info = ldap_get_entries($connect, $result);
+            $user->createUser($userName, $info[0][$ldap["firstname"]][0], $info[0][$ldap["lastname"]][0], $info[0][$ldap["email"]][0], 0);  
+                    //authorized users get student privileges by default
+        }
+
+	    // Close the ldap connection 
+	    ldap_unbind($connect);
+
+    	break;
+
 	case 'StandAlone':
 	default:
 		$userName = (isset($_REQUEST['username'])) ? $_REQUEST['username'] : $_SESSION['username'];
@@ -49,6 +91,7 @@ switch ($g_authenticationType)
 			header("Location: login.php$error");
 			exit;
 		}	
+
 }
 
 
@@ -68,6 +111,11 @@ if (!isset($_SESSION['userClass'])) {
 if (!isset($_SESSION['pageStack'])) {
 	$_SESSION['pageStack'] = array();
 }
+
+if(!isset($_SESSION['userID'])) {
+    $_SESSION['userID'] = $user->userID;
+}
+
 //array_push($_SESSION['pageStack'], $_REQUEST['QUERY_STRING']);
 
 $skins = new skins();

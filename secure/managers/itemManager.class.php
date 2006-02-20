@@ -29,8 +29,8 @@ http://www.reservesdirect.org/
 require_once("secure/common.inc.php");
 require_once("secure/displayers/itemDisplayer.class.php");
 require_once("secure/managers/classManager.class.php");
-require_once("secure/managers/noteManager.class.php");
-require_once("secure/managers/reservesManager.class.php");
+require_once('secure/managers/reservesManager.class.php');
+require_once('secure/classes/note.class.php');
 
 class itemManager
 {
@@ -54,242 +54,135 @@ class itemManager
 		
 		switch ($cmd)
 		{
-			case 'editItem':
-				$itemID = $_REQUEST['itemID'];
-				$item = new reserveItem($itemID);
 			
+			// *
+			// This case depends on editItem and so MUST COME IMMEDIATELY BEFORE `case 'editItem':`			
+			// *			
+			case 'duplicateReserve':	//duplicates reserve AND item
+				if(empty($_REQUEST['reserveID']))
+					break;	//error, no reserveID set
+								
+				//get the source reserve
+				$srcReserve = new reserve($_REQUEST['reserveID']);				
+				//duplicate it
+				$dupReserveID = $srcReserve->duplicateReserve();				
+				
+				//set up some vars
+				
+				$selected_instr = $_REQUEST['selected_instr'];	//remember instructor
+				
+				$_REQUEST = array();	//clear current request
+				
+				$_REQUEST['reserveID'] = $dupReserveID;	//set up new reserveID
+				$_REQUEST['dubReserve'] = true;	//set flag, to let editItem handler know this is a dupe
+				$_REQUEST['selected_instr'] = $selected_instr;	//set instructor
+
+			//use editItem
+			//no break!
+						
+			case 'editItem':
+				//switch b/n editing item or editing reserve+item
+				if(!empty($_REQUEST['reserveID'])) {	//editing item+reserve
+					//get reserve
+					$reserve = new reserve($_REQUEST['reserveID']);
+					//get item
+					$item = new reserveItem($reserve->getItemID());
+					
+					//init a courseInstance to show location				
+					$ci = new courseInstance($reserve->getCourseInstanceID());
+				}
+				elseif(!empty($_REQUEST['itemID'])) {	//editing item only
+					$item = new reserveItem($_REQUEST['itemID']);
+				}
+				else {	//no IDs set, error
+					break;
+				}
+				
+						
 				if (!isset($_REQUEST["Submit"]))		
 				{
 					$page = "manageClasses";
-					$loc  = "home";
+					$loc  = "edit item";
+								
+					$this->displayFunction = 'displayEditItemScreen';
+					$this->argList = array($item, $user, $reserve, $_REQUEST['search'], array('dubReserve'=>$_REQUEST['dubReserve'], 'selected_instr'=>$_REQUEST['selected_instr']));
+				} else {
+					//were we editing a reserve?
+					if($reserve instanceof reserve) {	//set some data;
+						//set status
+						$reserve->setStatus($_REQUEST['reserve_status']);
+						
+						//set dates, if status is ACTIVE
+						if($_REQUEST['reserve_status']=='ACTIVE') {
+							//if not empty, set activation and expiration dates
+							//try to convert dates to proper format
+							if(!empty($_REQUEST['reserve_activation_date'])) {
+								$reserve->setActivationDate(date('Y-m-d', strtotime($_REQUEST['reserve_activation_date'])));
+							}
+							if(!empty($_REQUEST['reserve_expiration_date'])) {
+								$reserve->setExpirationDate(date('Y-m-d', strtotime($_REQUEST['reserve_expiration_date'])));
+							}		
+						}											
+					}
 					
-					if (isset($_REQUEST['deleteNote'])) {
-						$note = new note($_REQUEST['deleteNote']);
-						if ($note->getID()) {
-							$note->destroy();
+					//if editing electronic item, manage files
+					if(isset($_REQUEST['documentType'])) {						
+						if($_REQUEST['documentType'] == 'DOCUMENT') {	//uploaded file?
+							$file = common_storeUploaded($_FILES['userFile'], $item->getItemID());
+							$item->setURL($g_documentURL.$file['name']);
+							$item->setMimeTypeByFileExt($file['ext']);
+						}
+						elseif($_REQUEST['documentType'] == 'URL') {	//link?
+							$item->setURL($_REQUEST['url']);
+						}
+						//else maintaining the same link; do nothing
+					}
+					
+					//set item data
+					$item->setTitle($_REQUEST['title']);
+					$item->setAuthor($_REQUEST['author']);
+					$item->setPerformer($_REQUEST['performer']);
+					$item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
+					$item->setVolumeTitle($_REQUEST['volumeTitle']);
+					$item->setVolumeEdition($_REQUEST['volumeEdition']);
+					$item->setPagesTimes($_REQUEST['pagesTimes']);
+					$item->setSource($_REQUEST['source']);					
+					//physical item data
+					if($item->isPhysicalItem()) {
+						$item->setHomeLibraryID($_REQUEST['home_library']);
+						
+						//physical copy data
+						if($item->getPhysicalCopy()) {	//returns false if not a physical copy
+							//only set these if they were part of the form
+							if(isset($_REQUEST['barcode'])) $item->physicalCopy->setBarcode($_REQUEST['barcode']);
+							if(isset($_REQUEST['call_num'])) $item->physicalCopy->setCallNumber($_REQUEST['call_num']);
 						}
 					}
 					
-					//populate personal owners
-					if( !empty($_REQUEST['owner_qryTerm']) )	//user is searching for an owner
-					{
-						$users = new users();
-						$users->search($_REQUEST['select_owner_by'], $_REQUEST['owner_qryTerm'], 'student'); //any registered user could own an item
-						$owner_list = $users->userList;
-					} else $owner_list = null;
-								
-					$this->displayFunction = 'displayEditItemScreen';
-					$this->argList = array($item, $user, $owner_list, $_REQUEST['search']);
-				} else {
-					if ($_REQUEST['title']) $item->setTitle($_REQUEST['title']);
-					if ($_REQUEST['author']) $item->setAuthor($_REQUEST['author']); else $item->setAuthor("");					
-					if ($_REQUEST['performer']) $item->setPerformer($_REQUEST['performer']); else $item->setPerformer("");
-					if ($_REQUEST['volumeTitle']) $item->setVolumeTitle($_REQUEST['volumeTitle']); else $item->setVolumeTitle("");
-					if ($_REQUEST['volumeEdition']) $item->setVolumeEdition($_REQUEST['volumeEdition']); else $item->setVolumeEdition("");
-					if ($_REQUEST['pagesTimes']) $item->setPagesTimes($_REQUEST['pagesTimes']); else $item->setPagesTimes("");
-					if ($_REQUEST['source']) $item->setSource($_REQUEST['source']); else $item->setSource("");
-					if ($_REQUEST['contentNotes']) $item->setContentNotes($_REQUEST['contentNotes']); else $item->setContentNotes("");
-					
 					//personal copies
-					if( $_REQUEST['personal_item'] == 'no' ) {	//do not want a private owner
+					if($_REQUEST['personal_item'] == 'no') {	//do not want a private owner
 						$item->setPrivateUserID('null');
 					}
-					elseif( $_REQUEST['personal_item'] == 'yes' ) {	//we want a private owner
+					elseif($_REQUEST['personal_item'] == 'yes') {	//we want a private owner
 						//if we are choosing a new private owner, set it
-						if( !empty($_REQUEST['selected_owner']) ) {
+						if( ($_REQUEST['personal_item_owner']=='new') && !empty($_REQUEST['selected_owner']) ) {
 							$item->setprivateUserID($_REQUEST['selected_owner']);
 						}
 						//else we are keeping old private owner, so no change necessary
 					}
 					
-//this is not set by the form, should it be?
-//					$item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
-					
-					// Check to see if this was a valid file they submitted
-					if ($_REQUEST['documentType'] == 'DOCUMENT')
-					{
-						$file = common_storeUploaded($_FILES['userFile'], $item->getItemID());
-						$item->setURL($g_documentURL.$file['name']);
-						$item->setMimeTypeByFileExt($file['ext']);
-					} else {
-						if ($_REQUEST['url']) $item->setURL($_REQUEST['url']);
-					}			
-					
-					if ($_REQUEST['itemNotes']) {
-						$itemNotes = array_keys($_REQUEST['itemNotes']);
-						foreach ($itemNotes as $itemNote)
-						{
-								$note = new note($itemNote);
-								$note->setText($_REQUEST['itemNotes'][$itemNote]);
-						}
-					}
-					
-					// display success
-					$this->displayFunction = 'displayItemSuccessScreen';
-					$this->argList = array(urlencode($_POST['search']), $user);
-					break;
-				}			
-			break;
-			
-			case 'duplicateReserve':	//utilize editReserve as much as possible
-				//initialize source reserve
-				$reserve = new reserve($_REQUEST['reserveID']);
-				$reserve->getItem();
-				//get course instance from reserve
-				$ci = new courseInstance($reserve->getCourseInstanceID());
-
-				//create new item and reserve
-				$new_item = new item();
-				$new_item->createNewItem();
-				$new_reserve = new reserve();
-				$new_reserve->createNewReserve($ci->getCourseInstanceID(), $new_item->getItemID());
-				//init the reserveItem
-				$new_reserve->getItem();
-
-				//duplicate reserve notes
-				foreach($reserve->getNotes() as $note) {
-					$new_note = new note();
-					$new_note->setTarget($new_reserve->getReserveID(), 'reserves');
-					$new_note->setType($note->getType());
-					$new_note->setText($note->getText());
-					unset($new_note);
-				}
-				
-				//duplicate item notes
-				foreach($reserve->item->getNotes() as $note) {
-					$new_note = new note();
-					$new_note->setTarget($new_item->getItemID(), 'items');
-					$new_note->setType($note->getType());
-					$new_note->setText($note->getText());
-					unset($new_note);
-				}
-
-				//check to see if we are duplicating a physical copy record too
-				if($reserve->item->getPhysicalCopy()) {		//returns true if record exists, false if not
-					//create new physical copy
-					$physCopy = new physicalCopy();
-					$physCopy->createPhysicalCopy();
-					
-					//populate fields
-					$physCopy->setItemID($new_item->getItemID());
-					$physCopy->setReserveID($new_reserve->getReserveID());					
-					$physCopy->setStatus($reserve->item->physicalCopy->getStatus());
-					$physCopy->setItemType($reserve->item->physicalCopy->getItemType());
-
-					if (!is_null($reserve->item->getPrivateUserID()))
-						$physCopy->setOwnerUserID($reserve->item->getPrivateUserID());
-
-					$reserveDesk = new library($reserve->item->getHomeLibraryID());
-					$physCopy->setOwningLibrary($reserveDesk->getReserveDesk());							
-				}
-				
-				//set data
-				$new_item->setTitle($reserve->item->getTitle().' (Duplicate)');	//set title manually, in case they never submit the form
-				$new_reserve->item->setLocalControlKey($reserve->item->getLocalControlKey());	//local control key
-				$new_reserve->item->setHomeLibraryID($reserve->item->getHomeLibraryID());	//home library
-				if(!is_null($reserve->item->getPrivateUserID()))
-					$new_reserve->item->setPrivateUserID($reserve->item->getPrivateUserID());		//private user
-				$new_item->setGroup($reserve->item->getItemGroup());	//item group
-				$new_reserve->setExpirationDate($reserve->getExpirationDate());	//expiration date
-
-				//set status to inactive until they submit the form
-				$new_reserve->setStatus('INACTIVE');
-				
-				//refresh item and reserve (for the notes)
-				$new_reserve->getReserveByID($new_reserve->getReserveID());
-				$new_reserve->getItem();
-
-				//process the rest of data by case 'editReserve'
-			//no break!
-			case 'editReserve':
-				if (!isset($_REQUEST["Submit"]))
-				{
-					$page = "manageClasses";
-					$loc  = "home";
-
-					if (isset($_REQUEST['deleteNote'])) {
-						$note = new note($_REQUEST['deleteNote']);
-						if ($note->getID()) {
-							$note->destroy();
-						}
-					}
-
-					$reserve = new reserve($_REQUEST['reserveID']);
-					$reserve->getItem();
-
-					//refresh new_reserve if duplicating
-					if(!empty($_REQUEST['new_rID'])) {
-						$new_reserve = new reserve($_REQUEST['new_rID']);
-						$new_reserve->getItem();
-					}
-					
-					$docTypeIcons = $user->getAllDocTypeIcons();
-					
-					$this->displayFunction = 'displayEditReserveScreen';
-					$this->argList = array($reserve, $user, $docTypeIcons, $new_reserve);
-				} else {
-					if ($_REQUEST['rID']) {
-						//if duplicating, set data for new reserve/item
-						if(!empty($_REQUEST['new_rID'])) {
-							$reserve = new reserve($_REQUEST['new_rID']);
-							$reserve->getItem();
-
-							//since this item was marked as INACTIVE by duplicateItem, need to mark it ACTIVE now (default)
-							$reserve->setStatus('ACTIVE');
-						}
-						else {	//set data for original reserve
-							$reserve = new reserve($_REQUEST['rID']);
-							$reserve->getItem();
-						}
-
-						if ($_REQUEST['deactivateReserve']) $reserve->setStatus('INACTIVE');
-						if ($_REQUEST['activateReserve']) $reserve->setStatus('ACTIVE');
-						if ($_REQUEST['month'] || $_REQUEST['day'] || $_REQUEST['year']) $reserve->setActivationDate($_REQUEST['year'] . '-' . $_REQUEST['month'] . '-' . $_REQUEST['day']);
-						if ($_REQUEST['title']) $reserve->item->setTitle($_REQUEST['title']);
-						if ($_REQUEST['author']) $reserve->item->setAuthor($_REQUEST['author']); else $reserve->item->setAuthor("");
-						if ($_REQUEST['url']) $reserve->item->setURL($_REQUEST['url']); else $reserve->item->setURL("");
-						if ($_REQUEST['performer']) $reserve->item->setPerformer($_REQUEST['performer']); else $reserve->item->setPerformer("");
-						if ($_REQUEST['volumeTitle']) $reserve->item->setVolumeTitle($_REQUEST['volumeTitle']); else $reserve->item->setVolumeTitle("");
-						if ($_REQUEST['volumeEdition']) $reserve->item->setVolumeEdition($_REQUEST['volumeEdition']); else $reserve->item->setVolumeEdition("");
-						if ($_REQUEST['pagesTimes']) $reserve->item->setPagesTimes($_REQUEST['pagesTimes']); else $reserve->item->setPagesTimes("");
-						if ($_REQUEST['source']) $reserve->item->setSource($_REQUEST['source']); else $reserve->item->setSource("");
-						if ($_REQUEST['contentNotes']) $reserve->item->setContentNotes($_REQUEST['contentNotes']); else $reserve->item->setContentNotes("");
-						
-						$reserve->item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
-
-						//physical items
-						if($reserve->item->getPhysicalCopy()) {		//returns true if record exists, false if not
-							if($_REQUEST['barcode'])
-								$reserve->item->physicalCopy->setBarcode($_REQUEST['barcode']);
-							if($_REQUEST['call_num'])
-								$reserve->item->physicalCopy->setCallNumber($_REQUEST['call_num']);
-						}
-						
-						if ($_REQUEST['itemNotes']) {
-							$itemNotes = array_keys($_REQUEST['itemNotes']);
-							foreach ($itemNotes as $itemNote)
-							{
-									$note = new note($itemNote);
-									$note->setText($_REQUEST['itemNotes'][$itemNote]);
-							}
-						}
-
-						if ($_REQUEST['instructorNotes']) {
-							$instructorNotes = array_keys($_REQUEST['instructorNotes']);
-							foreach ($instructorNotes as $instructorNote)
-							{
-									$note = new note($instructorNote);
-									$note->setText($_REQUEST['instructorNotes'][$instructorNote]);
+					//notes
+					if(!empty($_REQUEST['notes'])) {
+						foreach($_REQUEST['notes'] as $note_id=>$note_text) {
+							if(!empty($note_id)) {
+								$note = new note($note_id);
+								$note->setText($note_text);
 							}
 						}
 					}
-
+					
 					//if duplicating, show a different success screen
-					if(!empty($_REQUEST['new_rID'])) {
-						//reserve needs to be in an array
-						$reserves = array();
-						$reserves[] =& $reserve;
-
+					if($_REQUEST['dubReserve']) {
 						//get course instance
 						$ci = new courseInstance($reserve->getCourseInstanceID());
 						$ci->getPrimaryCourse();
@@ -299,102 +192,131 @@ class itemManager
 						$loc = 'add an item';
 						$this->displayClass = 'requestDisplayer';
 						$this->displayFunction = 'addSuccessful';
-						$this->argList = array($user, $reserves, $ci, $_REQUEST['selected_instr'], true);
+						//reserve needs to be in an array
+						$this->argList = array($user, array($reserve), $ci, $_REQUEST['selected_instr'], true);
 					}
-					else {	// goto edit class
-						classManager::classManager("editClass", $user, $adminUser=null, $_REQUEST);
+					else {
+						//get courseinstance id, if editing reserve
+						$ci_id = ($reserve instanceof reserve) ? $reserve->getCourseInstanceID() : null;
+						
+						// display success
+						$this->displayFunction = 'displayItemSuccessScreen';
+						$this->argList = array($ci_id, urlencode($_REQUEST['search']));
 					}
-
-					break;
-				}
+				}			
 			break;
 			
+			case 'editReserve':
+				if(empty($_REQUEST['reserveID']))
+					break;	//error, no reserveID set
+					
+				//init object
+				$reserve = new reserve($_REQUEST['reserveID']);	//init reserve obj and data
+				$reserve->getItem();	//fetch item object & data
+			
+				//init a courseInstance to show location				
+				$ci = new courseInstance($reserve->getCourseInstanceID());
+				
+				if(isset($_REQUEST['Submit'])) {	//submitting form, handle data
+					//set status
+					$reserve->setStatus($_REQUEST['reserve_status']);
+					
+					//set dates, if status is ACTIVE
+					if($_REQUEST['reserve_status']=='ACTIVE') {
+						//if not empty, set activation and expiration dates
+						//try to convert dates to proper format
+						if(!empty($_REQUEST['reserve_activation_date']))
+							$reserve->setActivationDate(date('Y-m-d', strtotime($_REQUEST['reserve_activation_date'])));
+						if(!empty($_REQUEST['reserve_expiration_date']))
+							$reserve->setExpirationDate(date('Y-m-d', strtotime($_REQUEST['reserve_expiration_date'])));		
+					}
+				
+					//set item data
+					$reserve->item->setURL($_REQUEST['url']);
+					$reserve->item->setTitle($_REQUEST['title']);
+					$reserve->item->setAuthor($_REQUEST['author']);
+					$reserve->item->setPerformer($_REQUEST['performer']);
+					$reserve->item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
+					$reserve->item->setVolumeTitle($_REQUEST['volumeTitle']);
+					$reserve->item->setVolumeEdition($_REQUEST['volumeEdition']);
+					$reserve->item->setPagesTimes($_REQUEST['pagesTimes']);
+					$reserve->item->setSource($_REQUEST['source']);
+					
+					//notes
+					if(!empty($_REQUEST['notes'])) {
+						foreach($_REQUEST['notes'] as $note_id=>$note_text) {
+							if(!empty($note_id)) {
+								$note = new note($note_id);
+								$note->setText($note_text);
+							}
+						}
+					}
+					
+					// display success
+					$this->displayFunction = 'displayItemSuccessScreen';
+					$this->argList = array($reserve->getCourseInstanceID());
+				}
+				else {	//display form					
+					$page = "manageClasses";
+					$loc  = "edit reserve";
+
+					$this->displayFunction = 'displayEditReserveScreen';
+					$this->argList = array($reserve, $user);
+				}
+			
+			break;
+
 			case 'editHeading':
 				$page = "myReserves";
 				$loc = "edit heading";
 				
-				if (isset($_REQUEST['deleteNote'])) {
-						$note = new note($_REQUEST['deleteNote']);
-						if ($note->getID()) {
-							$note->destroy();
-						}
-					}
-				
-				$ci = $_REQUEST['ci'];
-				if (isset($_REQUEST['headingID']) && $_REQUEST['headingID']!="" && $_REQUEST['headingID']!=null)
-					$headingID = $_REQUEST['headingID'];
-				else 
-					$headingID = null;
-					
+				$headingID = !empty($_REQUEST['headingID']) ? $_REQUEST['headingID'] : null;
 				$heading = new reserve($headingID);
 				
 				$this->displayFunction = 'displayEditHeadingScreen';
-				$this->argList = array($ci, $heading);
+				$this->argList = array($_REQUEST['ci'], $heading);
 			break;
 			
 			case 'processHeading':
 				$page = "myReserves";
 				$loc = "edit heading";
-				
-				
+
 				$ci = new courseInstance($_REQUEST['ci']);
-				$nextAction = $_REQUEST['nextAction'];
 				$headingText = $_REQUEST['heading'];
 				$headingID = $_REQUEST['headingID'];
 				
-				if ($headingID="" || $headingID==null) {
+				if(empty($headingID)) {	//need to create a new item
 					if ($headingText) {
-						$heading = new item($headingID);
+						$heading = new item();				
 						$heading->createNewItem();
 						$heading->makeHeading();
 						$reserve = new reserve();
-						$reserve->createNewReserve($ci->courseInstanceID, $heading->itemID);
+						$reserve->createNewReserve($ci->getCourseInstanceID(), $heading->itemID);
 						$reserve->setStatus('ACTIVE');
 						$reserve->setActivationDate($ci->activationDate);
 						$reserve->setExpirationDate($ci->expirationDate);
+						$reserve->insertIntoSortOrder($ci->getCourseInstanceID(), $headingText, 'zzzzz');	//zzzz will put the heading last if author-sorted
 					}
-				} else {
-					$heading = new item($_REQUEST['headingID']);
+				}
+				else {
+					$heading = new item($headingID);
 				}
 				
 				if ($headingText)
 					$heading->setTitle($headingText);
-
-				if ($_REQUEST['itemNotes']) {
-					$itemNotes = array_keys($_REQUEST['itemNotes']);
-					foreach ($itemNotes as $itemNote)
-					{
-						$note = new note($itemNote);
-						$note->setText($_REQUEST['itemNotes'][$itemNote]);
-					}
-				}
-
-				if ($_REQUEST['instructorNotes']) {
-					$instructorNotes = array_keys($_REQUEST['instructorNotes']);
-					foreach ($instructorNotes as $instructorNote)
-					{
-						$note = new note($instructorNote);
-						$note->setText($_REQUEST['instructorNotes'][$instructorNote]);
+					
+				//notes
+				if(!empty($_REQUEST['notes'])) {
+					foreach($_REQUEST['notes'] as $note_id=>$note_text) {
+						if(!empty($note_id)) {
+							$note = new note($note_id);
+							$note->setText($note_text);
+						}
 					}
 				}
 				
-				switch ($nextAction)
-				{
-					case 'editClass':
-						classManager::classManager("editClass", $user, $adminUser=null, $_REQUEST);
-					break;
-					
-					case 'editHeading':
-						$this->displayFunction = 'displayEditHeadingScreen';
-						$heading = new reserve();
-						$this->argList = array($ci->courseInstanceID, $heading);
-					break;
-					
-					case 'customSort':
-						reservesManager::reservesManager("customSort", $user);
-					break;
-				}
-
+				$this->displayFunction = 'displayHeadingSuccessScreen';
+				$this->argList = array($_REQUEST['ci']);
 			break;
 		}	
 	}

@@ -57,6 +57,18 @@ http://www.reservesdirect.org/
 	    'debug'     => (string)$configure->database->debug
 	);
 
+    $ldap = array(
+        'host'      => (string)$configure->ldap->ldapHost,
+        'domain'    => (string)$configure->ldap->ldapDomain,
+        'port'      => (string)$configure->ldap->ldapPort,
+        'version'   => (string)$configure->ldap->ldapVersion,
+        'basedn'    => (string)$configure->ldap->baseDistinguishedName,
+        'canonicalName'    => (string)$configure->ldap->userAttributes->canonicalName,
+        'firstname' => (string)$configure->ldap->userAttributes->firstName,
+        'lastname'  => (string)$configure->ldap->userAttributes->lastName,
+        'email'     => (string)$configure->ldap->userAttributes->email,
+    );
+
 	//open connection
 	$g_dbConn = DB::connect($dsn, $options);
 	if (DB::isError($g_dbConn)) { trigger_error($g_dbConn->getMessage(), E_USER_ERROR); }
@@ -80,6 +92,9 @@ http://www.reservesdirect.org/
 	$g_docCover				= (string)$configure->documentCover;
 
 	$g_siteURL				= (string)$configure->siteURL;
+    $g_serverName           = (string)$configure->serverName;
+    
+    $g_copyrightNoticeURL	= (string)$configure->copyrightNoticeURL;
 
 	$g_newUserEmail['subject']  = (string)$configure->newUserEmail->subject;
 	$g_newUserEmail['msg']  = (string)$configure->newUserEmail->msg;	

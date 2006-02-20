@@ -6,7 +6,7 @@ Default implementation for General Libraries
 Emory University
 Atlanta, GA 30322
 
-Last Modified 7/19/2005
+Last Modified 11/26/2005
 */
 
 /*
@@ -62,106 +62,7 @@ a:hover {
 }
 
 
-/*
-**************************************************
-HEADER DEFINITIONS 
-**************************************************
-*/
 
-/* 'brand' classes are for branding logos. UpperLeft would
-generally be for the institution logo, UpperRight for the
-program logo (default is 'ReservesDirect' logo). */
-.brandUpperLeft {
-/*	position: absolute;
-	top: 1px;
-	left: 1px;
-	width: 250px;
-*/
-	background-image: url('../images/logo-el-blue2.jpg');
-	background-repeat: no-repeat;
-	background-position: 0px 0px;
-	padding-bottom:100px;
-}
-.brandUpperRight {
-/*	position: absolute;
-	top: 1px;
-	right: 1px;
-	width: 250px; 
-*/
-	background-image: url('../images/logo-rd-gold-book.jpg');
-	background-repeat: no-repeat;
-	background-position: right top;
-	padding-bottom:100px;
-}
-
-/* mainNav defines the navigational tabs.
-Tabs are created using the 'Sliding Doors' CSS tabs technique
-by Douglas Bowman at http://www.alistapart.com/articles/slidingdoors/
-This technique can be used to create many different types of tabs;
-the commented guidelines below are for creating standard tabs. */
-#mainNav {
-    float:left;
-    width:100%;
-    background:#7C89CA url('../images/navtab-default-bg.gif') 
-      repeat-x bottom; /* creates the background behind the tabs--should be only 2-3 pixels wide.
-	  						background color should be same as top color of bg image. */
-	font:x-small/1.5em Arial, Helvetica, sans-serif;
-	font-size:x-small;
-    } 
-	
-#mainNav ul {
-    margin:0;
-    padding:0;
-	padding:12px 10px 0; /* padding to top|right and left|bottom of ul, creates space around whole nav bar */
-    list-style:none;
-    }
-#mainNav li {
-    float:left;
-	background:url('../images/navtab-default-left-up.gif')
-      no-repeat left top; /* left-hand tab image for inactive tabs */
-    margin:0;
-    padding:0 0 0 10px; /* top|right|bottom|left padding. left padding=px width of left image */
-    }
-#mainNav a {
-	float:left;
-	display:block;
-	background:url('../images/navtab-default-right-up.gif')
-      no-repeat right top;  /* right-hand tab image for inactive tabs */
-	padding:5px 15px 4px 5px; /* left padding=right padding - pixel width of left image
-								bottom padding=desired overall bottom padding-pixel 
-								width of bottom border, if any */
-	font-weight: bold;
-	font-size:12px;
-	color: #FFFFFF;
-	text-decoration: none;
-    }
-	/* Commented Backslash Hack
-     hides rule from IE5-Mac \*/
-  #mainNav a {float:none;}
-  /* End IE5-Mac hack */ 
-#mainNav a:hover {
-      color:#FFFF66;
-	  }	
-#mainNav #current {
-	background-image:url('../images/navtab-default-left-down.gif'); /* left-hand tab image for active tabs */
-    }
-#mainNav #current a {
-	background-image:url('../images/navtab-default-right-down.gif'); /* right-hand tab image for active tabs */
-	padding-bottom:5px; /* bottom padding=top padding of mainNav a */
-	color: #333399;
-    }
-	
-.divider {
-	background-image: url(../images/div-bg-yellow.gif);
-	background-repeat: repeat;
-	border-top-width: 1px;
-	border-bottom-width: 1px;
-	border-top-style: solid;
-	border-bottom-style: solid;
-	border-top-color: #000066;
-	border-bottom-color: #000066;
-	height: 0px;
-}
 
 
 /*
@@ -375,108 +276,372 @@ a.titlelink:hover {
 
 /*
 ************************************************* 
-PAGE REGION DEFINITIONS 
+POSTITIONAL LAYOUT STYLES and PAGE REGION DEFINITIONS 
+
+NOTE: Changing certain properties of these styles 
+(such as margin, float, width, height, and padding) can significantly alter the
+appearance of the ReservesDirect interface.
 ************************************************* 
 */
 
-/* 'functionlinks' describe the links to site-wide functions like help, sign off, and edit profile
-that appear on every screen. In ReservesDirect 2.x, these links appear at the top right
-under the ReservesDirect logo.  */
-#functionlinks {
-	
-	font-size: x-small;
-	font-weight: normal;
- 	color: #993333;
-	padding-bottom:5px;
-	padding-right:10px;
+#container { /* a wrapper for the entire page layout */
+	margin: 0px;
+	width: 100%;
 }
-#functionlinks a:link {
-	color: #993333;
-}
-#functionlinks a:visited {
-	color: #993333;
+#Header { /* a wrapper containing the branding image divs */
+	margin: 0px;
+	padding: 0px;
+	height: 100px;
 }
 
+/* 'brand' classes are for branding logos. UpperLeft would
+generally be for the institution logo, UpperRight for the
+program logo (default is 'ReservesDirect' logo). */
+
+#Header .brandUpperLeft {
+	margin: 0px;
+	float: left;
+	padding: 0px;
+	height: 70px;
+	width: 40%;
+	background-image: url('../images/logo-el-blue.jpg');
+	background-repeat: no-repeat;
+	background-position: 10px 0 left top;
+}
+#Header .brandUpperRight {
+	margin: 0px;
+	display: block;
+	text-align: right;
+	vertical-align: top;
+	float: right;
+	clear: none;
+	height: 100px;
+	width: 50%;
+	background-image: url('../images/logo-rd-gold-book.jpg');
+	background-repeat: no-repeat;
+	background-position: right top;
+}
+#Navigation { /* a wrapper containing 'resourceLinks', 'functionLinks', 'mainNav' and 'subNav' */
+	margin: 0px;
+	padding: 0px;
+}
+
+.functionLinks { /* 'functionlinks' describe the links to site-wide functions like help, sign off, and edit profile
+that appear on every screen.   */
+	margin: 8px 10px 0px 0px;
+	text-align: right;
+	padding-bottom: 8px;
+	font-size: x-small;
+	font-weight: normal;
+	color: #993333;
+	height: 10px;
+	float: right;
+}
+.functionLinks a:link {
+	color: #993333;
+}
+.functionlinks a:hover {
+	color: #993333;
+	text-decoration: underline;
+}
+.functionLinks a:visited {
+	color: #993333;
+}
+.resourceLinks { /* can be used for links to other library sites or resources 
+such as eJournals or Blackboard. Empty in the default implementation of RD 2.x. */
+	font-weight: bold;
+	color: #666666;
+	float: left;
+	margin-left: 10px;
+}
+/* mainNav defines the navigational tabs.
+Tabs are created using the 'Sliding Doors' CSS tabs technique
+by Douglas Bowman at http://www.alistapart.com/articles/slidingdoors/
+This technique can be used to create many different types of tabs;
+the commented guidelines below are for creating standard tabs. */
+#mainNav {
+    float:left;
+    width:100%;
+    background:#7C89CA url('../images/navtab-default-bg.gif') 
+      repeat-x bottom; /* creates the background behind the tabs--should be only 2-3 pixels wide.
+	  						background color should be same as top color of bg image. */
+	font:x-small/1.5em Arial, Helvetica, sans-serif;
+	font-size:x-small;
+    } 
+	
+#mainNav ul {
+    margin:0;
+    padding:0;
+	padding:12px 10px 0; /* padding to top|right and left|bottom of ul, creates space around whole nav bar */
+    list-style:none;
+    }
+#mainNav li {
+    float:left;
+	background:url('../images/navtab-default-left-up.gif')
+      no-repeat left top; /* left-hand tab image for inactive tabs */
+    margin:0;
+    padding:0 0 0 10px; /* top|right|bottom|left padding. left padding=px width of left image */
+    }
+#mainNav a {
+	float:left;
+	display:block;
+	background:url('../images/navtab-default-right-up.gif')
+      no-repeat right top;  /* right-hand tab image for inactive tabs */
+	padding:5px 15px 4px 5px; /* left padding=right padding - pixel width of left image
+								bottom padding=desired overall bottom padding-pixel 
+								width of bottom border, if any */
+	font-weight: bold;
+	font-size:12px;
+	color: #FFFFFF;
+	text-decoration: none;
+    }
+	/* Commented Backslash Hack
+     hides rule from IE5-Mac \*/
+  #mainNav a {float:none;}
+  /* End IE5-Mac hack */ 
+#mainNav a:hover {
+      color:#FFFF66;
+	  }	
+#mainNav #current {
+	background-image:url('../images/navtab-default-left-down.gif'); /* left-hand tab image for active tabs */
+    }
+#mainNav #current a {
+	background-image:url('../images/navtab-default-right-down.gif'); /* right-hand tab image for active tabs */
+	padding-bottom:5px; /* bottom padding=top padding of mainNav a */
+	color: #333399;
+    }
+#subNav { /* a wrapper for 'navItems' and 'user'. */
+	margin: 0px 10px;
+	height: 20px;
+	vertical-align: bottom;
+	display: block;
+}
+.navItems { /* empty in default implementation of RD 2.x */
+	margin: 0;
+	padding: 0;
+	float: left;
+}
+.user {
+	font-size: small;
+	font-weight: bold;
+	color: #333333;
+	margin-top: 3px;
+	margin-bottom: 3px;
+	float: right;
+}
+#divider { /* seperates navigation from content area */
+	background-image: url('../images/div-bg-yellow.gif');
+	background-repeat: repeat;
+	border-top-width: 1px;
+	border-bottom-width: 1px;
+	border-top-style: solid;
+	border-bottom-style: solid;
+	border-top-color: #000066;
+	border-bottom-color: #000066;
+	height: 10px;
+	margin: 0px;
+	padding: 0px;
+	clear: both;
+}
+#Location { /* a wrapper for 'locationIndicatorText' and 'currentClass' */
+	margin: 0px;
+	padding: 3px 0px 8px;
+	height: 16px;
+}
+.locationIndicatorText {
+	font-size: 14px;
+	font-weight: bold;
+	text-transform: lowercase;
+	color: #333333;
+	text-decoration: none;
+	float: left;
+	padding-left: 10px;
+}
+.currentClass {
+	font-weight: bold;
+	color: #333399;
+	padding-right:10px;
+	float: right;
+}
+.clear {
+	clear: both;
+	padding: 0;
+	margin: 0;
+	display: block;
+}
+#noJavaAlert {
+	margin:0px 50px;
+	text-align:center;
+	padding:3px;
+}
+#alertMsg {
+	margin:0px 50px;
+	text-align:center;
+	padding:3px;
+}
+#Content { /* wraps the content display area */
+	margin: 0px 50px;
+	min-height:200px;
+	clear: both;	
+}
+/* IE hack to get the width right \*/
+* html #Content {
+	width: 100%; 
+}
+/* end IE hack */
+
+/* oddRow/evenRow define how alternating row colors appear in tables */
+.oddRow {
+    padding-top:1px; /* this fixes a display error in IE for the default implementation. Change at your own risk. */
+	background-color: #CCCCCC;
+	border-left:1px solid #333333; 
+	border-right:1px solid #333333;
+}
+.evenRow {
+    padding-top:1px; /* this fixes a display error in IE for the default implementation. Change at your own risk. */
+	background-color: #FFFFFF;
+	border-left:1px solid #333333; 
+	border-right:1px solid #333333;
+}
+.headingCell1 {
+	font-weight: bold;
+	color: #FFFFFF;
+	background-color: #333333;
+	text-align: center;
+	padding:5px;
+	
+}
+.headingCell2 {
+
+	background-color: #CCCCFF;
+	text-align: left;
+	padding: 0;
+	border: 1px solid #333333;
+	
+}
+.headingCell2 .headingText{
+	font-size: large;
+	font-weight: bold;
+	color: #333333;
+	padding: 3px 0 5px 5px;
+
+	
+}
+.reserveItem {
+	margin:0px; 
+	padding:0px; 
+	border-left:1px solid #999999; 
+	border-right:1px solid #999999;
+}
+.editOptions { /* the editing box thate appears next to reserve items on the edit class screen */
+	float:right; 
+	margin:0 0 0 5px; 
+	width:245px; 
+	padding:3 0 0 0; 
+	height:25px; 
+	vertical-align:middle;
+}
+.editOptionsTitles {
+	margin:0px;
+	padding-bottom:5px;
+}
+.editOptions .checkBox, .editOptionsTitles .checkBox,  .editOptions .editBox, .editOptionsTitles .editBox,.editOptions .sortBox, .editOptionsTitles .sortBox ,.editOptions .itemNumber, .editOptionsTitles .itemNumber,.editOptions .statusBox, .editOptionsTitles .statusBox {
+	float:right; 	
+	vertical-align:middle;
+	text-align:center;	
+	padding-left:5px;
+	font-size:9pt;
+	
+}
+.editOptions .checkBox, .editOptionsTitles .checkBox {
+	width:40px;
+}
+.editOptions .editBox, .editOptionsTitles .editBox {
+	width:30px;
+}
+.editOptions .sortBox, .editOptionsTitles .sortBox {
+	width:30px;
+}
+.editOptions .itemNumber, .editOptionsTitles .itemNumber {
+	width:30px;
+}
+.editOptions .statusBox, .editOptionsTitles .statusBox {
+	width:85px;
+}
+.iconBlock { /* wrapper for the item type icon appearing next to items */
+	float:left; 
+	width:29px; 
+	padding:3px 0 0 5px;
+}
+.metaBlock { /* wrapper for item metadata on the edit class screen */
+	margin-left:35px; 
+	margin-right:245px; 
+	margin-top:0px;
+	padding:3px 5px 5px 0;
+	border-right:1px solid #999999;
+}
+.metaBlock-wide { /* wrapper for item metadata on screens other than the edit class screen */
+	margin-left:35px; 
+	margin-right:60px; 
+	padding:3px 5px 5px 0;
+}
+.checkBox-right { /* wrapper for the checkboxes that appear on the student class view */
+	float:right; 
+	margin:0px; 
+	width:20px;
+	padding:3px; 
+	padding-left:10px; 
+	padding-right:10px;
+}
 .homenav {
 	
 	font-size: 12px;
 	font-weight: bold;
 	list-style-type: none
 }
-.footer {
-	border-top-style: none;
-	font-family: Arial, Helvetica, sans-serif;
+#Footer { /* a wrapper for the footer content areas */
+	margin: 40px 0px 10px 0px;
+	left: 0px;
+	background-color: #FFFFFF; /* #E9E880; */
+	display: block;
+	border-top: 1px solid #666666;
+/*	border-bottom: 1px solid #666666; */
+	padding: 10px 5px;
 	font-size: xx-small;
 	font-style: italic;
-	font-weight: normal;
-	color: #000000;
-	text-align: center;
 }
-.displayList {
-	
+.footerContentLeft {
+	text-align: left;
+	vertical-align: top;
+	display: block;
+	left: 0;
+	width:250px;
+	float: left;
+}
+.footerContentCenter {
+	text-align: left;
+	vertical-align: top;
+	display: block;
+	margin-right:200px;
+	margin-left:250px;
+	float: none;
+	text-align:center;
+}
+.footerContentRight {
+	text-align: right;
+	vertical-align: top;
+	display: block;
+	width:200px;
+	float: right;
+	right: 0px;
+}
+.displayList {	
 	font-size: small;
 	font-style: normal;
 	color: #333333;
 	text-decoration: none;
 }
-/* oddRow/evenRow define how alternating row colors appear in tables */
-.oddRow {
-	background-color: #CCCCCC;
-}
-.evenRow {
-	background-color: #FFFFFF;
-}
-.headingCell1 {
-	
-	font-weight: bold;
-	color: #FFFFFF;
-	background-color: #333333;
-	text-align: center;
-}
-#headingCell2 {
 
-	background-color: #CCCCFF;
-	text-align: left;
-	padding: 3px;
-	border-top: 1px solid #333333;
-	border-bottom: 1px solid #333333;
-}
-#headingCell2 .headingText{
-	
-	font-size: large;
-	font-weight: bold;
-	color: #333333;
-	
-}
-.headingCell-helpfileActive {
-	
-	font-size: small;
-	font-weight: bold;
-	color: #FFFFFF;
-	background-color: #000066;
-	text-align: center;
-}
-.headingCell-helpfileInactive {
-	
-	font-size: small;
-	font-weight: bold;
-	text-transform: capitalize;
-	color: #333333;
-	background-color: #CCCCCC;
-	text-align: center;
-}
-.subnav {
-	
-	font-size: small;
-	font-weight: normal;
-	color: #666666;
-}
-
-/* printRequest controls how physical item requests appear when printed,
-whether there should be page breaks or no page breaks. */
-#printRequest {
-	page-break-before:always;
-}
 
 /*
 ************************************************* 
@@ -496,15 +661,22 @@ FORMATTING DEFINITIONS
 .border-helpfile {
 	border: 1px solid #000066;
 }
+#printRequest { /* controls how physical item requests appear when printed,
+whether there should be page breaks or no page breaks. */
+	page-break-before:always;
+}
+
+
 
 /*
  ************************************************* 
- TEXT DEFINITIONS 
+ TEXT DISPLAY DEFINITIONS 
  ************************************************* 
 */
 
 /* The following group of tags define how reserve items are listed, along with a.itemTitle 
-itemTitle defines the appearance of item titles for materials that do not have live links 
+(see "Link Definitions" above).
+'itemTitle' defines the appearance of item titles for materials that do not have live links 
 (like physical items) and for reserve item lists that do not show items as hot links (like the sort screen)
 itemMetaPre defines how some prefixes to metadata information appear, for example 'from' x journal or book.*/
 
@@ -514,39 +686,33 @@ itemMetaPre defines how some prefixes to metadata information appear, for exampl
 	color: #000000;
 
 }
-
 .itemAuthor {
 	font-size: x-small;
 	font-style: normal;
 	text-transform: uppercase;
 
 }
-
 .itemMeta {
 	font-size: x-small;
 	font-style: normal;
 	color: #000000;
 
 }
-
 .itemMetaPre {
 	font-size: x-small;
 	font-style: italic;
 
 } 
-
 .noteType {
 	font-size: small;
 	font-weight: bold;
 	color: #660000;
 
 }
-
 .noteText {
 	font-size: small;
 	font-weight: bold;
 	color: #000000;
-
 }
 
 /* Other text definition tags below.... */
@@ -565,31 +731,19 @@ itemMetaPre defines how some prefixes to metadata information appear, for exampl
 		font-weight: bold; 
 		color: #000099
 }
-.locationIndicatorText {  
-	 
-	font-size: 14px; 
-	font-weight: bold; 
-	text-transform: lowercase; 
-	color: #333333; 
-	text-decoration: none
-}
 .courseTitle {
-	
 	font-size: large;
 	font-weight: bold;
 	font-variant: small-caps;
 	color: #000066;
 }
 .courseHeaders {
-	
+
+	padding: 3px 0 3px 0;
+}
+.courseHeaders .label {
 	font-weight: bold;
 	color: #660000;
-}
-.currentClass {
-	
-	font-weight: bold;
-	color: #333399;
-	padding-right:10px;
 }
 .strong {
 	font-weight: bold;
@@ -603,7 +757,6 @@ itemMetaPre defines how some prefixes to metadata information appear, for exampl
 	font-weight: bold;
 	color: #CC0000;
 }
-
 .itemNumber {
 	
 	font-size: small;
@@ -611,17 +764,11 @@ itemMetaPre defines how some prefixes to metadata information appear, for exampl
 	font-variant: small-caps;
 	color: #999999;
 }
-#hiddenItem .itemTitle, #hiddenItem .itemTitleNoLink, #hiddenItem .itemMetaPre, #hiddenItem .itemMeta, #hiddenItem .itemAuthor, #hiddenItem .noteType, #hiddenItem .noteText {    
-		color: #999999
+.hiddenItem a.itemTitle:link, .hiddenItem .itemTitleNoLink, .hiddenItem .itemMetaPre, .hiddenItem .itemMeta, .hiddenItem .itemAuthor, .hiddenItem .noteType, .hiddenItem .noteText {    
+		color: #999999;
 }
 /*hiddenItem defines the appearance of reserve materials 
 that students have chosen to hide from view. */
-.user {
-	font-size: small;
-	font-weight: bold;
-	color: #333333;
-	padding-right: 10px;
-}
 .instructionText {
 	display: block;
 	text-align: left;
@@ -637,35 +784,129 @@ that students have chosen to hide from view. */
 
 /* statusText styles are used on the "Edit Class" page for text that indicates the current status
 of materials on reserve. */
-#statusText .heading {
+.heading {
 	font-weight: bold;
 	color: #000066;
 
 }
 
-#statusText .inProcess {
+.inProcess {
 	color: #666666;
 	font-weight: bold;
 
 }
 
-#statusText .active {
+.active {
 	color: #009900;
 	font-weight: bold;
 
 }
 
-#statusText .inactive {
+.inactive {
 	color: #CC0000;
 	font-weight: bold;
 
+}
+
+/*Auto complete Definitions for search lookup screens*/
+
+#keyword {
+margin: 0 25px 0 0;
+padding:0px;
+width: 300px;
+display: block;
+border:1px solid #99b58d;
+}
+
+
+.LSResult {
+      position: absolute;
+      
+      width: 350px;
+      margin: 1px 0px 2px 0px;
+      padding: 0px;
+      clear:  left;
+      z-index:  100;
+      border:1px solid #666666;
+      color: #783E3F;
+      background-color: #EDD2C9;
+      
+      height:150px;
+      overflow:auto;
+}
+.LSResult ul {
+	list-style-position:inside; 
+     margin-bottom: -5px;
+     margin-top: 0px;
+     padding-top: 0px;
+     margin: 0;
+     padding: 0px;
+}
+.LSResult li {
+    padding: 2px 10px;
+    line-height:normal;
+    margin-bottom: 0px;
+    font-size:12px;
+    font-family: Arial, Helvetica, sans-serif;
+    list-style-type: none;
+}
+/*
+.LSResult ul li {
+    text-indent: -20px;
+    padding: 0px 15px 0 20px;
+    margin-top:0;
+    line-height:1em;
+    list-style-type: none;
+}
+.LSShadow ul {
+      position: relative;
+      right: 1px;
+      margin: 0px;
+      padding: 0px;
+      background-color: #FFFFFF; /*shadow color*/
+      color: inherit;
+}
+*/
+.LSRes {
+      position: relative;
+      bottom: 1px;
+      right: 1px;
+      background-color: white;
+      border:  1px solid #AAA;
+}
+#LSHighlight {
+
+     color: #783E3F;
+     background-color: #DEC4B9;
+}
+.LSRow li {	
+	color:green;
+	cursor:default;
+	font-size:12px;
+	font-weight:normal;
 }
 /*
 ****************************************
 Help Screen Definitions
 ****************************************
 */
-
+.headingCell-helpfileActive {
+	
+	font-size: small;
+	font-weight: bold;
+	color: #FFFFFF;
+	background-color: #000066;
+	text-align: center;
+}
+.headingCell-helpfileInactive {
+	
+	font-size: small;
+	font-weight: bold;
+	text-transform: capitalize;
+	color: #333333;
+	background-color: #CCCCCC;
+	text-align: center;
+}
 #helpTabs {
     float:left;
     width:100%;
@@ -813,3 +1054,5 @@ a.helpsubtopic:active {
 	text-decoration: underline;
 	text-indent: 8px;
 }
+
+

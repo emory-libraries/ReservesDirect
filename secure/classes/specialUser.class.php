@@ -71,7 +71,7 @@ class specialUser extends user
 		$this->response['pwd'] = $pwd;
 
 		$notifyEmailSentTo = null;
-		if ($u->getDefaultRole() < $g_permission['admin'])
+		if ($u->getRole() < $g_permission['admin'])
 		{
 			$this->sendUserEmail($g_specialUserEmail['subject'], $g_specialUserEmail['msg'], $pwd);
 			$notifyEmailSentTo = $this->getEmail();

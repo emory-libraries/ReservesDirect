@@ -30,8 +30,6 @@ http://www.reservesdirect.org/
 *******************************************************************************/
 require_once("secure/common.inc.php");
 require_once("secure/classes/users.class.php");
-require_once("secure/classes/checkDuplicates.class.php");
-require_once("secure/managers/checkDuplicatesManager.class.php");
 require_once("secure/displayers/classDisplayer.class.php");
 
 class classManager
@@ -49,7 +47,7 @@ class classManager
 			call_user_func_array(array($this->displayClass, $this->displayFunction), $this->argList);
 
 	}
-
+	
 
 	function classManager($cmd, $user, $adminUser, $request)
 	{
@@ -64,14 +62,14 @@ class classManager
 			case 'manageClasses':
 				$page = "manageClasses";
 
-				if ($user->getDefaultRole() >= $g_permission['staff'])
+				if ($user->getRole() >= $g_permission['staff'])
 				{
-					$loc  = "home";
+					$loc  = "manage classes home";
 
 					$this->displayFunction = 'displayStaffHome';
 					$this->argList = array($user);
 				} else {
-					$loc  = "home";
+					$loc  = "manage classes home";
 
 					$this->displayFunction = 'displayInstructorHome';
 					$this->argList = "";
@@ -80,192 +78,261 @@ class classManager
 
 			case 'reactivateClass':
 				$page = "manageClasses";
-
-				if ($user->getUserClass() == 'instructor')
-				{
+				
+				if($user->getRole() == $g_permission['instructor']) {
 					$instructors 		= null;
 					$courses 			= null;
 					$courseInstances 	= $user->getAllCourseInstances(true);
 					for($i=0;$i<count($courseInstances);$i++) { $courseInstances[$i]->getPrimaryCourse(); }
-				} else {
-					$usersObject = new users();
-					//$instructors = $usersObject->getUsersByRole('instructor');
-	
-					if (isset($request['selected_instr']))
-					{
-						$i = new instructor();
-						$i->getUserByID($request['selected_instr']);
-						$courses = $i->getAllCourses(true);
-					} else
-						$courses = null;
-
-					if (isset($request['course']))
-					{
-						$courseInstances = $user->getCourseInstancesByCourse($request['course'], $request['selected_instr']);
-						//As an option, this call would return the same as statement above: 
-						//$courseInstances = $i->getMyCourseInstancesByCourseID($request['course']);
-					} else
-						$courseInstances = null;
-				}				
+				}
 				
+				$loc = 'reactivate class';
 				$this->displayFunction = 'displayReactivate';
-				$this->argList = array($courses, $courseInstances, 'reactivateList', $_REQUEST, array('cmd'=>$cmd));
+				$this->argList = array($courses, $courseInstances, 'reactivateConfirm', $_REQUEST, array('cmd'=>$cmd));
 			break;
+			
+			
+			case 'reactivateConfirm':	//show destination course confirmation form
+				$page = "manageClasses";
+				
+				//pull all the necessary info
+				$ci->getPrimaryCourse();
+				$ci->course->getDepartment();
+				$terms = new terms();
+				$dep = new department();
+				
+				$loc = 'reactivate class &gt;&gt; confirm reactivation';
+				$this->displayFunction = 'displayReactivateConfirm';
+				$this->argList = array($ci, $terms->getTerms(), $dep->getAllDepartments(), array('cmd'=>'reactivateList', 'ci'=>$ci->getCourseInstanceID(), 'course'=>$ci->course->getCourseID(), 'state'=>urlencode(serialize($_REQUEST))));			
+			break;	//reactivateConfirm
+			
 
 			case 'reactivateList':
+				//pull the necessary info into objects
 				$ci->getPrimaryCourse();
-				$ci->getCrossListings();
-				$ci->getInstructors();
-				$ci->getReserves();
-
 				$ci->course->getDepartment();
-				$loan_periods = $ci->course->department->getInstructorLoanPeriods();
+				$term = new term($_REQUEST['term']);
 				
-				$instructorList = null;
-				if ($user->getDefaultRole() >= $g_permission['staff'])
-				{
-					$usersObj = new users();
-					$instructorList = $usersObj->getUsersByRole('instructor');
+				//first, determine if they wish to use the existing course as-is, or edit it
+				if($_REQUEST['keep_selection'] == 'yes') {	//keeping old
+					//the section is the only part that could have changed
+					$section = $_REQUEST['section'];
+					//the rest stays the same
+					$dept_id = $ci->course->department->getDepartmentID();
+					$course_number = $ci->course->getCourseNo();
+					$course_name = $ci->course->getName();
 				}
+				elseif($_REQUEST['keep_selection'] == 'no') {	//they chose to reactivate with edited course info
+					$dept_id = $_REQUEST['department'];
+					$course_number = $_REQUEST['course_number'];
+					$course_name = $_REQUEST['course_name'];
+					$section = $_REQUEST['section2'];									
+				}
+		
+				$term = new term($_REQUEST['term']);
+				
+				//then, check to see if resulting class has a duplicate active class
+				//do not truly care about instructor/s, because we are looking for active course matches, no matter who teaches them
+				$dupes = classManager::getDuplicates($dept_id, $course_number, $section, $term->getTermYear(), $term->getTermName());
 
-				$this->displayFunction = 'displaySelectReservesToReactivate';
-				$this->argList = array($ci, $user, $instructorList, array('cmd'=>'reactivate', 'instructor'=>$_REQUEST['selected_instr'], 
-					'course'=>$_REQUEST['course'], 'ci'=>$_REQUEST['ci'], 'term'=>$_REQUEST['term']), $loan_periods);
+				if(!is_null($dupes[0])) {	//found an active dupe
+					//show duplicate course
+					$this->displayFunction = 'displayDuplicateCourses';
+					$this->argList = array($user, $dupes, $_REQUEST['state']);
+				}
+				else {	//no duplicate found, we can go on w/ reactivation
+					//did they want to edit course info?
+					if($_REQUEST['keep_selection'] == 'yes') {	//keeping old course
+						//pass course_id
+						$course_id = $_REQUEST['course'];
+					}
+					else {	//we are editing course
+						//set course_id to null; the rest of the info gets carried
+						$course_id = null;
+					}
+					
+					$ci->getInstructors();
+					$ci->getProxies();					
+					$ci->getCrossListings();	
+					$ci->course->getDepartment();
+					$loan_periods = $ci->course->department->getInstructorLoanPeriods();
+					
+					$instructorList = null;
+					if ($user->getRole() >= $g_permission['staff'])
+					{
+						$usersObj = new users();
+						$instructorList = $usersObj->getUsersByRole('instructor');
+					}
+					
+					//get reserves as a tree + recursive iterator
+					$walker = $ci->getReservesAsTreeWalker('getReserves');
+	
+					$loc = 'reactivate class &gt;&gt; reserves list';
+					$this->displayFunction = 'displaySelectReservesToReactivate';
+					$this->argList = array($ci, $walker, $instructorList, array('cmd'=>'reactivate', 'course'=>$course_id, 'course_number'=>$course_number, 'dept_id'=>$dept_id, 'course_name'=>$course_name, 'section'=>$section, 'ci'=>$_REQUEST['ci'], 'term'=>$_REQUEST['term']), $loan_periods);				}
+
 			break;
 
 			case 'reactivate':
-					$page = "manageClasses";
-					$term = new term($_REQUEST['term']);
-					$srcCI = new courseInstance($_REQUEST['ci']);
-					$srcCI->getPrimaryCourse();
-					$srcCI->getProxies();
-
-					$proxyList = (isset($request['restoreProxies']) && $request['restoreProxies'] == "on") ? $srcCI->proxyIDs : null;
-
-					$instructorList = $_REQUEST['carryInstructor'];
-					if (isset($_REQUEST['additionalInstructor']) && $_REQUEST['additionalInstructor'] != "") array_push($instructorList, $_REQUEST['additionalInstructor']);
-
-					$carryXListing = (isset($_REQUEST['carryCrossListing'])) ? $_REQUEST['carryCrossListing'] : null;
-					$carryReserves = (isset($_REQUEST['carryReserve'])) ? $_REQUEST['carryReserve'] : null;
-
-					$activeStatus = "ACTIVE";
-					
-					
-					//find requested loan periods
-					//for($i=0;$i<count($_REQUEST);$i++)
-					foreach ($_REQUEST as $field => $value)
-					{
-						if (ereg("requestedLoanPeriod_", $field))
-						{
-							list($devnull, $rID) = split("requestedLoanPeriod_", $field);
-							$requested_loan_periods[$rID] =  $value;
-						}
+				$page = "manageClasses";
+				$term = new term($_REQUEST['term']);
+				$srcCI = new courseInstance($_REQUEST['ci']);
+				$srcCI->getPrimaryCourse();
+				$srcCI->getProxies();
+				
+				//handle course reuse/creation
+				
+				$srcCourse = new course();
+				
+				//check to see if reusing old course or creating new
+				if(!empty($_REQUEST['course'])) {	//we found a course id, use it
+					$srcCourse->getCourseByID($_REQUEST['course']);
+				}
+				else {	//course id is null, get one by dept course# and name
+					if(is_null($srcCourse->getCourseByMatch($_REQUEST['dept_id'], $_REQUEST['course_number'], $_REQUEST['course_name']))) {	//did not find a course matching criteria
+						//must make new
+						$srcCourse->createNewCourse($srcCI->getCourseInstanceID());
+						$srcCourse->setCourseNo($_REQUEST['course_number']);
+						$srcCourse->setDepartmentID($_REQUEST['dept_id']);
+						$srcCourse->setName($_REQUEST['course_name']);
 					}
-
-					$newCI = $user->copyCourseInstance($srcCI, $term->getTermName(), $term->getTermYear(), $term->getBeginDate(), $term->getEndDate(), $activeStatus, $srcCI->course->getSection(), $instructorList, $proxyList, $carryXListing, $carryReserves, $requested_loan_periods);
-
-					if ($newCI instanceof courseInstance ) {
-						$this->displayFunction = 'displaySuccess';
-						$this->argList = array($page, $newCI);
-					} else { //duplicateReactivation Error: 
-							 //if $newCI is not a courseInstance, it will be an array of duplicate reactivations... 
-							 //not very pretty or elegant
-						
-						// goto check Duplicates
-						//checkDuplicatesManager::checkDuplicatesManager('checkDuplicateReactivation', $user, $duplicateReactivations);
-						checkDuplicatesManager::checkDuplicatesManager('checkDuplicateReactivation', $user, $newCI);
-					}
+					//else course info is set
+				}
+			
+				$instructorList = $_REQUEST['carryInstructor'];
+				if (isset($_REQUEST['additionalInstructor']) && $_REQUEST['additionalInstructor'] != "") array_push($instructorList, $_REQUEST['additionalInstructor']);
+//				$proxyList = isset($_REQUEST['carryProxy']) ? $_REQUEST['carryProxy'] : null;
+				$carryXListing = (isset($_REQUEST['carryCrossListing'])) ? $_REQUEST['carryCrossListing'] : null;
+				$carryReserves = (isset($_REQUEST['selected_reserves'])) ? $_REQUEST['selected_reserves'] : null;
+				$requested_loan_periods = (isset($_REQUEST['requestedLoanPeriod'])) ? $_REQUEST['requestedLoanPeriod'] : null;
+				
+				$status = "ACTIVE";
+				
+				//set dates
+				$begin_date = !empty($_REQUEST['course_activation_date']) ? date('Y-m-d', strtotime($_REQUEST['course_activation_date'])) : $term->getBeginDate();
+				$end_date = !empty($_REQUEST['course_expiration_date']) ? date('Y-m-d', strtotime($_REQUEST['course_expiration_date'])) : $term->getEndDate();
+				
+				//create new class
+				$newCI = $user->copyCourseInstance($srcCI, $srcCourse->getCourseID(), $_REQUEST['section'], $term->getTermName(), $term->getTermYear(), $begin_date, $end_date, $status, $instructorList, $proxyList, $carryXListing, $carryReserves, $requested_loan_periods);
+				
+				$this->displayFunction = 'displaySuccess';
+				$this->argList = array($page, $newCI);
 			break;		
 			
-			case 'editClass':			
+			case 'editClass':
 				$page = "manageClasses";
-				$loc  = "home";
+				$loc  = "edit class";
 
-				$reserves = (isset($_REQUEST['reserve'])) ? $_REQUEST['reserve'] : null;
+				$ci = new courseInstance($_REQUEST['ci']);
+				$reserves = (isset($_REQUEST['selected_reserves'])) ? $_REQUEST['selected_reserves'] : null;
+				
+				
+				//move items to folder
+				if(!empty($_REQUEST['heading_select']) && !empty($reserves)) {
+					foreach($reserves as $r_id) {
+						$reserve = new reserve($r_id);
+						
+						//setting parent_id to self breaks things
+						if($_REQUEST['heading_select'] == $r_id) {
+							continue;
+						}						
+						//handle 'null' parent
+						$parent = ($_REQUEST['heading_select'] == 'root') ? null : $_REQUEST['heading_select'];
+											
+						$reserve->setParent($parent);
+						
+						//try to insert into sort order
+						$reserve->getItem();
+						$reserve->insertIntoSortOrder($ci->getCourseInstanceID(), $reserve->item->getTitle(), $reserve->item->getAuthor(), $parent);
+					}
+				}
 
-
-				if (isset($_REQUEST['reserveListAction']))
-					switch ($_REQUEST['reserveListAction'])
-					{
-						case 'copyAll':
-							if (is_array($reserves) && !empty($reserves)){
-								$reservesArray = array();
-								foreach($reserves as $r)
-								{
-									$reservesArray[]=$r;
-									
-									$originalClass = $_REQUEST['ci'];
-									unset($request);
-									$request['originalClass']=$originalClass;
-									$request['reservesArray']=$reservesArray;
-									
-									classManager::classManager('copyItems',$user,$adminUser,$request);
-								}
+				//perform other action
+				if(isset($_REQUEST['reserveListAction']) && !empty($reserves)) {
+					//make sure the action is performed on all the children too
+					
+					//get reserves data	as tree
+					$tree = $ci->getReservesAsTree('getReserves');
+					
+					$tmp_res = array();
+					foreach($reserves as $r_id) {
+						//add the reserve
+						if(!isset($tmp_res[$r_id])) {
+							$tmp_res[$r_id] = $r_id;	//index by id to prevent duplicate values
+							$walker = new treeWalker($tree->findDescendant($r_id));	//get the node with that ID
+							foreach($walker as $leaf) {
+								$tmp_res[$leaf->getID()] = $leaf->getID();	//add child to array
 							}
+						}
+					}
+					$reserves = $tmp_res;
+
+					//atcion switch
+					switch($_REQUEST['reserveListAction']) {
+						case 'copyAll':
+							classManager::classManager('copyItems', $user, $adminUser, array('originalClass'=>$_REQUEST['ci'], 'reservesArray'=>$reserves));
 						break;
 						
 						case 'deleteAll':
-							if (is_array($reserves) && !empty($reserves)){
-								foreach($reserves as $r)
-								{
-									$reserve = new reserve($r);
-									$reserve->getItem();
-									if ($reserve->item->isPhysicalItem()) {
-										$reqst = new request();
-										$reqst->getRequestByReserveID($r);
-										$reqst->destroy();
-									}
-									$reserve->destroy();
+							foreach($reserves as $r) {
+								$reserve = new reserve($r);
+								$reserve->getItem();
+								if ($reserve->item->isPhysicalItem()) {
+									$reqst = new request();
+									$reqst->getRequestByReserveID($r);
+									$reqst->destroy();
 								}
+								$reserve->destroy();
 							}
 						break;
-
+						
 						case 'activateAll':
-							if (is_array($reserves) && !empty($reserves)){
-								foreach($reserves as $r)
-								{
-									$reserve = new reserve($r);
-									$reserve->setStatus('ACTIVE');
-								}
+							foreach($reserves as $r) {
+								$reserve = new reserve($r);
+								$reserve->setStatus('ACTIVE');
 							}
 						break;
 
 						case 'deactivateAll':
-							if (is_array($reserves) && !empty($reserves)){
-								foreach($reserves as $r)
-								{
-									$reserve = new reserve($r);
-									//Headings always have a status of active
-									if (!$reserve->isHeading())
-										$reserve->setStatus('INACTIVE');
-								}
+							foreach($reserves as $r) {
+								$reserve = new reserve($r);
+								//Headings always have a status of active
+								if (!$reserve->isHeading())
+									$reserve->setStatus('INACTIVE');
 							}
 						break;
 					}
+				}
 									
-				if ($_REQUEST['reserveListAction']!='copyAll')
-				{
-					$ci = new courseInstance($_REQUEST['ci']);
-					//$ci->getCourseForInstructor($user->getUserID());
+				if($_REQUEST['reserveListAction'] != 'copyAll') {
 					if (isset($_REQUEST['updateClassDates'])) {
-						$ci->setActivationDate($_REQUEST['activation']);
-						$ci->setExpirationDate($_REQUEST['expiration']);
+						//if not empty, set activation and expiration dates
+						//try to convert dates to proper format
+						if(!empty($_REQUEST['activation'])) {
+							$ci->setActivationDate(date('Y-m-d', strtotime($_REQUEST['activation'])));
+						}
+						if(!empty($_REQUEST['expiration'])) {
+							$ci->setExpirationDate(date('Y-m-d', strtotime($_REQUEST['expiration'])));
+						}
 					}
-					$ci->getReserves();
 					$ci->getInstructors();
 					$ci->getCrossListings();
 					$ci->getProxies();
 					$ci->getPrimaryCourse();
 					$ci->course->getDepartment();
-			
+					
+					//get reserves as a tree + recursive iterator
+					$walker = $ci->getReservesAsTreeWalker('getReserves');
+
+					//show screen
 					$this->displayFunction = 'displayEditClass';
-					$this->argList = array($user, $ci);
+					$this->argList = array($cmd, $ci, $walker);
 				}
 			break;
 
 			case 'editTitle':
 			case 'editCrossListings':
-
+				$loc ="edit title and crosslistings";
 				$ci = new courseInstance($_REQUEST['ci']);
 
 				if (isset($_REQUEST['deleteCrossListings']))
@@ -341,6 +408,7 @@ class classManager
 			break;
 
 			case 'editInstructors':
+				$loc = "edit instructors";
 				$ci = new courseInstance($_REQUEST['ci']);
 				$ci->getCrossListings();  //load cross listings 
 
@@ -376,6 +444,7 @@ class classManager
 			break;
 
 			case 'editProxies':
+				$loc = "edit proxies";
 				$ci = new courseInstance($_REQUEST['ci']);
 				$ci->getCrossListings();  //load cross listings
 
@@ -423,9 +492,9 @@ class classManager
 			break;
 
 			case 'selectClass':
-				if ($user->getDefaultRole() >= $g_permission['staff']) {
+				if ($user->getRole() >= $g_permission['staff']) {
 					$courseInstances = $user->getCourseInstances($adminUser->getUserID());
-				} elseif ($user->getDefaultRole() >= $g_permission['proxy']) { //2 = proxy
+				} elseif ($user->getRole() >= $g_permission['proxy']) { //2 = proxy
 					$courseInstances = $user->getCourseInstances();
 				} else {
 					trigger_error("Permission Denied:  Cannot add reserves. UserID=".$u->getUserID(), E_ERROR);
@@ -450,16 +519,19 @@ class classManager
 			break;
 
 			case 'addReserve':
-				if ($user->getDefaultRole() >= $g_permission['staff']) {
+				
+				if ($user->getRole() >= $g_permission['staff']) {
+					$loc = "add a reserve";
 					if (is_null($adminUser))
 					{
 					 	$this->classManager("selectInstructor", $user, null);
 					 	break;
 					}
 					else
+						
 						$courseInstances = $adminUser->getCourseInstances();
 
-				} elseif ($user->getDefaultRole() >= $g_permission['proxy']) { //2 = proxy
+				} elseif ($user->getRole() >= $g_permission['proxy']) { //2 = proxy
 					$courseInstances = $user->getCourseInstances();
 				} else {
 					trigger_error("Permission Denied:  Cannot add reserves. UserID=".$u->getUserID(), E_ERROR);
@@ -521,7 +593,7 @@ class classManager
 			case 'removeClass':
 				$page = "myReserves";
 
-				if ($user->getDefaultRole() < $g_permission['proxy']) {
+				if ($user->getRole() < $g_permission['proxy']) {
 					$user->getCourseInstances();
 				} else {
 					$user->getCurrentClassesFor($user->getUserID());
@@ -538,64 +610,73 @@ class classManager
 
 
 			case 'viewEnrollment':
-			case 'processViewEnrollment':
 				$page = "manageClasses";
 				$loc = "enrolled students";
+				
+				if(!empty($_REQUEST['ci'])) {	//if already looked up a class
+					$ci = new courseInstance($_REQUEST['ci']);
+					$ci->getStudents();
+				}
 
 				$this->displayFunction = 'displayClassEnrollment';
-				$this->argList = array($cmd, $user, $request);
+				$this->argList = array($ci);
 			break;
 
 			case 'createClass':
 				$page = "manageClasses";
+				$loc = "create new class";
 
-				$usersObject = new users();
 				$dept = new department();
 				$terms = new terms();
 
 				$this->displayFunction = 'displayCreateClass';
-				//$this->argList = array($dept->getAllDepartments(), $terms->getTerms(), array('cmd'=>'createNewClass'), $request);
-				$this->argList = array($dept->getAllDepartments(), $terms->getTerms(), array('cmd'=>'createClass'), $request);
+				$this->argList = array($dept->getAllDepartments(), $terms->getTerms(), 'createNewClass', $_REQUEST, array('cmd'=>'createClass'));
 			break;
 
 			case 'createNewClass':
 				$page = "manageClasses";
 				$loc = "create class";
 			
-				$checkDuplicates = new checkDuplicates();
-				$duplicateClasses = $checkDuplicates->checkDuplicateClass($request['department'],$request['course_number'], $request['section'], $user->getUserID());
+				$t = new term($request['term']);
+				
+				//check for duplicate course instances
+				$dupes = classManager::getDuplicates($request['department'],$request['course_number'], $request['section'], $t->getTermYear(), $t->getTermName());
 
-				if ($duplicateClasses) {
-					
-					// goto check Duplicates
-					checkDuplicatesManager::checkDuplicatesManager('checkDuplicateClass', $user, $duplicateClasses);
-					break;
-				}
-				else {
-					$t = new term($request['term']);
-
+				if(is_null($dupes) || isset($_REQUEST['confirm_new'])) {
 					$c  = new course(null);
 					$ci = new courseInstance(null);
 					
 					$ci->createCourseInstance();
-					$c->createNewCourse($ci->getCourseInstanceID());
+					
+					//see if the course exists
+					if( !is_null($c->getCourseByMatch($request['department'], $request['course_number'], $request['course_name'])) ) {
+						//course found, reuse it
+						$ci->setPrimaryCourse($c->getCourseID(), $request['section']);
+					}
+					else {	//no such course, create new
+						$c->createNewCourse($ci->getCourseInstanceID());
+						$c->setCourseNo($request['course_number']);
+						$c->setDepartmentID($request['department']);
+						$c->setName($request['course_name']);
+						$c->setSection($request['section']);
+						$ci->setPrimaryCourseAliasID($c->getCourseAliasID());
+					}
 
-					$ci->addInstructor($c->getCourseAliasID(), $request['selected_instr']);
-				
-					$c->setCourseNo($request['course_number']);
-					$c->setDepartmentID($request['department']);
-					$c->setName($request['course_name']);
-					$c->setSection($request['section']);
-					$ci->setPrimaryCourseAliasID($c->getCourseAliasID());
+					$ci->addInstructor($ci->getPrimaryCourseAliasID(), $request['selected_instr']);
 					$ci->setTerm($t->getTermName());
 					$ci->setYear($t->getTermYear());
-					$ci->setActivationDate($request['activation_date']);
-					$ci->setExpirationDate($request['expiration_date']);
+					$ci->setActivationDate(date('Y-m-d', strtotime($request['activation_date'])));
+					$ci->setExpirationDate(date('Y-m-d', strtotime($request['expiration_date'])));
 					$ci->setEnrollment($request['enrollment']);
 					$ci->setStatus('ACTIVE');
 				
 					$this->displayFunction = 'displaySuccess';
 					$this->argList = array($page, $ci);
+				}
+				elseif(!is_null($dupes)) {
+					$this->displayFunction = 'displayDuplicateCourses';
+					$_REQUEST['cmd'] = 'createClass';	//make sure we go back to the previous screen
+					$this->argList = array($user, $dupes, urlencode(serialize($_REQUEST)), $request['selected_instr']);
 				}
 			break;
 
@@ -603,7 +684,7 @@ class classManager
 				$page = "manageClasses";
 				$loc = "delete class";
 
-				if ($user->getDefaultRole() >= $g_permission['staff'])
+				if ($user->getRole() >= $g_permission['staff'])
 				{
 					$this->displayFunction = 'displayDeleteClass';
 					$this->argList = array($cmd, $user, $request);
@@ -652,52 +733,100 @@ class classManager
 			case 'processCopyItems':
 				$page = "manageClasses";
 				$loc = "copy reserve items to another class";
-				
-				$targetClass = new courseInstance($request['ci']);
-				$originalClass = new courseInstance($request['originalClass']);
-				
-				$targetClass->getPrimaryCourse();
-				$originalClass->getPrimaryCourse();
-				
-				for ($i=0;$i<count($request['reservesArray']);$i++)
-				{
-					
-					$reserve = new reserve($request['reservesArray'][$i]);
-					$reserve->getItem();
-				
-					if (!$reserve->item->isPhysicalItem())
-					{
-						if ($reserve->createNewReserve($targetClass->getCourseInstanceID(), $reserve->itemID))
-						{
-							$reserve->setActivationDate($targetClass->getActivationDate());	
-							$reserve->setExpirationDate($targetClass->getExpirationDate());	
-						}
 
-					} else {
-						//store reserve for physical items with status = IN PROCESS	
-							
-						if($reserve->createNewReserve($targetClass->getCourseInstanceID(), $reserve->itemID)) {
-							$reserve->setStatus("IN PROCESS");
-							$reserve->setActivationDate($targetClass->getActivationDate());	
-							$reserve->setExpirationDate($targetClass->getExpirationDate());	
-								
-							//create request
-							$requst = new request();				
-							$requst->createNewRequest($targetClass->getCourseInstanceID(), $reserve->itemID);
-							$requst->setRequestingUser($user->getUserID());
-							$requst->setReserveID($reserve->getReserveID());
-						}
-							
-					}
+				$srcCI = new courseInstance($_REQUEST['originalClass']);
+				//copy reserves
+				if(is_array($_REQUEST['reservesArray']) && !empty($_REQUEST['reservesArray'])) {
+					$srcCI->copyReserves($_REQUEST['ci'], $_REQUEST['reservesArray']);
 				}
 				
-				
+				$dstCI = new courseInstance($_REQUEST['ci']);
+				$srcCI->getPrimaryCourse();
+				$dstCI->getPrimaryCourse();
+			
 				$this->displayFunction = 'displayCopyItemsSuccess';
-				$this->argList = array($targetClass,$originalClass,count($request['reservesArray']));
+				$this->argList = array($dstCI,$srcCI,count($_REQUEST['reservesArray']));
 			break;
 				
 		}	
 	}
+		
+	
+	/**
+	 * @return null if no matches, or multidimensional array of matching CIs [0]=direct clashes, [1]=clashes owned by curr instr, [2]=clashes owned by other instr
+	 * @param int $dept_id Department ID
+	 * @param string $courseNumber Course number
+	 * @param string $section Course section
+	 * @param int $u_id Current user's ID (either instructor or staff+)
+	 * @param int $year Year
+	 * @param string $term Term (fall, spring, summer)
+	 * @desc Searches for and returns duplicate courseInstances in the DB; matches on dept_id and course_num
+	*/
+	function getDuplicates($dept_id, $courseNumber, $section, $year, $term) {
+		global $g_dbConn, $g_permission, $u;
+		
+		$u_id = $u->getUserID();
+		
+		//result sets
+		$match_clash = null;		//int - contains ci object of ci that matches on every parameter (except instr)
+		$match_own = array();		//array - contains all ci objects of ci that match on instr (for reactivation)
+		$match_others = array();	//array - contains all other matching ci objects
+		
+		//select all courses matching on dept and course number
+		switch($g_dbConn->phptype) {
+			default: //'mysql'
+				$sql = "SELECT ci.course_instance_id, ci.year, ci.term, ca.section, a.user_id
+						FROM course_instances AS ci
+							JOIN course_aliases AS ca ON ca.course_alias_id = ci.primary_course_alias_id
+							JOIN courses AS c ON c.course_id = ca.course_id
+							JOIN access AS a ON a.alias_id = ca.course_alias_id
+						WHERE c.department_id = ! AND c.course_number = ?
+							AND a.permission_level = 3
+						ORDER BY ci.year, ci.term, a.user_id";
+		}
+
+		//query
+		$rs = $g_dbConn->query($sql, array($dept_id, $courseNumber));		
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+	
+		//check for matches
+		while($row = $rs->fetchRow()) {
+			//get a temp CI object & pull info
+			$tempCI = new courseInstance($row[0]);
+			$tempCI->getPrimaryCourse();
+			$tempCI->getInstructors();
+			
+			//look for various matches
+			if( ($row[3]==$section) && ($row[1]==$year) && ($row[2]==$term) ) {	//found a clash					
+				$match_clash = $tempCI;
+			}
+			elseif($row[4]==$u_id) {	//found a reactivatable course
+				$match_own[] = $tempCI;
+			}
+			else {	//found another match (CI owned by a different instructor)
+				$match_others[] = $tempCI;
+			}
+			unset($tempCI);
+		}
+		
+		//customize result to current user
+		if($u->getRole() >= $g_permission['staff']) {	//if user is staff or higher, we care about _all_ matches
+			if($rs->numRows() == 0) {
+				return null;
+			}
+			else {
+				return array($match_clash, $match_own, $match_others);
+			}
+		}	
+		else {	//user is instructor and does not care about matches to other instructors
+			if(empty($match_clash) && empty($match_own)) {
+				return null;
+			}
+			else {
+				return array($match_clash, $match_own);
+			}
+		}
+	} //getDuplicates()
 }
 
 ?>

@@ -27,10 +27,10 @@ ReservesDirect is located at:
 http://www.reservesdirect.org/
 
 *******************************************************************************/
-require_once("secure/common.inc.php");
+require_once('secure/displayers/baseDisplayer.class.php');
 
-class noteDisplayer
-{
+class noteDisplayer extends baseDisplayer {
+	
 	/**
 	* @return void
 	* @param $user, $reserveID
@@ -38,38 +38,20 @@ class noteDisplayer
 	*/
 	function displayAddNoteScreen($user, $hidden_fields)
 	{
-		global $g_permission;
+		global $g_permission, $g_notetype;
 
-		//$reserve = new reserve($reserveID);
-		//$reserve->getItem();
-
-		echo "<form name=\"addNote\" action=\"index.php?cmd=addNote\" method=\"post\">\n";
-
-		if (is_array($hidden_fields)){
-			$keys = array_keys($hidden_fields);
-			foreach($keys as $key){
-				if (is_array($hidden_fields[$key])){
-					foreach ($hidden_fields[$key] as $field){
-						echo "<input type=\"hidden\" name=\"".$key."[]\" value=\"". $field ."\">\n";
-					}
-				} else {
-					echo "<input type=\"hidden\" name=\"$key\" value=\"". $hidden_fields[$key] ."\">\n";
-				}
-			}
-		}
-
-
-		//echo '<table width="410" border="0" cellspacing="0" cellpadding="0">';
-		//echo '	<tr>';
-		//echo '		<td width="10">&nbsp;</td>';
-		//echo '		<td width = "400">';
+		echo "<form name=\"addNote\" action=\"index.php?no_table=1&amp;cmd=addNote\" method=\"post\">\n";
+		
+		//show hidden fields
+		self::displayHiddenFields($hidden_fields);
 
 		echo '<center>';
-		echo '<table width="400" border="0" cellspacing="0" cellpadding="0">';
-  		echo '	<tr><td align="left" valign="top"><h1>Add Note</h1></td></tr>';
-  		echo '	<tr><td align="left" valign="top">&nbsp;</td></tr>';
-  		echo '	<tr><td align="left" valign="top">&nbsp;</td></tr>';
-  		if ($user->dfltRole >= $g_permission['staff']) {
+		echo '<table width="400" border="0" cellspacing="0" cellpadding="0" style="margin-top:30px;">';
+  		echo '	<tr><td align="left" valign="top"><h1>ReservesDirect</h1></td></tr>';
+		echo '	<tr><td align="left" valign="top" style="padding-bottom:30px;"><h2>Add Note</h2></td></tr>';
+ // 		echo '	<tr><td align="left" valign="top">&nbsp;</td></tr>';
+  //		echo '	<tr><td align="left" valign="top">&nbsp;</td></tr>';
+  		if ($user->getRole() >= $g_permission['staff']) {
   			echo '	<tr>';
   			echo '  	<td align="left" valign="top">';
   			echo '			<table width="100%" border="0" cellspacing="0" cellpadding="0">';
@@ -89,29 +71,22 @@ class noteDisplayer
 			echo '				    purposes.)</span></p>';
 			echo '					</td>';
         	echo '					<td width="78%" align="left"><p>';
-       		echo '					<label><input type="radio" name="noteType" value="Content" checked>Content Note</label><br>';
-       		echo '					<label><input type="radio" name="noteType" value="Instructor">Instructor Note</label><br>';
-       		echo '					<label><input type="radio" name="noteType" value="Staff">Staff Note</label><br>';
-			echo '					<label><input type="radio" name="noteType" value="Copyright">Copyright Note</label><br>';
+       		echo '					<label><input type="radio" name="noteType" value="'.$g_notetype['content'].'" checked>Content Note</label><br>';
+       		
+       		//only allow instructor notes if editing reserve
+       		if(!empty($hidden_fields['reserveID'])) {
+       			echo '					<label><input type="radio" name="noteType" value="'.$g_notetype['instructor'].'">Instructor Note</label><br>';
+       		}
+       		
+       		echo '					<label><input type="radio" name="noteType" value="'.$g_notetype['staff'].'">Staff Note</label><br>';
+			echo '					<label><input type="radio" name="noteType" value="'.$g_notetype['copyright'].'">Copyright Note</label><br>';
 			echo '					</p></td>';
 			echo '				</tr>';
-			/*
-      		echo '				<tr align="left" valign="top" bgcolor="#CCCCCC">';
-        	echo '					<td class="strong">Permanency:</td>';
-        	echo '					<td><p>';
-        	echo '						<label><input name="Permanency" type="radio" value="radio" checked>Permanent</label>';
-        	echo '							<span class="small-x">(until deleted)</span>';
-        	echo '						<label></label><br>';
-        	echo '						<label><input type="radio" name="Permanency" value="radio">Temporary</label>';
-        	echo '							<span class="small-x">(lasts only for the current semester)</span><br>';
-        	echo ' 					</p></td>';
-      		echo '				</tr>';
-      		*/
 			echo '			</table>';
 			echo '		</td>';
   			echo '	</tr>';
 		} else {
-			echo '					<input type="hidden" name="noteType" value="Instructor">';
+			echo '					<input type="hidden" name="noteType" value="'.$g_notetype['instructor'].'">';
 		}
 
   		echo '	<tr>';
@@ -156,18 +131,17 @@ class noteDisplayer
 	{
 		echo "<script language=\"JavaScript\">this.window.opener.newWindow_returnValue='$noteID';</script>\n"; //pass value to parent window
 
-		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n"
+		echo "<table width=\"400\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\" style=\"margin-top:30px;\">\n"
 		.	 "	<tbody>\n"
-		.	 "		<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n"
+		.	 "	<tr><td align=\"left\" valign=\"top\"><h1>ReservesDirect</h1></td></tr>\n"
+		.	 "	<tr><td align=\"left\" valign=\"top\" style=\"padding-bottom:30px;\"><h2>Add Note</h2></td></tr>\n"
+		.	 "		<tr><td width=\"100%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n"
 		.	 "		<tr>\n"
-	    .	 "			<td align=\"left\" valign=\"top\" class=\"borders\">\n"
-	    .	 "				<table width=\"50%\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"5\">\n"
-		.	 "					<tr><td align=\"center\"><strong>You have successfully added a note.</strong></td></tr>\n"
-		.	 "					<tr><td align=\"center\">\n"
-		.	 "						Please close this window to Continue<p\>\n"
-		.	 "						<input type=\"button\" value=\"Close Window\" onClick=\"window.close();\">\n"
-		.	 "					</td></tr>\n"
-		.	 "				</table>\n"
+	    .	 "			<td align=\"left\" valign=\"top\" class=\"borders\" style=\"text-align:center; padding:5px 15px 10px 15px;\">\n"
+	    .	 "				<p><strong>You have successfully added a note.</strong></p>\n"
+	    .	 "						<p>Your note will not appear until you Save Changes to the item or heading you are working on.</p>\n"
+		.	 "						<p>Please close this window to Continue</p>\n"
+		.	 "						<p><input type=\"button\" value=\"Close Window\" onClick=\"window.close();\"></p>\n"
 		.	 "			</td>\n"
 		.	 "		</tr>\n"
 		.	 "		<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n"

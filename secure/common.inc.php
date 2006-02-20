@@ -32,6 +32,7 @@ require_once("secure/classes/note.class.php");
 require_once("secure/classes/reserveItem.class.php");
 
 $g_permission = array("student"=>0, "custodian"=>1, "proxy"=>2, "instructor"=>3, "staff"=>4, "admin"=>5);
+$g_notetype = array('instructor'=>'Instructor', 'content'=>'Content', 'staff'=>'Staff', 'copyright'=>'Copyright');
 
 // user defined error handling function
 /**
@@ -118,58 +119,6 @@ function common_ErrorHandler($errno, $errmsg, $filename, $linenum, $vars)
 	}
 }
 
-/**
-* @return array of notes
-* @param string $targetTable
-* @param int $targetID
-* @desc get record by targ
-*/
-
-function common_getNotesByTarget($targetTable, $targetID)
-{
-	global $g_dbConn;
-
-	switch ($g_dbConn->phptype)
-	{
-		default: //'mysql'
-			$sql = "SELECT note_id, note, target_id, target_table, type "
-				.  "FROM notes "
-				.  "WHERE target_id = ! AND target_table = ? "
-				.  "ORDER BY type, note_id";
-	}
-
-	$rs = $g_dbConn->query($sql, array($targetID, $targetTable));
-
-	if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-	$tmpArray = array();
-	while ($row = $rs->fetchRow()) {
-		$tmpNote = new note();
-		list($tmpNote->noteID, $tmpNote->text, $tmpNote->targetID, $tmpNote->targetTable, $tmpNote->type) = $row;
-		$tmpArray[] = $tmpNote;
-	}
-
-	return $tmpArray;
-}
-
-/**
-* @return note object
-* @param optional int $noteID
-* @param string $noteType
-* @param string $noteText
-* @param string $targetTable
-* @param int $targetID
-* @desc Creates a note object, and calls individual set methods to set the note attributes
-*/
-function common_setNote($noteID=NULL, $noteType, $noteText, $targetTable, $targetID)
-{
-	$tempNote = new note($noteID);
-
-	$tempNote->setType($noteType);
-	$tempNote->setTarget($targetID, $targetTable);
-	$tempNote->setText($noteText);
-	return $tempNote;
-}
 
 /**
  * @return user Array
@@ -297,4 +246,19 @@ function common_formatDate($d, $format)
 			}
 		} else return '';
 }
+
+
+	/**
+	 * @return void
+	 * @param int $note_id ID of note to delete
+	 * @desc Deletes the specified note
+	 */
+	function common_deleteNote($note_id) {
+		if(!empty($note_id)) {
+			$note = new note($note_id);
+			if($note->getID()) {
+				$note->destroy();
+			}
+		}		
+	}
 ?>

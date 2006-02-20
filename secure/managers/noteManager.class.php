@@ -46,9 +46,9 @@ class noteManager
 	}
 
 
-	function noteManager($cmd, $user, $reserveID)
+	function noteManager($cmd, $user)
 	{
-		global $ci;
+		global $ci, $g_notetype;
 		$this->displayClass = "noteDisplayer";
 
 		switch ($cmd)
@@ -56,7 +56,7 @@ class noteManager
 			default:
 			case 'addNote':
 				$this->displayFunction = "displayAddNoteScreen";
-				$this->argList = array($user, array('cmd'=>'saveNote', 'reserve_id'=>$reserveID));
+				$this->argList = array($user, array('cmd'=>'saveNote', 'reserveID'=>$_REQUEST['reserveID'], 'itemID'=>$_REQUEST['itemID']));
 			break;
 
 			case 'saveNote':
@@ -65,16 +65,27 @@ class noteManager
 				{
 					$noteText = trim($_REQUEST['noteText']);
 					if ($noteText) {
-						$reserve = new reserve($reserveID);
+						//switch b/n editing item or editing reserve+item
+						if(!empty($_REQUEST['reserveID'])) {	//editing item+reserve
+							//get reserve
+							$reserve = new reserve($_REQUEST['reserveID']);
+							//get item
+							$item = new reserveItem($reserve->getItemID());
+						}
+						elseif(!empty($_REQUEST['itemID'])) {	//editing item only
+							$item = new reserveItem($_REQUEST['itemID']);
+						}
+						else {	//no IDs set, error
+							break;
+						}
 
 						$noteType = $_REQUEST['noteType'];
 
-						if ($noteType=='Content' || $noteType=='Staff' || $noteType=='Copyright') {
-							$reserve->getItem();
-							$reserve->item->setNote($noteType, $noteText);
-
-						} elseif ($noteType=='Instructor') {
-							$reserve->setNote($noteType,$noteText);
+						if($noteType==$g_notetype['content'] || $noteType==$g_notetype['staff'] || $noteType==$g_notetype['copyright']) {
+							$item->setNote($noteText, $noteType);
+						}
+						elseif(($noteType==$g_notetype['instructor']) && ($reserve instanceof reserve)) {
+							$reserve->setNote($noteText);
 						}
 					}
 				}

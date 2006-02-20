@@ -36,74 +36,11 @@ class staff extends instructor
 {
 	var $sp;
 
-	function staff($userName)
+	function staff($userName=null)
 	{
-		if (is_null($userName)) trigger_error($userName . " has not been authorized as staff", E_ERROR);
-		else $this->getUserByUserName($userName);
+		if (!is_null($userName)) $this->getUserByUserName($userName);
 	}
 
-	/**
-	* @return user object
-	* @param user $user will be set
-	* @desc accepts the userid of the user to be administered return appropriate user object
-	*/
-	/*
-	function setAdministeredUser($userID)
-	{
-		$u = new user($userID);
-		switch ($u->getUserClass())
-		{
-			case 'staff':
-				$r_user = new staff($u->getUsername());
-			break;
-			case 'instructor':
-				$r_user = new instructor($u->getUsername());
-			break;
-			case 'proxy':
-				$r_user = new proxy($u->getUsername());
-			break;
-			case 'custodian':
-				$r_user = new custodian($u->getUsername());
-			break;
-			default:
-				$r_user = new student($u->getUsername());
-		}
-
-		unset ($u);
-		return $r_user;
-	}
-	*/
-	/*
-	function getEditableCourseInstances($userID)
-	{
-		global $g_dbConn;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$d = date("Y-m-d");
-
-				$sql  = "SELECT DISTINCT ci.course_instance_id "
-				.  		"FROM access as a "
-				.  		"  JOIN course_aliases as ca on a.alias_id = ca.course_alias_id "
-				.		"  JOIN course_instances as ci ON ca.course_instance_id = ci.course_instance_id "
-				.		"WHERE a.user_id = ! AND a.permission_level >= 2 " //2 = proxy minimal edit permission
-				;
-
-				$sql .= "AND '$d' <= ci.expiration_date ";  //get any current or future classes
-
-				$sql .=	"ORDER BY ci.expiration_date ASC, ci.status DESC";
-		}
-		$rs = $g_dbConn->query($sql, $userID);
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		unset($this->courseInstances);
-		while ($row = $rs->fetchRow()) {
-			$this->courseInstances[] = new courseInstance($row[0]);
-		}
-		return $this->courseInstances;
-	}
-	*/
 	function getCourseInstances($userID=null)
 	{
 		global $g_dbConn;
@@ -130,7 +67,7 @@ class staff extends instructor
 		if (!is_null($userID))
 			$rs = $g_dbConn->query($sql, $userID);
 		else
-			$rs = $g_dbConn->query($sql, $this->userID);
+			$rs = $g_dbConn->query($sql, $this->getUserID());
 
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
@@ -319,6 +256,8 @@ class staff extends instructor
 				;
 			}
 			
+			$sql .= "GROUP BY r.request_id ";
+			
 			switch ($sort)
 			{
 				case "instructor":
@@ -399,20 +338,52 @@ class staff extends instructor
 	function getStaffLibrary()
 	{
 		global $g_dbConn;
+		
+		if (!is_null($this->getUserID()))
+		{
+			switch ($g_dbConn->phptype)
+			{
+				default: //'mysql'
+					$sql = "SELECT library_id "
+						.  "FROM staff_libraries "
+						.  "WHERE user_id = !"
+						;
+			}
+	
+			$rs = $g_dbConn->query($sql, $this->getUserID());		
+			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+	
+			$row = $rs->fetchRow();
+			return $row[0];
+		} else {
+			return null;
+		}
+	}
+
+	function assignStaffLibrary($libraryID)
+	{
+		global $g_dbConn;
 
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT library_id "
+				$sql_find = "SELECT library_id "
 					.  "FROM staff_libraries "
 					.  "WHERE user_id = !"
 					;
+					
+				$sql_in = "INSERT INTO staff_libraries (library_id, permission_level_id, user_id) VALUES (!, !, !)";
+				$sql_up = "UPDATE staff_libraries SET library_id = !, permission_level_id = ! WHERE user_id = !";
 		}
 
-		$rs = $g_dbConn->query($sql, $this->userID);
+		$rs = $g_dbConn->query($sql_find, $this->getUserID());
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+			
+		if ($rs->numRows() < 1)
+			$rs = $g_dbConn->query($sql_in, array($libraryID, $this->getRole(), $this->getUserID()));	
+		else
+			$rs = $g_dbConn->query($sql_up, array($libraryID, $this->getRole(), $this->getUserID()));	 	
 
-		$row = $rs->fetchRow();
-		return $row[0];
-	}
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+	}		
 }

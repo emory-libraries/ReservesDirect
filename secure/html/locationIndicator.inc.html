@@ -36,20 +36,13 @@ if ($ci instanceof courseInstance)
 	$currentClass = "";
 }
 
-echo "<tr>\n";
-echo "	<td height=\"4\" colspan=\"2\">\n";
-echo "		<table width=\"100%\" border=\"0\" align=\"left\" cellpadding=\"0\" cellspacing=\"0\">\n";
-echo "			<tr>\n";
-echo "				<td align=\"left\" valign=\"top\" width=\"10\"><img src=\"images/spacer.gif\" width=\"12\" height=\"20\"></td>\n";
-echo "				<td width=\"50%\" align=\"left\" valign=\"middle\" class=\"locationIndicatorText\">$loc</td>\n";
-echo "				<td width=\"67\" align=\"left\" valign=\"middle\">&nbsp;</td>\n";
-echo "				<td width=\"67\" align=\"left\" valign=\"middle\">&nbsp;</td>\n";
-echo "				<td width=\"67\" align=\"left\" valign=\"middle\">&nbsp;</td>\n";
-echo "				<td width=\"50%\" valign=\"middle\" align=\"right\" class=\"currentClass\">$currentClass</td>\n";          
-echo "			</tr>\n";
-echo "		</table>\n";
-echo "	</td>\n";
-echo "</tr>\n";
 
+echo "		<div id=\"Location\">\n";
+echo "			<div class=\"locationIndicatorText\"> $loc </div>\n";
+echo "			<div class=\"currentClass\"> $currentClass </div>\n";
+echo "			<div class=\"clear\"></div>\n";
+echo "		</div>\n";
+	
 
 ?>
+

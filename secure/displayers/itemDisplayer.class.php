@@ -2,8 +2,7 @@
 /*******************************************************************************
 itemDisplayer.class.php
 
-
-Created by Kathy Washington (kawashi@emory.edu)
+Created by Dmitriy Panteleyev (dpantel@emory.edu)
 
 This file is part of ReservesDirect
 
@@ -27,444 +26,388 @@ ReservesDirect is located at:
 http://www.reservesdirect.org/
 
 *******************************************************************************/
-require_once("secure/common.inc.php");
 
-class itemDisplayer
-{
+require_once('secure/displayers/baseDisplayer.class.php');
+require_once('secure/managers/ajaxManager.class.php');
+
+class itemDisplayer extends baseDisplayer {
+	
+	function displayEditHeadingScreen($ci, $heading)
+	{
+		$heading->getItem();
+		
+		if ($heading->getSortOrder() == 0 || $heading->getSortOrder() == null)
+			$currentSortOrder = "Not Yet Specified";
+		else
+			$currentSortOrder = $heading->getSortOrder();
+?>
+		<form action="index.php" method="post" name="editHeading">
+		
+			<input type="hidden" name="cmd" value="processHeading">
+			<input type="hidden" name="nextAction" value="editClass">
+			<input type="hidden" name="ci" value="<?=$ci?>">
+			<input type="hidden" name="headingID" value="<?=$heading->itemID?>">
+			
+		<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+			<tr>
+				<td colspan="2" align="right"><strong><a href="index.php?cmd=editClass&ci=<?=$ci?>">Cancel and return to class</a></strong></td>	
+			</tr>
+			<tr>
+				<td colspan="2">
+					<div class="helperText" style="align:left; padding:8px 0 20px 0; margin-right:180px;">
+					Headings help organize your list of materials into topics or weeks. Headings can stand alone, 
+					or you can add items to them. To add an item to a heading (like you would to a folder), go to the Edit Class
+					screen, check the items to add to the heading, and scroll to the bottom of your list of materials.
+					Select which heading to add the materials to and click the "Submit" button.
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td class="headingCell1" width="25%" align="center">HEADING DETAILS</td>
+				<td width="75%" align="center">&nbsp;</td>
+			</tr>
+		    <tr>
+		    	<td colspan="2" class="borders">
+			    	<table width="100%" border="0" cellspacing="0" cellpadding="5">
+			    		<tr>
+			    			<td width="30%" bgcolor="#CCCCCC" align="right" class="strong">
+			    				<font color="#FF0000">*</font>&nbsp;Heading Title:
+			    			</td>
+			    			<td>
+			    				<input name="heading" type="text" size="60" value="<?=$heading->item->getTitle()?>" />
+			    			</td>
+			    		</tr>
+			    		<tr>
+			    			<td bgcolor="#CCCCCC" align="right" class="strong">
+			    				Current Sort Position:
+			    			</td>
+	        				<td>
+	        					<?=$currentSortOrder?>
+	        				</td>			    		
+			    		</tr>
+<?php
+		//notes - only deal with notes if editing a heading (as opposed to creating)
+		if($heading->getReserveID()):		
+			//get notes
+			$itemNotes = $heading->item->getNotes();
+			$reserveNotes = $heading->getNotes();
+			//show note edit boxes
+			self::displayEditNotes($itemNotes, 'headingID='.$heading->getReserveID().'&amp;ci='.$ci);
+			self::displayEditNotes($reserveNotes, 'headingID='.$heading->getReserveID().'&amp;ci='.$ci);
+			
+			//display "Add Note" button
+?>
+						<tr>
+							<td colspan="2" bgcolor="#CCCCCC" align="center" class="borders" style="border-left:0px; border-bottom:0px; border-right:0px;">
+								<?php self::displayAddNoteButton('reserveID='.$heading->getReserveID()); ?>
+							</td>
+						</tr>
+<?php	endif; ?>
+
+					</table>
+        		</td>
+      		</tr>
+      		<tr>
+      			<td colspan="2" align="center">
+      				<br />
+      				<input type="submit" name="submit" value="Save Heading" />
+				</td>
+      		</tr>
+    	</table>
+    	</form>
+<?php
+  
+	}
+
+
 	/**
 	* @return void
-	* @param reserve current reserve object
-	* @param user $user
-	* @param docTypeIcons
-	* @param new_reserve new reserve object if duplicating
-	* @desc display edit course form
+	* @param reserves $reserve reserves object
+	* @param object $user user interface object (object depends on user type)
+	* @desc Displays form for editing reserve information. Limited version of editItem form.
 	*/
-	function displayEditReserveScreen($reserve, $user, $docTypeIcons=null, $new_reserve=null)
-	{
-
-		global $g_permission;
-
-		if (!is_a($reserve->item, "reserveItem")) $reserve->getItem();
+	function displayEditReserveScreen($reserve, $user) {
+		global $calendar, $g_serverName;
 		
-		echo "
-		<script language=\"JavaScript\">
-		//<!--
-			function validateForm(frm,physicalCopy)
-			{			
-				var alertMsg = \"\";
-
-				if (frm.title.value == \"\")
-					alertMsg = alertMsg + \"Title is required.<br>\";
-				
-				if (physicalCopy) {
-					//make sure this physical copy is supposed to have a barcode
-					//	if it is, there will be an input element for it in the form
-					if( (document.getElementById('barcode') != null) && (document.getElementById('barcode').value == '') )
-						alertMsg = alertMsg + \"Barcode is required.<br />\";
-				}
-				else {
-					if (frm.url.value == \"\")
-						alertMsg = alertMsg + \"URL is required.<br>\";				
-				}
-				
-				
-				if (!alertMsg == \"\") 
-				{ 
-					document.getElementById('alertMsg').innerHTML = alertMsg;
-					return false;
-				}
-					
-			}
-		//-->
-		</script>	
-		";	
-	
-		if ($reserve->item->isPhysicalItem())
-			echo "<form name=\"reservesMgr\" action=\"index.php?cmd=editReserve\" method=\"post\" onSubmit=\"return validateForm(this,true);\">\n";
-		else
-			echo "<form name=\"reservesMgr\" action=\"index.php?cmd=editReserve\" method=\"post\" onSubmit=\"return validateForm(this,false);\">\n";
-		echo "<input type=\"hidden\" name=\"ci\" value=\"".$reserve->getCourseInstanceID()."\">\n";
-		echo "<input type=\"hidden\" name=\"rID\" value=\"".$reserve->getReserveID()."\">\n";
-
-		//pass destination reserveID for duplication
-		if(!empty($new_reserve)) {
-			echo "<input type=\"hidden\" name=\"new_rID\" value=\"".$new_reserve->getReserveID()."\">\n";
-			echo "<input type=\"hidden\" name=\"selected_instr\" value=\"".$_REQUEST['selected_instr']."\">\n";
-		}
-
-
-		$activationDate = $reserve->getActivationDate();
-		list($year, $month, $day) = split("-", $activationDate);
-
-		$status = $reserve->getStatus();
-		$todaysDate = date ("Y-m-d");
-
-		$statusTag = common_getStatusStyleTag($status);
-
 		$title = $reserve->item->getTitle();
 		$author = $reserve->item->getAuthor();
-		$url = $reserve->item->getURL();
 		$performer = $reserve->item->getPerformer();
 		$volTitle = $reserve->item->getVolumeTitle();
 		$volEdition = $reserve->item->getVolumeEdition();
 		$pagesTimes = $reserve->item->getPagesTimes();
 		$source = $reserve->item->getSource();
-		$contentNotes = $reserve->item->getContentNotes();
 		$docTypeIcon = $reserve->item->getItemIcon();
+		$docTypeIcons = $user->getAllDocTypeIcons();
+		$reserve_notes = $reserve->getNotes();
+		$url = $reserve->item->getURL();
+		
+		//URL hiding fun - if URL points to a local resource, hide it	
+		$hide_url = (stripos($url, $g_serverName) !== false) ? true : false;
 
-		//pull notes from new reserve/item if duplicating
-		if(!empty($new_reserve)) {
-			$itemNotes = $new_reserve->item->getNotes(); //Valid note types, associated with an item, are content, copyright, and staff
-			$instructorNotes = $new_reserve->getNotes();
-		}
-		else {	//not duplicating, get notes from original
-			$itemNotes = $reserve->item->getNotes(); //Valid note types, associated with an item, are content, copyright, and staff
-			$instructorNotes = $reserve->getNotes();
+		//reserve status/dates stuff
+		
+		switch($reserve->getStatus()) {
+			case 'ACTIVE':
+				$reserve_status_active = 'checked="true"';
+				$reserve_status_inactive = '';
+				$reserve_block_vis = '';
+				break;
+			case 'INACTIVE':
+				$reserve_status_active = '';
+				$reserve_status_inactive = 'checked="true"';
+				$reserve_block_vis = 'style="visibility:hidden;"';
+				break;
 		}
 		
-		//output a message about duplicating
-		if(!empty($new_reserve)) {
-			echo '<div style="width:100%; text-align:center;"><strong>EDIT THE DUPLICATE</strong></div>';
-		}
-
-		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "	<tr>\n";
-		echo "    	<td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td>\n";
-		echo "	</tr>\n";
-		echo "	<tr><td colspan=\"3\" align=\"right\"> <a href=\"index.php?cmd=editClass&ci=".$reserve->getCourseInstanceID()."\" class=\"strong\">Return to Class</a></div></td></tr>\n";
-		echo "    <tr>\n";
-		echo "    	<td>\n";
-		echo "    	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
-		echo "        	<tr align=\"left\" valign=\"top\">\n";
-		echo "            	<td class=\"headingCell1\"><div align=\"center\">ITEM DETAILS</div></td>\n";
-		echo "            ";
-		echo "			<!--The \"Show All Editable Item\" Links appears by default when this";
-		echo "			page is loaded if some of the metadata fields for the document are blank.";
-		echo "			Blank fields will be hidden upon page load. -->  ";
-		echo "			  ";
-		echo "				<td width=\"75%\"><!-- <div align=\"right\">[ <a href=\"link\" class=\"editlinks\">show all editable fields</a><a href=\"link\" class=\"editlinks\"></a> ]</div>--></td>\n";
-		echo "			</tr>\n";
-		echo "		</table>\n";
-		echo "		</td>\n";
-		echo "	</tr>\n";
-		echo "    <tr>\n";
-		echo "    	<td align=\"left\" valign=\"top\" class=\"borders\">\n";
-		echo "    	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
-		echo "        	<tr valign=\"middle\">\n";
-		echo "            	<td colspan=\"2\" align=\"right\" bgcolor=\"#CCCCCC\" class=\"borders\">\n";
-		echo "            	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
-		echo "                	<tr>\n";
-		echo "                  		<td width=\"35%\" height=\"14\"><p><span class=\"strong\">Current Status: </span><strong><font color=\"".$statusTag."\">".$status."</font></strong>\n";
-
-		if ($status == "ACTIVE") {
-			if ($activationDate > $todaysDate) {
-				echo "<span class=\"small\"> (hidden until ".$month."/".$day."/".$year.")</span>\n";
-			}
-			echo " | <input type=\"checkbox\" name=\"deactivateReserve\" value=\"".$reserve->getReserveID()."\"> Deactivate?";
-			echo "						<td width=\"100%\"><span class=\"strong\">Activation Date:</span><strong></strong>&nbsp;<input name=\"month\" type=\"text\" size=\"2\" maxlength=\"2\" value=\"".$month."\"> / <input name=\"day\" type=\"text\" size=\"2\" maxlength=\"2\" value=\"".$day."\"> / <input name=\"year\" type=\"text\" size=\"4\" maxlength=\"4\" value=\"".$year."\"></td>\n";
-		} elseif ($status == "INACTIVE") {
-			echo " | <input type=\"checkbox\" name=\"activateReserve\" value=\"".$reserve->getReserveID()."\"> Activate?";
-		} elseif (($status == "IN PROCESS") && ($user->dfltRole >= $g_permission['staff'])) { //only staff can change an in-process status
-			echo " | <input type=\"checkbox\" name=\"activateReserve\" value=\"".$reserve->getReserveID()."\"> Activate?";
-		}
-
-		echo "					</tr>\n";
-		echo "              	</table>\n";
-		echo "              	</td>\n";
-		echo "			</tr>\n";
-		echo "            <tr valign=\"middle\">\n";
-		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>&nbsp;Document Title:</div></td>\n";
-		echo "				<td width=\"100%\" align=\"left\"><input name=\"title\" type=\"text\" id=\"title\" size=\"50\" value=\"$title\"></td>\n";
-		echo "			</tr>\n";
-		echo "            <tr valign=\"middle\">\n";
-		echo "            	<td width=\"25%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\">Author/Composer:</div></td>\n";
-		echo "				<td width=\"100%\" align=\"left\"><input name=\"author\" type=\"text\" id=\"author\" size=\"50\" value=\"".$author."\"></td>\n";
-		echo "			</tr>\n";
-		if (!$reserve->item->isPhysicalItem()) {
-			echo "            <tr valign=\"middle\">\n";
-			echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>URL:</div></td>\n";
-			echo "				<td width=\"100%\" align=\"left\"><input name=\"url\" type=\"text\" size=\"50\" value=\"".urldecode($url)."\"></td>\n";
-			echo "			</tr>\n";
-		}
-		echo "          <tr valign=\"middle\">\n";
-		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Performer </span><span class=\"strong\">:</span></div></td>\n";
-		echo "				<td width=\"100%\" align=\"left\"><input name=\"performer\" type=\"text\" id=\"performer\" size=\"50\" value=\"".$performer."\"></td>\n";
-		echo "			</tr>\n";
-		
-		if (!is_null($docTypeIcons))
-		{
-			echo "				<tr valign=\"middle\">\n";
-			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">Document Type Icon:</span></td>\n";
-			echo "					<td align=\"left\">";
-			echo "						<select name=\"selectedDocIcon\" onChange=\"document.iconImg.src = this[this.selectedIndex].value;\">\n";
-					
-			for ($j = 0; $j<count($docTypeIcons); $j++)
-			{
-				$selectedIcon = ($docTypeIcon == $docTypeIcons[$j]['helper_app_icon']) ? " selected " : "";
-				echo "							<option value=\"" . $docTypeIcons[$j]['helper_app_icon']  . "\" $selectedIcon>" . $docTypeIcons[$j]['helper_app_name'] . "</option>\n";
-			}
-				
-			echo "						</select>\n";
-			echo "					<img name=\"iconImg\" width=\"24\" height=\"20\" src=\"$docTypeIcon\">\n";
-			echo "					</td>\n";
-			echo "				</tr>\n";
-		}	
-		
-		
-		echo "            <tr valign=\"middle\">\n";
-		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Book/Journal/Work Title</span><span class=\"strong\">:</span></div></td>\n";
-		echo "				<td width=\"100%\" align=\"left\"><input name=\"volumeTitle\" type=\"text\" id=\"volumeTitle\" size=\"50\" value=\"".$volTitle."\"></td>\n";
-		echo "			</tr>\n";
-		echo "            <tr valign=\"middle\">\n";
-		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Volume/ Edition</span><span class=\"strong\">:</span></div></td>\n";
-		echo "				<td width=\"100%\" align=\"left\"><input name=\"volumeEdition\" type=\"text\" id=\"volumeEdition\" size=\"50\" value=\"".$volEdition."\"></td>\n";
-		echo "			</tr>\n";
-		echo "            <tr valign=\"middle\">\n";
-		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Pages/Time</span><span class=\"strong\">:</span></div></td>\n";
-		echo "				<td width=\"100%\" align=\"left\"><input name=\"pagesTimes\" type=\"text\" id=\"pages\" size=\"50\" value=\"".$pagesTimes."\"></td>\n";
-		echo "            </tr>\n";
-		echo "            <tr valign=\"middle\">\n";
-		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Source/ Year</span><span class=\"strong\">:</span></div></td>\n";
-		echo "				<td width=\"100%\" align=\"left\"><input name=\"source\" type=\"text\" id=\"source\" size=\"50\" value=\"".$source."\"></td>\n";
-		echo "			</tr>\n";
-		
-		//items w/ ILS records require a barcode and optional call number
-		//only allow this for staff
-		if( ($user->dfltRole >= $g_permission['staff']) && $reserve->item->getPhysicalCopy()) {
-			//set barcode to itself if editing, to '' if duplicating
-			$barcode = ($new_reserve instanceof reserve) ? '' : $reserve->item->physicalCopy->getBarcode();
+		//dates
+		$reserve_activation_date = $reserve->getActivationDate();
+		$reserve_expiration_date = $reserve->getExpirationDate();
+		//set reset dates to course dates
+		$ci = new courseInstance($reserve->getCourseInstanceID());
+		$course_activation_date = $ci->getActivationDate();	
+		$course_expiration_date = $ci->getExpirationDate();
+			
 ?>
-			<tr valign="middle">		
-				<td width="25%" align="right" bgcolor="#CCCCCC">
-					<strong><font color="#FF0000">*</font>&nbsp;Barcode:</strong>
-				</td>
-				<td width="100%" align="left">
-					<input name="barcode" type="text" id="barcode" size="20" value="<?=$barcode?>" />
-				</td>
-			</tr>
-			<tr valign="middle">		
-				<td width="25%" align="right" bgcolor="#CCCCCC">
-					<strong>Call Number:</strong>
-				</td>
-				<td width="100%" align="left">
-					<input name="call_num" type="text" id="call_num" size="30" value="<?=$reserve->item->physicalCopy->getCallNumber()?>" />
-				</td>
-			</tr>
-<?php
-		}
-		
-		if ($contentNotes) {
+		<div id="alertMsg" align="center" class="failedText"></div>
+        <p />
+        
+		<script language="JavaScript">
+		//<!--
+			function validateForm(frm) {			
+				var alertMsg = "";
 
-			echo "            <tr valign=\"middle\">\n";
-			echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Content Note:<br></span></div></td>\n";
-			echo "				<td width=\"100%\" align=\"left\"><textarea name=\"contentNotes\" cols=\"50\" rows=\"3\">".$contentNotes."</textarea></td>\n";
-			echo "			</tr>\n";
-		}
-		if ($itemNotes) {
+				if (frm.title.value == "")
+					alertMsg = alertMsg + "Title is required.<br>";
+				
+				if(frm.url.value == "") {
+					alertMsg = alertMsg + "URL is required.<br>";				
+				}
 
-			for ($i=0; $i<count($itemNotes); $i++) {
-
-				if ($user->dfltRole >= $g_permission['staff'] || $itemNotes[$i]->getType() == "Instructor" || $itemNotes[$i]->getType() == "Content") {
-					echo "      <tr valign=\"middle\">\n";
-					echo "			";
-					echo "			<!-- On page load, by default, there is no blank \"Notes\" field showing, only ";
-					echo "			previously created notes, if any, and the \"add Note\" button. Notes should";
-					echo "			be added one after the other at the bottom of the table, but above the \"add Note\" button.-->\n";
-					echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">".$itemNotes[$i]->getType()." Note:</span><br><a href=\"index.php?cmd=editReserve&reserveID=".$reserve->getReserveID()."&deleteNote=".$itemNotes[$i]->getID()."\">Delete this note</a></td>\n";
-					echo "				<td align=\"left\"><textarea name=\"itemNotes[".$itemNotes[$i]->getID()."]\" cols=\"50\" rows=\"3\">".$itemNotes[$i]->getText()."</textarea></td>\n";
-					echo "      </tr>\n";
+				if (!alertMsg == "") { 
+					document.getElementById('alertMsg').innerHTML = alertMsg;
+					return false;
+				}					
+			}
+			
+			//shows/hides activation/expiration date form elements
+			function toggleDates() {
+				if(document.getElementById('reserve_status_active').checked) {
+					document.getElementById('reserve_dates_block').style.visibility = 'visible';
+				}
+				else {
+					document.getElementById('reserve_dates_block').style.visibility = 'hidden';
 				}
 			}
-		}
-		if ($instructorNotes) {
-
-			for ($i=0; $i<count($instructorNotes); $i++) {
-
-				echo "      <tr valign=\"middle\">\n";
-				echo "			";
-				echo "			<!-- On page load, by default, there is no blank \"Notes\" field showing, only ";
-				echo "			previously created notes, if any, and the \"add Note\" button. Notes should";
-				echo "			be added one after the other at the bottom of the table, but above the \"add Note\" button.-->\n";
-				echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">Instructor Note:</span><br><a href=\"index.php?cmd=editReserve&reserveID=".$reserve->getReserveID()."&deleteNote=".$instructorNotes[$i]->getID()."\">Delete this note</a></td>\n";
-				echo "				<td align=\"left\"><textarea name=\"instructorNotes[".$instructorNotes[$i]->getID()."]\" cols=\"50\" rows=\"3\">".$instructorNotes[$i]->getText()."</textarea></td>\n";
-				echo "      </tr>\n";
+			
+			//resets reserve dates
+			function resetDates(from, to) {
+				document.getElementById('reserve_activation_date').value = from;
+				document.getElementById('reserve_expiration_date').value = to;
 			}
-		}
-		echo "          <tr valign=\"middle\">\n";
-		//echo "            	<td colspan=\"2\" align=\"left\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"borders\" align=\"center\"><a href='index.php?cmd=addNote&reserveID=".$reserve->getReserveID()."'><input type=\"button\" name=\"addNote\" value=\"Add Note\"></a></td>\n";
-		echo "            	<td colspan=\"2\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"borders\" align=\"center\">\n";
-
-		//if duplicating, add note to new reserve
-		if(!empty($new_reserve)) {
-			echo "					<input type=\"button\" name=\"addNote\" value=\"Add Note\" onClick=\"openWindow('&cmd=addNote&reserve_id=".$new_reserve->getReserveID()."');\">\n";
-		}
-		else {
-			echo "					<input type=\"button\" name=\"addNote\" value=\"Add Note\" onClick=\"openWindow('&cmd=addNote&reserve_id=".$reserve->getReserveID()."');\">\n";
-		}
-
-		echo "				</td>\n";
-		echo "			</tr>\n";
-		echo "		</table>\n";
-		echo "		</td>\n";
-		echo "	</tr>\n";
-		echo "    <tr>\n";
-		echo "    	<td><strong><font color=\"#FF0000\">* </font></strong><span class=\"helperText\">=required fields</span></td>\n";
-		echo "	</tr>\n";
-		echo "    <tr>\n";
-		echo "    	<td><div align=\"center\"><input type=\"submit\" name=\"Submit\" value=\"Save Changes\"\"></div></td>\n";
-		echo "	</tr>\n";
-		echo "	<tr><td colspan=\"3\">&nbsp;</td></tr>\n";
-		echo "	<tr><td colspan=\"3\" align=\"center\"> <a href=\"index.php?cmd=editClass&ci=".$reserve->getCourseInstanceID()."\" class=\"strong\">Return to Class</a></div></td></tr>\n";
-		echo "	<tr><td colspan=\"3\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
-		echo "    <tr>\n";
-		echo "    	<td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td>\n";
-		echo "	</tr>\n";
-		echo "</table>\n";
-		echo "</form>\n";
-	}
-
-
-	function displayEditHeadingScreen($ci, $heading)
-	{
-		$heading->getItem();
+		//-->
+		</script>
 		
-		$contentNotes = $heading->item->getContentNotes();
-		$itemNotes = $heading->item->getNotes(); //Valid note types, associated with an item, are content, copyright, and staff
-		$instructorNotes = $heading->getNotes();
-		
-		if ($heading->getSortOrder() == 0 || $heading->getSortOrder() == null)
-			$currentSortOrder = "Not Yet Specified";
-		else
-			$currentSortOrder = ($heading->getSortOrder()+1);
-		
-		echo "<script language=\"javaScript\">
-			function processHeading(form, nextAction)
-			{
-				form.nextAction.value = nextAction;
-				form.submit();
+		<form name="reservesForm" action="index.php?cmd=editReserve" method="post" onSubmit="return validateForm(this);">
+			<input type="hidden" name="reserveID" value="<?=$reserve->getReserveID()?>" />
 
-			}
-		</script>";
+		<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+			<tr class="strong">
+				<td align="right" colspan="2"><a href="index.php?cmd=editClass&amp;ci=<?=$reserve->getCourseInstanceID()?>">Return to Class</a></td>
+			</tr>
+			<tr>
+				<td class="headingCell1" width="25%" align="center">RESERVE DETAILS</td>
+				<td width="75%" align="center">&nbsp;</td>
+			</tr>
+			
+			
+			<tr>
+				<td colspan="2" class="borders">
+					<table width="100%" border="0" cellspacing="0" cellpadding="0">
+						<tr bgcolor="#CCCCCC">
+							<td>
+					
+<?php	if($reserve->getStatus()=='IN PROCESS'): ?>
+
+								<div id="statusText">
+									<strong>Current Status:</strong>&nbsp;<span id="statusText" class="inProcess">IN PROCESS</span>
+									<br />
+									Please contact your Reserves staff to inquire about the status of this reserve.
+									<input type="hidden" name="reserve_status" value="IN PROCESS" />
+								</div>
+						
+<?php	else: ?>
+								<table width="100%" border="0" cellspacing="0" cellpadding="5">
+									<tr valign="top">
+										<td width="25%">
+											<strong>Set Status:</strong>
+											<br />
+											<div id="statusText" style="margin-left:10px;">
+												<input type="radio" name="reserve_status" id="reserve_status_active" value="ACTIVE" onChange="toggleDates();" <?=$reserve_status_active?> />&nbsp;<span class="active">ACTIVE</span>
+												<br />
+												<input type="radio" name="reserve_status" id="reserve_status_inactive" value="INACTIVE" onChange="toggleDates();" <?=$reserve_status_inactive?> />&nbsp;<span class="inactive">INACTIVE</span>
+											</div>
+										</td>
+										<td>
+											<div id="reserve_dates_block" <?=$reserve_block_vis?>>
+												<strong>Active Dates</strong> (YYYY-MM-DD) &nbsp;&nbsp; [<a href="#" name="reset_dates" onclick="resetDates('<?=$course_activation_date?>', '<?=$course_expiration_date?>'); return false;">Reset dates</a>]
+												<br />
+												<div style="margin-left:10px;">
+													<strong>From:</strong>&nbsp;<input type="text" id="reserve_activation_date" name="reserve_activation_date" size="10" maxlength="10" value="<?=$reserve_activation_date?>" /> <?=$calendar->getWidgetAndTrigger('reserve_activation_date', $reserve_activation_date)?>
+													<br />
+													<strong>To:</strong>&nbsp;<input type="text" id="reserve_expiration_date" name="reserve_expiration_date" size="10" maxlength="10" value="<?=$reserve_expiration_date?>" />  <?=$calendar->getWidgetAndTrigger('reserve_expiration_date', $reserve_expiration_date)?>
+												</div>
+											</div>
+										</td>
+									</tr>
+								</table>						
+<?php	endif; ?>
+							</td>
+						</tr>
+							
+
+					</table>
+				</td>
+			</tr>
+			<tr><td>&nbsp;</td></tr>	
+			<tr>
+				<td class="headingCell1" width="25%" align="center">ITEM DETAILS</td>
+				<td width="75%" align="center">&nbsp;</td>
+			</tr>
+		    <tr>
+		    	<td colspan="2" class="borders">
+			    	<table width="100%" border="0" cellspacing="0" cellpadding="5">
+			    		<tr>
+			    			<td width="30%" bgcolor="#CCCCCC" align="right" class="strong">
+			    				<font color="#FF0000">*</font>&nbsp;Document Title:
+			    			</td>
+			    			<td>
+			    				<input name="title" type="text" id="title" size="50" value="<?=$title?>" />
+			    			</td>
+			    		</tr>
+			    		<tr>
+			    			<td bgcolor="#CCCCCC" align="right" class="strong">
+			    				Author/Composer:
+			    			</td>
+			    			<td>
+			    				<input name="author" type="text" id="author" size="50" value="<?=$author?>" />
+			    			</td>
+			    		</tr>
+			    		
+<?php	if($hide_url): ?>
+						<input name="url" type="hidden" id="url" size="50" value="<?=$url?>" />
+<?php	else: ?>
+			    		<tr>
+			    			<td bgcolor="#CCCCCC" align="right" class="strong">
+			    				<font color="#FF0000">*</font>&nbsp;URL:
+			    			</td>
+			    			<td>
+			    				<input name="url" type="text" id="url" size="50" value="<?=$url?>" />
+			    			</td>
+			    		</tr>
+<?php	endif; ?>
+
+			    		<tr>
+			    			<td bgcolor="#CCCCCC" align="right" class="strong">
+			    				Performer:
+			    			</td>
+			    			<td>
+			    				<input name="performer" type="text" id="performer" size="50" value="<?=$performer?>" />
+			    			</td>
+			    		</tr>
+			    		<tr>
+			    			<td bgcolor="#CCCCCC" align="right" class="strong">
+			    				Document Type Icon:
+			    			</td>
+			    			<td>
+			    				<select name="selectedDocIcon" onChange="document.iconImg.src = this[this.selectedIndex].value;">
+<?php
+		foreach($docTypeIcons as $icon):
+			$selected = ($docTypeIcon == $icon['helper_app_icon']) ? ' selected="selected"' : '';
+?>
+									<option value="<?=$icon['helper_app_icon']?>"><?=$icon['helper_app_name']?></option>
+<?php	endforeach; ?>
+								</select>
+								<img name="iconImg" width="24" height="20" src="<?=$docTypeIcon?>" />
+			    			</td>
+			    		</tr>
+			    		<tr>
+			    			<td bgcolor="#CCCCCC" align="right" class="strong">
+			    				Book/Journal/Work Title:
+			    			</td>
+			    			<td>
+			    				<input name="volumeTitle" type="text" id="volumeTitle" size="50" value="<?=$volTitle?>" />
+			    			</td>
+			    		</tr>
+			    		<tr>
+			    			<td bgcolor="#CCCCCC" align="right" class="strong">
+			    				Volume/Edition:
+			    			</td>
+			    			<td>
+			    				<input name="volumeEdition" type="text" id="volumeEdition" size="50" value="<?=$volEdition?>" />
+			    			</td>
+			    		</tr>
+			    		<tr>
+			    			<td bgcolor="#CCCCCC" align="right" class="strong">
+			    				Pages/Time
+			    			</td>
+			    			<td>
+			    				<input name="pagesTimes" type="text" id="pagesTimes" size="50" value="<?=$pagesTimes?>" />
+			    			</td>
+			    		</tr>
+			    		<tr>
+			    			<td bgcolor="#CCCCCC" align="right" class="strong">
+			    				Source/Year:
+			    			</td>
+			    			<td>
+			    				<input name="source" type="text" id="source" size="50" value="<?=$source?>" />
+			    			</td>
+			    		</tr>
+<?php	if(!empty($reserve_notes)): 
+			//show reserve notes
+			self::displayEditNotes($reserve_notes, 'reserveID='.$reserve->getReserveID());
+endif; ?>
+			    		<tr>
+			    			<td class="borders" bgcolor="#CCCCCC" colspan="2" align="center" text-align="center">
+<?php 
+		//display "Add Note" button
+		self::displayAddNoteButton('reserveID='.$reserve->getReserveID());
+?>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td align="left" colspan="2">
+					<strong><font color="#FF0000">*</font></strong>&nbsp;<span class="helperText">=required fields</span>
+				</td>
+			</tr>
+				<td colspan="2" style="text-align:center; padding-top:15px;">
+					<p />
+					<input type="submit" name="Submit" value="Save Changes">
+				</td>
+			</tr>
+		</table>
 		
-		echo "<form action=\"index.php\" method=\"post\" name=\"editHeading\">\n";
-		
-		echo "<input type=\"hidden\" name=\"cmd\" value=\"processHeading\">\n";
-		echo "<input type=\"hidden\" name=\"nextAction\" value=\"\">\n";
-		echo "<input type=\"hidden\" name=\"ci\" value=\"$ci\">\n";
-		echo "<input type=\"hidden\" name=\"headingID\" value=\"$heading->itemID\">\n";
-		
-		echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">';
-    	echo ' 	<tr><td width="140%"><img src="/images/spacer.gif" width="1" height="5"> </td></tr>';
-    	echo ' 	<tr>';
-        echo ' 		<td>';
-        echo '		<table width="100%" border="0" cellspacing="0" cellpadding="0">';
-        echo ' 			<tr align="left" valign="top">';
-        echo ' 				<td class="headingCell1"><div align="center">HEADING DETAILS</div></td>';
-        echo ' 				<td width="75%">&nbsp;</td>';
-        echo ' 			</tr>';
-        echo '		</table>';
-        echo '		</td>';
-      	echo '	</tr>';
-      	echo '	<tr>';
-        echo '		<td align="left" valign="top" class="borders">';
-        echo '		<table width="100%" border="0" cellspacing="0" cellpadding="3">';
-        echo '		    <tr valign="middle">';
-        echo '		      	<td colspan="2" align="right" bgcolor="#CCCCCC" class="headingCell1">&nbsp;</td>';
-        echo '		    </tr>';
-        echo '		    <tr valign="middle">';
-        echo '      		<td width="30%" align="right" bgcolor="#CCCCCC"><div align="right" class="strong"><font color="#FF0000"><strong>*</strong></font> Heading Title:</div></td>';
-        echo '				<td align="left"><input name="heading" type="text" size="60" value="'.$heading->item->getTitle().'"></td>';
-        echo '			</tr>';
-        echo '			<tr valign="middle">';
-        echo '				<td width="30%" align="right" bgcolor="#CCCCCC"><strong>Current Sort Position: </strong></td>';
-        //echo '				<td align="left"> &nbsp;'.$heading->getSortOrder().'&nbsp;<!-- <a href="link">change sort position &gt;&gt; </a>--></td>';
-        echo '				<td align="left"> &nbsp;'.$currentSortOrder.'&nbsp;<!-- <a href="link">change sort position &gt;&gt; </a>--></td>';
-        echo '			</tr>';
-        
-        //START
-        if ($contentNotes) {
+		</form>
 
-			echo "            <tr valign=\"middle\">\n";
-			echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Content Note:<br></span></div></td>\n";
-			echo "				<td width=\"100%\" align=\"left\"><textarea name=\"contentNotes\" cols=\"50\" rows=\"3\">".$contentNotes."</textarea></td>\n";
-			echo "			</tr>\n";
-		}
-		if ($itemNotes) {
-
-			for ($i=0; $i<count($itemNotes); $i++) {
-
-				//if ($user->dfltRole >= $g_permission['staff'] || $itemNotes[$i]->getType() == "Instructor" || $itemNotes[$i]->getType() == "Content") {
-					echo "      <tr valign=\"middle\">\n";
-					echo "			";
-					echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">".$itemNotes[$i]->getType()." Note:</span><br><a href=\"index.php?cmd=editHeading&ci=".$ci."&headingID=".$heading->getReserveID()."&deleteNote=".$itemNotes[$i]->getID()."\">Delete this note</a></td>\n";
-					echo "				<td align=\"left\"><textarea name=\"itemNotes[".$itemNotes[$i]->getID()."]\" cols=\"50\" rows=\"3\">".$itemNotes[$i]->getText()."</textarea></td>\n";
-					echo "      </tr>\n";
-				//}
-			}
-		}
-		if ($instructorNotes) {
-
-			for ($i=0; $i<count($instructorNotes); $i++) {
-
-				echo "      <tr valign=\"middle\">\n";
-				echo "			";
-				echo "			<!-- On page load, by default, there is no blank \"Notes\" field showing, only ";
-				echo "			previously created notes, if any, and the \"add Note\" button. Notes should";
-				echo "			be added one after the other at the bottom of the table, but above the \"add Note\" button.-->\n";
-				echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">Instructor Note:</span><br><a href=\"index.php?cmd=editHeading&ci=".$ci."&headingID=".$heading->getReserveID()."&deleteNote=".$instructorNotes[$i]->getID()."\">Delete this note</a></td>\n";
-				echo "				<td align=\"left\"><textarea name=\"instructorNotes[".$instructorNotes[$i]->getID()."]\" cols=\"50\" rows=\"3\">".$instructorNotes[$i]->getText()."</textarea></td>\n";
-				echo "      </tr>\n";
-			}
-		}
-		
-		//END
-        
-        if ($heading->getReserveID())
-        {
-        echo '			<tr valign="middle">';
-        echo '				<td colspan="2" align="left" valign="top" bgcolor="#CCCCCC" class="borders">';
-        echo '					<div align="center"><input type="button" name="addNote" value="Add Note" onClick="openWindow(\'&cmd=addNote&reserve_id='.$heading->getReserveID().'\');"></div>';
-        echo '				</td>';
-        echo '			</tr>';
-      	}
-        echo '		</table>';
-        echo '		</td>';
-      	echo '	</tr>';
-      	echo '	<tr>';
-        echo '		<td>&nbsp;</td>';
-      	echo '	</tr>';
-      	/*
-      	echo '	<tr>';
-        echo '		<td><div align="left">';
-        echo '			<p align="center">';
-        echo '				<input type="submit" name="Submit" value="Save Changes">';
-    	echo '				<br>';
-    	echo '				&gt;&gt; Save changes and return to class';
-    	echo '			</p>';
-        echo '			<p align="center">';
-        echo '				<input type="submit" name="Submit" value="Add another heading">';
-        echo '				<br>';
-        echo '				&gt;&gt; Save changes and create another heading';
-        echo '			</p>';
-        echo '		</div></td>';
-      	echo '	</tr>';
-      	*/
-      	echo '	<tr><td align="left"><a href="javascript:processHeading(document.forms.editHeading,\'editClass\');">&gt;&gt;&nbsp;Save changes and return to class</a></td></tr>';
-      	echo '	<tr><td align="left"><a href="javascript:processHeading(document.forms.editHeading,\'editHeading\');">&gt;&gt;&nbsp;Save changes and create another heading</a></td></tr>';
-      	echo '	<tr><td align="left"><a href="javascript:processHeading(document.forms.editHeading,\'customSort\');">&gt;&gt;&nbsp;Save changes and change heading sort position</a></td></tr>';
-      	echo '	<tr><td align="left">&nbsp;</td></tr>';
-      	echo '	<tr><td align="left"><a href="index.php?cmd=editClass&ci='.$ci.'">&gt;&gt;&nbsp;Cancel and return to class</a></td></tr>';
-      	echo '	<tr>';
-        echo '		<td><img src="/images/spacer.gif" width="1" height="15"></td>';
-      	echo '	</tr>';
-    	echo '</table>';
-    	echo '</form>';
+<?php
+	
 	}
 	
-	function displayEditItemScreen($item,$user,$owner_list=null,$search_serial=null)
-	{
-		
-		global $g_permission, $g_documentURL;
+	
+	/**
+	* @return void
+	* @param reserveItem $item reserveItem object
+	* @param object $user user interface object (object depends on user type)
+	* @param reserves $reserve (optional) reserves object
+	* @param array $owner_list (optional) array of user objects
+	* @param string $search_serial (optional) urlencoded search query string
+	* @param array $dub_array (optional) array of information pertaining to duplicating an item. currently 'dubReserve' flag and 'selected_instr'
+	* @desc Displays form for editing item information (optionally: reserve information)
+	*/	
+	function displayEditItemScreen($item, $user, $reserve=null, $search_serial=null, $dub_array=null) {
+		global $calendar;
 		
 		$title = $item->getTitle();
 		$author = $item->getAuthor();
@@ -474,80 +417,241 @@ class itemDisplayer
 		$volEdition = $item->getVolumeEdition();
 		$pagesTimes = $item->getPagesTimes();
 		$source = $item->getSource();
-		$contentNotes = $item->getContentNotes();
-		$itemNotes = $item->getNotes(); //Valid note types, associated with an item, are content, copyright, and staff
+		$docTypeIcon = $item->getItemIcon();
+		$docTypeIcons = $user->getAllDocTypeIcons();
+		$libraries = $user->getLibraries();
+		$library_id = $item->getHomeLibraryID();
+		//notes
+		$item_notes = $item->getNotes();
+		
+		//format long urls
+		if(strlen($url) > 75) {
+			$url = substr($url, 0, 75).'...';
+		}
+
 		//private user
 		if( !is_null($item->getPrivateUserID()) ) {
 			$privateUserID = $item->getPrivateUserID();
 			$item->getPrivateUser();
 			$privateUser = $item->privateUser->getName(). ' ('.$item->privateUser->getUsername().')';
 		}
+		
+		//reserve - only applies if we are editing a reserve (item instance linked to a course instance)
+		if( !empty($reserve) && ($reserve instanceof reserve) ) {	//we are editing reserve info
+			$edit_reserve = true; //set flag to show the reserve block
+
+			//status
+			switch($reserve->getStatus()) {
+				case 'ACTIVE':
+					$reserve_status_active = 'checked="true"';
+					$reserve_status_inactive = '';
+					$reserve_block_vis = '';
+					break;
+				case 'INACTIVE':
+					$reserve_status_active = '';
+					$reserve_status_inactive = 'checked="true"';
+					$reserve_block_vis = 'style="visibility:hidden;"';
+					break;
+			}
+			
+			//dates
+			$reserve_activation_date = $reserve->getActivationDate();
+			$reserve_expiration_date = $reserve->getExpirationDate();
+			//set reset dates to course dates
+			$ci = new courseInstance($reserve->getCourseInstanceID());
+			$course_activation_date = $ci->getActivationDate();	
+			$course_expiration_date = $ci->getExpirationDate();
+			
+			//notes
+			$reserve_notes = $reserve->getNotes();
+		} 
+		else $edit_reserve = false;
 ?>
-	<script language="JavaScript">
-	//<!--
-		function validateForm(frm)
-		{			
-			var alertMsg = "";
 
-			if (frm.title.value == "")
-				alertMsg = alertMsg + "Title is required.<br />";
+		<div id="alertMsg" align="center" class="failedText"></div>
+        <p />
+        
+		<script language="JavaScript">
+		//<!--
+			function validateForm(frm,physicalCopy) {			
+				var alertMsg = "";
+
+				if (frm.title.value == "")
+					alertMsg = alertMsg + "Title is required.<br>";
 				
-			if (frm.documentType[1].checked)
-			{ 
-				if (frm.userFile.value == "")
-					alertMsg = alertMsg + "File path is required.<br>"
-			} else if (frm.documentType[2].checked) {
-				if (frm.url.value == "")
-					alertMsg = alertMsg + "URL is required.<br>";				
-			} 
+				if (physicalCopy) {
+					//make sure this physical copy is supposed to have a barcode
+					//	if it is, there will be an input element for it in the form
+					if( (document.getElementById('barcode') != null) && (document.getElementById('barcode').value == '') )
+						alertMsg = alertMsg + "Barcode is required.<br />";
+				}
+				else if((frm.documentType.value == "DOCUMENT") && (frm.userFile.value == "")) {
+					alertMsg = alertMsg + "You must choose a file to upload.<br />";
+				}
+				else if((frm.documentType.value == "URL") && (frm.url.value == "")) {
+					alertMsg = alertMsg + "URL is required.<br />";
+				}
 				
-			if (!alertMsg == "") 
-			{ 
-				document.getElementById('alertMsg').innerHTML = alertMsg;
-				return false;
+				
+				if (!alertMsg == "") { 
+					document.getElementById('alertMsg').innerHTML = alertMsg;
+					return false;
+				}					
 			}
-		}
+			
+			//shows/hides personal item elements; marks them as required or not
+			function togglePersonal(enable) {
+				if(enable) {
+					document.getElementById('personal_item_yes').checked = true;
+					document.getElementById('personal_item_owner_block').style.display ='';
+					togglePersonalOwnerSearch();
+				}
+				else {
+					document.getElementById('personal_item_no').checked = true;
+					document.getElementById('personal_item_owner_block').style.display ='none';
+				}
+			}
 		
+			//shows/hides personal item owner search fields
+			function togglePersonalOwnerSearch() {
+				//if no personal owner set, 
+				if(document.getElementById('personal_item_owner_curr').checked) {
+					document.getElementById('personal_item_owner_search').style.visibility = 'hidden';
+				}
+				else if(document.getElementById('personal_item_owner_new').checked) {
+					document.getElementById('personal_item_owner_search').style.visibility = 'visible';
+				}	
+			}
+			
+			//shows/hides activation/expiration date form elements
+			function toggleDates() {
+				if(document.getElementById('reserve_status_active').checked) {
+					document.getElementById('reserve_dates_block').style.visibility = 'visible';
+				}
+				else {
+					document.getElementById('reserve_dates_block').style.visibility = 'hidden';
+				}
+			}
+			
+			//resets reserve dates
+			function resetDates(from, to) {
+				document.getElementById('reserve_activation_date').value = from;
+				document.getElementById('reserve_expiration_date').value = to;
+			}
+		//-->
+		</script>
 		
-		//shows/hides personal item elements; marks them as required or not
-		function togglePersonal(enable) {
-			if(enable) {
-				document.getElementById('personal_item_yes').checked = true;
-				document.getElementById('personal_item_owner_block').style.display ='';
-				togglePersonalOwnerSearch();
-			}
-			else {
-				document.getElementById('personal_item_no').checked = true;
-				document.getElementById('personal_item_owner_block').style.display ='none';
-			}
-		}
-	
-		//shows/hides personal item owner search fields
-		function togglePersonalOwnerSearch() {
-			//if no personal owner set, 
-			if(document.getElementById('personal_item_owner_curr').checked) {
-				document.getElementById('personal_item_owner_search').style.visibility = 'hidden';
-			}
-			else if(document.getElementById('personal_item_owner_new').checked) {
-				document.getElementById('personal_item_owner_search').style.visibility = 'visible';
-			}	
-		}
-	//-->
-	</script>			
+<?php	if($item->getItemGroup() == 'ELECTRONIC'): ?>
+
+		<form name="itemForm" enctype="multipart/form-data" action="index.php?cmd=editItem" method="post" onSubmit="return validateForm(this,false);">
+		
+<?php	else: ?>
+
+		<form name="itemForm" action="index.php?cmd=editItem" method="post" onSubmit="return validateForm(this,true);">
+		
+<?php	endif; ?>
+
+			<input type="hidden" name="itemID" value="<?=$item->getItemID()?>" />
+			<input type="hidden" name="search" value="<?=$search_serial?>" />
+			
+<?php	if($edit_reserve): ?>
+			<input type="hidden" name="reserveID" value="<?=$reserve->getReserveID()?>" />	
+<?php 	endif; ?>
+
+<?php	if(!empty($dub_array)): 
+			foreach($dub_array as $key=>$val):
+?>
+			<input type="hidden" name="<?=$key?>" value="<?=$val?>" />	
 <?php
-		$formEncode = ($item->getItemGroup() == 'ELECTRONIC') ? "enctype=\"multipart/form-data\"" : "";
-		echo "<form name=\"reservesMgr\" action=\"index.php?cmd=editItem\" method=\"post\" $formEncode onSubmit=\"return validateForm(this);\">\n";
-		
-		echo "<input type=\"hidden\" name=\"itemID\" value=\"".$item->getItemID()."\">\n";
-		echo "<input type=\"hidden\" name=\"search\" value=\"".$search_serial."\">\n";		
+			endforeach;
+		endif;
+?>
 
-		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "	  <tr>\n";
-		echo "     	<td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td>\n";
-		echo "	  </tr>\n";		
+
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+				<tr>
+					<td colspan="2" align="center">
+						<p class="helperText">
+							You are editing the source item. Changes to information such as Title, Author, etc. will affect every reserve linked to this item.
+
+<?php	if($edit_reserve): ?>
+							<br />Changes to status (active/inactive) and activation/expiration dates will affect only this class.
+<?php	endif; ?>
+
+						</p>
+						<br />
+					</td>
+				</tr>
+				<tr class="strong">
+
+<?php	if($edit_reserve): ?>
+					<td align="right" colspan="2"><a href="index.php?cmd=editClass&amp;ci=<?=$reserve->getCourseInstanceID()?>">Return to Class</a></td>
+<?php	else: ?>
+					<td align="right" colspan="2"><a href="index.php?cmd=doSearch&amp;search=<?=urlencode($_REQUEST['search'])?>">Return to Search Results</a></td>
+<?php	endif; ?>
+				</tr>
+				
+<?php	if($edit_reserve):	//only show this block if editing a reserve ?>
+
+				<tr>
+					<td class="headingCell1" width="25%" align="center">RESERVE DETAILS</td>
+					<td width="75%" align="center">&nbsp;</td>
+				</tr>
+				<tr>
+					<td colspan="2" class="borders">
+						<table width="100%" border="0" cellspacing="0" cellpadding="0">
+							<tr bgcolor="#CCCCCC">
+								<td>
+					
+<?php		if($reserve->getStatus()=='IN PROCESS'): ?>
+
+									<div id="statusText">
+										<strong>Current Status:</strong>&nbsp;<span id="statusText" class="inProcess">IN PROCESS</span>
+										<br />
+										Please contact your Reserves staff to inquire about the status of this reserve.
+										<input type="hidden" name="reserve_status" value="IN PROCESS" />
+									</div>
+						
+<?php		else: ?>
+									<table width="100%" border="0" cellspacing="0" cellpadding="5">
+										<tr valign="top">
+											<td width="25%">
+												<strong>Set Status:</strong>
+												<br />
+												<div id="statusText" style="margin-left:10px;">
+													<input type="radio" name="reserve_status" id="reserve_status_active" value="ACTIVE" onChange="toggleDates();" <?=$reserve_status_active?> />&nbsp;<span class="active">ACTIVE</span>
+													<br />
+													<input type="radio" name="reserve_status" id="reserve_status_inactive" value="INACTIVE" onChange="toggleDates();" <?=$reserve_status_inactive?> />&nbsp;<span class="inactive">INACTIVE</span>
+												</div>
+											</td>
+											<td>
+												<div id="reserve_dates_block" <?=$reserve_block_vis?>>
+													<strong>Active Dates</strong> (YYYY-MM-DD) &nbsp;&nbsp; [<a href="#" name="reset_dates" onclick="resetDates('<?=$course_activation_date?>', '<?=$course_expiration_date?>'); return false;">Reset dates</a>]
+													<br />
+													<div style="margin-left:10px;">
+														<strong>From:</strong>&nbsp;<input type="text" id="reserve_activation_date" name="reserve_activation_date" size="10" maxlength="10" value="<?=$reserve_activation_date?>" /> <?=$calendar->getWidgetAndTrigger('reserve_activation_date', $reserve_activation_date)?>
+														<br />
+														<strong>To:</strong>&nbsp;<input type="text" id="reserve_expiration_date" name="reserve_expiration_date" size="10" maxlength="10" value="<?=$reserve_expiration_date?>" />  <?=$calendar->getWidgetAndTrigger('reserve_expiration_date', $reserve_expiration_date)?>
+													</div>
+												</div>
+											</td>
+										</tr>
+									</table>						
+<?php		endif; ?>
+								</td>
+							</tr>
+							
+						</table>
+					</td>
+				</tr>
+				<tr><td>&nbsp;</td></tr>	
+<?php	endif;	//end reserve info block ?>		    	
+				    	
+<?php
+		//electronic data block (file management)
 		
-		if ($item->getItemGroup() == 'ELECTRONIC')
-		{
+		if($item->getItemGroup() == 'ELECTRONIC'):
+			//set up some form elements
 			if (!isset($request['documentType'])) {
 				$maintain_current = 'checked';
 				$upload_checked  = '';
@@ -568,299 +672,305 @@ class itemDisplayer
 				$url_checked	 = 'checked'; 
 				$url_disabled	 = '';				
 			}
-			
-			echo "  <tr>\n";
-			echo "    	<td>\n";
-			echo "    	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
-			echo "        	<tr align=\"left\" valign=\"top\">\n";
-			echo "            	<td class=\"headingCell1\"><div align=\"center\">ITEM SOURCE</div></td>\n";
-			echo "				<td width=\"75%\">&nbsp;</td>\n";
-			echo "			</tr>\n";
-			echo "		</table>\n";
-			echo "		</td>\n";
-			echo "	</tr>\n";
-			echo "  <tr>\n";
-			echo "    	<td align=\"left\" valign=\"top\" class=\"borders\">\n";
-			echo "			<table width=\"100%\" border=\"0\" cellpadding=\"3\" cellspacing=\"0\" bgcolor=\"#CCCCCC\" align=\"center\">\n";
-			echo "				<tr class=\"borders\">\n";
-			echo "					<td align=\"left\" valign=\"top\" NOWRAP><strong>Current URL:</strong></td>\n";
-			echo "					<td>$url &nbsp;&nbsp;&nbsp;<i><b>to overwrite set below</b></i></td>\n";
-			echo "				</tr>\n";
-
-			echo "				<tr class=\"borders\">\n";
-			echo "					<td align=\"left\" valign=\"top\" NOWRAP colspan=\"2\">\n";
-			echo "						<input type=\"radio\" name=\"documentType\" $maintain_current onClick=\"this.form.userFile.disabled = true; this.form.url.disabled = true;\">";
-			echo "						&nbsp;<span class=\"strong\">Maintain current URL</span>\n";
-			echo "					</td>\n";
-			echo "				</tr>\n";			
-			
-			
-			echo "				<tr class=\"borders\">\n";
-			echo "					<td align=\"left\" valign=\"top\" NOWRAP>\n";
-			echo "						<input type=\"radio\" name=\"documentType\" value=\"DOCUMENT\" $upload_checked onClick=\"this.form.userFile.disabled = !this.checked; this.form.url.disabled = this.checked;\">";
-			echo "						&nbsp;<span class=\"strong\">Upload new file&gt;&gt;</span>\n";
-			echo "					</td>\n";
-			echo "					<td align=\"left\" valign=\"top\" colspan=\"2\"><input type=\"file\" name=\"userFile\" size=\"40\" $upload_disabled></td>\n";
-			echo "				</tr>\n";
-			echo "				<tr class=\"borders\">\n";
-			echo "					<td align=\"left\" valign=\"top\">\n";
-			echo "						<input type=\"radio\" name=\"documentType\" value=\"URL\" $url_checked onClick=\"this.form.url.disabled = !this.checked; this.form.userFile.disabled = this.checked;\">\n";
-			echo "						<span class=\"strong\">Change URL&gt;&gt;</span>\n";
-			echo "					</td>\n";
-			echo "					<td align=\"left\" valign=\"top\">\n";
-			echo "						<input name=\"url\" type=\"text\" size=\"50\" $url_disabled>\n";
-			echo "					</td>\n";
-			echo "					<td align=\"left\" valign=\"top\" width=\"80%\">";
-			echo "						<input type=\"button\" onClick=\"openNewWindow(this.form.url.value, 500);\" value=\"Preview\">";
-			echo "					</td>\n";			
-			echo "				</tr>\n";
-			echo "			</table>\n";		
-			echo "		</td>\n";
-			echo "	</tr>\n";
-		}
-		
-		echo "    <tr>\n";
-		echo "    	<td>\n";
-		echo "    	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
-		echo "        	<tr align=\"left\" valign=\"top\">\n";
-		echo "            	<td class=\"headingCell1\"><div align=\"center\">ITEM DETAILS</div></td>\n";
-		echo "				<td width=\"75%\">&nbsp;</td>\n";
-		echo "			</tr>\n";
-		echo "		</table>\n";
-		echo "		</td>\n";
-		echo "	</tr>\n";
-		echo "    <tr>\n";
-		echo "    	<td align=\"left\" valign=\"top\" class=\"borders\">\n";
-		echo "    	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
-		echo "            <tr valign=\"middle\">\n";
-		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>Document Title:</div></td>\n";
-		echo "				<td width=\"100%\" align=\"left\"><input name=\"title\" type=\"text\" id=\"title\" size=\"50\" value=\"$title\"></td>\n";
-		echo "			</tr>\n";
-		echo "            <tr valign=\"middle\">\n";
-		echo "            	<td width=\"25%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\">Author/Composer:</div></td>\n";
-		echo "				<td width=\"100%\" align=\"left\"><input name=\"author\" type=\"text\" id=\"author\" size=\"50\" value=\"".$author."\"></td>\n";
-		echo "			</tr>\n";
-
-		if ($item->getItemGroup() != 'ELECTRONIC')
-		{
-/*			
-			echo "          <tr valign=\"middle\">\n";
-			echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>URL:</div></td>\n";
-			echo "				<td width=\"100%\" align=\"left\">";
-			//echo "					<input name=\"url\" type=\"text\" size=\"50\" value=\"".urldecode($url)."\">";
-			//echo "					<input type=\"button\" onClick=\"openNewWindow(this.form.url.value, 500);\" value=\"Preview\">";
-			//echo "					&nbsp;&nbsp;";
-			//echo "					<input type=\"button\" onClick=\"openNewWindow(this.form.url.value, 500);\" value=\"Preview\">";
-
-
-			
-			
-			
-			echo "				</td>\n";
-			echo "			</tr>\n";
-		} else {
-*/
-			$pc = new physicalCopy();
-			$pc->getByItemID($item->getItemID());
-			echo "          <tr valign=\"middle\">\n";
-			echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>Barcode:</div></td>\n";
-			echo "				<td width=\"100%\" align=\"left\"><input name=\"barcode\" type=\"text\" size=\"50\" value=\"". $pc->getBarcode() ."\"></td>\n";
-			echo "			</tr>\n";
-		}
-		
-		echo "          <tr valign=\"middle\">\n";
-		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Performer </span><span class=\"strong\">:</span></div></td>\n";
-		echo "				<td width=\"100%\" align=\"left\"><input name=\"performer\" type=\"text\" id=\"performer\" size=\"50\" value=\"".$performer."\"></td>\n";
-		echo "			</tr>\n";
-		echo "            <tr valign=\"middle\">\n";
-		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Book/Journal/Work Title</span><span class=\"strong\">:</span></div></td>\n";
-		echo "				<td width=\"100%\" align=\"left\"><input name=\"volumeTitle\" type=\"text\" id=\"volumeTitle\" size=\"50\" value=\"".$volTitle."\"></td>\n";
-		echo "			</tr>\n";
-		echo "            <tr valign=\"middle\">\n";
-		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Volume/ Edition</span><span class=\"strong\">:</span></div></td>\n";
-		echo "				<td width=\"100%\" align=\"left\"><input name=\"volumeEdition\" type=\"text\" id=\"volumeEdition\" size=\"50\" value=\"".$volEdition."\"></td>\n";
-		echo "			</tr>\n";
-		echo "            <tr valign=\"middle\">\n";
-		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Pages/Time</span><span class=\"strong\">:</span></div></td>\n";
-		echo "				<td width=\"100%\" align=\"left\"><input name=\"pagesTimes\" type=\"text\" id=\"pages\" size=\"50\" value=\"".$pagesTimes."\"></td>\n";
-		echo "            </tr>\n";
-		echo "            <tr valign=\"middle\">\n";
-		echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Source/ Year</span><span class=\"strong\">:</span></div></td>\n";
-		echo "				<td width=\"100%\" align=\"left\"><input name=\"source\" type=\"text\" id=\"source\" size=\"50\" value=\"".$source."\"></td>\n";
-		echo "			</tr>\n";
+?>
+				
+				<tr>
+					<td class="headingCell1" width="25%" align="center">ITEM SOURCE</td>
+					<td width="75%" align="center">&nbsp;</td>
+				</tr>
+				<tr>
+					<td colspan="2" class="borders" bgcolor="#CCCCCC">
+						<div class="strong" style="padding:5px;">
+							Current URL: <em><?=$url?></em> [<a href="reservesViewer.php?item=<?=$item->getItemID()?>">Preview</a>]
+							<br />
+							<small>Please note that items stored on the ReservesDirect server are access restricted; use the Preview link to view the item.<br/>
+                            To overwrite this URL, use the options below.</small>
+							<p />
+							<div style="margin:2px;"><input type="radio" name="documentType" <?=$maintain_current?> onClick="this.form.userFile.disabled = true; this.form.url.disabled = true;">&nbsp;Maintain current URL</div>
+							<div style="margin:2px;"><input type="radio" name="documentType" value="DOCUMENT" <?=$upload_checked?> onClick="this.form.userFile.disabled = !this.checked; this.form.url.disabled = this.checked;">&nbsp;Upload new file&nbsp;&gt;&gt;&nbsp;<input type="file" name="userFile" size="40" <?=$upload_disabled?>></div>
+							<div style="margin:2px;"><input type="radio" name="documentType" value="URL" <?=$url_checked?> onClick="this.form.url.disabled = !this.checked; this.form.userFile.disabled = this.checked;">&nbsp;Change URL&nbsp;&gt;&gt;&nbsp;<input name="url" type="text" size="50" <?=$url_disabled?>>&nbsp;<input type="button" onClick="openNewWindow(this.form.url.value, 500);" value="Preview"></div>
+						</div>
+					</td>
+				</tr>
+				<tr><td>&nbsp;</td></tr>
+					
+<?php
+		endif;	//end electronic item info block
+?>		
+				<tr>
+					<td class="headingCell1" width="25%" align="center">ITEM DETAILS</td>
+					<td width="75%" align="center">&nbsp;</td>
+				</tr>
+			    <tr>
+			    	<td colspan="2" class="borders">
+				    	<table width="100%" border="0" cellspacing="0" cellpadding="5">
+				    		<tr>
+				    			<td width="30%" bgcolor="#CCCCCC" align="right" class="strong">
+				    				<font color="#FF0000">*</font>&nbsp;Document Title:
+				    			</td>
+				    			<td>
+				    				<input name="title" type="text" id="title" size="50" value="<?=$title?>">
+				    			</td>
+				    		</tr>
+				    		<tr>
+				    			<td bgcolor="#CCCCCC" align="right" class="strong">
+				    				Author/Composer:
+				    			</td>
+				    			<td>
+				    				<input name="author" type="text" id="author" size="50" value="<?=$author?>">
+				    			</td>
+				    		</tr>
+				    		<tr>
+				    			<td bgcolor="#CCCCCC" align="right" class="strong">
+				    				Performer:
+				    			</td>
+				    			<td>
+				    				<input name="performer" type="text" id="performer" size="50" value="<?=$performer?>">
+				    			</td>
+				    		</tr>
+				    		<tr>
+				    			<td bgcolor="#CCCCCC" align="right" class="strong">
+				    				Document Type Icon:
+				    			</td>
+				    			<td>
+				    				<select name="selectedDocIcon" onChange="document.iconImg.src = this[this.selectedIndex].value;">
+<?php
+		foreach($docTypeIcons as $icon):
+			$selected = ($docTypeIcon == $icon['helper_app_icon']) ? ' selected="selected"' : '';
+?>
+										<option value="<?=$icon['helper_app_icon']?>"><?=$icon['helper_app_name']?></option>
+<?php	endforeach; ?>
+									</select>
+									<img name="iconImg" width="24" height="20" src="<?=$docTypeIcon?>" />
+				    			</td>
+				    		</tr>
+				    		<tr>
+				    			<td bgcolor="#CCCCCC" align="right" class="strong">
+				    				Book/Journal/Work Title:
+				    			</td>
+				    			<td>
+				    				<input name="volumeTitle" type="text" id="volumeTitle" size="50" value="<?=$volTitle?>">
+				    			</td>
+				    		</tr>
+				    		<tr>
+				    			<td bgcolor="#CCCCCC" align="right" class="strong">
+				    				Volume/Edition:
+				    			</td>
+				    			<td>
+				    				<input name="volumeEdition" type="text" id="volumeEdition" size="50" value="<?=$volEdition?>">
+				    			</td>
+				    		</tr>
+				    		<tr>
+				    			<td bgcolor="#CCCCCC" align="right" class="strong">
+				    				Pages/Time
+				    			</td>
+				    			<td>
+				    				<input name="pagesTimes" type="text" id="pagesTimes" size="50" value="<?=$pagesTimes?>">
+				    			</td>
+				    		</tr>
+				    		<tr>
+				    			<td bgcolor="#CCCCCC" align="right" class="strong">
+				    				Source/Year:
+				    			</td>
+				    			<td>
+				    				<input name="source" type="text" id="source" size="50" value="<?=$source?>">
+				    			</td>
+				    		</tr>
+<?php
+		//physical item block
+		if($item->isPhysicalItem()):
+	
+			//home library selector
+?>
+				    		<tr>
+				    			<td bgcolor="#CCCCCC" align="right" class="strong">
+				    				Reserve Desk:
+				    			</td>
+				    			<td>
+				    				<select name="home_library">
+<?php
+			foreach($libraries as $lib):
+				$selected_lib = ($library_id == $lib->getLibraryID()) ? 'selected="selected"' : '';
+?>
+										<option value="<?=$lib->getLibraryID()?>" <?=$selected_lib?>><?=$lib->getLibrary()?></option>			
+<?php		endforeach; ?>
+				    				</select>
+				    			</td>
+				    		</tr>
+<?php
+			//details from the physical copy table (barcode/call num)
+			if($item->getPhysicalCopy()):
+?>
+				    		<tr>		
+								<td bgcolor="#CCCCCC" align="right" class="strong">
+									<font color="#FF0000">*</font>&nbsp;Barcode:
+								</td>
+								<td>
+									<input name="barcode" type="text" id="barcode" size="20" value="<?=$item->physicalCopy->getBarcode()?>" />
+				
+								</td>
+							</tr>
+							<tr>		
+								<td bgcolor="#CCCCCC" align="right" class="strong">
+									Call Number:
+								</td>
+								<td>
+									<input name="call_num" type="text" id="call_num" size="30" value="<?=$item->physicalCopy->getCallNumber()?>" />
+								</td>				
+							</tr>
+<?php
+			endif;	//end physical copy info
+		endif; //end physical item block
 		
 		//personal copy/private user block
-		
-		//set search-by selected
-		$username = "";
-		$last_name = "";
-		$selector = (isset($_REQUEST['select_owner_by'])) ? $_REQUEST['select_owner_by'] : "last_name";
-		$$selector = 'selected="selected"';
-		
-		//set search term
-		$owner_qryTerm = (isset($_REQUEST['owner_qryTerm'])) ? $_REQUEST['owner_qryTerm'] : "";
-
-		//set name selected
-		$inst_DISABLED = (is_null($owner_list)) ? 'disabled="disabled"' : '';
-
-		//show the form elements
 ?>
-			<tr align="left" valign="top" id="personal_item_row">
-				<td align="right" bgcolor="#CCCCCC" class="strong">
-					Personal Copy Owner:
-				</td>
-				<td>
-					<div id="personal_item_choice">
-						<input type="radio" name="personal_item" id="personal_item_no" value="no" onChange="togglePersonal(0);" /> No
-						&nbsp;&nbsp;
-						<input type="radio" name="personal_item" id="personal_item_yes" value="yes" onChange="togglePersonal(1);" /> Yes
-					</div>
-					<div id="personal_item_owner_block" style="margin-top:2px; margin-bottom:15px;">
+							<tr id="personal_item_row" valign="top">
+								<td align="right" bgcolor="#CCCCCC" class="strong">
+									Personal Copy Owner:
+								</td>
+								<td>
+									<div id="personal_item_choice" style="background-color:#EEDDCC;">
+										<input type="radio" name="personal_item" id="personal_item_no" value="no" onChange="togglePersonal(0);" /> No
+										&nbsp;&nbsp;
+										<input type="radio" name="personal_item" id="personal_item_yes" value="yes" onChange="togglePersonal(1);" /> Yes
+									</div>
+									<div id="personal_item_owner_block" style="padding:2px 3px 15px; background-color:#DFD8C6; border-top:1px dashed #999999;">
 <?php
 	//if there is an existing owner, give a choice of picking new one
 	if(isset($privateUser)):
 ?>
-						<input type="radio" name="personal_item_owner" id="personal_item_owner_curr" value="old" checked="checked" onChange="togglePersonalOwnerSearch();" /> Current - <strong><?=$privateUser?></strong>
-						<br />
-						<input type="radio" name="personal_item_owner" id="personal_item_owner_new" value="new" onChange="togglePersonalOwnerSearch();" /> New &nbsp;
+										<input type="radio" name="personal_item_owner" id="personal_item_owner_curr" value="old" checked="checked" onChange="togglePersonalOwnerSearch();" /> Current - <strong><?=$privateUser?></strong>
+										<br />
+										<input type="radio" name="personal_item_owner" id="personal_item_owner_new" value="new" onChange="togglePersonalOwnerSearch();" /> New &nbsp;
 <?php
 	else:	//if not, then just assume we are searching for a new one
 ?>
-						<input type="hidden" name="personal_item_owner" id="personal_item_owner_new" value="new" />
+										<input type="hidden" name="personal_item_owner" id="personal_item_owner_new" value="new" />
 <?php
 	endif;
 ?>
-						<span id="personal_item_owner_search">
-							<select name="select_owner_by">
-								<option value="last_name" <?=$last_name?>>Last Name</option>
-								<option value="username" <?=$username?>>User Name</option>
-							</select>
-							&nbsp; <input id="owner_qryTerm" name="owner_qryTerm" type="text" value="<?=$owner_qryTerm?>" size="15"  onBlur="this.form.submit();">
-							&nbsp; <input type="submit" name="owner_search" value="Search">
-							&nbsp;
-							<select name="selected_owner" <?=$inst_DISABLED?>>
-								<option value="null">-- Choose Item Owner -- </option>
+										<span id="personal_item_owner_search">
 <?php
-		for($i=0;$i<count($owner_list);$i++) {
-			$owner_selector = ($_REQUEST['selected_owner'] == $owner_list[$i]->getUserID() || $search_results['personal_owner'] == $owner_list[$i]->getUserID()  ) ? 'selected="selected"' : '';
-			echo "\t\t\t\t\t\t\t".'<option value="'. $owner_list[$i]->getUserID() .'" '.$owner_selector.'>'.$owner_list[$i]->getName().'</option>'."\n";
-		}
+		//ajax user lookup
+		$mgr = new ajaxManager('lookupUser', null, null, null, null, false, array('min_user_role'=>3, 'field_id'=>'selected_owner'));
+		$mgr->display();		
 ?>
-							</select>
-						</span>
-					</div>
-				</td>
-			</tr>
+										</span>
+									</div>
+								</td>
+							</tr>
+<?php	if(!empty($reserve_notes)): 
+			//show reserve notes
+			self::displayEditNotes($reserve_notes, 'reserveID='.$reserve->getReserveID());
+		endif; ?>
 <?php
-		//notes
+		//build correct link for the item notes, depending on if we are editing item or reserve
+		$link = $edit_reserve ? 'reserveID='.$reserve->getReserveID() : 'itemID='.$item->getItemID();
 		
-		if ($contentNotes) {
-		
-			echo "            <tr valign=\"middle\">\n";
-			echo "            	<td width=\"25%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Content Note:<br></span></div></td>\n";
-			echo "				<td width=\"100%\" align=\"left\"><textarea name=\"contentNotes\" cols=\"50\" rows=\"3\">".$contentNotes."</textarea></td>\n";
-			echo "			</tr>\n";
-		}
-		if ($itemNotes) {
-			
-			for ($i=0; $i<count($itemNotes); $i++) {
-				
-				if ($user->dfltRole >= $g_permission['staff'] || $itemNotes[$i]->getType() == "Instructor" || $itemNotes[$i]->getType() == "Content") {
-					echo "      <tr valign=\"middle\">\n";
-					echo "			";
-					echo "			<!-- On page load, by default, there is no blank \"Notes\" field showing, only ";
-					echo "			previously created notes, if any, and the \"add Note\" button. Notes should";
-					echo "			be added one after the other at the bottom of the table, but above the \"add Note\" button.-->\n";
-//cannot delete notes (no ReserveID)
-echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">".$itemNotes[$i]->getType()." Note:</span></td>\n";
-//					echo "            	<td align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">".$itemNotes[$i]->getType()." Note:</span><br><a href=\"index.php?cmd=editReserve&reserveID=".$reserve->getReserveID()."&deleteNote=".$itemNotes[$i]->getID()."\">Delete this note</a></td>\n";
-					echo "				<td align=\"left\"><textarea name=\"itemNotes[".$itemNotes[$i]->getID()."]\" cols=\"50\" rows=\"3\">".$itemNotes[$i]->getText()."</textarea></td>\n";
-					echo "      </tr>\n";
-				}
+		//show notes
+		self::displayEditNotes($item_notes, $link);
+?>
+							<tr>
+			    			<td class="borders" bgcolor="#CCCCCC" colspan="2" align="center" text-align="center">
+<?php 
+		//display "Add Note" button
+		self::displayAddNoteButton($link);
+?>
+							</td>
+						</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td align="left" colspan="2">
+						<strong><font color="#FF0000">*</font></strong>&nbsp;<span class="helperText">=required fields</span>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">&nbsp;</td>
+				<tr>
+					<td colspan="2" align="center">
+						<input type="submit" name="Submit" value="Save Changes">
+					</td>
+				</tr>
+			</table>
+		</form>
+
+		<script language="JavaScript">
+			//set up some fields on load
+			if( document.getElementById('personal_item_owner_curr') != null ) {	//if there is already a private owner
+				//select current owner
+				document.getElementById('personal_item_owner_curr').checked = true;
+				//show private owner block
+				togglePersonal(1);			
 			}
-		}
+			else {
+				//default to no private owner
+				togglePersonal(0);
+			}
+		</script> 
 
-##############################
-// cannot add notes by itemID
-//
-//		echo "          <tr valign=\"middle\">\n";	
-//		echo "            	<td colspan=\"2\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"borders\" align=\"center\">\n";
-//		echo "					<input type=\"button\" name=\"addNote\" value=\"Add Note\" onClick=\"openWindow('&cmd=addNote&item_id=".$item->getitemID()."');\">\n";
-//		echo "				</td>\n";
-//		echo "			</tr>\n";
-##############################
-
-		echo "		</table>\n";
-		echo "		</td>\n";
-		echo "	</tr>\n";
-		echo "    <tr>\n";
-		echo "    	<td><strong><font color=\"#FF0000\">* </font></strong><span class=\"helperText\">=required fields</span></td>\n";
-		echo "	</tr>\n";
-		echo "    <tr>\n";
-		echo "    	<td><div align=\"center\"><input type=\"submit\" name=\"Submit\" value=\"Save Changes\"></div></td>\n";
-		echo "	</tr>\n";
-		echo "	<tr><td colspan=\"3\">&nbsp;</td></tr>\n";
-
-		echo "	<tr><td colspan=\"3\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
-		echo "    <tr>\n";
-		echo "    	<td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td>\n";
-		echo "	</tr>\n";
-		echo "</table>\n";
-		echo "</form>\n";
-?>
-	<script language="JavaScript">
-		//set up some fields on load
-		
-		//if we are searching for a new owner
-		if( document.getElementById('owner_qryTerm').value != '') {
-			//select new owner
-			document.getElementById('personal_item_owner_new').checked = true;
-			//show private owner block
-			togglePersonal(1);
-		}
-		else if( document.getElementById('personal_item_owner_curr') != null ) {	//if there is already a private owner
-			//select current owner
-			document.getElementById('personal_item_owner_curr').checked = true;
-			//show private owner block
-			togglePersonal(1);			
-		}
-		else {
-			//default to no private owner
-			togglePersonal(0);
-		}
-	</script>
 <?php
 	}
 
-	function displayItemSuccessScreen($search_serial,$user)
-	{
-		
-		global $g_permission;
-
-		echo "	<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "		<tr>\n";
-		echo "	    	<td width=\"140%\"><img src=\"/images/spacer.gif\" width=\"1\" height=\"5\"> </td>\n";
-		echo "	    </tr>\n";
-		echo "	    <tr>\n";
-		echo "	        <td align=\"left\" valign=\"top\" class=\"borders\">\n";
-		echo "				<table width=\"50%\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"5\">\n";
-		echo "	            	<tr>\n";
-		echo "	                	<td><strong>Your item has been updated successfully.</strong></td>\n";
-		echo "	                </tr>\n";
-		echo "	                <tr>\n";
-		echo "	                	<td align=\"left\" valign=\"top\">\n";
-		echo "	                		<ul>\n";
-		echo "	                			<li><a href=\"index.php?cmd=doSearch&search=". $search_serial ."\">Return to Search Results</a></li>\n";
-		echo "	                			<li><a href=\"index.php\">Return to myReserves</a><br></li>\n";
-		echo "	                		</ul>\n";
-		echo "	                	</td>\n";
-		echo "	                </tr>\n";
-		echo "	            </table>\n";
-		echo "			</td>\n";
-		echo "		</tr>\n";
-		echo "	</table>\n";				
-
-	}	
-
+	
+	/**
+	* @return void
+	* @param int $ci_id courseInstance ID
+	* @param string $search_serial serialized search _request
+	* @desc Displays editItem/editReserve success screen
+	*/	
+	function displayItemSuccessScreen($ci_id=null, $search_serial=null)	{		
+?>
+		<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+			<tr>
+		    	<td width="140%"><img src="/images/spacer.gif" width="1" height="5"> </td>
+		    </tr>
+		    <tr>
+		        <td align="left" valign="top" class="borders">
+					<table width="50%" border="0" align="center" cellpadding="0" cellspacing="5">
+		            	<tr>
+		                	<td><strong>Your item has been updated successfully.</strong></td>
+		                </tr>
+		                <tr>
+		                	<td align="left" valign="top">
+		                		<ul>		                		
+<?php	if($ci_id): ?>
+					<li><a href="index.php?cmd=editClass&amp;ci=<?=$ci_id?>">Return to Class</a></li>
+<?php	elseif($search_serial): ?>
+					<li><a href="index.php?cmd=doSearch&amp;search=<?=$search_serial?>">Return to Search Results</a></li>					
+<?php	endif; ?>
+		                			<li><a href="index.php">Return to myReserves</a><br></li>
+		                		</ul>
+		                	</td>
+		                </tr>
+		            </table>
+				</td>
+			</tr>
+		</table>
+<?php
+	}
+	
+	/**
+	* @return void
+	* @param int $ci_id courseInstance ID
+	* @desc Displays editHeading success screen
+	*/	
+	function displayHeadingSuccessScreen($ci_id=null)	{		
+?>
+		<div class="borders" style="text-align:middle;">
+			<div style="width:50%; margin:auto;">
+				<strong>Your heading has been added/updated successfully.</strong>
+				<br />
+				<ul>
+	    			<li><a href="index.php?cmd=editClass&amp;ci=<?=$ci_id?>">Return to class</a></li>
+	    			<li><a href="index.php?cmd=editHeading&amp;ci=<?=$ci_id?>">Create another heading</a></a></li>
+	    			<li><a href="index.php?cmd=customSort&amp;ci=<?=$ci_id?>">Change heading sort position</a></li>
+	    		</ul>
+			</div>
+		</div>
+<?php
+	}
+	
 }
 ?>

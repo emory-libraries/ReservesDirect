@@ -60,7 +60,7 @@ class lookupManager
 				if (isset($request['select_instr_by']) && isset($request['instr_qryTerm'])) //user is searching for an instructor
 				{
 					$users = new users();
-					$users->search($request['select_instr_by'], $request['instr_qryTerm'], 'proxy');
+					$users->search($request['select_instr_by'], $request['instr_qryTerm'], $g_permission['proxy']);
 					$instr_list = $users->userList;
 				} else $instr_list = null;
 
@@ -83,7 +83,7 @@ class lookupManager
 				if (isset($request['select_instr_by']) && isset($request['instr_qryTerm'])) //user is searching for an instructor
 				{
 					$users = new users();
-					$users->search($request['select_instr_by'], $request['instr_qryTerm'], 'proxy');
+					$users->search($request['select_instr_by'], $request['instr_qryTerm'], $g_permission['proxy']);
 					$instr_list = $users->userList;
 				} else $instr_list = null;
 

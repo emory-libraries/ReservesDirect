@@ -29,6 +29,7 @@ http://www.reservesdirect.org/
 
 *******************************************************************************/
 require_once("secure/classes/user.class.php");
+require_once("secure/classes/courseInstance.class.php");
 
 class users
 {
@@ -38,28 +39,40 @@ class users
 
 	function initUser($userClass, $userName)
 	{
+	
+		//When comparing a string and an int, PHP will convert the string to an int/float.
+		//Any string not containing a digit will become 0 (zero) --> ex: intval('admin') => 0)
+		//Because of this the numeric cases of the switch below must be expressed as strings --> ex: '0'
+		//This works if $userClass is a string --> ('admin' == '0') => false
+		//And if $userClass is an int --> (5 == '5') => (5 == 5) => true		
 		switch ($userClass)
 		{
+			case '0':
 			case 'student':
 				$u = new student($userName);
 			break;
 
+			case '1':
 			case 'custodian':
 				$u = new custodian($userName);
 			break;
 
+			case '2':
 			case 'proxy':
 				$u = new proxy($userName);
 			break;
 
+			case '3':
 			case 'instructor':
 				$u = new instructor($userName);
 			break;
 
+			case '4':
 			case 'staff':
 				$u = new staff($userName);
 			break;
 
+			case '5':
 			case 'admin':
 				$u = new admin($userName);
 			break;
@@ -67,13 +80,13 @@ class users
 			default:
 				trigger_error("userClass not valid", E_ERROR);
 		}
-
+		
 		return $u;
 	}
 
 	function search($term, $qry, $role=null)
 	{
-		if ($term != "" && $qry != "")
+		if ($qry != "")
 			switch ($term)
 			{
 				case 'last_name':
@@ -83,24 +96,63 @@ class users
 				case 'user_name':
 					$this->getUsersByUserName($qry, $role);
 					break;
+				default:
+					$this->getUsersByNameOrUserName($qry, $role);
 			}
 	}
 
 	function getUsersByLastName($lastName, $role=null)
 	{
-		global $g_dbConn, $g_permission;
+		global $g_dbConn;
 
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
 				$sql = 	"SELECT user_id, last_name, first_name, username "
 				.		"FROM users "
-				.		"WHERE last_name LIKE '%$lastName%' ";
+				.		"WHERE last_name LIKE ? ";
 
-				if (!is_null($role)) $sql .= "AND dflt_permission_level >= " . $g_permission[$role] . " ";
+				if (!is_null($role)) $sql .= "AND dflt_permission_level >= " . $role . " ";
 
-				$sql .=	"ORDER BY last_name, first_name, username "
-				;
+				$sql .=	"ORDER BY last_name, first_name, username";// LIMIT 30";
+				
+				$lName = "%$lastName%";
+		}
+
+		$rs = $g_dbConn->query($sql, array($lName));
+
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+		unset ($this->userList);
+		while($row = $rs->fetchRow())
+			$this->userList[] = new user($row[0]);			
+	}
+
+	function getUsersByNameOrUserName($qry, $role=null)
+	{
+		global $g_dbConn;
+
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				list($name1, $name2) = preg_split("/\s|(,\s)/", $qry);
+				$name1 = ($name1 != "") ? "%".trim($name1) . "%" : "%";
+				$name2 = ($name2 != "") ? "%".trim($name2) . "%" : "%";
+
+				$sql = 	"SELECT user_id, last_name, first_name, username "
+				.		"FROM users "
+				.		"WHERE 1 ";
+
+				if (!is_null($role)) $sql .= "AND dflt_permission_level >= " . $role . " ";
+				
+				$sql .= "AND ((first_name LIKE \"$name1\" AND last_name LIKE \"$name2\") ";
+				$sql .= "OR (first_name LIKE \"$name2\" AND last_name LIKE \"$name1\") ";
+				
+				if($name2 == "%") //if search by 2 names we can exclude username search which cannot contain spaces
+					$sql .= "OR (username LIKE '$name1') ";
+				$sql .= ") ";					
+					
+				$sql .=	"ORDER BY last_name, first_name, username LIMIT 30";				
 		}
 
 		$rs = $g_dbConn->query($sql);
@@ -109,11 +161,11 @@ class users
 		unset ($this->userList);
 		while($row = $rs->fetchRow())
 			$this->userList[] = new user($row[0]);			
-	}
-
+	}	
+	
 	function getUsersByUsername($username, $role=null)
 	{
-		global $g_dbConn, $g_permission;
+		global $g_dbConn;
 
 		switch ($g_dbConn->phptype)
 		{
@@ -122,9 +174,9 @@ class users
 				.		"FROM users "
 				.		"WHERE username LIKE '%$username%' ";
 
-				if (!is_null($role)) $sql .= "AND dflt_permission_level >= " . $g_permission[$role] . " ";
+				if (!is_null($role)) $sql .= "AND dflt_permission_level >= " . $role . " ";
 
-				$sql .=	"ORDER BY last_name, first_name, username "
+				$sql .=	"ORDER BY last_name, first_name, username"// LIMIT 30"
 				;
 		}
 
@@ -178,10 +230,6 @@ class users
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		while($row =  $rs->fetchRow(DB_FETCHMODE_ASSOC))
 			$userData[$row['user_id']] = $row;
-
-		//maintain highest permission level
-		$dflt_permission_lvl = ($userData[$keep]['dflt_permission_level'] < $userData[$merge]['dflt_permission_level']) ? $userData[$merge]['dflt_permission_level'] : $userData[$keep]['dflt_permission_level'];
-		$g_dbConn->query($sql_find_user, array($dflt_permission_lvl, $keep));
 		
 		$rs = $g_dbConn->query($sql_find, array($keep, $merge));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
@@ -227,6 +275,13 @@ class users
 			$rs = $g_dbConn->query($sql . $sql_values);
 		}
 			
+		//create new user
+		$userToKeep = new user($keep);
+		//maintain highest permission level
+		$dflt_permission_lvl = ($userData[$keep]['dflt_permission_level'] < $userData[$merge]['dflt_permission_level']) ? $userData[$merge]['dflt_permission_level'] : $userData[$keep]['dflt_permission_level'];
+		$userToKeep->setDefaultRole($dflt_permission_lvl);
+		unset($userToKeep);
+		
 		//Staff libraries
 		//if none exist do nothing
 		//if more than 1 entry exists simple delete the one to not keep
@@ -241,6 +296,7 @@ class users
 		//if none exist do nothing
 		//if more than 1 entry exists simple delete the one to not keep
 		//if only 1 exists update so user_id = keep
+
 		$rs = $g_dbConn->query($sql_find_instr_attr, array($keep, $merge));
 		if ($rs->numRows() > 1)
 			$g_dbConn->query($sql_delete_instr_attr, array($merge));	
@@ -299,6 +355,52 @@ class users
 
 		return $tmpArray;
 	}
+	
+	
+	function searchForCI($instructor_id, $dept_id, $course_id, $term_id)
+	{
+		global $g_dbConn, $g_permission;
+
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "
+					SELECT DISTINCT ci.course_instance_id, t.term_id, c.course_name
+					FROM course_aliases as ca 
+						LEFT JOIN access as a on a.alias_id = ca.course_alias_id
+						JOIN course_instances as ci on ci.course_instance_id = ca.course_instance_id
+						JOIN courses as c on ca.course_id = c.course_id
+						LEFT JOIN terms as t on t.term_year = ci.year AND t.term_name = ci.term 
+					WHERE 1 ";
+				
+				if (!is_null($instructor_id) && $instructor_id != "")
+					$sql .= "AND (a.permission_level = " . $g_permission['instructor'] . ") AND a.user_id = '$instructor_id' ";
+				if (!is_null($dept_id) && $dept_id != "")
+					$sql .= "AND c.department_id = $dept_id ";
+				if (!is_null($course_id) && $course_id != "")
+					$sql .= "AND c.course_id = $course_id ";
+				if(!is_null($term_id) && $term_id != "")
+					$sql .= "AND t.term_id = $term_id ";
+					
+				$sql .= "ORDER BY t.term_id DESC, c.course_name LIMIT 50";
+		}
+
+		$rs = $g_dbConn->query($sql);	
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		$tmpArray = null;
+		while ($row = $rs->fetchRow())
+		{
+			$tmpCI = new courseInstance($row[0]);
+			$tmpCI->getPrimaryCourse();
+			$tmpCI->getInstructors();
+			$tmpArray[] = $tmpCI;
+		}
+			
+		return $tmpArray;
+	}
+
+
 
 	function getAllUsers()
 	{
@@ -335,10 +437,10 @@ class users
 	
 	function displayUserSelect($cmd, $msg="", $label="", $selection_list, $allowAddUser=false, $request, $elementPrefix)
 	{
-		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "	<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
+		echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+		echo "	<tr><td width=\"100%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
 		echo "	<tr><td align=\"center\" valign=\"top\" class=\"helperText\">$msg&nbsp;</td></tr>\n";
-		echo "	<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
+		echo "	<tr><td width=\"100%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
 
 		if ($allowAddUser)
 			echo "	<tr><td align=\"left\" valign=\"top\" class=\"helperText\"><a href=\"index.php?page=manageUser&subpage=addUser\">Create New User</a>&nbsp;</td></tr>\n";
@@ -412,8 +514,8 @@ class users
 			}
 		}
 
-		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "	<tr><td width=\"140%\"><img src=images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
+		echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+		echo "	<tr><td width=\"100%\"><img src=images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
 		echo "	<tr>\n";
 		echo "		<td align=\"left\" valign=\"top\">\n";
 		echo "			<p><span class=\"helperText\">The following registered users matched your search. If you do not see the user you are looking for, you may search again or contact the Reserves Desk for assistance.</span> </p>\n";

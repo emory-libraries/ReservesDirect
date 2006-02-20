@@ -111,7 +111,7 @@ class zQuery
 
 	function parseToArray()
 	{
-		$search_results = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'volume_title'=>'', 'source'=>'', 'content_note'=>'', 'controlKey'=>'', 'personal_owner'=>null, 'physicalCopy'=>'');
+		$search_results = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'volume_title'=>'', 'source'=>'', 'controlKey'=>'', 'personal_owner'=>null, 'physicalCopy'=>'');
 		$sXML = simplexml_load_string(rtrim(ltrim($this->xmlResults)));
 
 		//if (is_array($sXML->record->field) && !empty($sXML->record->field))

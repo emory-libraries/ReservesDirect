@@ -1,6 +1,5 @@
 <?
-/*******************************************************($this->itemGroup); }
-**
+/*********************************************************
 item.class.php
 Item Primitive Object
 
@@ -28,10 +27,11 @@ ReservesDirect is located at:
 http://www.reservesdirect.org/
 
 *******************************************************************************/
-require_once("secure/common.inc.php");
 
-class item
-{
+require_once('secure/classes/notes.class.php');
+
+class item extends Notes {
+	
 	//Attributes
 	public $itemID;
 	public $title;
@@ -39,13 +39,11 @@ class item
 	public $creationDate;
 	public $lastModDate;
 	public $itemType;
-	public $notes = array();
-	public $contentNotes;
 
 	/**
-	* @return item
-	* @param int $itemID
-	* @desc initalize the item object
+	* @return void
+	* @param int $itemID (optional)
+	* @desc Initalize the item object
 	*/
 	function item($itemID = NULL)
 	{
@@ -84,6 +82,9 @@ class item
 		$this->itemID = $row[0];
 		$this->creationDate = $d;
 		$this->lastModDate = $d;
+		
+		$this->getItemByID($this->itemID);
+		return $this->itemID;
 	}
 
 	/**
@@ -98,33 +99,20 @@ class item
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT i.item_id, i.title, i.item_group, i.last_modified, i.creation_date, i.item_type, i.content_notes, n.note_id "
+				$sql = "SELECT i.item_id, i.title, i.item_group, i.last_modified, i.creation_date, i.item_type "
 					.  "FROM items as i "
-					.  "LEFT JOIN notes as n on n.target_table='items' AND n.target_id = i.item_id "
 					.  "WHERE item_id = !"
 					;
 		}
 
-		$rs = $g_dbConn->query($sql, $itemID);
+		$rs = $g_dbConn->getRow($sql, array($itemID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
-		$row = $rs->fetchRow();
-			$this->itemID 		= $row[0];
-			$this->title		= $row[1];
-			$this->itemGroup	= $row[2];
-			$this->lastModDate	= $row[3];
-			$this->creationDate = $row[4];
-			$this->itemType		= $row[5];
-			$this->contentNotes	= $row[6];
-			//$this->notes[] = new note($row[7]); This won't work if there are multiple notes... replaced with logic below ... kaw 8.4.05
-			
-			
-			if (!is_null($row[7]))
-				$this->notes[] = new note($row[7]);
-				
-			while ($row = $rs->fetchRow()) //get additional notes
-				if (!is_null($row[7]))
-					$this->notes[] = new note($row[7]);
+		list($this->itemID, $this->title, $this->itemGroup, $this->lastModDate, $this->creationDate, $this->itemType) = $rs;
+
+		//get the notes
+		$this->setupNotes('items', $this->itemID);
+		$this->fetchNotes();
 	}
 
 	/**
@@ -224,20 +212,6 @@ class item
 	function getType() { return htmlentities(stripslashes($this->itemType)); }
 	function isHeading() { return $this->itemType == "HEADING"; }
 	function makeHeading() { $this->setType("HEADING"); }
-
-	function getNotes()
-	{
-		return $this->notes;
-	}
-
-	function getContentNotes()
-	{
-		return htmlentities(stripslashes($this->contentNotes));
-	}
-
-	function setNote($type, $text)
-	{
-		$this->notes[] = common_setNote($noteID=null, $type, $text, "items", $this->itemID);
-	}
+	
 }
 ?>

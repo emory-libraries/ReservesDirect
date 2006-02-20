@@ -5,7 +5,7 @@ This page generate rss xml
 
 Created by Jason White (jbwhite@emory.edu)
 
-This file is part of ReservesDirect
+This file is part of ReservesDirect.
 
 Copyright (c) 2004-2005 Emory University, Atlanta, Georgia.
 
@@ -33,9 +33,9 @@ require_once("secure/common.inc.php");
 
 require_once("secure/classes/reserves.class.php");
 require_once("secure/classes/course.class.php");
-require_once("secure/classes/note.class.php");
 require_once("secure/classes/courseInstance.class.php");
 require_once("secure/classes/reserveItem.class.php");
+require_once('secure/classes/tree.class.php');
 require_once("secure/interface/instructor.class.php");
 require_once("secure/interface/student.class.php");
 
@@ -62,7 +62,8 @@ if (!isset($_REQUEST['ci']))
 	$ci->getCrossListings();
 	$ci->getInstructors();
 	$ci->getPrimaryCourse();
-	$ci->getActiveReserves();
+	//get reserves as a tree + recursive iterator
+	$walker = $ci->getReservesAsTreeWalker('getActiveReserves');
 
 	flush;
 
@@ -93,19 +94,23 @@ if (!isset($_REQUEST['ci']))
 
     echo		". Helper application for viewing reserves: Adobe Acrobat Reader, http://www.adobe.com/products/acrobat/readstep2.html .";
     echo 		"</description>\n\n";
-
-    foreach ($ci->reserveList as $rItem)
-    {
+    
+    foreach($walker as $leaf) {
+    	$rItem = new reserve($leaf->getID());
     	$rItem->getItem();
-    	$rItem->getNotes();
+    	$itemNotes = $rItem->item->getNotes();
+    	$resNotes = $rItem->getNotes();
 
     	echo "		<item>\n";
         
-        if ($rItem->item->isPhysicalItem()) {
-            echo "          <link>" . htmlentities($g_reservesViewer . $rItem->item->getLocalControlKey()) . "</link>";
-        } else {
-            echo "			<link>" . htmlentities($g_siteURL."/reservesViewer.php?viewer=-115&reserve=". $rItem->getReserveID() ."&location=" . $rItem->item->getURL()) . "</link>\n";
-        }
+    	//do not show link for headings
+    	if(!$rItem->item->isHeading()) {
+	        if ($rItem->item->isPhysicalItem()) {
+	            echo "          <link>" . htmlentities($g_reservesViewer . $rItem->item->getLocalControlKey()) . "</link>";
+	        } else {
+	            echo "			<link>" . htmlentities($g_siteURL."/reservesViewer.php?reserve=". $rItem->getReserveID() ."&location=" . $rItem->item->getURL()) . "</link>\n";
+	        }
+    	}
     	
         echo "			<title>" . $rItem->item->getTitle() . "</title>\n";
 
@@ -130,14 +135,25 @@ if (!isset($_REQUEST['ci']))
     		if ($rItem->item->getSource() != "")
                     echo trim($rItem->item->getSource()) . ". ";
 
-    		foreach ($rItem->item->notes as $n)
-    		{
-    			if ($n->getType() == 'Instructor') echo $n->getText() . ". ";
-    			elseif ($n->getType() == 'Content') echo $n->getText() . ". ";
-
-    		}
+			foreach($itemNotes as $note) {
+				if($note->getType() == 'Content') {
+					echo $note->getText().'. ';
+				}
+			}
+			foreach($resNotes as $note) {
+				echo $note->getText().'. ';
+			}
 
     	echo "</description>\n";
+    	
+    	//show category
+    	if($rItem->item->isHeading()) {
+    		echo '<category>heading_'.($walker->getDepth()+1).'</category>';
+    	}
+    	else {
+    		echo "<category>reserve</category>";
+    	}
+    	
     	echo "		</item>\n\n";
     }
 

@@ -6,31 +6,34 @@
 <? echo "<link rel=\"stylesheet\" href=\"" . $_SESSION['css'] ."\" type=\"text/css\">\n"; ?>
 
 <script language="JavaScript" src="secure/javascript/jsFunctions.js"></script>
+
+<!-- start JSCalendar files -->
+<?php
+	//load JSCalendar JS files
+	$calendar->load_files();
+?>
+<!-- end JSCalendar files -->
 </head>
 
 <body bgcolor="#FFFFFF" text="#000000">
-<table width="100%" border="0" cellspacing="0" cellpadding="0" align="left">
-  	<!--banner.inc-->
+
+<div id="container">
+	<!--banner.inc-->
 	<?php include("secure/html/banner.inc.html"); ?>
-    
-	<tr align="left" valign="top">
-		<td colspan="2" class="divider"><img src=../images/spacer.gif" width="1" height="10"></td>
-	</tr>    
+    <!-- a spacer to compensate for the missing navigation -->
+	<div style="padding-top:10px;">&nbsp;</div>
+	<div id="divider">&nbsp;</div>    
 	
 	<!--locationIndicator.inc-->
   	<?php include("secure/html/locationIndicator.inc.html"); ?>
-  
-  <tr><td colspan="2">&nbsp;</td></tr>
-  <tr>
-    <td height="108" align="left" valign="top" colspan="2">
-    
-    <? $mgr->display() ?>
-    
-    </td>
-  </tr>
-  <tr><td colspan="2">&nbsp;</td></tr>
-  <tr><td colspan="2"><?php include("secure/html/footer.inc.html"); ?></td></tr>
-  </table>
+    <div class="helperText" style="padding:5px; margin:10px 50px 10px 50px; text-size:large; align:center; text-align:center; border:1px solid #666666; background:#CCCCCC;">This is a PREVIEW only. Click "Close Window" to return to ReservesDirect and continue working.</div>
+    <div id="Content">
+    	<? $mgr->display() ?>
+    </div>
+	<div id="Footer">
+ 		<?php include("secure/html/footer.inc.html"); ?>
+ 	</div>
+</div>
 
 </body>
 </html>

@@ -54,7 +54,7 @@ class reservesManager
 
 	function reservesManager($cmd, $user)
 	{
-		global $g_permission, $page, $loc, $g_faxDirectory, $g_documentDirectory, $g_documentURL, $ci;
+		global $g_permission, $page, $loc, $g_faxDirectory, $g_documentDirectory, $g_documentURL, $ci, $g_notetype;
 
 		$this->displayClass = "reservesDisplayer";
 		//$this->user = $user;
@@ -99,146 +99,143 @@ class reservesManager
 				$this->displayFunction = "displayCourseList";
 				$this->argList = array($user);
 			break;
-
-			case 'viewReservesList':
-				global $ci;
+			
+			
+			case 'previewStudentView':	//see if($cmd==...) statement in previewReservesList	
+			case 'previewReservesList':
+				$ci = new courseInstance($_REQUEST['ci']);
+				$ci->getInstructors();
+				$ci->getCrossListings();
+				$ci->getPrimaryCourse();
+				
+				//get different reserve data based on $cmd
+				if($cmd=='previewStudentView') {
+					$reserve_data = $ci->getActiveReserves();	
+				}
+				elseif($cmd=='previewReservesList') {
+					$reserve_data = $ci->getReserves();
+				}
+				
+				//build treen and get recursive iterator
+				$tree = $ci->getReservesAsTree(null, null, $reserve_data);
+				$walker = new treeWalker($tree);
+				
 				$page = "myReserves";
 				$loc  = "home";
-
+				$this->displayFunction = "displayReserves";
+				$this->argList = array($cmd, $ci, $walker, count($reserve_data[0]), $reserve_data[2], true);				
+			break;
+			
+			
+			case 'viewReservesList':
 				$ci = new courseInstance($_REQUEST['ci']);
+				$ci->getInstructors();
+				$ci->getCrossListings();
+				$ci->getCourseForUser($user->getUserID());
 				
-				if (isset($_REQUEST['hideSelected'])) {
-					$hidden = (isset($_REQUEST['hidden'])) ? $_REQUEST['hidden'] : null;
-					$originalHidden = (isset($_REQUEST['originalHiddenArray'])) ? $_REQUEST['originalHiddenArray'] : null;
-
-					if (is_array($originalHidden)) {
-						if (!is_array($hidden)) $hidden=array();
-						$unhide = array_diff($originalHidden, $hidden);
-						if (is_array($unhide) && !empty($unhide)){
-							foreach($unhide as $r)
-							{
-								$reserve = new reserve($r);
+				//hide/unhide items
+				if(!empty($_REQUEST['hideSelected'])) {
+					//we need to fetch the whole tree (including hidden items)
+					$reserve_data = $ci->getActiveReservesForUser($user->getUserID(), true);
+					//build tree
+					$tree = $ci->getReservesAsTree(null, null, $reserve_data);
+					
+					$hidden = !empty($_REQUEST['selected_reserves']) ? $_REQUEST['selected_reserves'] : array();
+					
+					//unhide first
+					if(!empty($reserve_data[2])) {	//only bother if there were hidden items before
+						$unhide = array_diff($reserve_data[2], $hidden);
+				
+						//are there changes?
+						if(!empty($unhide)) {
+							foreach($unhide as $r_id) {	//must unhide element AND its children
+								//unhide reserve
+								$reserve = new reserve($r_id);
 								$reserve->unhideReserve($user->getUserID());
+								//unhide its children
+								$walker = new treeWalker($tree->findDescendant($r_id));
+								foreach($walker as $leaf) {
+									$reserve = new reserve($leaf->getID());
+									$reserve->unhideReserve($user->getUserID());
+								}
 							}
 						}
 					}
-					
-					if (is_array($hidden) && !empty($hidden)){
-						foreach($hidden as $r)
-						{
-							$reserve = new reserve($r);
-							$reserve->hideReserve($user->getUserID());
+			
+					//now hide (the same process in reverse)
+					if(!empty($hidden)) {	//only bother if anything was checked
+						$hide = array_diff($hidden, $reserve_data[2]);
+
+						//are there changes?
+						if(!empty($hide)) {
+							foreach($hide as $r_id) {	//must hide element AND its children
+								//hide reserve
+								$reserve = new reserve($r_id);
+								$reserve->hideReserve($user->getUserID());
+								//hide its children
+								$walker = new treeWalker($tree->findDescendant($r_id));
+								foreach($walker as $leaf) {
+									$reserve = new reserve($leaf->getID());
+									$reserve->hideReserve($user->getUserID());
+								}
+							}
 						}
-					}
-			}
-				$ci->getCourseForUser($user->getUserID());
-
-				if (!$_REQUEST['showAll'])
-					$ci->getActiveReservesForUser($user->getUserID());
-				else
-					$ci->getActiveReservesForUser($user->getUserID(),true);
-
-				$ci->getInstructors();
-				$ci->getCrossListings();
-
-				$this->displayFunction = "displayReserves";
-				$this->argList = array($cmd, $user, $ci);
-			break;
-
-			case 'previewReservesList':
-				$page = "myReserves";
-				$loc  = "home";
-
-				$ci = new courseInstance($_REQUEST['ci']);
-
-				$ci->getReserves();
-				$ci->getInstructors();
-				$ci->getCrossListings();
-				$ci->getPrimaryCourse();
-
-				$this->displayFunction = "displayReserves";
-				$this->argList = array($cmd, $user, $ci, 'no_exit');
-			break;
-
-			case 'previewStudentView':
-				$page = "myReserves";
-				$loc  = "home";
-
-				$ci = new courseInstance($_REQUEST['ci']);
-
-				$ci->getActiveReserves();
-				$ci->getInstructors();
-				$ci->getCrossListings();
-				$ci->getPrimaryCourse();
-
-				$this->displayFunction = "displayReserves";
-				$this->argList = array($cmd, $user, $ci, 'no_exit');
-			break;
-
-
-			case 'sortReserves':
-				$page = "myReserves";
-				$loc  = "sort reserves list";
-
-				$sortBy=$_REQUEST['sortBy'];
-				$ci = new courseInstance($_REQUEST['ci']);
-
-				//$ci->getCourseForUser($user->getUserID());
-
-				if ($_REQUEST['saveOrder']) {
-					$ci->updateSortOrder($sortBy);
-				} else {
-					$ci->getReserves($sortBy);
+					}					
 				}
-
-				$this->displayFunction = "displaySortScreen";
-				$this->argList = array($user,$ci);
+				
+				//get array of reserves for this CI for tree-building
+				$reserve_data = $ci->getActiveReservesForUser($user->getUserID(), $_REQUEST['showAll']);
+				//build treen and get recursive iterator
+				$tree = $ci->getReservesAsTree(null, null, $reserve_data);
+				$walker = new treeWalker($tree);
+				
+				$page = "myReserves";
+				$loc  = "home";
+				$this->displayFunction = "displayReserves";
+				$this->argList = array($cmd, $ci, $walker, count($reserve_data[0]), $reserve_data[2], false);	
 			break;
 
 			case 'customSort':
 				$page = "myReserves";
 				$loc  = "sort reserves list";
-
-				$sortBy=$_REQUEST['sortBy'];
+				
 				$ci = new courseInstance($_REQUEST['ci']);
-
-				if ($_REQUEST['saveOrder']) {
-					//get Post Data that contains the newSortValues assigned by the user
-					$reserveSortIDs = array_keys($_REQUEST['reserveSortIDs']);
-					
-					foreach ($reserveSortIDs as $reserveSortID)
-					{
-						$reserve = new reserve($reserveSortID);
-						$reserve->setSortOrder($_REQUEST['reserveSortIDs'][$reserveSortID]['newSortOrder']);
+				
+				if(isset($_REQUEST['saveOrder'])) {	//update order
+					foreach($_REQUEST['new_order'] as $r_id=>$order) {
+						$reserve = new reserve($r_id);
+						$reserve->setSortOrder($order);
 					}
-					$ci->getReserves();
-				} else {
-					$ci->getReserves($sortBy);
+					$reserves = $ci->getSortedReserves('', $_REQUEST['parentID']);
+				}
+				else {
+					$reserves = $ci->getSortedReserves($_REQUEST['sortBy'], $_REQUEST['parentID']);
 				}
 				
 				$this->displayFunction = "displayCustomSort";
-				$this->argList = array($user,$ci);
+				$this->argList = array($ci, $reserves);
 			break;
-
+			
 			case 'selectInstructor':
 				$page = "addReserve";
 				$progress = array ('total' => 4, 'full' => 0);
-				if (($user->getDefaultRole() >= $g_permission['staff']) && $cmd=='selectInstructor') {
+				if (($user->getRole() >= $g_permission['staff']) && $cmd=='selectInstructor') {
 					//$user->selectUserForAdmin('instructor', $page, 'selectClass');
 					$this->displayFunction = "displaySelectInstructor";
 					$this->argList = array($user, $page, 'addReserve');
 				}
 			break;
+			
 			case 'addReserve':
 				$page = "addReserve";
 				$progress = array ('total' => 4, 'full' => 0);
 
-				if ($user->getDefaultRole() >= $g_permission['staff']) {
+				if ($user->getRole() >= $g_permission['staff']) {
 					//$courseInstances = $user->getCourseInstances($_REQUEST['u']);
 					$this->displayFunction = "displayStaffAddReserve";
 					$this->argList = array($_REQUEST);
 					break;
-				} elseif ($user->getDefaultRole() >= $g_permission['proxy']) { //2 = proxy
+				} elseif ($user->getRole() >= $g_permission['proxy']) { //2 = proxy
 					$courseInstances = $user->getCourseInstances();
 				} else {
 					trigger_error("Permission Denied:  Cannot add reserves. UserID=".$user->getUserID(), E_ERROR);
@@ -310,39 +307,45 @@ class reservesManager
 				$page = "addReserve";
 
 				$requests = (isset($_REQUEST['request'])) ? $_REQUEST['request'] : null;
-				$reserves = (isset($_REQUEST['reserve'])) ? $_REQUEST['reserve'] : null;
+				$items = (isset($_REQUEST['reserve'])) ? $_REQUEST['reserve'] : null;
 
 				$ci = new courseInstance($_REQUEST['ci']);
 
 				//add items to reserve
-				if (is_array($reserves) && !empty($reserves)){
-					foreach($reserves as $r)
+				if (is_array($items) && !empty($items)){
+					foreach($items as $i_id)
 					{
 						$reserve = new reserve();
-						if ($reserve->createNewReserve($ci->getCourseInstanceID(), $r))
+						if ($reserve->createNewReserve($ci->getCourseInstanceID(), $i_id))
 						{
 							$reserve->setActivationDate($ci->getActivationDate());
 							$reserve->setExpirationDate($ci->getExpirationDate());
+							//attempt to insert this reserve into order
+							$reserve->getItem();
+							$reserve->insertIntoSortOrder($ci->getCourseInstanceID(), $reserve->item->getTitle(), $reserve->item->getAuthor());
 						}
 					}
 				}
 
 				//make requests
 				if (is_array($requests) && !empty($requests)){
-					foreach($requests as $r)
+					foreach($requests as $i_id)
 					{
 						//store reserve with status processing
 						$reserve = new reserve();
-						if ($reserve->createNewReserve($ci->getCourseInstanceID(), $r))
+						if ($reserve->createNewReserve($ci->getCourseInstanceID(), $i_id))
 						{
 							$reserve->setStatus("IN PROCESS");
 							$reserve->setActivationDate($ci->getActivationDate());
 							$reserve->setExpirationDate($ci->getExpirationDate());
-							$reserve->setRequestedLoanPeriod($_REQUEST['requestedLoanPeriod_'.$r]);
+							$reserve->setRequestedLoanPeriod($_REQUEST['requestedLoanPeriod_'.$i_id]);
+							//attempt to insert this reserve into order
+							$reserve->getItem();
+							$reserve->insertIntoSortOrder($ci->getCourseInstanceID(), $reserve->item->getTitle(), $reserve->item->getAuthor());
 
 							//create request
 							$request = new request();
-							$request->createNewRequest($ci->getCourseInstanceID(), $r);
+							$request->createNewRequest($ci->getCourseInstanceID(), $i_id);
 							$request->setRequestingUser($user->getUserID());
 							$request->setReserveID($reserve->getReserveID());
 						}
@@ -367,8 +370,8 @@ class reservesManager
 				$page = "addReserve";
 				// Check to see if this was a valid file they submitted
 	    		if ($_REQUEST['type'] == 'DOCUMENT'){
-	    			if (!$_FILES['userfile']['tmp_name']) {
-	    				trigger_error("Possible file upload attack. Filename: " . $_FILES['userfile']['name'] . "If you are trying to load a very file (> 10 MB) contact Reserves to add the file.", E_ERROR);
+	    			if (!$_FILES['userFile']['tmp_name']) {
+	    				trigger_error("Possible file upload attack. Filename: " . $_FILES['userFile']['name'] . "If you are trying to load a very file (> 10 MB) contact Reserves to add the file.", E_ERROR);
 	    			}
 	    		}
 
@@ -378,9 +381,8 @@ class reservesManager
 	    		$item->setAuthor($_REQUEST['author']);
 	    		$item->setPerformer($_REQUEST['performer']);
 	    		$item->setVolumeTitle($_REQUEST['volumetitle']);
-	    		$item->setvolumeEdition($_REQUEST['volume']);
+	    		$item->setVolumeEdition($_REQUEST['volume']);
 	    		$item->setSource($_REQUEST['source']);
-	    		//$item->setContentNotes($_REQUEST['contents']);
 	    			    
 	    		$item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
 
@@ -401,25 +403,30 @@ class reservesManager
 				if ($p != " - ") $item->setPagesTimes($p);
 				elseif ($t != " - ") $item->setPagesTimes($t);
 
-				if ($_REQUEST['personal'] == "on") $item->setPrivateUserID($user->getUserID());
+				if(isset($_REQUEST['personal'])) $item->setPrivateUserID($user->getUserID());
 
 				$item->setGroup('ELECTRONIC');
 				$item->setType('ITEM');
-
+				
 				$ci = new courseInstance($_REQUEST['ci'])	;
-
 				$reserve = new reserve();
 				
 				if ($reserve->createNewReserve($ci->getCourseInstanceID(), $item->getItemID()))
 				{
-					if (isset($_REQUEST['contents']) && $_REQUEST['contents'] != "" && isset($_REQUEST['noteType']))
-	    			if ($_REQUEST['noteType'] == "Instructor")
-	    				$reserve->setNote($_REQUEST['noteType'],$_REQUEST['contents']);
-	    			else
-	    				$item->setNote($_REQUEST['noteType'],$_REQUEST['contents']);
+					if(!empty($_REQUEST['noteText']) && isset($_REQUEST['noteType'])) {
+						if($_REQUEST['noteType']==$g_notetype['instructor']) {
+							$reserve->setNote($_REQUEST['noteText']);
+						}
+						else {
+							$item->setNote($_REQUEST['noteText']);
+						}
+					}
 					
 					$reserve->setActivationDate($ci->getActivationDate());
-					$reserve->setExpirationDate($ci->getExpirationDate());
+					$reserve->setExpirationDate($ci->getExpirationDate());					
+					//attempt to insert this reserve into order
+					$reserve->getItem();
+					$reserve->insertIntoSortOrder($ci->getCourseInstanceID(), $reserve->item->getTitle(), $reserve->item->getAuthor());
 
 					$itemAudit = new itemAudit();
 					$itemAudit->createNewItemAudit($item->getItemID(),$user->getUserID());
@@ -472,8 +479,7 @@ class reservesManager
 					$item->setTitle($_REQUEST[$file]['title']);
 					$item->setAuthor($_REQUEST[$file]['author']);
 					$item->setVolumeTitle($_REQUEST[$file]['volumetitle']);
-					$item->setvolumeEdition($_REQUEST[$file]['volume']);
-					//$item->setContentNotes($_REQUEST[$file]['contents']);
+					$item->setVolumeEdition($_REQUEST[$file]['volume']);
 					
 					//store the fax
 					$dst_fname = $item->getItemID().'-fax.pdf';
@@ -496,14 +502,20 @@ class reservesManager
 
 					if ($reserve->createNewReserve($ci->getCourseInstanceID(), $item->getItemID()))
 					{
-						if (isset($_REQUEST[$file]['contents']) && $_REQUEST[$file]['contents'] != "" && isset($_REQUEST[$file]['noteType']))
-	    				if ($_REQUEST[$file]['noteType'] == "Instructor")
-	    					$reserve->setNote($_REQUEST[$file]['noteType'],$_REQUEST[$file]['contents']);
-	    				else
-	    					$item->setNote($_REQUEST[$file]['noteType'],$_REQUEST[$file]['contents']);
+	    				if(!empty($_REQUEST[$file]['noteText']) && isset($_REQUEST[$file]['noteType'])) {
+							if($_REQUEST[$file]['noteType']==$g_notetype['instructor']) {
+								$reserve->setNote($_REQUEST[$file]['noteText']);
+							}
+							else {
+								$item->setNote($_REQUEST[$file]['noteText']);
+							}
+						}
 						
 						$reserve->setActivationDate($ci->getActivationDate());
 						$reserve->setExpirationDate($ci->getExpirationDate());
+						//attempt to insert this reserve into order
+						$reserve->getItem();
+						$reserve->insertIntoSortOrder($ci->getCourseInstanceID(), $reserve->item->getTitle(), $reserve->item->getAuthor());
 
 						$itemAudit = new itemAudit();
 						$itemAudit->createNewItemAudit($item->getItemID(),$user->getUserID());

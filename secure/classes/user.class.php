@@ -26,8 +26,6 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 ReservesDirect is located at:
 http://www.reservesdirect.org/
 *******************************************************************************/
-require_once("secure/classes/note.class.php");
-require_once("secure/common.inc.php");
 
 class user
 {
@@ -38,9 +36,11 @@ class user
 	public $lastName;
 	public $email;
 	public $dfltRole;
+	private $dfltClass;
+	private $role;
 	public $lastLogin;
-	public $notes = array();
-
+	private $userClass;
+	private $not_trained;
 
 	/**
 	* Constructor Method
@@ -67,7 +67,7 @@ class user
 
 		switch ($g_dbConn->phptype)
 		{
-			default: //'mysql'
+			default: //'mysql' 
 				$sql = "SELECT user_id FROM users WHERE username = ?";
 		}
 		$rs = $g_dbConn->query($sql, array($userName));
@@ -95,7 +95,8 @@ class user
 		{
 			default: //'mysql'
 				$sql = "SELECT u.user_id 
-						FROM users as u join special_users as sp ON u.user_id = sp.user_id 
+						FROM users as u 
+							JOIN special_users as sp ON u.user_id = sp.user_id 
 						WHERE u.username = ? AND sp.password = ? AND (expiration <= ? OR expiration IS NULL)
 					   ";
 				$d = date("Y-m-d");
@@ -140,61 +141,6 @@ class user
 		$this->getUserByID($row[0]); //set object attributes = to newly created user
 	}
 
-	/**
-	* @return void
-	* @param optional int $noteID
-	* @param string $type
-	* @param int $userID
-	* @param string $noteText
-	* @param string $targetTable="users"
-	* @desc Creates a note object, and calls individual set methods to set the note attributes
-	*/
-
-	function setNote($noteID=NULL, $type, $noteText)
-	{
-		if (is_null($noteID)){ //Set a brand new note
-			$this->notes[] = common_setNote($noteID, $type, $noteText, "users", $this->userID);
-		} else { //Update an existing note
-			common_setNote($noteID, $type, $noteText, "users", $this->userID);
-				//Change this to just update the array with the changed note value,
-				//Instead of re-loading the entire notes array
-			$this->notes = common_getNotesByTarget("users", $this->userID);
-		}
-	}
-
-	function getUserClass()
-	{
-
-		global $g_dbConn;
-
-		if (!is_null($this->getDefaultRole()) && !is_null($this->userID)){
-			switch ($g_dbConn->phptype)
-			{
-				default: //'mysql'
-					$sql  = "SELECT nt.permission_level "
-					.  		"FROM not_trained as nt "
-					.	    "WHERE nt.user_id = ! "
-					;
-					$sql1 = "SELECT label FROM permissions_levels WHERE permission_id = !";
-			}
-
-			$rs = $g_dbConn->query($sql, $this->userID);
-			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-			if ($row = $rs->fetchRow()) {
-				$rs2 = $g_dbConn->query($sql1, $row[0]);
-				if (DB::isError($rs2)) { trigger_error($rs2->getMessage(), E_USER_ERROR); }
-			} else {
-				$rs2 = $g_dbConn->query($sql1, $this->getDefaultRole());
-				if (DB::isError($rs2)) { trigger_error($rs2->getMessage(), E_USER_ERROR); }
-			}
-
-			if ($row = $rs2->fetchRow())
-				return $row[0];
-		} else
-			return null;
-
-	}
 
 	/**
 	* @return void
@@ -211,7 +157,7 @@ class user
 			default: //'mysql'
 				$sql = "UPDATE users SET username = ? WHERE user_id = !";
 		}
-		$rs = $g_dbConn->query($sql, array($userName, $this->userID));
+		$rs = $g_dbConn->query($sql, array($userName, $this->getUserID()));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 
@@ -230,7 +176,7 @@ class user
 			default: //'mysql'
 				$sql = "UPDATE users SET first_name = ? WHERE user_id = !";
 		}
-		$rs = $g_dbConn->query($sql, array($firstName, $this->userID));
+		$rs = $g_dbConn->query($sql, array($firstName, $this->getUserID()));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 
@@ -249,7 +195,7 @@ class user
 			default: //'mysql'
 				$sql = "UPDATE users SET last_name = ? WHERE user_id = !";
 		}
-		$rs = $g_dbConn->query($sql, array($lastName, $this->userID));
+		$rs = $g_dbConn->query($sql, array($lastName, $this->getUserID()));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 
@@ -272,7 +218,7 @@ class user
 					default: //'mysql'
 						$sql = "UPDATE users SET email = ? WHERE user_id = !";
 				}
-				$rs = $g_dbConn->query($sql, array($email, $this->userID));
+				$rs = $g_dbConn->query($sql, array($email, $this->getUserID()));
 				if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	
 				$this->sendUserEmail($g_newUserEmail['subject'], $g_newUserEmail['msg']);			
@@ -299,7 +245,7 @@ class user
 			default: //'mysql'
 				$sql = "UPDATE users SET dflt_permission_level = ! WHERE user_id = !";
 		}
-		$rs = $g_dbConn->query($sql, array($dfltRole, $this->userID));
+		$rs = $g_dbConn->query($sql, array($dfltRole, $this->getUserID()));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 
@@ -314,17 +260,32 @@ class user
 				$d = date('Y-m-d');
 		}
 
-		$rs = $g_dbConn->query($sql, array($d, $this->userID));
+		$rs = $g_dbConn->query($sql, array($d, $this->getUserID()));
+
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$this->lastLogin = $d;
+	}
+	
+	
+	/**
+	 * @return string
+	 * @param boolean $last_name_first If true, will return "LAST, FIRST" else will return "FIRST LAST"
+	 * @desc returns the user's name
+	 */	
+	function getName($last_name_first=true) {
+		if($last_name_first) {
+			return stripslashes($this->lastName) . ", " . stripslashes($this->firstName);
+		}
+		else {
+			return stripslashes($this->firstName).' '.stripslashes($this->lastName);
+		}
 	}
 
 	function getUserID() { return $this->userID; }
 	function getUsername() { return stripslashes($this->userName); }
 	function getFirstName() { return stripslashes($this->firstName); }
 	function getLastName() { return stripslashes($this->lastName); }
-	function getName() { return stripslashes($this->lastName) . ", " . stripslashes($this->firstName); }
 	function getEmail() { return stripslashes($this->email); }
 	function getLastLogin() { return $this->lastLogin; }
 
@@ -338,50 +299,46 @@ class user
 				$sql = "SELECT count(user_id) from special_users WHERE user_id = !";
 		}
 
-		$rs = $g_dbConn->query($sql, array($this->userID));
+		$rs = $g_dbConn->query($sql, $this->userID);
 		if (DB::isError($rs)) { return false; }
 
 		$row = $rs->fetchRow();
-		return ($row[0] == 1) ? true : false;
+		return ($row[0] == 1) ? true : false;		
 	}
 
 	/**
 	* @return int
-	* @desc Returns User's Default Role
+	* @desc Returns User's Default Role as specified in the users table
 	*/
 	function getDefaultRole() {
-		global $g_dbConn;
-
-		if ($this->userID) {
-			switch ($g_dbConn->phptype)
-			{
-				default: //'mysql'
-						$sql  = "SELECT nt.permission_level "
-					.  		"FROM not_trained as nt "
-					.	    "WHERE nt.user_id = !"
-					;
-			}
-
-			$rs = $g_dbConn->query($sql, $this->userID);
-			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-			if ($row = $rs->fetchRow()) {
-				return $row[0];
-			} else {
-				return $this->dfltRole;
-			}
-		} else
-			return $this->dfltRole;
+		return $this->dfltRole;
 	}
-
+	
 	/**
-	* @return void
-	* @desc Calls getNotesByTarget() to retrieve all notes for a user, from the DB, by userID
+	* @return int
+	* @desc Returns User's Class as specified in the users table
 	*/
-	function getNotes()
-	{
-		$this->notes = common_getNotesByTarget("users", $this->userID);
+	function getDefaultClass() {
+		return $this->dfltClass;
 	}
+	
+	/**
+	* @return int
+	* @desc Returns User's  Class as specified in the users table may be overwritten by not_trained
+	*/
+	function getUserClass()
+	{
+			return $this->userClass;
+	}	
+	
+	/**
+	* @return int
+	* @desc Returns User's Role may be overwritten by not_trained table
+	*/
+	function getRole() {
+		return $this->role;
+	}
+
 
 	/**
 	* @return void
@@ -395,16 +352,37 @@ class user
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT user_id, username, first_name, last_name, email, dflt_permission_level "
-					.  "FROM users "
-					.  "WHERE user_id = !";
+				$sql = "
+						SELECT u.user_id, u.username, u.first_name, u.last_name, u.email, u.dflt_permission_level, p.label,
+							CASE WHEN nt.user_id IS NOT NULL THEN nt.permission_level
+								ELSE u.dflt_permission_level END as permission_level, 
+							CASE WHEN nt.user_id IS NOT NULL THEN nt_p.label
+								ELSE p.label END as userclass,
+							CASE WHEN nt.user_id IS NOT NULL THEN 1
+								ELSE 0 END as not_trained
+					    FROM users as u 
+					    	LEFT JOIN not_trained as nt on u.user_id = nt.user_id					    	 
+							JOIN permissions_levels as p ON p.permission_id = u.dflt_permission_level
+							LEFT JOIN permissions_levels as nt_p ON nt_p.permission_id = nt.permission_level  
+						WHERE u.user_id = !
+				";
 		}
 
 		$rs = $g_dbConn->query($sql, $userID);
-//print_r($rs);echo"<hr>";
+
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
-		list($this->userID, $this->userName, $this->firstName, $this->lastName, $this->email, $this->dfltRole) = $rs->fetchRow();
+		$row = $rs->fetchRow();
+			$this->userID 		= $row[0];
+			$this->userName 	= $row[1];
+			$this->firstName	= $row[2];
+			$this->lastName		= $row[3];
+			$this->email		= $row[4];
+			$this->dfltRole		= $row[5];
+			$this->dfltClass	= $row[6];
+			$this->role			= $row[7];
+			$this->userClass	= $row[8];
+			$this->not_trained	= $row[9];
 	}
 
 	/**
@@ -422,16 +400,9 @@ class user
 					.  "FROM users "
 					.  "WHERE user_id = !"
 					;
-				$sql2 = "DELETE "
-					.	"FROM notes "
-					.	"WHERE target_id = ! AND target_table = 'users'"
-					;
 		}
 
-		$rs = $g_dbConn->query($sql, $this->userID);
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		$rs = $g_dbConn->query($sql2, $this->userID);
+		$rs = $g_dbConn->query($sql, $this->getUserID());
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 
@@ -506,5 +477,40 @@ class user
 			$this->courseInstances[] = new courseInstance($row[0]);
 		}
 	}
+	
+	function addNotTrained()
+	{
+		global $g_dbConn;
+
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "INSERT INTO not_trained (user_id, permission_level) VALUES (!, 0)";					
+		}
+
+		$rs = $g_dbConn->query($sql, $this->getUserID());
+
+		//reload user object
+		$this->getUserByID($this->getUserID());	
+	}
+	
+	function removeNotTrained()
+	{
+		global $g_dbConn;
+
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "DELETE FROM not_trained WHERE user_id = !";					
+		}
+		
+		$rs = $g_dbConn->query($sql, $this->getUserID());
+
+		//reload user object
+		$this->getUserByID($this->getUserID());		
+	}
+	
+	function isNotTrained() { return $this->not_trained; }
+	
 }
 ?>

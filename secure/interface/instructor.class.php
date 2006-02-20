@@ -377,36 +377,24 @@ class instructor extends proxy
 	/**
 	* @return courseInstance
 	* @param courseInstance $oldCI
+	* @param int $course_id source course ID
+	* @param string $section
 	* @param string $newTerm
 	* @param string $newYear
 	* @param date $newActivation
 	* @param date $newExpiration
 	* @param string $status
-	* @param string $section
 	* @desc creates a new courseInstance in the database with crosslistings and instructor from old courseInstance
 	*/
-	function copyCourseInstance($oldCI, $newTerm, $newYear, $newActivation, $newExpiration, $status="ACTIVE", $section="", $instructorList, $proxyList, $crossList, $reserveList, $request_loan_periods=null)
+	function copyCourseInstance($oldCI, $course_id, $section, $newTerm, $newYear, $newActivation, $newExpiration, $status="ACTIVE", $instructorList, $proxyList, $crossList, $reserveList, $request_loan_periods=null)
 	{
 		global $g_dbConn, $g_permission;
 
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql_add_access			 = "INSERT INTO access (user_id, alias_id, permission_level) VALUES (!,!,!)";
+				$sql_add_access = "INSERT INTO access (user_id, alias_id, permission_level) VALUES (!,!,!)";
 		}
-		
-		$oldCI->getPrimaryCourse();
-		
-		$checkDuplicates = new checkDuplicates();
-		$duplicateReactivations = $checkDuplicates->checkDuplicateReactivation($oldCI->course->deptID, $oldCI->course->getCourseNo(), $section, $newTerm, $newYear, null);
-		
-		if ($duplicateReactivations) {
-					
-			//return false;
-			return  $duplicateReactivations;
-		}
-		else {
-		
 		
 		//create new CI in db
 		$newCI = new courseInstance();
@@ -421,98 +409,87 @@ class instructor extends proxy
 		$newCI->setEnrollment($oldCI->getEnrollment());
 
 		//set Primary Course Info
-		//$oldCI->getPrimaryCourse();			
-		$newCI->setPrimaryCourse($oldCI->course->getCourseID(), $section);
+		$newCI->setPrimaryCourse($course_id, $section);
 
-		foreach($instructorList as $instr)
-		{
-			//set Access
-			$rs = $g_dbConn->query($sql_add_access, array($instr, $newCI->primaryCourseAliasID, $g_permission['instructor']));
-			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		}
-
-		if(is_array($proxyList) && !empty($proxyList))
-		{
-			foreach($proxyList as $p)
-			{
-				$rs = $g_dbConn->query($sql_add_access, array($p, $newCI->primaryCourseAliasID, $g_permission['proxy']));
+		//grant access to instructors
+		if(is_array($instructorList) && !empty($instructorList)) {
+			foreach($instructorList as $instr) {
+				//set Access
+				$rs = $g_dbConn->query($sql_add_access, array($instr, $newCI->primaryCourseAliasID, $g_permission['instructor']));
 				if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 			}
 		}
 
-		//copy crosslistings
-		//if (is_array($crossListing) && !empty($crossListing))
-		if (is_array($crossList) && !empty($crossList)) //added by kawashi 11.12.2004 - fixed apparent bug?
-		{
-			foreach($crossList as $xListing)
-			{
-				//Create new cross listing
-				$newCI->addCrossListing($xListing->getCourseID(), $xListing->getSection());
+/****************************************************
+		//grant access to proxies
+		
 
-				/* commented out by kawashi on 11.12.2004 - no longer adding proxies to cross listings
-				//copy proxies for each crossListing
-				foreach($proxyList as $p)
-				{
-					$rs = $g_dbConn->query($sql_add_access, array($p, $xListing->courseAliasID, $g_permission['proxy']));
-					if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-				}
-				*/
+######################
+#	temporary handler for proxy list
+#
 
-				//This for loop added by kawashi on 11.12.2004 - apparent oversight?
-				//copy proxies for each crossListing
-				foreach($instructorList as $instr)
-				{
-					$rs = $g_dbConn->query($sql_add_access, array($instr, $xListing->courseAliasID, $g_permission['instructor']));
-					if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-				}
+		if(!empty($proxyList)) {
+			$proxyList = unserialize(urldecode($proxyList));
+			
+######################
+# real handler follows
+//
+//		if(is_array($proxyList) && !empty($proxyList)) {
+//
+######################
+
+			foreach($proxyList as $p) {
+				$rs = $g_dbConn->query($sql_add_access, array($p, $newCI->primaryCourseAliasID, $g_permission['proxy']));
+				if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 			}
 		}
+*****************************************************/
 
-		//copy reserves
-		if (is_array($reserveList) && !empty($reserveList))
-		{
-			foreach($reserveList as $srcReserve)
-			{
-				$rListing = new reserve($srcReserve);
-
-				$r = new reserve();
-				if ($r->createNewReserve($newCI->getCourseInstanceID(), $rListing->getItemID()))
-				{
-					$r->setActivationDate($newActivation);
-					$r->setExpirationDate($newExpiration);
-					$r->setSortOrder($rListing->getSortOrder());
-					//$r->setStatus($rListing->getStatus()); //commented out by kawashi 12.1.2004 - replaced with logic below
-
-					//When reactivating a class, the default status of the reserve should be "IN PROCESS" if physical item
-					//and "ACTIVE" if an electronic item
-
-					$rListing->getItem();
-					if ($rListing->item->getItemGroup() == 'MULTIMEDIA' || $rListing->item->getItemGroup() == 'MONOGRAPH') {
-						$r->setStatus('IN PROCESS');
-					} else {
-						$r->setStatus('ACTIVE');
-					}
-					//End of changes made by kawashi on 12.1.2004
-
-					$r->getItem();
-
-					if ($r->item->getItemGroup() != 'ELECTRONIC')
-					{
-						$req = new request();
-						$req->createNewRequest($newCI->getCourseInstanceID(), $r->getItemID());
-						$req->setDateRequested(date('Y-m-d'));
-						$req->setRequestingUser($instructorList[0]);
-						$req->setReserveID($r->getReserveID());
-						$r->setStatus("IN PROCESS");	
-						$r->setRequestedLoanPeriod($request_loan_periods[$srcReserve]); //array is indexed by old reserveID
-					}
-				}
+		//copy crosslistings
+		if(is_array($crossList) && !empty($crossList)) {
+			foreach($crossList as $cross_info) {	//each element is a serialized array of [0]course_id, [1]section
+				//get back the array				
+				$cross_info = unserialize(urldecode($cross_info));
+				
+				//create new crosslisting
+				$newCI->addCrossListing($cross_info[0], $cross_info[1]);
 			}
+		}
+		
+		//copy reserves
+		if(is_array($reserveList) && !empty($reserveList)) {
+			$oldCI->copyReserves($newCI->getCourseInstanceID(), $reserveList, $request_loan_periods);
 		}
 
 		return $newCI;
-	    }
 	}
 	
+    /**
+     * Generate a list of available reports
+     *
+     * @return array containing report_id, title, sql, parameters
+     */
+    function getReportList()
+    {
+            global $g_dbConn, $g_permission;
 
+            switch ($g_dbConn->phptype)
+            {
+                    default: //'mysql'
+                            $sql = "SELECT report_id, title, sql, parameters "
+                                    .  "FROM reports "
+                                    .  "WHERE min_permissions <= " . $this->getRole() . " "
+                                    .  "ORDER BY sort_order";
+                                    ;
+            }
+
+            $rs = $g_dbConn->query($sql);
+            if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+			
+            $tmpArray = null;
+            while ($row = $rs->fetchRow(DB_FETCHMODE_ASSOC))
+                    $tmpArray[] = $row;
+
+            return $tmpArray;
+    }
 }

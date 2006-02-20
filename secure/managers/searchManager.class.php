@@ -82,7 +82,7 @@ class searchManager
 					{
 						if ($search_array[$i]['term'] != '')				
 						{
-							if ($i > 0) $displayQry .= " " . $search_array[$i]['conjunct'] . " ";
+							if ($i > 0) $displayQry .= " " . $search_array[$i-1]['conjunct'] . " ";
 							$displayQry .= $search_array[$i]['term'];
 						}
 					}
@@ -103,8 +103,20 @@ class searchManager
 			case 'addResultsToClass':
 				$loc  = "add items to class";
 				
-				$activate_date = (isset($request['hide_year'])) ? $request['hide_year'] . '-' . $request['hide_month'] . '-' . $request['hide_day'] : date ('Y-m-d');
-							
+				//get CI and set up dates
+				if(!empty($request['ci'])) {
+					$ci = new courseInstance($request['ci']);
+					
+					//set dates based on CI
+					$activation_date = $ci->getActivationDate();
+					$expiration_date = $ci->getExpirationDate();
+				}
+				else {
+					//set dates based on today
+					$activation_date = date('Y-m-d');
+					$expiration_date = date('Y-m-d');
+				}
+					
 				if (!isset($request['submitButton']) || $request['submitButton'] != 'Add Items to Class')
 				{
 					//class not yet selected
@@ -115,24 +127,29 @@ class searchManager
 							$selectedItem[] = new reserveItem($request['itemSelect'][$i]);				
 							
 					$this->displayFunction = 'addResultsToClass';				
-					$this->argList = array('addResultsToClass', 'storeClassItems', $u, $selectedItem, $request, $activate_date, null);	
+					$this->argList = array('addResultsToClass', 'storeClassItems', $u, $selectedItem, $request, $activation_date, $expiration_date, null);	
 				} else {
 					//class selected create reserves				
 					$requests = (isset($request['requestItem'])) ? $request['requestItem'] : null;
-					$reserves = (isset($request['reserveItem'])) ? $request['reserveItem'] : null;						
+					$items = (isset($request['reserveItem'])) ? $request['reserveItem'] : null;						
 	
-					$ci = new courseInstance($request['ci']);
 					$reserveCnt = 0;
 	
 					//add items to reserve
-					if (is_array($reserves) && !empty($reserves)){
-						foreach($reserves as $r)
+					if (is_array($items) && !empty($items)){
+						foreach($items as $i_id)
 						{
 							$reserve = new reserve();
-							if ($reserve->createNewReserve($ci->getCourseInstanceID(), $r))
+							if ($reserve->createNewReserve($ci->getCourseInstanceID(), $i_id))
 							{
-								$reserve->setActivationDate($activate_date);
-								$reserve->setExpirationDate($ci->getExpirationDate());
+								$reserve->setActivationDate($request['activation_date']);
+								$reserve->setExpirationDate($request['expiration_date']);
+								$reserve->setStatus($request['status']);
+								
+								//attempt to insert this reserve into order
+								$reserve->getItem();
+								$reserve->insertIntoSortOrder($ci->getCourseInstanceID(), $reserve->item->getTitle(), $reserve->item->getAuthor());
+								
 								$reserveCnt++;
 							}
 						}
@@ -140,25 +157,29 @@ class searchManager
 	
 					//make requests
 					if (is_array($requests) && !empty($requests)){
-						foreach($requests as $r)
+						foreach($requests as $i_id)
 						{
 							//store reserve with status processing
 							$reserve = new reserve();
-							if ($reserve->createNewReserve($ci->getCourseInstanceID(), $r))
+							if ($reserve->createNewReserve($ci->getCourseInstanceID(), $i_id))
 							{
 								$reserve->setStatus("IN PROCESS");
-								$reserve->setActivationDate($activate_date);
-								$reserve->setExpirationDate($ci->getExpirationDate());
+								$reserve->setActivationDate($request['activation_date']);
+								$reserve->setExpirationDate($request['expiration_date']);
+								//attempt to insert this reserve into order
+								$reserve->getItem();
+								$reserve->insertIntoSortOrder($ci->getCourseInstanceID(), $reserve->item->getTitle(), $reserve->item->getAuthor());
+								$reserveCnt++;
 	
 								//create request
-								$request = new request();
-								$request->createNewRequest($ci->getCourseInstanceID(), $r);
-								$request->setRequestingUser($user->getUserID());
-								$request->setReserveID($reserve->getReserveID());
+								$req = new request();
+								$req->createNewRequest($ci->getCourseInstanceID(), $i_id);
+								$req->setRequestingUser($user->getUserID());
+								$req->setReserveID($reserve->getReserveID());
 							}
 						}
 					}
-				
+	
 					$ci->getPrimaryCourse();
 				
 					//$loc  = "search for documents";			
@@ -210,7 +231,8 @@ class searchManager
 					{
 						if ($search[$i]['field'] == 'n.note')
 						{
-							$sql_add .= "LEFT JOIN notes as n ON n.target_table='items' AND n.type = 'content' AND n.target_id = i.item_id ";
+							$sql_add = "LEFT JOIN notes as n ON n.target_table='items' AND n.type = 'content' AND n.target_id = i.item_id ";
+							break;
 						}
 					}
 					$sql_from .= $sql_add;
@@ -294,7 +316,7 @@ class searchManager
 			$raw_sql = split("ORDER BY", $this->search_sql_statement);			
 			$this->search_sql_statement = $raw_sql[0] . $sql_sort;
 		}	
-		
+
 		$rs = $g_dbConn->query($this->search_sql_statement);		
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_ERROR); }
 

@@ -43,10 +43,11 @@ class note
 	* @param optional $noteID
 	* @construct note and populate it passed noteID
 	*/
-	function note($noteID=NULL)
-	{
-		$n = (!is_null($noteID)) ? $noteID : $this->createNewNote();
-		$this->getNoteByID($n);
+	function note($noteID=NULL) {
+		if(!is_null($noteID))
+			$this->getNoteByID($noteID);
+		else
+			$this->createNewNote();
 	}
 
 	/**
@@ -109,7 +110,6 @@ class note
 
 		$rs = $g_dbConn->query($sql, array($id, $table, $this->noteID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
 	}
 
 	function getType() { return $this->type; }
@@ -126,27 +126,25 @@ class note
 	* @return int newNoteID
 	* @desc Create new note object and insert new record into db
 	*/
-	function createNewNote()
-	{
+	function createNewNote() {
 		global $g_dbConn;
 
-		switch ($g_dbConn->phptype)
-		{
+		switch ($g_dbConn->phptype) {
 			default: //'mysql'
-				$sql  = "INSERT INTO notes (note, target_id, target_table, type) VALUES ('', 0, '', '')";
+				$sql  = "INSERT INTO notes () VALUES ()";
 				$sql2 = "SELECT LAST_INSERT_ID() FROM notes";
 		}
 
 		$rs = $g_dbConn->query($sql);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
-		$rs = $g_dbConn->query($sql2);
+		//get the id	
+		$rs = $g_dbConn->getOne($sql2);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		$this->noteID = $rs;
 
-		$row = $rs->fetchRow();
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		  return $row[0];
+		return $rs;
 	}
 
 	/**
@@ -190,6 +188,26 @@ class note
 		}
 
 		$rs = $g_dbConn->query($sql, $this->noteID);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+	}
+	
+	
+	/**
+	 * @return void
+	 * @param int $new_target_id new target ID
+	 * @desc Duplicate this note in the DB with the new target id.
+	 */
+	public function duplicate($new_target_id) {
+		global $g_dbConn;
+		
+		switch($g_dbConn->phptype) {
+			default:	//mysql
+				$sql = 'INSERT INTO notes (type, target_id, note, target_table)
+						VALUES(?, !, ?, ?)';
+		}
+		
+		//run the query
+		$rs = $g_dbConn->query($sql, array($this->type, $new_target_id, $this->text, $this->targetTable));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 

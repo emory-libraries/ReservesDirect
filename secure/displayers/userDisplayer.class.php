@@ -27,7 +27,7 @@ ReservesDirect is located at:
 http://www.reservesdirect.org/
 
 *******************************************************************************/
-require_once("secure/common.inc.php");
+require_once('secure/managers/ajaxManager.class.php');
 
 class userDisplayer
 {
@@ -98,7 +98,7 @@ class userDisplayer
 	{
 		echo "<form action=\"index.php\" method=\"post\" name=\"editUser\">\n";
 	    echo "<input type=\"hidden\" name=\"cmd\" value=\"$nextCmd\">\n";
-		echo '<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">';
+		echo '<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">';
         echo 	'<tr>';
         echo 		'<td width="140%"><img src="images/spacer.gif" width="1" height="5"> </td>';
         echo 	'</tr>';
@@ -168,13 +168,16 @@ class userDisplayer
       	echo '</table>';
 	}
 
-	function displayEditUser($userToEdit, $user, $msg=null, $request, $usersObj=null, $hidden_fields=null)
+	function displayEditUser($userToEdit, $user, $msg=null, $request, $usersObj=null, $hidden_fields=null, $libraries=null)
 	{
 		global $g_permission;
-
-		if (!is_null($usersObj))
-			$usersObj->displayUserSearch($hidden_fields['previous_cmd'], $msg, 'Select a User to Edit', $usersObj->userList, false, $request);
-
+		
+		if(empty($userToEdit)) {
+			//ajax user lookup
+			$mgr = new ajaxManager('lookupUser', $hidden_fields['previous_cmd'], 'manageUsers', 'Select User', null, true, array('min_user_role'=>0, 'field_id'=>'selectedUser'));
+			$mgr->display();
+		}
+		
 		if (!is_null($userToEdit))
 		{
 			echo "<form action=\"index.php\" method=\"post\" name=\"editUser\">\n";
@@ -195,14 +198,14 @@ class userDisplayer
 			}			
 			
 			
-			echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+			echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 			//echo "	<tr><td width=\"100%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
 			echo "	<tr><td align=\"center\" valign=\"top\" class=\"helperText\">$msg&nbsp;</td></tr>\n";
 
 			echo "	<tr>\n";
 			echo "		<td align=\"left\" valign=\"top\">\n";
 			echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
-			echo "			<tr><td colspan=\"3\" align=\"right\">[ <a href=\"index.php?cmd=manageUser\">Exit</a> ]</div></td></tr>\n";
+			echo "			<tr><td colspan=\"3\" align=\"right\">[ <a href=\"index.php?cmd=manageUser\">Exit</a> ]</td></tr>\n";
 
 
 			if ($hidden_fields['cmd'] == "addUser")
@@ -242,7 +245,7 @@ class userDisplayer
 			echo "				<tr>\n";
 			echo "					<td class=\"strong\" align=\"right\">Default Role:</td>\n";
 
-			if ($user->getUserID() != $userToEdit->getUserID() && $user->getDefaultRole() >= $g_permission['staff'])
+			if ($user->getUserID() != $userToEdit->getUserID() && $user->getRole() >= $g_permission['staff'])
 			{
 				$SELECT_0 = "";
 				$SELECT_1 = "";
@@ -261,7 +264,7 @@ class userDisplayer
 				echo "							<option value=\"2\" $SELECT_2>PROXY</option>\n";
 				echo "							<option value=\"3\" $SELECT_3>INSTRUCTOR</option>\n";
 				echo "							<option value=\"4\" $SELECT_4>STAFF</option>\n";
-				if ($userToEdit->getDefaultRole() == $g_permission['admin']) echo "							<option value=\"5\" $SELECT_5>ADMIN</option>\n";
+				if ($user->getRole() == $g_permission['admin']) echo "							<option value=\"5\" $SELECT_5>ADMIN</option>\n";
 				echo "						</select>\n";
 				echo "					</td>\n";
 			}else{
@@ -269,9 +272,16 @@ class userDisplayer
 				echo "					<td>". strtoupper($userToEdit->getUserClass()) ."</td>\n";
 			}
 			echo "				</tr>\n";
+			
+			//users should not be allowed to edit there trained status
+			if ($user->getUserID() != $userToEdit->getUserID())
+			{
+				$not_trained = ($userToEdit->isNotTrained()) ? " checked " : "";
+				echo "				<tr><td>&nbsp;</td><td valign=\"top\"><input type=\"checkbox\" name=\"user[not_trained]\" value=\"not_trained\" $not_trained> Not Trained &nbsp;&nbsp;&nbsp;<span class=\"helperText\">Allow only student level access.</span></td></tr>\n";
+			}
 
-			if (($user->getDefaultRole() >= $g_permission['staff'] && $userToEdit->getDefaultRole() >= $g_permission['instructor']) ||
-				(isset($request['user']['defaultRole']) && $request['user']['defaultRole'] >= $g_permission['instructor']))
+			$role = (isset($request['user']['defaultRole'])) ? $request['user']['defaultRole'] : $userToEdit->getDefaultRole();
+			if ($role >= $g_permission['instructor'])
 			{
 				echo "				<tr>\n";
 				echo "					<td class=\"strong\" align=\"right\">ILS User ID:</td>\n";
@@ -284,15 +294,34 @@ class userDisplayer
 				echo "				</tr>\n";
 			}
 
+			//Staff Libraries
+			if ((!isset($request['user']['defaultRole']) && $userToEdit->getRole() >= $g_permission['staff']) 
+				|| (isset($request['user']['defaultRole']) && $request['user']['defaultRole'] >= $g_permission['staff'])
+				&& is_array($libraries))
+			{
+				echo "				<tr>\n";
+				echo "					<td class=\"strong\" align=\"right\">Primary Library:</td>\n";
+				echo "					<td><select name=\"user[staff_library]\">\n";
+				
+				foreach ($libraries as $l)
+				{
+					$lib_selected = ($userToEdit->getStaffLibrary() == $l->getLibraryID()) ? " SELECTED " : "";
+					echo "						<option $lib_selected value=\"".$l->getLibraryID()."\">" . $l->getLibraryNickname() . "</option>\n";
+				}
+				
+				echo "					</select></td>\n";
+				echo "				</tr>\n";
+			}
 
 			echo "				<tr><td colspan=\"2\">&nbsp;</td></tr>\n";
 
 
 			//edit password
 			//If special user, allow user to override password, otherwise give them a button
+			
 			if ($userToEdit->isSpecialUser())
 			{
-				if ($user->getDefaultRole() >= $g_permission['staff'] || $user->getUserID() == $userToEdit->getUserID() || $user->getDefaultRole() == $g_permission['custodian'])
+				if ($user->getRole() >= $g_permission['staff'] || $user->getUserID() == $userToEdit->getUserID() || $user->getRole() == $g_permission['custodian'])
 				{
 					$warningText = ($user->getUserID() != $userToEdit->getUserID()) ? "(use only if user cannot login normally)" : "";
 					
@@ -306,7 +335,7 @@ class userDisplayer
 					echo "				</tr>\n";
 				}
 			}
-			elseif (($user->getDefaultRole() >= $g_permission['staff']  || $user->getDefaultRole() == $g_permission['custodian'])&& $user->getUserID() != $userToEdit->getUserID())
+			elseif (($user->getRole() >= $g_permission['staff']  || $user->getRole() == $g_permission['custodian'])&& $user->getUserID() != $userToEdit->getUserID())
 			{
 
 				$addPwd_disabled = (is_null($userToEdit->getUserID())) ? "disabled" : "";
@@ -375,7 +404,7 @@ class userDisplayer
 		echo "	<tr>\n";
 		echo "		<td align=\"center\" valign=\"top\" class=\"borders\">\n";
 		echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
-		echo "				<tr class=\"headingCell1\"><td width=\"33%\">Create</td><td width=\"33%\">Edit</td><!--<td width=\"33%\">Assign</td>--></tr>\n";
+		echo "				<tr class=\"headingCell1\"><td width=\"33%\">Create</td><td width=\"33%\">Edit</td><td width=\"33%\">Assign</td></tr>\n";
 		echo "				<tr align=\"left\" valign=\"top\">\n";
 
 		echo "					<td width=\"33%\" class=\"borders\">\n";
@@ -396,12 +425,12 @@ class userDisplayer
 		echo "						</ul>\n";
 		echo "					</td>\n";
 
-		echo "					<!--<td width=\"33%\" class=\"borders\">\n";
+		echo "					<td width=\"33%\" class=\"borders\">\n";
 		echo "						<ul>\n";
 		echo "							<li><a href=\"index.php?cmd=assignProxy\">Assign a Proxy to a Class</a></li>\n";
 		echo "							<li><a href=\"index.php?cmd=assignInstr\">Assign an Instructor to a Class</a></li>\n";
 		echo "						</ul>\n";
-		echo "					</td>-->\n";
+		echo "					</td>\n";
 
 		echo "				</tr>\n";
 		echo "			</table>\n";
@@ -413,8 +442,11 @@ class userDisplayer
 
 	function displayAssignUser($cmd, $nextCmd, $userToAssign, $msg, $usersObj, $label, $request)
 	{
-		if (!is_null($usersObj))
-			$usersObj->displayUserSearch($cmd, $msg, $label, $usersObj->userList, false, $request);
+		if(empty($userToEdit)) {
+			//ajax user lookup
+			$mgr = new ajaxManager('lookupUser', $cmd, 'manageUsers', 'Select User', null, true, array('min_user_role'=>0, 'field_id'=>'selectedUser'));
+			$mgr->display();
+		}
 	}
 
 	

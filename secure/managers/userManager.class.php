@@ -30,6 +30,7 @@ http://www.reservesdirect.org/
 *******************************************************************************/
 require_once("secure/common.inc.php");
 require_once("secure/displayers/userDisplayer.class.php");
+require_once("secure/managers/ajaxManager.class.php");
 
 class userManager
 {
@@ -57,21 +58,21 @@ class userManager
 
 				$page = "manageUser";
 
-				if ($user->getDefaultRole() >= $g_permission['staff'])
+				if ($user->getRole() >= $g_permission['staff'])
 				{
-					$loc  = "home";
+					$loc  = "manage users home";
 
 					$this->displayFunction = 'displayStaffHome';
 					$this->argList = array(null);
-				} elseif ($user->getDefaultRole() == $g_permission['instructor']) {
+				} elseif ($user->getRole() == $g_permission['instructor']) {
 
-					$loc  = "home";
+					$loc  = "manage your proxies";
 
 					$this->displayFunction = 'displayInstructorHome';
 					$this->argList = "";
-				} elseif ($user->getDefaultRole() == $g_permission['custodian']) {
+				} elseif ($user->getRole() == $g_permission['custodian']) {
 
-					$loc  = "home";
+					$loc  = "manage user passwords";
 
 					$this->displayFunction = 'displayCustodianHome';
 					$this->argList = "";
@@ -81,10 +82,12 @@ class userManager
 			case "newProfile":				
 			case "editProfile":
 				$page = "manageUser";
+				$loc = "edit your profile";
 
 				$newUser = ($cmd == "newProfile") ? true : false;
 				
-				if ($user->getDefaultRole() >= $g_permission['instructor'])
+				if ($user->getRole() >= $g_permission['instructor'] 
+					|| (isset($request['user']['defaultRole']) && $request['user']['defaultRole'] >= $g_permission['staff']))
 					$user->getInstructorAttributes();
 				
 				$hidden_fields = array (
@@ -94,11 +97,12 @@ class userManager
 				);
 				
 				$this->displayFunction = 'displayEditUser';
-				$this->argList = array($user, $user, null, $_REQUEST, null, $hidden_fields);
+				$this->argList = array($user, $user, null, $_REQUEST, null, $hidden_fields, $user->getLibraries());
 			break;
 			
 			case "mergeUsers":				
 				$page = "manageUser";
+				$loc = "merge user profiles";
 
 				$userObj = new users();
 				
@@ -116,7 +120,7 @@ class userManager
 						$alertMsg = "User to keep and User to merge must be different users.";
 
 						$this->displayFunction = 'displayMergeUser';
-						$this->argList = array($_REQUEST, $hidden_fields, $userObj, $cmd);	
+						$this->argList = array($_REQUEST, array('cmd'=>$cmd), $userObj, $cmd);	
 					}
 				} else {
 					$hidden_fields = array (
@@ -131,11 +135,30 @@ class userManager
 
 			case 'addUser':
 				$page = "manageUser";
+				$loc = "create user";
 
-				if ($_REQUEST['user']['defaultRole'] >= $g_permission['instructor']) //need to have access to intructor_attributes
-					$userToEdit = new instructor();
-				else
-					$userToEdit = new user();
+				switch ($_REQUEST['user']['defaultRole'])
+				{
+					case $g_permission['admin']:
+						$userToEdit = new admin();
+						break;
+					case $g_permission['staff']:
+						$userToEdit = new staff();
+						break;	
+					case $g_permission['instructor']: //need to have access to intructor_attributes
+						$userToEdit = new instructor();
+						break;
+					case $g_permission['proxy']:
+						$userToEdit = new proxy();
+						break;
+					case $g_permission['custodian']:
+						$userToEdit = new custodian();
+						break;
+					case $g_permission['custodian']:
+					default:
+						$userToEdit = new student();
+						break;											
+				}
 
 				if (isset($_REQUEST['user']))  // we do not want to store this to the db yet but should populate the object for display to the form
 				{
@@ -145,7 +168,7 @@ class userManager
 					$userToEdit->dfltRole  = $_REQUEST['user']['defaultRole'];
 					$userToEdit->email	   = $_REQUEST['user']['email'];
 
-					if ($userToEdit->dfltRole >= $g_permission['instructor'] && isset($_REQUEST['user']['ils_user_name']))
+					if ($userToEdit->getRole() >= $g_permission['instructor'] && isset($_REQUEST['user']['ils_user_name']))
 					{
 						$userToEdit->ils_user_id = $_REQUEST['user']['ils_user_id'];
 						$userToEdit->ils_name = $_REQUEST['user']['ils_user_name'];
@@ -160,11 +183,12 @@ class userManager
 				);
 				
 				$this->displayFunction = 'displayEditUser';				
-				$this->argList = array($userToEdit, $user, null, $_REQUEST, null, $hidden_fields);
+				$this->argList = array($userToEdit, $user, null, $_REQUEST, null, $hidden_fields, $user->getLibraries());
 			break;
 
 			case 'resetPwd':
 				$page = "manageUser";
+				$loc = "reset user password";
 
 				$users = new users();
 
@@ -182,7 +206,7 @@ class userManager
 					else
 						$sp->resetPassword($userToEdit->getUsername());
 
-					if ($user->getDefaultRole() == $g_permission['custodian']) {
+					if ($user->getRole() == $g_permission['custodian']) {
 						$this->displayFunction = 'displayCustodianHome';
 						$this->argList = array('Override Password Reset');
 					} else {
@@ -197,7 +221,7 @@ class userManager
 					);
 				//($userToEdit, $user, $msg=null, $request, $usersObj=null, $hidden_fields=null)
 					$this->displayFunction = 'displayEditUser';
-					$this->argList = array($userToEdit, $user, null, $_REQUEST, $users, $hidden_fields);
+					$this->argList = array($userToEdit, $user, null, $_REQUEST, $users, $hidden_fields, $user->getLibraries());
 				}
 
 			break;
@@ -220,73 +244,90 @@ class userManager
 
 			case 'editUser':
 				$page = "manageUser";
+				$loc = "edit user profile";
 
 				$users = new users();
-
-				//determine if search has been issued and if so search
-				if (isset($_REQUEST['select_user_by']) && isset($_REQUEST['user_qryTerm']))
-					$users->search($_REQUEST['select_user_by'], $_REQUEST['user_qryTerm']);
 
 				//if user to be editted has been selected create object and get data
 				if (!isset($userToEdit))
 				{
 					if (isset($_REQUEST['selectedUser']))
-					{
-						$userToEdit = new instructor();
-						$userToEdit->getUserByID($_REQUEST['selectedUser']);
+					{						
+						$tmpUser = new user($_REQUEST['selectedUser']);
+						
+						$role = (isset($_REQUEST['user']['defaultRole'])) ? $_REQUEST['user']['defaultRole'] : $tmpUser->getDefaultClass();
+										
+						$userToEdit = $users->initUser($role, $tmpUser->getUsername());
+						$userToEdit->getUserByID($_REQUEST['selectedUser']);		
+						unset($tmpUser);
+						
+						if ($role >= 'instructor')
+							$userToEdit->getInstructorAttributes();
+						
 					} else
 						$userToEdit = null;
 				}
-
-				if (!is_null($userToEdit) && $userToEdit->getDefaultRole() >= $g_permission['instructor'])
-				{
-					//recreate as instructor
-					$userToEdit = new instructor($userToEdit->getUsername());
-					$userToEdit->getInstructorAttributes();
-				}
+				
 
 				$hidden_fields = array (
 					'cmd' 			=> 'storeUser', 
 					'previous_cmd'	=> $cmd,
 					'newUser'		=> false
 				);
-				
+			
 				$this->displayFunction = 'displayEditUser';
-				$this->argList = array($userToEdit, $user, null, $_REQUEST, $users, $hidden_fields);
+				$this->argList = array($userToEdit, $user, null, $_REQUEST, $users, $hidden_fields, $user->getLibraries());
 
 			break;
 
 			case 'assignProxy':
 			case 'assignInstr':
-				$page = "manageUser";
-
-				$ci = (isset($_REQUEST['ci'])) ? new courseInstance($_REQUEST['ci']) : null;
-
-				$this->displayFunction = 'displayEditUser';
-				$this->argList = array($cmd, 'storeUser', $userToEdit, $user, null, $users, $_REQUEST);
-
-				if (is_null($ci)) { // user has been seleced so choose class
-					require_once("managers/selectClassManager.class.php");
-					selectClassManager::selectClassManager('lookupClass', $cmd, $cmd, 'Assign User', $user, $_REQUEST, null);
-				} else { // show proxy screen
-					require_once("managers/classManager.class.php");
-
-					if ($cmd == 'assignProxy')
-						classManager::classManager('editProxies', $user, $adminUser, $_REQUEST);
-					else
-						classManager::classManager('editInstructors', $user, $adminUser, $_REQUEST);
+				//set some info
+				if($cmd == 'assignInstr') {
+					$next_cmd = 'editInstructors';
+					$hidden = array('addInstructor'=>'true');
+					$min_user_role = 3;
+					$field_name = 'selected_instr';
+					$user_role_label = 'instructor';
+				}
+				elseif($cmd == 'assignProxy') {
+					$next_cmd = 'editProxies';
+					$hidden = array('addProxy'=>'true');
+					$min_user_role = 0;
+					$field_name = 'proxy';
+					$user_role_label = 'proxy';
+				}
+				
+				$page = 'manageUser';	//set tab
+				$loc = "assign $user_role_label to class >> ";
+				
+				//init a manager - sets the displayer
+				ajaxManager::ajaxManager();			
+					
+				if(!empty($_REQUEST[$field_name])) {	//if already selected a user, show class lookup
+					$loc .= "select class";	//show where we are
+					$hidden[$field_name] = $_REQUEST[$field_name];	//pass on the user id
+					ajaxManager::lookup('lookupClass', $next_cmd, 'manageUser', 'Select Class', $hidden);
+				}
+				else {	//show user lookup
+					$loc .= "select user";	//show where we are
+					ajaxManager::lookup('lookupUser', $cmd, 'manageUser', "Select User", null, true, array('min_user_role'=>$min_user_role, 'field_id'=>$field_name));
 				}
 
 			break;
 
 			case 'storeUser':
 				$editUser = new user();
+				
+
+				
+				
 				if ($_REQUEST['previous_cmd'] == 'addUser')
 				{
 					$tmpUser = new user();
 					if (!$tmpUser->getUserByUserName($_REQUEST['user']['username']))
 					{
-						$editUser->createUser($_REQUEST['user']['username'], '', '', '', 0);
+						$editUser->createUser($_REQUEST['user']['username'], '', '', '', $_REQUEST['user']['defaultRole']);
 					} else {
 						$hidden_fields = array (
 							'cmd' 			=> 'addUser', 
@@ -295,12 +336,17 @@ class userManager
 						);
 						
 						$this->displayFunction = 'displayEditUser';
-						$this->argList = array($editUser, $user, "This username is in use.  Please choose another.", $_REQUEST, $users, $hidden_fields);
+						$this->argList = array($editUser, $user, "This username is in use.  Please choose another.", $_REQUEST, $users, $hidden_fields, $user->getLibraries());
 						return;
 					}
 				} else
 					$editUser->getUserByID($_REQUEST['user']['userID']);
 
+					
+				$usersObject = new users();
+				//$editUser->getRole()
+				$editUser = $usersObject->initUser($_REQUEST['user']['defaultRole'], $editUser->getUsername());	
+					
 				if ($editUser->setEmail($_REQUEST['user']['email']))
 				{
 					$editUser->setFirstName($_REQUEST['user']['first_name']);
@@ -313,21 +359,28 @@ class userManager
 						$sp->resetPassword($editUser->getUsername(), $_REQUEST['user']['pwd']);
 					}
 
-					if ($editUser->getDefaultRole() >= $g_permission['instructor'] && isset($_REQUEST['user']['ils_user_id']))
+					if (isset($_REQUEST['user']['ils_user_id']))
 					{
-						$editUser = new instructor($editUser->getUsername());  //recreate as instructor
 						$editUser->storeInstructorAttributes($_REQUEST['user']['ils_user_id'], $_REQUEST['user']['ils_user_name']);
 					}
 
+					if ($editUser->getRole() >= $g_permission['instructor'] && isset($_REQUEST['user']['staff_library']))
+						$editUser->assignStaffLibrary($_REQUEST['user']['staff_library']);
+						
+					if (isset($_REQUEST['user']['not_trained']) && $_REQUEST['user']['not_trained'] == 'not_trained')
+						$editUser->addNotTrained();
+					else
+						$editUser->removeNotTrained();
+						
 					$msg = "User Record Successfully Saved";
 				} else {
 					$msg = "Invalid Email Format - Changes Not Saved";
 				}
 
-				if ($user->getDefaultRole() == $g_permission['custodian']) {
+				if ($user->getRole() == $g_permission['custodian']) {
 					$this->displayFunction = 'displayCustodianHome';
 					$this->argList = array("User Password Successfully Changed");
-				} elseif ($user->getDefaultRole() >= $g_permission['staff']) {
+				} elseif ($user->getRole() >= $g_permission['staff']) {
 					$this->displayFunction = 'displayStaffHome';
 					$this->argList = array($msg);
 				} else {
@@ -349,11 +402,9 @@ class userManager
 
 			case 'removePwd':
 				$page = "manageUser";
+				$loc = "remove user password";
 
 				$users = new users();
-
-				if (isset($_REQUEST['select_user_by']) && isset($_REQUEST['user_qryTerm']))
-					$users->search($_REQUEST['select_user_by'], $_REQUEST['user_qryTerm']);
 				
 				$userToEdit = (isset($_REQUEST['selectedUser'])) ? new user($_REQUEST['selectedUser']) : null;
 
@@ -365,7 +416,7 @@ class userManager
 						$sp->destroy();
 					}
 
-					if ($user->getDefaultRole() == $g_permission['custodian']) {
+					if ($user->getRole() == $g_permission['custodian']) {
 						$this->displayFunction = 'displayCustodianHome';
 						$this->argList = array('Override Password Removed');
 					} else {

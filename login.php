@@ -41,7 +41,7 @@
                           <input name="username" type="text" size="15"></p> 
                           
                           <p><strong>Password:
-                          <input name="pwd" type="text" size="15">
+                          <input name="pwd" type="password" size="15">
                         </strong> </p></div>
                     </td>
                     <td width="14%">&nbsp;</td>

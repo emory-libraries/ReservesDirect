@@ -297,7 +297,7 @@ class searchDisplayer
 				//marks items as 'personal' if they are such
 				$personal_label = $item->isPersonalCopy() ? '(Personal) ' : '' ;
 				
-				$previewItemURL = ($item->isPhysicalItem()) ?	$g_reservesViewer . $item->getLocalControlKey() : $item->getURL();
+				$previewItemURL = ($item->isPhysicalItem()) ?	$g_reservesViewer . $item->getLocalControlKey() : "reservesViewer.php?item=".$item->itemID;
 				
 				echo "				<tr align=\"left\" valign=\"middle\">\n";
 				echo "					<td width=\"4%\" valign=\"top\" class=\"$rowClass\"><img src=\"". $item->getitemIcon() ."\" width=\"24\" height=\"20\"></td>\n";
@@ -343,8 +343,9 @@ class searchDisplayer
 		
 	}
 
-	function addResultsToClass($cmd, $nextCmd, $u, $selectedResults, $request, $activate_date, $hidden_fields)
+	function addResultsToClass($cmd, $nextCmd, $u, $selectedResults, $request, $activation_date, $expiration_date, $hidden_fields)
 	{
+		global $calendar;
 		
 		echo "<form action=\"index.php\" method=\"POST\">\n";
 		
@@ -364,42 +365,25 @@ class searchDisplayer
 		}		
 		
 		
-		
-		
 		$selectClassMgr = new lookupManager('','lookupClass', $u, $request);
 		$selectClassMgr->display();
 		
-		//split activation date for display in boxes
-		list($a_y, $a_m, $a_d) = split("-", $activate_date);
+		echo "<table width=\"100%\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\">";
 		
-		//set active/inactive checkbox
-		if (!isset($request['currentStatus']) || $request['currentStatus'] == 'ACTIVE')
-		{
-			$a_checked = 'checked';
-			$i_checked = '';
-		} else {
-			$a_checked = '';
-			$i_checked = 'checked';
-		}
+		//status and dates		
+		$selected_status_inactive = ($request['status']=='INACTIVE') ? 'checked="true"' : '';
+		$selected_status_active = ($request['status']=='INACTIVE') ? '' : 'checked="true"';
+?>
+		<tr>
+			<td width="40%" id="statusText">
+				<strong>MARK ALL:</strong>&nbsp;&nbsp;&nbsp;&nbsp;<em>Current Status:</em>
+				<input type="radio" name="status" value="ACTIVE" <?=$selected_status_active?> /> <span class="active">ACTIVE</span> &nbsp; <input type="radio" name="status" value="INACTIVE" <?=$selected_status_inactive?> /> <span class="inactive">INACTIVE</span>
+			&nbsp;&nbsp;&nbsp;
+				<em>Active Dates:</em> <input type="text" id="activation_date" name="activation_date" size="10" maxlength="10" value="<?=$activation_date?>" /> <?=$calendar->getWidgetAndTrigger('activation_date', $activation_date)?> to <input type="text" id="expiration_date" name="expiration_date" size="10" maxlength="10" value="<?=$expiration_date?>" />  <?=$calendar->getWidgetAndTrigger('expiration_date', $activation_date)?> (YYYY-MM-DD)
+			</td>
+		</tr>
 		
-		echo "<table width=\"90%\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\">";
-
-
-		echo "	<tr>\n";
-		echo "		<td>\n";
-		echo "			<span class=\"strong\">Status:</span>\n";
-		echo "			<strong>Make All</strong>\n";
-		echo "			<input name=\"currentStatus\" value=\"ACTIVE\" type=\"radio\" $a_checked>Active\n";
-		echo "			<input name=\"currentStatus\" value=\"INACTIVE\" type=\"radio\" $i_checked>Inactive\n";
-		echo "		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\n";
-		echo "			<span class=\"strong\">Hide Until:</span>\n";
-		echo "			<input name=\"hide_month\" size=\"2\" maxlength=\"2\" value=\"$a_m\" type=\"text\">/\n";
-		echo "			<input name=\"hide_day\" size=\"2\" maxlength=\"2\" value=\"$a_d\" type=\"text\">/\n";
-		echo "			<input name=\"hide_year\" size=\"4\" maxlength=\"4\" value=\"$a_y\" type=\"text\">mm/dd/yyyy\n";
-		echo "		</td>\n";
-		echo "	</tr>\n";
-		
-		
+<?php	
 		
 		echo "	<tr><td>&nbsp;</td></tr>\n";
 

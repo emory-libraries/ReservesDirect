@@ -38,27 +38,62 @@ class library
 	public $reserveDesk;
 	public $libraryURL;
 	public $contactEmail;
+	private $monograph_library_id;
+	private $multimedia_library_id;
 
 	function library($libraryID)
 	{
 		global $g_dbConn;
 
-		$this->$libraryID = $libraryID;
-
+		if (!is_null($libraryID))
+		{
+			$this->$libraryID = $libraryID;
+	
+			switch ($g_dbConn->phptype)
+			{
+				default: //'mysql'
+					$sql  = "SELECT l.library_id, l.name, l.nickname, l.ils_prefix, l.reserve_desk, l.url, l.contact_email, l.monograph_library_id, l.multimedia_library_id "
+						  . "FROM libraries as l "
+						  . "WHERE l.library_id = !";
+	
+			}
+	
+			$rs = $g_dbConn->query($sql, $libraryID);
+			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+	
+			list($this->libraryID, $this->library, $this->libraryNickname, $this->ilsPrefix, $this->reserveDesk, $this->libraryURL, $this->contactEmail, $this->monograph_library_id, $this->multimedia_library_id) = $rs->fetchRow();
+		}
+	}
+	
+	function createNew($name, $nickname, $ils_prefix, $reserveDesk, $url, $contactEmail, $monograph_library_id, $multimedia_library_id)
+	{
+		global $g_dbConn;
+		
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql  = "SELECT l.library_id, l.name, l.nickname, l.ils_prefix, l.reserve_desk, l.url, l.contact_email "
-					  . "FROM libraries as l "
-					  . "WHERE l.library_id = !";
+				$sql  = "INSERT INTO libraries (name, nickname, ils_prefix, reserve_desk, url, contact_email, monograph_library_id, multimedia_library_id) VALUES (?,?,?,?,?,?,!,!)";
 
 		}
 
-		$rs = $g_dbConn->query($sql, $libraryID);
+		$rs = $g_dbConn->query($sql, array($name, $nickname, $ils_prefix, $reserveDesk, $url, $contactEmail, $monograph_library_id, $multimedia_library_id));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		list($this->libraryID, $this->library, $this->libraryNickname, $this->ilsPrefix, $this->reserveDesk, $this->libraryURL, $this->contactEmail) = $rs->fetchRow();
 	}
+
+	function update()
+	{
+		global $g_dbConn;
+		
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql  = "UPDATE libraries set name = ?, nickname = ?, ils_prefix =?, reserve_desk = ?, url = ?, contact_email = ?, monograph_library_id = !, multimedia_library_id = ! WHERE library_id = !";
+
+		}
+
+		$rs = $g_dbConn->query($sql, array($this->getLibrary(), $this->getLibraryNickname(), $this->getILS_prefix(), $this->getReserveDesk(), $this->getContactEmail(), $this->getLibraryID(), $this->getMonograph_library_id(), $this->getMultimedia_library_id(), $this->getLibraryID()));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+	}	
 
 	function getLibraryID() { return $this->libraryID; }
 	function getLibrary() { return $this->library; }
@@ -67,5 +102,16 @@ class library
 	function getReserveDesk() { return $this->reserveDesk; }
 	function getLibraryURL() { return $this->libraryURL; }
 	function getContactEmail() { return $this->contactEmail; }
+	function getMonograph_library_id() { return $this->monograph_library_id; }
+	function getMultimedia_library_id() { return $this->multimedia_library_id; }
+		
+	function setLibrary($name) { $this->library = stripslashes($name); }
+	function setLibraryNickname($nickname) { $this->libraryNickname = stripslashes($nickname); }
+	function setILS_prefix($prefix) { $this->ilsPrefix = stripslashes($prefix); }
+	function setReserveDesk($desk) { $this->reserveDesk = stripslashes($desk); }
+	function setLibraryURL($url) { $this->libraryURL = stripslashes($url); }
+	function setContactEmail($email) { $this->contactEmail = $email; }	
+	function setMonograph_library_id($library_id) { $this->monograph_library_id = $library_id; }
+	function setMultimedia_library_id($library_id) { $this->multimedia_library_id = $library_id; }	
 }
 ?>

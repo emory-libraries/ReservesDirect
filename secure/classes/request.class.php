@@ -49,7 +49,6 @@ class request
 	public $priority;
 	public $courseInstanceID;
 	public $courseInstance;
-	public $notes = array();
 	public $holdings = array();
 	
 	private $zQry;
@@ -141,16 +140,15 @@ class request
 					;
 		}
 
-		$rs = $g_dbConn->query($sql, $reserveID);
+		$rs = $g_dbConn->getRow($sql, array($reserveID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		if( ($row = $rs->fetchRow()) != null ) {
-			list($this->requestID, $this->reserveID, $this->requestedItemID, $this->requestingUserID, $this->requestedDate, $this->processedDate, $this->desiredDate, $this->priority, $this->courseInstanceID) = $row;
-			
-			return $this->requestID;
+		
+		if(empty($rs)) {
+			return false;
 		}
-		else
-			return null;
+		else {
+			list($this->requestID, $this->reserveID, $this->requestedItemID, $this->requestingUserID, $this->requestedDate, $this->processedDate, $this->desiredDate, $this->priority, $this->courseInstanceID) = $rs;
+		}
 	}
 	
 	function getHoldings()
@@ -327,6 +325,7 @@ class request
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 	
+	function getRequestID() { return $this->requestID; }
 	function getReserveID()		{ return $this->reserveID; }
 	function getDateRequested() { return $this->requestedDate; }
 	function getProcessedDate() { return $this->processedDate; }
@@ -337,7 +336,5 @@ class request
 	function getReserve(){ $this->reserve = new reserve($this->reserveID); }
 	function getPrority() { $this->priority; }
 
-	function getNotes() { $this->notes = getNotesByTarget("requests", $this->requestID); }
-	function setNote($type, $text) { $this->notes[] = common_setNote($type, $text, "requests", $this->requestID); }
 }
 ?>

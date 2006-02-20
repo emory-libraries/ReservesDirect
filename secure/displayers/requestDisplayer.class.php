@@ -30,13 +30,15 @@ http://www.reservesdirect.org/
 require_once("secure/common.inc.php");
 require_once("secure/classes/terms.class.php");
 require_once("secure/classes/circRules.class.php");
+require_once('secure/displayers/baseDisplayer.class.php');
+require_once('secure/managers/ajaxManager.class.php');
 
-class requestDisplayer
-{
+class requestDisplayer extends baseDisplayer {
+	
 	function displayAllRequest($requestList, $libList, $request, $user, $msg="")
 	{
 
-		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+		echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		//echo "	<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
 		if (!is_null($msg) && $msg != "")
 			echo "	<tr><td width=\"100%\" class=\"failedText\" align=\"center\">$msg<br></td></tr>\n";
@@ -72,12 +74,12 @@ class requestDisplayer
         echo "	<input type=\"hidden\" name=\"request_id\">\n";
         echo "	<tr>\n";
         echo "		<td><font color=\"#666666\">&nbsp;</font></td>";
-        echo "		<td bgcolor=\"#FFFFFF\" align=\"right\"><input type=\"button\" value=\"Print Selected Request\" onClick=\"this.form.cmd.value='printRequest'; this.form.target='printPage'; this.form.submit();\">";
+        echo "		<td bgcolor=\"#FFFFFF\" align=\"right\"><input type=\"button\" value=\"Print Selected Request\" onClick=\"this.form.cmd.value='printRequest'; this.form.target='printPage'; this.form.submit(); checkAll(this.form, false);\">";
 		echo "	</td>\n";
 		echo "</tr>\n";		
 
 		if (is_array($requestList) && !empty($requestList))
-			requestDisplayer::displayRequestList($requestList, $item, $ci);
+			requestDisplayer::displayRequestList($requestList);
 		else 
 			echo "<tr><td>No Request to process for this unit.</td></tr>";
 
@@ -96,7 +98,7 @@ class requestDisplayer
 	function printSelectedRequest($requestList, $libList, $request, $user, $msg="")
 	{
 
-		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+		echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		
 
 		echo "	<tr>\n";
@@ -125,14 +127,14 @@ class requestDisplayer
 
 		echo "</table>\n";		
 		if (is_array($requestList) && !empty($requestList))
-			requestDisplayer::displayRequestList($requestList, $item, $ci, "true");
+			requestDisplayer::displayRequestList($requestList, "true");
 		else 
 			echo "<p style=\"text-align: center\">No Request selected for printing.</p>";
 
 
 	}	
 	
-	function displayRequestList($requestList, $item, $ci, $printView=null)
+	function displayRequestList($requestList, $printView=null)
 	{	
 		echo "	<tr><td colspan=\"2\">&nbsp;</td></tr>\n";
 
@@ -285,9 +287,9 @@ class requestDisplayer
 	
 	
 	
-	function addItem($user, $cmd, $search_results, $owner_list, $lib_list, $request_id=null, $request, $hidden_fields, $docTypeIcons=null, $isActive=true, $buttonValue="Add Item", $msg="", $requestLoanPeriod=null)
+	function addItem($user, $cmd, $search_results, $lib_list, $request_id=null, $request, $hidden_fields, $docTypeIcons=null, $isActive=true, $buttonValue="Add Item", $msg="", $requestLoanPeriod=null)
 	{
-		global $g_documentURL, $g_permission;
+		global $g_documentURL, $g_permission, $calendar, $g_notetype;
 
 		$circRules = new circRules();
 
@@ -295,7 +297,8 @@ class requestDisplayer
 		//This is so the reserve activation date will match the course instance activation date
 		if (is_array($hidden_fields)){
 			$ci = new courseInstance($hidden_fields['ci']);
-			list($y, $m, $d) = split("-", $ci->getActivationDate());
+			$reserve_activation_date = $ci->getActivationDate();
+			$reserve_expiration_date = $ci->getExpirationDate();
 		}
 		//End of added code section
 
@@ -445,7 +448,7 @@ class requestDisplayer
 <?php
 		echo "</script>\n";
 
-		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+		echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "	<tr><td width=\"100%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
 
 		echo "	<tr><td width=\"100%\" class=\"failedText\" align=\"center\">$msg<br></td></tr>\n";
@@ -474,34 +477,25 @@ class requestDisplayer
 		{
 			echo "	<input type=\"hidden\" name=\"item_type\" value=\"ELECTRONIC\">\n";
 			echo "	<input type=\"hidden\" name=\"home_library\" value=\"1\">\n"; //will not be processed so set to default of Woodruff
-			echo "			<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"borders\">\n";
+			echo "			<table width=\"100%\" border=\"0\" cellpadding=\"3\" cellspacing=\"0\" bgcolor=\"#CCCCCC\" class=\"borders\">\n";
 			echo "				<tr>\n";
-			echo "					<td width=\"25%\" align=\"left\" valign=\"top\"> <p class=\"headingCell1\" >MATERIAL TYPE (Pick One):</p></td><td width=\"75%\">&nbsp;</td>\n";
+			echo "					<td align=\"left\" colspan=\"2\" valign=\"top\"> <p class=\"strong\">MATERIAL TYPE (Pick One):</p></td>\n";
 			echo "				</tr>\n";
-			echo "				<tr>\n";
-			echo "					<td align=\"left\" valign=\"top\" colspan=\"2\">\n";
-			echo "						<table width=\"100%\" border=\"0\" cellpadding=\"3\" cellspacing=\"0\" bgcolor=\"#CCCCCC\">\n";
-			echo "							<tr class=\"borders\">\n";
+			echo "							<tr>\n";
 			echo "								<td align=\"left\" valign=\"top\">\n";
-			echo "									<font color=\"#FF0000\"><strong>*</strong></font><input type=\"radio\" name=\"documentType\" value=\"DOCUMENT\" checked onClick=\"this.form.userFile.disabled = !this.checked; this.form.url.disabled = this.checked; this.form.prependURL.disabled = this.checked;\">&nbsp;<span class=\"strong\">Upload&gt;&gt;</span>\n";
+			echo "									<font color=\"#FF0000\"><strong>*</strong></font><input type=\"radio\" name=\"documentType\" value=\"DOCUMENT\" checked onClick=\"this.form.userFile.disabled = !this.checked; this.form.url.disabled = !this.checked;\">&nbsp;<span class=\"strong\">Upload &gt;&gt;</span>\n";
 			echo "								</td>\n";
 			echo "								<td align=\"left\" valign=\"top\"><input type=\"file\" name=\"userFile\" size=\"40\"></td>\n";
 			echo "							</tr>\n";
-			echo "							<tr class=\"borders\">\n";
+			echo "							<tr>\n";
 			echo "								<td align=\"left\" valign=\"top\">\n";
-			echo "									<font color=\"#FF0000\"><strong>*</strong></font>\n";
-			echo "									<input type=\"radio\" name=\"documentType\" value=\"URL\" onClick=\"this.form.url.disabled = !this.checked; this.form.prependURL.disabled = !this.checked; this.form.userFile.disabled = this.checked;\">\n";
-			echo "									<span class=\"strong\"> URL&gt;&gt;</span>\n";
+			echo "									<font color=\"#FF0000\"><strong>*</strong></font><input type=\"radio\" name=\"documentType\" value=\"URL\" onClick=\"this.form.url.disabled = !this.checked; this.form.userFile.disabled = this.checked;\">\n";
+			echo "									<span class=\"strong\">URL &gt;&gt;</span>\n";
 			echo "								</td>\n";
 			echo "								<td align=\"left\" valign=\"top\">\n";
-			echo "									<input name=\"url\" type=\"text\" size=\"100\" DISABLED>\n";
-			echo "									&nbsp; <input DISABLED type=\"checkbox\" name=\"prependURL\" onClick=\" if (this.checked) this.form.url.value = '$g_documentURL'+this.form.url.value;\">\n";
-			echo "									<span class=\"small\">Prepend eReserves hostname to path.</span>\n";
+			echo "									<input name=\"url\" type=\"text\" size=\"50\" DISABLED>\n";
 			echo "								</td>\n";
 			echo "							</tr>\n";
-			echo "						</table>\n";
-			echo "					</td>\n";
-			echo "				</tr>\n";
 			echo "			</table>\n";
 			echo "		</td>\n";
 			echo "	</tr>\n";
@@ -641,24 +635,20 @@ class requestDisplayer
 		echo "					<td colspan=\"2\" align=\"right\" bgcolor=\"#CCCCCC\" class=\"borders\">\n";
 		echo "						<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
 		echo "							<tr>\n";
-		echo "								<td width=\"50%\" height=\"14\">\n";
-		echo "									<p><span class=\"strong\">Current Status:</span><strong>";
-
-		if ($isActive)
-			echo "									<font color=\"#009900\">ACTIVE</font></strong> | <input type=\"checkbox\" name=\"currentStatus\" value=\"INACTIVE\">Deactivate?</p>\n";
-		else
-			echo "									<font color=\"#009900\">INACTIVE</font></strong> | <input type=\"checkbox\" name=\"currentStatus\" value=\"ACTIVE\">Activate?</p>\n";
-
-		echo "								</td>\n";
-		echo "								<td width=\"50%\">\n";
-		echo "									<span class=\"strong\">Hide Until:</span>\n";
-		echo "										<input name=\"hide_month\" type=\"text\" size=\"2\" maxlength=\"2\" value=\"$m\">\n";
-		echo "										/\n";
-		echo "										<input name=\"hide_day\" type=\"text\" size=\"2\" maxlength=\"2\" value=\"$d\">\n";
-		echo "										/\n";
-		echo "										<input name=\"hide_year\" type=\"text\" size=\"4\" maxlength=\"4\" value=\"$y\">\n";
-		echo "										mm/dd/yyyy\n";
-		echo "								</td>\n";
+		
+		//status and dates
+		
+		$selected_status_active = $isActive ? 'checked="true"' : '';
+		$selected_status_inactive = $isActive ? '' : 'checked="true"';
+?>
+		<td width="40%" id="statusText">
+			<strong>Current Status:</strong>
+			<input type="radio" name="status" value="ACTIVE" <?=$selected_status_active?> /> <span class="active">ACTIVE</span> &nbsp; <input type="radio" name="status" value="INACTIVE" <?=$selected_status_inactive?> /> <span class="inactive">INACTIVE</span>
+		</td>
+		<td>
+			<strong>Active Dates:</strong> <input type="text" id="reserve_activation_date" name="reserve_activation_date" size="10" maxlength="10" value="<?=$reserve_activation_date?>" /> <?=$calendar->getWidgetAndTrigger('reserve_activation_date', $reserve_activation_date)?> to <input type="text" id="reserve_expiration_date" name="reserve_expiration_date" size="10" maxlength="10" value="<?=$reserve_expiration_date?>" />  <?=$calendar->getWidgetAndTrigger('reserve_expiration_date', $reserve_activation_date)?> (YYYY-MM-DD)
+		</td>
+<?php
 		echo "							</tr>\n";
 		echo "						</table>\n";
 		echo "					</td>\n";
@@ -666,20 +656,6 @@ class requestDisplayer
 
 		//personal item block
 		//output html, but hide by default with css
-
-		//set search-by selected
-		$username = "";
-		$last_name = "";
-		$selector = (isset($request['select_owner_by'])) ? $request['select_owner_by'] : "last_name";
-		$$selector = 'selected="selected"';
-		
-		//set search term
-		$owner_qryTerm = (isset($request['owner_qryTerm'])) ? $request['owner_qryTerm'] : "";
-
-		//set name selected
-		$inst_DISABLED = (is_null($owner_list)) ? 'disabled="disabled"' : '';
-
-		//personal item block
 ?>
 				<input type="hidden" name="personal_item" id="personal_item" value="no" />
 				
@@ -696,22 +672,11 @@ class requestDisplayer
 							<input type="radio" name="personal_item_choose" id="personal_item_yes" value="Yes" onChange="togglePersonalOwnerSearch();" /> Yes
 						</div>
 						<div id="personal_item_owner" style="margin-top:2px; margin-bottom:15px;">
-							<select name="select_owner_by">
-								<option value="last_name" <?=$last_name?>>Last Name</option>
-								<option value="username" <?=$username?>>User Name</option>
-							</select>
-							&nbsp; <input id="owner_qryTerm" name="owner_qryTerm" type="text" value="<?=$owner_qryTerm?>" size="15"  onBlur="this.form.submit();">
-							&nbsp; <input type="submit" name="owner_search" value="Search">
-							&nbsp;
-							<select name="selected_owner" <?=$inst_DISABLED?>>
-								<option value="null">-- Choose Item Owner -- </option>
 <?php
-		for($i=0;$i<count($owner_list);$i++) {
-			$inst_selector = ($request['selected_owner'] == $owner_list[$i]->getUserID() || $search_results['personal_owner'] == $owner_list[$i]->getUserID()  ) ? 'selected="selected"' : '';
-			echo "\t\t\t\t\t\t\t".'<option value="'. $owner_list[$i]->getUserID() .'" '.$owner_selector.'>'.$owner_list[$i]->getName().'</option>'."\n";
-		}
+		//ajax user lookup
+		$mgr = new ajaxManager('lookupUser', null, null, null, null, false, array('min_user_role'=>3, 'field_id'=>'selected_owner'));
+		$mgr->display();
 ?>
-							</select>
 						</div>
 					</td>
 				</tr>
@@ -775,60 +740,40 @@ class requestDisplayer
 		//echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">Call Number:</td>\n";
 		//echo "					<td><input type=\"text\" size=\"30\" name=\"callNumber\" value=\"".$search_results['callNumber'][0]."\"></td>\n";
 		//echo "				</tr>\n";
-		echo "				<tr align=\"left\" valign=\"middle\">\n";
 		
-		if ($user->dfltRole >= $g_permission['staff']) {
+		//show notes
+		self::displayEditNotes($search_results['notes'], 'ci='.$_REQUEST['ci'].'&amp;selected_instr='.$_REQUEST['selected_instr'].'&amp;request_id='.$_REQUEST['request_id']);
 				
-				$contentChecked="";
-				$instructorChecked="";
-				$staffChecked="";
-				$copyrightChecked="";
+		//add a note
+?>
+		<tr valign="top">
+			<td align="right" bgcolor="#CCCCCC" class="strong">Note:</td>
+			<td>
+				<textarea name="new_note" cols="50" rows="3"></textarea>
+				<br />
+				<small>Note Type:
+				<label><input type="radio" name="new_note_type" value="<?=$g_notetype['instructor']?>" checked="true">Instructor Note</label>
 				
-				if ($search_results['noteType'] != "" && $search_results['content_note'] != "") {
-					switch ($search_results['noteType']) {
-						case 'Content':
-							$contentChecked="checked";
-						break;
-						case 'Instructor':
-							$instructorChecked="checked";
-						break;
-						case 'Staff':
-							$staffChecked="checked";
-						break;
-						case 'Copyright':
-							$copyrightChecked="checked";
-						break;
-					}
-				} else {
-					$contentChecked="checked";
-				}
-				
-				echo "					<td align=\"right\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"strong\">Note:</td>\n";
-				echo "					<td><TEXTAREA name=\"content_note\" cols=\"50\" rows=\"3\">".$search_results['content_note']."</TEXTAREA>\n<br>\n";
-	
-  			echo '      			<span class="small">Note Type:';
-    		echo '					<label><input type="radio" name="noteType" value="Content" '.$contentChecked.'>Content Note</label>';
-    		echo '					<label><input type="radio" name="noteType" value="Instructor" '.$instructorChecked.'>Instructor Note</label>';
-    		echo '					<label><input type="radio" name="noteType" value="Staff" '.$staffChecked.'>Staff Note</label>';
-				echo '					<label><input type="radio" name="noteType" value="Copyright" '.$copyrightChecked.'>Copyright Note</label>';
-				echo '					</span>';
-			} else {
-				echo "					<td align=\"right\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"strong\">Instructor Note:</td>\n";
-				echo "					<td><TEXTAREA name=\"content_note\" cols=\"50\" rows=\"3\">".$search_results['content_note']."</TEXTAREA>\n<br>\n";
-				echo '					<input type="hidden" name="noteType" value="Instructor">';
-			}
-		
-		//echo "					<td align=\"right\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"strong\">Content Notes:</td>\n";
-		//echo "					<td><textarea name=\"content_note\" cols=\"50\" rows=\"3\">".$search_results['content_note']."</textarea></td>\n";
-		echo "				</td></tr>\n";
+<?php	if($user->getRole() >= $g_permission['staff']): ?>
+				<label><input type="radio" name="new_note_type" value="<?=$g_notetype['content']?>" checked="true">Content Note</label>
+				<label><input type="radio" name="new_note_type" value="<?=$g_notetype['staff']?>">Staff Note</label>
+				<label><input type="radio" name="new_note_type" value="<?=$g_notetype['copyright']?>">Copyright Note</label></small>
+<?php	endif; ?>
 
+				<br />
+				<br />
+			</td>
+		</tr>
+		
+<?php
+		
 		//only show this stuff for physical items
 		if( ($cmd == 'addPhysicalItem') || ($cmd == 'processRequest') ) {
 			$barcode_value = (isset($barcode) && (isset($request['searchTerm']) && $request['searchTerm'] != "")) ? $request['searchTerm'] : $search_results['physicalCopy'][0]['bar'];			
 			
 			echo "				<tr align=\"left\" valign=\"middle\" id=\"nonman_barcode\">\n";
 			echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">Barcode:</td>\n";
-			echo "					<td><input name=\"barcode\" type=\"text\" size=\"12\" value=\"$barcode_value\"></td>\n";
+			echo "					<td><input name=\"barcode\" type=\"text\" size=\"15\" value=\"$barcode_value\"></td>\n";
 			echo "				</tr>\n";
 
 			echo "				<tr align=\"left\" valign=\"middle\" id=\"nonman_control\">\n";
@@ -850,7 +795,7 @@ class requestDisplayer
 					echo "							<tr>\n";
 					echo '								<td><input type="checkbox" '.$copySelect.' name="physical_copy[]" value="'.urlencode(serialize($phyCopy)).'" /></td>'."\n";
 					//echo "								<td><input type=\"checkbox\" $copySelect name=\"physical_copy[]\" value=\"".$phyCopy['type']."::".$phyCopy['library']."::".$phyCopy['callNum']."::".$phyCopy['loc']."::".$phyCopy['bar']."::".$phyCopy['copy']."\"></td>\n";
-					echo "								<td>".$phyCopy['type']." ".$phyCopy['library']." ".$phyCopy['loc']." ".$phyCopy['callNum']."</td>\n";
+					echo "								<td>".$phyCopy['type']." | ".$phyCopy['library']." | ".$phyCopy['loc']." | ".$phyCopy['callNum']." | ".$phyCopy['bar']."</td>\n";
 					echo "							</tr>\n";
 				}
 				echo "						</table>\n";
@@ -913,11 +858,6 @@ class requestDisplayer
 		//we do this w/ jscript
 ?>
 	<script language="JavaScript">
-		//if we are searching for a name, enable personal item
-		if(document.getElementById('owner_qryTerm').value != '') {
-			document.getElementById('personal_item_yes').checked = true;
-		}
-
 <?php
 		if( ($cmd == 'addPhysicalItem') || ($cmd == 'processRequest') ):
 ?>
@@ -1014,9 +954,7 @@ class requestDisplayer
 				$volEdition = $reserve->item->getVolumeEdition();
 				$pagesTimes = $reserve->item->getPagesTimes();
 				$source = $reserve->item->getSource();
-				$contentNotes = $reserve->item->getContentNotes();
 				$itemNotes = $reserve->item->getNotes();
-				$instructorNotes = $reserve->getNotes();
 				
 				echo "				<tr><td>&nbsp;</td></tr>\n";
 				echo '<tr><td><table border="0" cellspacing="0" cellpadding="0">';
@@ -1041,30 +979,8 @@ class requestDisplayer
 				if ($source)
 					echo '<br><span class="itemMetaPre">Source/Year:</span>&nbsp;<span class="itemMeta"> '.$source.'</span>';
 
-				if ($contentNotes)
-				{
-					echo '<br><span class="noteType">Content Note:</span>&nbsp;<span class="noteText">'.$contentNotes.'</span>';
-				}
-				if ($itemNotes) 
-				{
+				self::displayItemNotes($itemNotes);
 				
-					for ($n=0; $n<count($itemNotes); $n++)
-					{
-						$type = strtolower($itemNotes[$n]->getType());
-						//if ($type == "content") {
-						if ($user->dfltRole >= $g_permission['staff'] || $type == "content") {
-							echo '<br><span class="noteType">'.ucfirst($type).' Note:</span>&nbsp;<span class="noteText">'.$itemNotes[$n]->getText().'</span>';
-						}
-					}
-				}
-				if ($instructorNotes)
-				{
-				
-					for ($n=0; $n<count($instructorNotes); $n++)
-					{
-						echo '<br><span class="noteType">Instructor Note:</span>&nbsp;<span class="noteText">'.$instructorNotes[$n]->getText().'</span>';
-					}
-				}
 				echo '	</td>';
 				echo '	<td width="17%" valign="top" align="right" nowrap="nowrap">[ <a href="index.php?cmd=editReserve&reserveID='.$reserve->getReserveID().'" class="editlinks">edit item</a> ]';
 				if($duplicate_link)

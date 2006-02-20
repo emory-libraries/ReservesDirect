@@ -1,7 +1,7 @@
-<?
+<?php
 /*******************************************************************************
 reservesViewer.php
-reservesViewer.php logs user access to reserves items
+controls and logs user access to reserves items
 
 Created by Jason White (jbwhite@emory.edu)
 
@@ -33,33 +33,58 @@ http://www.reservesdirect.org/
 	require_once("secure/classes/reserveItem.class.php");
 	require_once("secure/classes/user.class.php");
 	require_once("secure/classes/skins.class.php");
-
+	
 	include("secure/session.inc.php");
-
-
-    import_request_variables("g", "in_");
-
-	if (isset($in_item)) {
-		$reserveItem = new reserveItem($in_item);
-		// Redirect the user to where they want to go and continue processing
-    	header("Content-Type: " . $reserveItem->getMimeType());
-    	header("Location:  " . $reserveItem->getURL());
-	} else {
-
-    	$reserve = new reserve($in_reserve);
-		$reserve->getItem();
-
-		//$helper = new helpApplication($item->getMimeType());
-
-    	// Redirect the user to where they want to go and continue processing
-    	header("Content-Type: " . $reserve->item->getMimeType());
-    	header("Location:  " . $reserve->item->getURL());
-
-    	// Log the user, instruct_id and access time into the reserves_viewed table
-    	$reserve->addUserView($in_viewer);
+	include("statusCodes.php");
+	
+	header("Cache-control: private");	//send some headers
+    header("Pragma: public");
+	
+	$user = new user($_SESSION['userID']);	//grab current user from session
+	
+	//get the reserve/item
+	//When previewing items we do not have a reserve_id and must use the item_id to view the URL
+	//This should only be accessed by staff/admin and will not be tracked
+	if(isset($_REQUEST['reserve'])) {	//requesting reserve
+		$reserve = new reserve($_REQUEST['reserve']);
+		
+		if($reserve->getItemForUser($user)) {	//make sure this user should be allowed access to the reserve
+			$item =& $reserve->item;	//grab the item for info
+		}
+	
+		//since a reserve was requested, track the views
+		if($user->getRole() < $g_permission['instructor']) {	//only count student views
+			$reserve->addUserView($user->getUserID());	//log user, reserve and access time
+		}
 	}
-
-    exit(0);
+	elseif(isset($_REQUEST['item']) && ($user->getRole() >= $g_permission['proxy'])) {	//requesting item		
+		$item = new reserveItem($_REQUEST['item']);	//grab the item for info
+	} 
+	
+	//if we have an item object, then we try to serve the doc
+	if($item instanceof reserveItem) {
+		$url = $item->getURL();	//grab the url
+		$url = str_replace(" ", "%20", trim($url));	//replace all spaces with the hex values (sometimes RD chokes on URLs with spaces in them)
+		
+		if(!empty($g_serverName) && (stripos($url, $g_serverName) !== false)) {	//if item URL points to local server, serve the document directly
+			if($stream = @fopen($url, r)) {	//open file for reading
+				$filename = end(split('/', $url));	//grab the filename to suggest 'save-as' name
+				//serve the doc			
+				header('Content-Type: '.$item->getMimeType());
+				header('Content-Disposition: inline; filename="'.$filename.'"');
+				fpassthru($stream);
+				fclose($stream);	//close file
+			}
+			else {	//file not found
+				sendStatusCode(404);
+			}
+		}
+		else {	//item is on remote server -- redirect
+			header('Location: '.$url);
+		}
+	}
+	else {	//no item, assume that no ID was specified
+		header('"HTTP/1.0 403 Permission Denied');
+		sendStatusCode(403);
+	}
 ?>
-
-

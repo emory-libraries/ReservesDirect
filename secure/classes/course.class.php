@@ -41,14 +41,13 @@ class course
 	public $courseNo;
 	public $section;
 	public $uniformTitle;
-	public $notes;		   //array of notes
 
 	/**
 	* @return course
 	* @param int $courseAliasID
 	* @desc construct course object
 	*/
-	function course($courseAliasID = NULL) //, $name, $dept, $courseNo, $managingLibrary, $section, $uniformTitle, $notes = NULL)
+	function course($courseAliasID = NULL)
 	{
 		if (!is_null($courseAliasID)){
 			$this->getCourse($courseAliasID);
@@ -168,7 +167,65 @@ class course
 			$this->uniformTitle 	= $row[4];
 	}
 
-
+	/**
+	 * @return course object or null
+	 * @param int $dept_id Department ID
+	 * @param string $course_number Course number
+	 * @param string $name Course name
+	 * @desc Searches for a match on dept, course number, and name; loads object on success
+	 */
+	function getCourseByMatch($dept_id, $course_number, $course_name) {
+		global $g_dbConn;
+		
+		switch($g_dbConn->phptype) {
+			default:	//mysql
+				$sql = "SELECT course_id
+						FROM courses
+						WHERE department_id = ! AND course_number = ? AND course_name = ?";
+		}
+		
+		$rs = $g_dbConn->query($sql, array($dept_id, $course_number, stripslashes($course_name)));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_ERROR); }
+		
+		if($rs->numRows() == 0) {
+			return null;
+		}
+		else {
+			$row = $rs->fetchRow();
+			return $this->getCourseByID($row[0]);
+		}
+	}
+	
+	/**
+	 * @return Array of course object or null
+	 * @param string $qry
+	 * @desc Searches for a $qry in either course_number or course_name; loads object on success
+	 */
+	function searchForCourses($qry) {
+		global $g_dbConn;
+		
+		switch($g_dbConn->phptype) {
+			default:	//mysql
+				$sql = "SELECT course_id
+						FROM courses
+						WHERE course_number LIKE '$qry%' OR course_name LIKE '%$qry%'";
+		}
+		
+		$rs = $g_dbConn->query($sql, array());
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_ERROR); }
+		
+		$tmpArray = null;
+		while ($row = $rs->fetchRow())
+		{
+			$tmpC = new course();
+			$tmpC->getCourseByID($row[0]);
+			$tmpC->getDepartment();
+			$tmpArray[] = $tmpC;
+		}
+			
+		return $tmpArray;
+	}
+	
 	function setName($name)
 	{
 		global $g_dbConn;
@@ -269,7 +326,5 @@ class course
 
 	function getCourseID() { return $this->courseID; }
 
-	function getNotes() { $this->notes = getNotesByTarget("courses", $this->courseID); }
-	function setNote($type, $text) { $this->notes[] = common_setNote($type, $text, "courses", $this->courseID); }
 }
 ?>

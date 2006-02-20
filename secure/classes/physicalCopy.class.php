@@ -27,8 +27,6 @@ ReservesDirect is located at:
 http://www.reservesdirect.org/
 
 *******************************************************************************/
-require_once("secure/classes/note.class.php");
-require_once("secure/common.inc.php");
 
 class physicalCopy
 {
@@ -42,7 +40,6 @@ class physicalCopy
 	public $owningLibrary;
 	public $itemType;
 	public $ownerUserID;
-	public $notes = array();
 
 
 	/**
@@ -139,26 +136,7 @@ class physicalCopy
 	}
 
 
-	/**
-	* @return void
-	* @param optional int $noteID
-	* @param string $type
-	* @param int $userID
-	* @param string $noteText
-	* @param string $targetTable="physical_copies"
-	* @desc Creates a note object, and calls individual set methods to set the note attributes
-	*/
-	function setNote($noteID=NULL, $type, $noteText)
-	{
-		if (is_null($noteID)){ //Set a brand new note
-			$this->notes[] = common_setNote($noteID, $type, $noteText, "physical_copies", $this->physicalCopyID);
-		} else { //Update an existing note
-			common_setNote($noteID, $type, $noteText, "physical_copies", $this->physicalCopyID);
-				//Change this to just update the array with the changed note value,
-				//Instead of re-loading the entire notes array
-			$this->notes = common_getNotesByTarget("physical_copies", $this->physicalCopyID);
-		}
-	}
+
 	/**
 	* @return void
 	* @param int $reserveID
@@ -322,14 +300,6 @@ class physicalCopy
 	function getItemType() { return $this->itemType; }
 	function getOwnerUserID() { return $this->ownerUserID; }
 
-	/**
-	* @return void
-	* @desc Calls getNotesByTarget() to retrieve all notes for a physical copy, from the DB, by physicalCopyID
-	*/
-	function getNotes()
-	{
-		$this->notes = common_getNotesByTarget("physical_copies", $this->physicalCopyID);
-	}
 
 	/**
 	* @return void
@@ -369,16 +339,9 @@ class physicalCopy
 					.  "FROM physical_copies "
 					.  "WHERE physical_copy_id = !"
 					;
-				$sql2 = "DELETE "
-					.	"FROM notes "
-					.	"WHERE target_id = ! AND target_table = 'physical_copies'"
-					;
 		}
 
 		$rs = $g_dbConn->query($sql, $this->physicalCopyID);
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		$rs = $g_dbConn->query($sql2, $this->physicalCopyID);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 }

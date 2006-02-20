@@ -30,9 +30,11 @@ http://www.reservesdirect.org/
 
 require_once("secure/classes/course.class.php");
 require_once("secure/classes/department.class.php");
-require_once("secure/classes/note.class.php");
+require_once("secure/interface/instructor.class.php");
 require_once("secure/classes/reserveItem.class.php");
 require_once("secure/classes/reserves.class.php");
+require_once("secure/classes/request.class.php");
+require_once('secure/classes/tree.class.php');
 
 class courseInstance
 {
@@ -42,9 +44,6 @@ class courseInstance
 	public $crossListings = array();			//array of courses
 	public $course;						//single course
  	public $courseList = array();	//array of All courses associated with a course instance - note this publiciable was added by kawashi 11.5.2004
-	public $reserveList = array();			//array of reserves
-	//public $studentList = array();
-	//public $proxyList = array();
 	public $instructorList = array();		//array of users
 	public $instructorIDs = array(); 		//array of instructor userIDs
 	public $primaryCourseAliasID;
@@ -54,7 +53,6 @@ class courseInstance
 	public $expirationDate;
 	public $status;
 	public $enrollment;
-	public $notes;
 	public $proxies = array();
 	public $proxyIDs = array();
 	public $students = array();
@@ -130,7 +128,7 @@ class courseInstance
 			default: //'mysql'
 				//$sql  = "SELECT ca.course_id "
 				$sql  = "SELECT ca.course_alias_id "
-					  . "FROM course_aliases ca "
+					  . "FROM course_aliases AS ca "
 //					  . "LEFT JOIN course_instances AS ci ON ca.course_instance_id = ci.course_instance_id "
 					  . "WHERE ca.course_instance_id = ! "
 					  . "AND ca.course_alias_id <> !"; //ca.course_alias_id != ci.primary_course_alias_id
@@ -201,7 +199,8 @@ class courseInstance
 					  .	"LEFT JOIN access AS a ON a.user_id = u.user_id "
 					  . "LEFT JOIN course_aliases AS ca ON ca.course_alias_id = a.alias_id "
 					  . "WHERE ca.course_instance_id = ! "
-					  . "AND a.permission_level = 0";
+					  . "AND a.permission_level = 0 "
+					  . "ORDER BY u.last_name, u.first_name, u.username";
 		}
 
 		$rs = $g_dbConn->query($sql, $this->courseInstanceID);
@@ -378,7 +377,6 @@ class courseInstance
 	}
 
 	function getCourseForUser($userID)
-	//function getCourseForUser($userID,$aliasID=null)
 	{
 
 		global $g_dbConn;
@@ -402,24 +400,9 @@ class courseInstance
 			$this->course = new course($row[0]);
 		}
 
-		/*
-		if ((!$aliasID) && (!$this->aliasID)) {
-			$rs = $g_dbConn->query($sql, array($userID, $this->courseInstanceID));
-			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-			while ($row = $rs->fetchRow()) {
-				$this->course = new course($row[0]);
-				//$this->courseList[] = new course($row[0]);
-			}
-		} elseif (!$aliasID) {
-			$this->course = new course($this->aliasID);
-		} else {
-			$this->course = new course($aliasID);
-		}
-		*/
 	}
 
-	//New Method - Get Courses For Instructor
+
 	function getCoursesForInstructor($userID)
 	{
 		global $g_dbConn;
@@ -442,36 +425,6 @@ class courseInstance
 		}
 	}
 
-	/* Commented out by kawashi on 11.2.2004 - Not Needed; Serves same purpose as getPrimaryCourse()
-	function getCourseForInstructor($userID)  // WHY NOT USE getPrimaryCourse?  jbwhite
-	{
-		global $g_dbConn;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-
-				$sql  = "SELECT ca.course_alias_id "
-				.  		"FROM course_aliases as ca "
-				.  		"  JOIN access as a on a.alias_id = ca.course_alias_id AND a.user_id = ! "
-
-				//removed by jbwhite this appears to attempt to be non functional
-				//Added back by kawashi, this should stay if this method is implemented; however, since we have
-				//getPrimaryCourse(), I'm commenting out this entire method - kawashi 11.2.2004
-				.	    "WHERE ca.course_instance_id = ! "
-				.		"AND a.alias_id = !" //a.alias_id = $ci->getPrimaryCourseAliasID()
-				;
-		}
-
-		//$rs = $g_dbConn->query($sql, array($userID));//, $this->courseInstanceID, $this->getPrimaryCourseAliasID()));
-		$rs = $g_dbConn->query($sql, array($userID, $this->courseInstanceID, $this->getPrimaryCourseAliasID()));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		while ($row = $rs->fetchRow()) {
-			$this->course = new course($row[0]);
-		}
-	}
-	*/
 
 	function getPermissionForUser($userID)
 	{
@@ -622,148 +575,297 @@ class courseInstance
 	}
 
 	/**
-	* @return void
-	* @desc load reservseList from DB
+	* @return array
+	* @param string $sort_by How to sort the list
+	* @param int $parent_id Which sublist to sort
+	* @desc load reserves in a particular sort order
 	*/
-	function getReserves($sortBy=null)
-	{
+	function getSortedReserves($sort_by=null, $parent_id=null) {
 		global $g_dbConn;
 
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql = "SELECT r.reserve_id, r.sort_order, i.title "
-					.  "FROM reserves as r "
-					.  "  JOIN items as i ON r.item_id = i.item_id  "
-					.  "WHERE course_instance_id = ! ";
-
-				$order_default 	= "ORDER BY r.sort_order, i.title";
-				$order_author  	= "ORDER BY i.author, i.title";
-				$order_title	= "ORDER BY i.title, i.author";
+		switch ($g_dbConn->phptype) {
+			default: 	//mysql
+				$sql = "SELECT r.reserve_id
+						FROM reserves as r
+							JOIN items as i ON r.item_id = i.item_id
+						WHERE r.course_instance_id = ".$this->courseInstanceID;				
+				$sql_where_parent_set = "	AND r.parent_id = ".intval($parent_id);
+				$sql_where_parent_unset = " AND (r.parent_id IS NULL OR r.parent_id = '')";				
+				$sql_order_default 	= " ORDER BY r.sort_order, i.title";
+				$sql_order_author  	= " ORDER BY i.author, i.title";
+				$sql_order_title	= " ORDER BY i.title, i.author";
 		}
 
-		switch ($sortBy) {
+		//set sort
+		switch ($sort_by) {
 			case 'author':
-				$sort = $order_author;
+				$sort = $sql_order_author;
 				break;
 			case 'title':
-				$sort = $order_title;
+				$sort = $sql_order_title;
 				break;
 			default:
-				$sort = $order_default;
+				$sort = $sql_order_default;
 		}
-
-		$rs = $g_dbConn->query($sql . $sort, $this->courseInstanceID);
+		//set parent
+		$parent = empty($parent_id) ? $sql_where_parent_unset : $sql_where_parent_set;
+		
+		$rs = $g_dbConn->query($sql.$parent.$sort);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		$this->reserveList = array();
-
-		while ($row = $rs->fetchRow()) {
-            $r = new reserve($row[0]);
-            if ($r->isHeading())
-            	$this->containsHeading=true;
-            $this->reserveList[] = $r;
-        }
-	}
-
-	/**
-	* @return void
-	* @desc load reservseList from DB
-	*/
-	function getActiveReserves($sortBy=null)
-	{
-		global $g_dbConn;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql = "SELECT r.reserve_id, r.sort_order, i.title "
-					.  "FROM reserves as r "
-					.  "  JOIN items as i ON r.item_id = i.item_id  "
-					.  "WHERE course_instance_id = ! "
-					.  "AND r.status='ACTIVE' AND r.activation_date <= ? AND ? <= r.expiration "
-					;
-				$order_default = "ORDER BY r.sort_order, i.title";
-				$order_author = "ORDER BY i.author, i.title";
-				$order_title = "ORDER BY i.title, i.author";
-
-				$d = date("Y-m-d"); //get current date
-		}
-
-		switch ($sortBy) {
-			case 'author':
-				$sort = $order_author;
-				break;
-			case 'title':
-				$sort = $order_title;
-				break;
-			default:
-				$sort = $order_default;
-		}
-
-		$rs = $g_dbConn->query($sql . $sort, array($this->courseInstanceID, $d, $d));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		$this->reserveList = array();
-		while ($row = $rs->fetchRow()) {
-			$r = new reserve($row[0]);
-			$this->reserveList[] = $r;
-		}
-	}
-
-	/**
-	* @return void
-	* @desc load reservseList from DB
-	*/
-	function getActiveReservesForUser($userID, $showAll=null)
-	{
-		global $g_dbConn;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql = "SELECT r.reserve_id, r.sort_order, i.title, hr.reserve_id, hr.user_id "
-					 .  "FROM reserves as r "
-					 .  "  JOIN items as i ON r.item_id = i.item_id  "
-					 .	 "	LEFT JOIN hidden_readings as hr on (hr.reserve_id = r.reserve_id "
-					 .	 "	AND hr.user_id = ! ) "
-					 .  "WHERE course_instance_id = ! "
-					 .  "AND r.status='ACTIVE' AND r.activation_date <= ? AND ? <= r.expiration "
-					 ;
-				if (!$showAll)	 
-					 $sql .=  "AND hr.reserve_id IS NULL AND hr.user_id IS NULL ";
-					 
-				$sql .= "ORDER BY r.sort_order, i.title"
-					 ;
 			
-				$d = date("Y-m-d"); //get current date
-		}
-
-			$rs = $g_dbConn->query($sql, array($userID, $this->courseInstanceID, $d, $d));
-		
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		$this->reserveList = array();
-		
-		while ($row = $rs->fetchRow()) {
-			$r = new reserve($row[0]);
-			if (!is_null($row[4])) { //if hr.user_id is not null then this is in the Hidden_readings table and should be hidden 
-				$r->hidden=true;
-			}
-			$this->reserveList[] = $r;
-		}
+		$reserves = array();
+		while($row = $rs->fetchRow()) {
+			$reserves[] = $row[0];
+        }
+        
+        return $reserves;
 	}
 	
-	function updateSortOrder($sortType=null)
-	{
-		$this->getReserves($sortType);
+	
+	/**
+	 * @return obj reference
+	 * @param string $tree_gen_method Specifies a callback method for generating the tree
+	 * @param array $tree_gen_method_args Array of arguments for the callback metehod
+	 * @param array $reserve_data array of reserve data for tree building
+	 * @desc Returns a reference to a tree object. The tree is built using the passed data, or by using the callback method specified by the first param. If no data or callback method is specified, returns a tree for all reserves.
+	 */
+	function &getReservesAsTree($tree_gen_method='getReserves', $tree_gen_method_args=null, &$reserve_data=null) {
+		//get array of reserves for this CI for tree-building
+		$tree_data = array();
+		
+		//first see if tree data has already been passed
+		if(is_array($reserve_data)) {
+			if(is_array($reserve_data[0]) && is_array($reserve_data[1])) {	//is the array properly formatted?
+				$tree_data = &$reserve_data;	//use data
+			}
+		}
+		
+		//if no data has been passed, try generating it
+		if(empty($tree_data) && method_exists($this, $tree_gen_method)) {	//check to see if method exists
+			$tree_data = call_user_func_array(array(&$this, $tree_gen_method), $tree_gen_method_args);
+		}
+		
+		//if still no data, then we can do nothing else
+		if(empty($tree_data)) {
+			return null;
+		}
+		else {	//we have data; build and return the tree
+			//build tree
+			$tree = new Tree('root');
+			$tree->buildTree($tree_data[0], $tree_data[1]);
+			return $tree;
+		}		
+	}
+	
+	
+	/**
+	 * @return obj reference
+	 * @param string $tree_gen_method Specifies a callback method for generating the tree
+	 * @param array $tree_gen_method_args Array of arguments for the callback metehod
+	 * @desc Returns a reference to a recursive tree iterator object.  The tree is built using the callback method specified by the first param.
+	 */
+	function &getReservesAsTreeWalker($tree_gen_method='getReserves', $tree_gen_method_args=null) {
+		if(!empty($tree_gen_method)) {	//if passed a way to generate a new tree
+			$tree = new treeWalker($this->getReservesAsTree($tree_gen_method, $tree_gen_method_args));
+		}
+		else {	//no tree => no walker
+			$tree = null;
+		}	
+		return $tree;	
+	}
+	
 
-		for($i=0; $i<count($this->reserveList); $i++)
-		{
-			$this->reserveList[$i]->setSortOrder($i+1);
+	/**
+	 * @return array (with 3 subarrays) [0] indexed by rID, with parentID as value; [1] indexed by rID, with sort order as value; [2]holds rIDs of all reserves marked as hidden.  Arrays are meant to be used tree-builder precursors
+	 * @param int $user_id (optional) User ID.  If specified, method will ignore items marked 'hidden' by the specified user
+	 * @param boolean $show_hidden (optional) Only matters if user_id is set.  If true, will override the default behavior and include hidden items in the returned array.  Will also include an array of items marked 'hidden' as part of the result
+	 * @param boolean $show_inactive (optional) If false, will return ACTIVE items only, otherwise will return all
+	 * @desc Fetches and reserves info from DB, based on flags.  Used by other methods to do their fetching.
+	 */
+	function getReservesAsTreePrecursor($user_id=null, $show_hidden=false, $show_inactive=false, $heading_only=false) {
+		global $g_dbConn;
+
+		//build the query snippets
+		switch($g_dbConn->phptype) {
+			default:	//mysql
+		
+				$sql_select = "SELECT r.reserve_id, r.parent_id, r.sort_order";
+				$sql_select_hidden = ", hr.user_id";
+				$sql_from = " FROM reserves AS r JOIN items AS i ON i.item_id = r.item_id";
+				$sql_from_join_hidden = " LEFT JOIN hidden_readings AS hr ON (hr.reserve_id = r.reserve_id AND hr.user_id = ".intval($user_id).")";
+				$sql_where = " WHERE course_instance_id = ".$this->courseInstanceID;
+				$sql_where_active_only = " AND r.status='ACTIVE' AND r.activation_date <= NOW() AND NOW() <= r.expiration";
+				$sql_where_noshowhidden = " AND hr.user_id IS NULL";
+				$sql_where_heading_only = " AND i.item_type = 'HEADING'";
+				$sql_order = " ORDER BY r.sort_order, i.title";				
+		}
+		
+		//build query	
+		if(!empty($user_id)) {	//if user specified, join to hidden_readings table and select user_id
+			$sql_select .= $sql_select_hidden;
+			$sql_from .= $sql_from_join_hidden;
+			
+			if(!$show_hidden) {	//if we do not want to get hidden items, exclude them
+				$sql_where .= $sql_where_noshowhidden;
+			}			
+		}
+		if(!$show_inactive) {	//if we do not want inactive (and in process) items, exclude them
+			$sql_where .= $sql_where_active_only;
+		}
+		if($heading_only) {	//only interested in headings/folders
+			$sql_where .= $sql_where_heading_only;
+		}
+		//piece the query together		
+		$sql = $sql_select.$sql_from.$sql_where.$sql_order;
+			
+		//query
+		$rs = $g_dbConn->query($sql);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+	
+		//need 3 arrays
+		$reserves_data = array();
+		$sort_data = array();
+		$hidden_data = array();
+		
+		while( ($row = $rs->fetchRow()) ) {
+			$reserves_data[$row[0]] = $row[1];	//indexed by rID, with parentID as value
+			$sort_data[$row[0]] = $row[2];		//indexed by rID, with sort order as value
+			
+			if(!empty($row[3])) {
+				$hidden_data[] = $row[0];	//holds rIDs of all reserves marked as hidden
+			}
+		}
+
+		return array($reserves_data, $sort_data, $hidden_data);	
+	}
+	
+	
+	/**
+	 * @return array (with 3 subarrays) [0] indexed by rID, with parentID as value; [1] indexed by rID, with sort order as value; [2]holds rIDs of all reserves marked as hidden. Arrays are meant to be used tree-builder precursors
+	 * @param int $user_id (optional) User ID.  If specified, method will ignore items marked 'hidden' by the specified user
+	 * @param boolean $show_hidden (optional) Only matters if user_id is set.  If true, will override the default behavior and include hidden items in the returned array.  Will also include an array of items marked 'hidden' as part of the result
+	 * @desc Returns info on reserves.
+	 */
+	function getActiveReservesForUser($user_id, $show_hidden) {
+		return self::getReservesAsTreePrecursor($user_id, $show_hidden);
+	}
+	
+	/**
+	 * @return array (with 3 subarrays) [0] indexed by rID, with parentID as value; [1] indexed by rID, with sort order as value; [2]holds rIDs of all reserves marked as hidden.  Arrays are meant to be used tree-builder precursors
+	 * @desc Returns info on reserves.
+	 */
+	function getActiveReserves() {
+		return self::getReservesAsTreePrecursor();
+	}
+	
+	
+	/**
+	 * @return array (with 3 subarrays) [0] indexed by rID, with parentID as value; [1] indexed by rID, with sort order as value; [2]holds rIDs of all reserves marked as hidden.  Arrays are meant to be used tree-builder precursors
+	 * @desc Returns info on reserves.
+	 */
+	function getReserves() {
+		return self::getReservesAsTreePrecursor(null, null, true);
+	}
+	
+	
+	/**
+	 * @return array (with 3 subarrays) [0] indexed by rID, with parentID as value; [1] indexed by rID, with sort order as value; [2]holds rIDs of all reserves marked as hidden.  Arrays are meant to be used tree-builder precursors
+	 * @desc Returns only headings/folders.
+	 */
+	function getHeadings() {
+		return self::getReservesAsTreePrecursor(null, null, true, true);
+	}
+	
+		
+	/**
+	 * @return void
+	 * @param int $new_ci_id ID of the destination CI
+	 * @param array $selected_reserves (optional) Array of reserve IDs to copy.  Used when only part of the reserve list is to be copied.
+	 * @param array $requested_loan_periods (optional) Array of requested loan periods for physical-item reserves.
+	 * @desc Copies reserves from this CI to the destination CI
+	 */
+	function copyReserves($dst_ci_id, $selected_reserves=null, $requested_loan_periods=null) {
+		if(empty($dst_ci_id)) {
+			return;
+		}
+		
+		//this script may take a while, so increase max exec time
+		set_time_limit(180);	//allow 3 minutes for this script
+		
+		//gather info
+		$tree = $this->getReservesAsTree();
+		$dst_ci = new courseInstance($dst_ci_id);
+		$dst_ci->getInstructors();
+
+		//copy reserves
+		$this->copyReserveTree($tree, $dst_ci, null, $selected_reserves, $requested_loan_periods);
+	}	
+	
+	
+	/**
+	 * @return void
+	 * @param Tree $root Reference The reserve tree.
+	 * @param courseInstance $target_ci Refernce The destination CI
+	 * @param int $parent_id ID of reserve to be used as parent for the leaves of the growing tree.
+	 * @param array $selected_reserves (optional) Array of reserve IDs to copy.  Used when only part of the reserve list is to be copied.
+	 * @param array $requested_loan_periods (optional) Array of requested loan periods for physical-item reserves.
+	 * @desc Copies reserves from this CI to the destination CI (recursive)
+	 */	
+	function copyReserveTree(&$root, &$target_ci, $parent_id=null, &$selected_reserves=null, &$requested_loan_periods=null) {
+		foreach($root as $leaf) {	//walk through the children
+			//if this is a non-empty array, then only copy those reserves that are in the array
+			$copy_reserve = true;
+			if(is_array($selected_reserves) && !empty($selected_reserves)) {
+				if(!in_array($leaf->getID(), $selected_reserves)) {
+					$copy_reserve = false;	//if this reserve is not in the "selected" list, then skip it
+				}
+			}
+
+			if($copy_reserve) {	//copy reserve
+				//fetch source reserve
+				$src_reserve = new reserve($leaf->getID());
+				$src_reserve->getItem();
+				
+				//create new reserve
+				$reserve = new reserve();
+				if($reserve->createNewReserve($target_ci->getCourseInstanceID(), $src_reserve->getItemID())) {
+					$reserve->setActivationDate($target_ci->getActivationDate());
+					$reserve->setExpirationDate($target_ci->getExpirationDate());
+					$reserve->setStatus($src_reserve->getStatus());
+					$reserve->setSortOrder($src_reserve->getSortOrder());
+					$reserve->setParent($parent_id);
+					//duplicate notes
+					$src_reserve->duplicateNotes($reserve->getReserveID());
+					
+					//if physical item, put it on request
+					if($src_reserve->item->isPhysicalItem()) {
+						$reserve->setStatus("IN PROCESS");
+						if(!empty($requested_loan_periods)) {	//set requested loan period if specified
+							$reserve->setRequestedLoanPeriod($requested_loan_periods[$src_reserve->getReserveID()]);
+						}
+						
+						//create request
+						$req = new request();
+						$req->createNewRequest($target_ci->getCourseInstanceID(), $src_reserve->getItemID());
+						$req->setRequestingUser($target_ci->instructorIDs[0]);
+						$req->setReserveID($reserve->getReserveID());
+					}
+				}
+				//use this as the parent_id for any children
+				$new_parent_id = $reserve->getReserveID();
+			}
+			else {
+				$new_parent_id = null;
+			}
+							
+			//copy reserve's children
+			if($leaf->hasChildren()) {
+				$this->copyReserveTree($leaf, $target_ci, $new_parent_id, $selected_reserves, $requested_loan_periods);
+			}
 		}
 	}
-
+		
+	
 	/**
 	* @return void
 	* @desc load instructorList from DB
@@ -787,7 +889,7 @@ class courseInstance
 
 		while ($row = $rs->fetchRow()) {
 			$tmpI = new instructor();
-				$tmpI->getUserByID($row[0]);
+			$tmpI->getUserByID($row[0]);
 			$this->instructorList[] = $tmpI;
 			$this->instructorIDs[] = $row[0];
 		}
@@ -854,7 +956,7 @@ class courseInstance
 		$retValue = "";
 		for($i=0;$i<count($this->instructorList);$i++)
 		{
-			$retValue .=  $this->instructorList[$i]->getName() . " ";
+			$retValue .=  $this->instructorList[$i]->getName() . "; ";
 		}
 		return ($retValue == "" ? "None" : $retValue);
 	}
@@ -874,9 +976,12 @@ class courseInstance
 		$retString = "";
 		for($i=0;$i<count($this->instructorList);$i++)
 		{
-			//if (is_a($this->instructorList[$i], "user"))
-			if ($this->instructorList[$i] instanceof user)
-				$retString .= $this->instructorList[$i]->getName() . " ";
+			if ($this->instructorList[$i] instanceof user) {
+				if($i>0) {	//if not the first instructor
+					$retString .= '; ';
+				}
+				$retString .= $this->instructorList[$i]->getName(false);				
+			}
 		}
 		return $retString;
 	}
@@ -892,7 +997,5 @@ class courseInstance
 	function getStatus() { return $this->status; }
 	function getEnrollment() { return $this->enrollment; }
 
-	function getNotes() { $this->notes = getNotesByTarget("course_instances", $this->courseInstanceID); }
-	function setNote($type, $text) { $this->notes[] = common_setNote($type, $text, "course_instances", $this->courseInstanceID); }
 }
 ?>

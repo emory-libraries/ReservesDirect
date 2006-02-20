@@ -33,7 +33,7 @@ class terms
 {
 	function terms() {}
 
-	function getTerms()
+	function getTerms($getAll=false)
 	{
 		global $g_dbConn;
 
@@ -45,8 +45,17 @@ class terms
 				.		"WHERE end_date >= ? "
 				.		"ORDER BY sort_order LIMIT 4"
 				;
-
 				$d = date("Y-m-d");
+				
+				if ($getAll)
+				{
+					$sql = 	"SELECT term_id "
+					.		"FROM terms "
+					.		"ORDER BY sort_order"
+					;
+					$d = null;
+				}
+				
 		}
 
 		$rs = $g_dbConn->query($sql, $d);
@@ -56,6 +65,7 @@ class terms
 		while($rows = $rs->fetchRow()){
 			$tmpArray[] = new term($rows[0]);
 		}
+
 		return $tmpArray;
 	}
 

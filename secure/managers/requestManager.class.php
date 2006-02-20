@@ -32,6 +32,7 @@ require_once("secure/classes/itemAudit.class.php");
 require_once("secure/classes/users.class.php");
 require_once("secure/classes/zQuery.class.php");
 require_once("secure/displayers/requestDisplayer.class.php");
+require_once('secure/classes/note.class.php');
 
 class requestManager
 {
@@ -52,7 +53,7 @@ class requestManager
 
 	function requestManager($cmd, $user, $ci, $request)
 	{
-		global $g_permission, $page, $loc, $ci, $alertMsg;
+		global $g_permission, $page, $loc, $ci, $alertMsg, $g_documentURL, $g_notetype;
 
 		$this->displayClass = "requestDisplayer";
 
@@ -99,20 +100,17 @@ class requestManager
 				$requestObj->destroy();
 
 			case 'displayRequest':			
-				$page = "manageClasses";
+				$page = "addReserve";
 
 				$loc  = "process request";
 
 				$unit = (!isset($request['unit']) || $request['unit'] == "") ? $user->getStaffLibrary() : $request['unit'];
 				
-				
 				$requestList = $user->getRequests($unit, $request['sort']);				
 							
 				for($i=0;$i<count($requestList);$i++)
 				{
-					$item = $requestList[$i]->requestedItem;
-					$item->getPhysicalCopy();
-
+					$requestList[$i]->requestedItem->getPhysicalCopy();
 					$requestList[$i]->courseInstance->getInstructors();
 					$requestList[$i]->courseInstance->getCrossListings();								
 				}
@@ -122,8 +120,6 @@ class requestManager
 			break;
 
 			case 'storeRequest':
-				global $g_documentURL;
-
 				//initialize array/string to pass information to success screens
 				$reserves = array();
 				$ilsResults = '';
@@ -139,13 +135,24 @@ class requestManager
 					//if storing physical items, get item count
 					$item_count = count($request['physical_copy']);
 				}
+				
+				//if processing request, we need to know the reserve for which the request was originated
+				//if the physical copy matching this reserve was selected, then it should be processed
+				//if no physical copies match (i.e. different copy was substituted), then this reserve should be removed
+				//also, reserves created for multiple copies will get this reserve's sort order and parent
+				if($request['previous_cmd'] == 'processRequest') {
+					$req = new request($request['request_id']);
+					$originally_requested_reserve = new reserve($req->getReserveID());
+					$originally_requested_reserve->processed = false;	//flag this reserve as not-processed
+					unset($req);			
+				}
 
 				//loop, to process all items
 				for($x=0; $x<$item_count; $x++) {
 					//create new objects
 					$item = new reserveItem();
 					$reserve = new reserve();
-
+					
 					//get existing item/reserve, or create new; handle request if necessary
 
 					if( ($request['previous_cmd'] == 'addDigitalItem') || ($request['addType']=='MANUAL') ) {	//add electronic/manual item
@@ -158,7 +165,7 @@ class requestManager
 						}
 
 						//try to find existing reserve
-						if( $reserve->getReserveByCI_Item($ci->getCourseInstanceID(), $item->getItemID()) == null ) {
+						if( $reserve->getReserveByCI_Item($ci->getCourseInstanceID(), $item->getItemID()) === false ) {
 							//if querying old reserve returns nothing, create new
 							$reserve->createNewReserve($ci->getCourseInstanceID(), $item->getItemID());
 							$itemAudit = new itemAudit();
@@ -175,12 +182,17 @@ class requestManager
 							//get item
 							$item->getItemByID($physCopy->getItemID());
 							//get reserve by item and course
-							if( $reserve->getReserveByCI_Item($ci->getCourseInstanceID(), $item->getItemID()) != null ) {
-								$requestObj = new request();
+							if( $reserve->getReserveByCI_Item($ci->getCourseInstanceID(), $item->getItemID()) !== false ) {
+								//check if this matches the originally requested reserve
+								if(($originally_requested_reserve instanceof reserve) && ($reserve->getReserveID()==$originally_requested_reserve->getReserveID())) {
+									$originally_requested_reserve->processed = true;	//mark as processed									
+								}
+								
 								//look for a request for this reserve item
-								if( $requestObj->getRequestByReserveID($reserve->getReserveID()) != null ) {
+								$requestObj = new request();
+								if( $requestObj->getRequestByReserveID($reserve->getReserveID()) !== false ) {
 									//process request
-									$requestObj->setDateProcessed(date('Y-m-d'));
+									$requestObj->setDateProcessed(date('Y-m-d'));									
 								}
 								else {
 									unset($requestObj);
@@ -201,21 +213,14 @@ class requestManager
 							//store some stats
 							$itemAudit = new itemAudit();
 							$itemAudit->createNewItemAudit($item->getItemID(),$user->getUserID());
-						}
-						
-						//if request_id is set, process it
-						//this is needed if the physical copy was not found (creating new), or staff chose a different item from the list
-						if(isset($_REQUEST['request_id'])) {
-							$requestObj = new request();
-							$requestObj->getRequestByID($_REQUEST['request_id']);
-							$requestObj->setDateProcessed(date('Y-m-d'));
-						}
+						}					
 					}
 
 					//set item & reserve data
-
-					$reserve->setActivationDate($request['hide_year'].'-'.$request['hide_month'].'-'.$request['hide_day']);
-					$reserve->setExpirationDate($ci->getExpirationDate());
+					
+					//dates
+					$reserve->setActivationDate(date('Y-m-d', strtotime($request['reserve_activation_date'])));
+					$reserve->setExpirationDate(date('Y-m-d', strtotime($request['reserve_expiration_date'])));
 
 					//if adding multiple items, check display preference
 					if( ($request['selectItemsToDisplay']=='one') && ($x>0) ) {
@@ -223,22 +228,15 @@ class requestManager
 						$reserve->setStatus('INACTIVE');
 					}
 					else {	//else set status to their preference
-						$status = (isset($request['currentStatus'])) ? $request['currentStatus'] : "ACTIVE";
-						$reserve->setStatus($status);
+						$reserve->setStatus($request['status']);
 					}
 
 					if (isset($request['author'])) $item->setAuthor($request['author']);
-					if( !empty($request['content_note']) && isset($request['noteType']) ) {
-						if ($request['noteType'] == "Instructor")
-							$reserve->setNote($request['noteType'],$request['content_note']);
-						else
-							$item->setNote($request['noteType'],$request['content_note']);
-					}							
 					if (isset($request['controlKey'])) $item->setLocalControlKey($request['controlKey']);
 					if (isset($request['performer'])) $item->setPerformer($request['performer']);
 					if (isset($request['source'])) $item->setSource($request['source']);
 					if (isset($request['title'])) $item->setTitle($request['title']);
-					if (isset($request['volume_edition'])) $item->setvolumeEdition($request['volume_edition']);
+					if (isset($request['volume_edition'])) $item->setVolumeEdition($request['volume_edition']);
 					if (isset($request['home_library'])) $item->sethomeLibraryID($request['home_library']);
 					if (isset($request['item_type'])) $item->setGroup($request['item_type']);
 					if (isset($request['volume_title'])) $item->setVolumeTitle($request['volume_title']);
@@ -247,6 +245,34 @@ class requestManager
 					//check personal item owner
 					if( ($request['personal_item'] == 'yes') && !empty($request['selected_owner']) ) {
 						$item->setPrivateUserID($request['selected_owner']);
+					}
+					
+					//notes
+					if(!empty($_REQUEST['notes'])) {
+						foreach($_REQUEST['notes'] as $note_id=>$note_text) {
+							if(!empty($note_id)) {
+								$note = new note($note_id);
+								$note->setText($note_text);
+							}
+						}
+					}
+					if(!empty($_REQUEST['new_note'])) {	//add new note
+						if($_REQUEST['new_note_type'] == $g_notetype['instructor']) {
+							$reserve->setNote($_REQUEST['new_note'], $_REQUEST['new_note_type']);
+						}
+						else {
+							$item->setNote($_REQUEST['new_note'], $_REQUEST['new_note_type']);
+						}
+					}
+					
+					//if an originally-requested reserve exists, then match sort order and parent to it
+					if($originally_requested_reserve instanceof reserve) {
+						$reserve->setSortOrder($originally_requested_reserve->getSortOrder());
+						$reserve->setParent($originally_requested_reserve->getParent());
+					}
+					else {
+						//attempt to set a sort order for the reserve
+						$reserve->insertIntoSortOrder($ci->getCourseInstanceID(), $item->getTitle(), $item->getAuthor());
 					}
 
 					//set physical item data (but not for manual entries)
@@ -271,7 +297,7 @@ class requestManager
 
 						//set euclid record
 
-						//get instructor
+						//set up ILS record
 						if( $request['euclid_record'] == 'yes' ) {
 							if( isset($requestObj) ) {	//get instructor from request
 								$instr = new instructor();
@@ -318,6 +344,21 @@ class requestManager
 					unset($reserveDesk);
 					unset($instr);
 				}	//end looping through items
+				
+				//tie up some loose ends
+				
+				//if the originally-requested reserve was not processed, then there was a substitution
+				//process request, and delete the "inprocess" reserve from the class
+				if(($originally_requested_reserve instanceof reserve) && !$originally_requested_reserve->processed) {
+					//process request
+					$requestObj = new request();
+					//the reserve is tied to the request_id, so just use that (although can also get request by reserve_id)
+					$requestObj->getRequestByID($request['request_id']);
+					$requestObj->setDateProcessed(date('Y-m-d'));
+					
+					//delete the reserve
+					$originally_requested_reserve->destroy();
+				}					
 
 				//show success screen
 
@@ -375,7 +416,8 @@ class requestManager
 
 					$zQry = new zQuery($qryValue, $qryField);
 					$search_results = $zQry->parseToArray();
-					$search_results['physicalCopy'] = $zQry->getHoldings('control', $item->getLocalControlKey());
+					//$search_results['physicalCopy'] = $zQry->getHoldings('control', $item->getLocalControlKey());
+					$search_results['physicalCopy'] = $zQry->getHoldings($qryField, $qryValue);
 
 //				} else ($item->getLocalControlKey() <> "") {
 //					$zQry = new zQuery($item->getLocalControlKey(), 'control');
@@ -385,7 +427,7 @@ class requestManager
 
 				//we will pull item values from db if they exist otherwise default to searched values
 
-				$pre_value = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'source'=>'', 'content_note'=>'', 'controlKey'=>'', 'personal_owner'=>null, 'physicalCopy'=>'');
+				$pre_value = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'source'=>'', 'notes'=>'', 'controlKey'=>'', 'personal_owner'=>null, 'physicalCopy'=>'');
 				$pre_values['title'] = ($item->getTitle() <> "") ? $item->getTitle() : $search_results['title'];
 				$pre_values['author'] = ($item->getAuthor() <> "") ? $item->getAuthor() : $search_results['author'];
 				$pre_values['edition'] = ($item->getVolumeEdition() <> "") ? $item->getVolumeEdition() : $search_results['edition'];
@@ -393,19 +435,11 @@ class requestManager
 				$pre_values['volume_title'] = ($item->getVolumeTitle() <> "") ? $item->getVolumeTitle() : $search_results['volume_title'];
 				$pre_values['times_pages'] = ($item->getPagesTimes() <> "") ? $item->getPagesTimes() : $search_results['times_pages'];
 				$pre_values['source'] = ($item->getSource() <> "") ? $item->getSource() : $search_results['source'];
-				$pre_values['content_note'] = ($item->getContentNotes() <> "") ? $item->getContentNotes() : "";
 				$pre_values['controlKey'] = ($item->getLocalControlKey() <> "") ? $item->getLocalControlKey() : $search_results['controlKey'];
 				$pre_values['personal_owner'] = $item->getPrivateUserID();
+				$pre_values['notes'] = $item->getNotes();
 
 				$pre_values['physicalCopy'] = $search_results['physicalCopy'];
-
-				//populate personal owners
-				if (isset($pre_values['personal_owner']) || ((isset($_REQUEST['personal_item']) && $_REQUEST['personal_item'] == "yes") && (isset($_REQUEST['select_owner_by']) && isset($_REQUEST['owner_qryTerm'])))) //user is searching for an owner
-				{
-					$users = new users();
-					$users->search($_REQUEST['select_owner_by'], $_REQUEST['owner_qryTerm'], 'student'); //any registered user could own an item
-					$owner_list = $users->userList;
-				} else $owner_list = null;
 
 				$isActive = ($reserve->getStatus() == 'ACTIVE' || $reserve->getStatus() == 'IN PROCESS') ? true : false;
 
@@ -413,7 +447,7 @@ class requestManager
 				$lib_list = $user->getLibraries();
 
 				$this->displayFunction = 'addItem';
-				$this->argList = array($user, $cmd, $pre_values, $owner_list, $lib_list, $requestObj->requestID, $_REQUEST, array('cmd'=>$cmd, 'previous_cmd'=>$cmd, 'ci'=>$ci->getCourseInstanceID(), 'request_id'=>$requestObj->requestID), null, $isActive, 'Process Item', $msg, $reserve->getRequestedLoanPeriod());
+				$this->argList = array($user, $cmd, $pre_values, $lib_list, $requestObj->requestID, $_REQUEST, array('cmd'=>$cmd, 'previous_cmd'=>$cmd, 'ci'=>$ci->getCourseInstanceID(), 'request_id'=>$requestObj->requestID), null, $isActive, 'Process Item', $msg, $reserve->getRequestedLoanPeriod());
 			break;
 
 			case 'addDigitalItem':
@@ -436,7 +470,7 @@ class requestManager
 					if ($item->getItemID() != "")
 					{
 						$item_id = $item->getItemID();
-						$search_results = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'source'=>'', 'content_note'=>'', 'controlKey'=>'', 'personal_owner'=>null, 'physicalCopy'=>'');
+						$search_results = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'source'=>'', 'controlKey'=>'', 'personal_owner'=>null, 'notes'=>'', 'physicalCopy'=>'');
 						$search_results['title'] = ($item->getTitle() <> "") ? $item->getTitle() : "";
 						$search_results['author'] = ($item->getAuthor() <> "") ? $item->getAuthor() : "";
 						$search_results['edition'] = ($item->getVolumeEdition() <> "") ? $item->getVolumeEdition() : "";
@@ -444,9 +478,9 @@ class requestManager
 						$search_results['volume_title'] = ($item->getVolumeTitle() <> "") ? $item->getVolumeTitle() : "";
 						$search_results['times_pages'] = ($item->getPagesTimes() <> "") ? $item->getPagesTimes() : "";
 						$search_results['source'] = ($item->getSource() <> "") ? $item->getSource() : "";
-						$search_results['content_note'] = ($item->getContentNotes() <> "") ? $item->getContentNotes() : "";
 						$search_results['controlKey'] = $item->getLocalControlKey();
-						$search_results['personal_owner'] = $item->getPrivateUserID();												
+						$search_results['personal_owner'] = $item->getPrivateUserID();		
+						$search_results['notes'] = $item->getNotes();
 					} else {
 						$item_id = null;
 					}
@@ -456,13 +490,6 @@ class requestManager
 					$search_results = null;
 					$item_id = null;
 				}
-				//populate personal owners
-				if (isset($_REQUEST['personal_item']) && ($_REQUEST['personal_item'] == "yes") && (isset($_REQUEST['select_owner_by']) && isset($_REQUEST['owner_qryTerm']))) //user is searching for an owner
-				{
-					$users = new users();
-					$users->search($_REQUEST['select_owner_by'], $_REQUEST['owner_qryTerm'], 'student'); //any registered user could own an item
-					$owner_list = $users->userList;
-				} else $owner_list = null;
 
 				//get all Libraries
 				$lib_list = $user->getLibraries();
@@ -477,7 +504,7 @@ class requestManager
 				$this->displayFunction = 'addItem';			
 						
 				//when form is sumbitted for save cmd is set to storeRequest its ugly but it works
-				$this->argList = array($user, $cmd, $search_results, $owner_list, $lib_list, null, $_REQUEST, array('cmd'=>$cmd, 'previous_cmd'=>$cmd, 'ci'=>$_REQUEST['ci'], 'selected_instr'=>$_REQUEST['selected_instr'], 'item_id'=>$item_id), $docTypeIcons);
+				$this->argList = array($user, $cmd, $search_results, $lib_list, null, $_REQUEST, array('cmd'=>$cmd, 'previous_cmd'=>$cmd, 'ci'=>$_REQUEST['ci'], 'selected_instr'=>$_REQUEST['selected_instr'], 'item_id'=>$item_id), $docTypeIcons);
 			break;
 		}
 	}

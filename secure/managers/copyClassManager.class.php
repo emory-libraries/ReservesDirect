@@ -3,7 +3,7 @@
 copyClassManager.class.php
 
 
-Created by Kathy Washington (kawashi@emory.edu)
+Created by Dmitriy Panteleyev (dpantel@emory.edu)
 
 This file is part of ReservesDirect
 
@@ -28,28 +28,17 @@ http://www.reservesdirect.org/
 
 
 *******************************************************************************/
-require_once("secure/common.inc.php");
-require_once("secure/classes/users.class.php");
 require_once("secure/displayers/copyClassDisplayer.class.php");
-require_once("secure/classes/checkDuplicates.class.php");
-require_once("secure/managers/checkDuplicatesManager.class.php");
+require_once("secure/displayers/classDisplayer.class.php");
+require_once("secure/classes/courseInstance.class.php");
+require_once("secure/classes/course.class.php");
+require_once("secure/classes/department.class.php");
+require_once("secure/classes/term.class.php");
+require_once("secure/classes/terms.class.php");
+require_once("secure/classes/reserves.class.php");
+require_once("secure/classes/request.class.php");
 
-class copyClassManager
-{
-	public $user;
-	public $displayClass;
-	public $displayFunction;
-	public $argList;
-
-	function display()
-	{
-		//echo "attempting to call ". $this->displayClass ."->". $this->displayFunction ."<br>";
-
-		if (is_callable(array($this->displayClass, $this->displayFunction)))
-			call_user_func_array(array($this->displayClass, $this->displayFunction), $this->argList);
-
-	}
-
+class copyClassManager extends baseManager {
 
 	function copyClassManager($cmd, $user, $request, $hidden_fields=null)
 	{
@@ -59,50 +48,67 @@ class copyClassManager
 
 		switch ($cmd)
 		{
+
 			case 'copyClass':
 				$page = 'manageClasses';
-				$loc  = "copy course reserves list";
-
-				$this->displayFunction = 'displayCopyClass';
-				$this->argList = array($cmd, $user, $request);
+				$loc  = "copy course reserves list >> select source class";
+				
+				$this->displayFunction = 'displaySelectClass';
+				$this->argList = array('copyClassOptions', 'Select class to copy FROM:');
 			break;
+				
+			case 'copyClassOptions':
+				$sourceClass = new courseInstance($_REQUEST['ci']);
+				$sourceClass->getPrimaryCourse();
+				$sourceClass->getInstructors();
 
-			case 'clearCopyClassLookup':
-				$ci = $request['ci'];
-				$cmd = $request['copyAction'];
-				unset($request);
-				$request['sourceClass']=$ci;
-				copyClassManager::copyClassManager($cmd,$user,$request);
+				$page = 'manageClasses';
+				$loc  = "copy course reserves list >> copy options";
+				
+				$this->displayFunction = 'displayCopyClassOptions';
+				$this->argList = array($sourceClass);				
 			break;
 
 			case 'copyExisting':
 				$page = 'manageClasses';
-				$loc = 'copy course';
+				$loc = 'copy course reserves list >> select destination class';
+				
+				//propogate the info
+				$needed_info = array();
+				if(!empty($_REQUEST['sourceClass']))	$needed_info['sourceClass'] = $_REQUEST['sourceClass'];
+				if(!empty($_REQUEST['copyReserves']))	$needed_info['copyReserves'] = $_REQUEST['copyReserves'];
+				if(!empty($_REQUEST['copyCrossListings']))	$needed_info['copyCrossListings'] = $_REQUEST['copyCrossListings'];
+				if(!empty($_REQUEST['copyEnrollment']))	$needed_info['copyEnrollment'] = $_REQUEST['copyEnrollment'];
+				if(!empty($_REQUEST['copyInstructors']))	$needed_info['copyInstructors'] = $_REQUEST['copyInstructors'];
+				if(!empty($_REQUEST['copyProxies']))	$needed_info['copyProxies'] = $_REQUEST['copyProxies'];
+				if(!empty($_REQUEST['deleteSource']))	$needed_info['deleteSource'] = $_REQUEST['deleteSource'];	
 
-				$sourceClass=new courseInstance($request['sourceClass']);
-				$sourceClass->getPrimaryCourse();
-				$sourceClass->getInstructors();
-
-				$this->displayFunction = 'displayCopyExisting';
-				$this->argList = array($cmd, $user, $sourceClass, $request);
+				$this->displayFunction = 'displaySelectClass';
+				$this->argList = array('processCopyClass', 'Select class to copy TO:', $needed_info);	
 			break;
 
 			case 'copyNew':
 				$page = 'manageClasses';
-				$loc = 'copy course';
-
-				$sourceClass=new courseInstance($request['sourceClass']);
-				$sourceClass->getPrimaryCourse();
-				$sourceClass->getInstructors();
-
+				$loc = 'copy course reserves list >> create destination class';
+				
+				$dept = new department();
 				$terms = new terms();
-				$termsArray = $terms->getTerms();
+				
+				//propogate the info
+				$needed_info = array();
+				if(!empty($_REQUEST['sourceClass']))	$needed_info['sourceClass'] = $_REQUEST['sourceClass'];
+				if(!empty($_REQUEST['copyReserves']))	$needed_info['copyReserves'] = $_REQUEST['copyReserves'];
+				if(!empty($_REQUEST['copyCrossListings']))	$needed_info['copyCrossListings'] = $_REQUEST['copyCrossListings'];
+				if(!empty($_REQUEST['copyEnrollment']))	$needed_info['copyEnrollment'] = $_REQUEST['copyEnrollment'];
+				if(!empty($_REQUEST['copyInstructors']))	$needed_info['copyInstructors'] = $_REQUEST['copyInstructors'];
+				if(!empty($_REQUEST['copyProxies']))	$needed_info['copyProxies'] = $_REQUEST['copyProxies'];
+				if(!empty($_REQUEST['deleteSource']))	$needed_info['deleteSource'] = $_REQUEST['deleteSource'];
+				$needed_info['cmd'] = 'copyNew';
+				$needed_info['copyNew'] = 'copyNew';
 
-				$department = new department();
-				$departments = $department->getAllDepartments();
-
-				$this->displayFunction = 'displayCopyNew';
-				$this->argList = array($cmd, $user, $sourceClass, $termsArray, $departments, $request);
+				$this->displayClass = 'classDisplayer';
+				$this->displayFunction = 'displayCreateClass';
+				$this->argList = array($dept->getAllDepartments(), $terms->getTerms(), 'processCopyClass', $_REQUEST, $needed_info);
 			break;
 
 			case 'processCopyClass':
@@ -111,37 +117,50 @@ class copyClassManager
 
 				if(isset($request['copyNew']))
 				{
-
-					$checkDuplicates = new checkDuplicates();
-					$duplicateClasses = $checkDuplicates->checkDuplicateClass($request['department'],$request['course_number'], $request['section']);
+					$t = new term($request['term']);
 					
-					if ($duplicateClasses) {
-						// goto check Duplicates
-						checkDuplicatesManager::checkDuplicatesManager('checkDuplicateClass', $user, $duplicateClasses);
+					//first, check to see if resulting class has a duplicate active class
+					//do not care about instructor(s), because we are looking for active course matches, no matter who teaches them
+					require_once("secure/managers/classManager.class.php");
+					$dupes = classManager::getDuplicates($request['department'], $request['course_number'], $request['section'], $t->getTermYear(), $t->getTermName());
+					if(!is_null($dupes[0])) {	//found an active dupe
+						require_once("secure/displayers/classDisplayer.class.php");
+						$this->displayClass = 'classDisplayer';
+						$this->displayFunction = 'displayDuplicateCourses';
+						//leave a trail to return
+						$_REQUEST['cmd'] = 'copyNew';
+						$this->argList = array($user, $dupes, urlencode(serialize($_REQUEST)));
+						//break out of the case if we hit a dupe
 						break;
 					}
-					else {
-						$t = new term($request['term']);
-		
+					else {	
 						$c  = new course(null);
 						$ci = new courseInstance(null);
 					
 						$ci->createCourseInstance();
-						$c->createNewCourse($ci->getCourseInstanceID());
-						$ci->addInstructor($c->getCourseAliasID(), $request['selected_instr']);
-				
-						$c->setCourseNo($request['course_number']);
-						$c->setDepartmentID($request['department']);
-						$c->setName($request['course_name']);
-						$c->setSection($request['section']);
-						$ci->setPrimaryCourseAliasID($c->getCourseAliasID());
+						
+						//see if the course exists
+						if( !is_null($c->getCourseByMatch($request['department'], $request['course_number'], $request['course_name'])) ) {
+							//course found, reuse it
+							$ci->setPrimaryCourse($c->getCourseID(), $request['section']);
+						}
+						else {	//no such course, create new
+							$c->createNewCourse($ci->getCourseInstanceID());
+							$c->setCourseNo($request['course_number']);
+							$c->setDepartmentID($request['department']);
+							$c->setName($request['course_name']);
+							$c->setSection($request['section']);
+							$ci->setPrimaryCourseAliasID($c->getCourseAliasID());
+						}
+	
+						$ci->addInstructor($ci->getPrimaryCourseAliasID(), $request['selected_instr']);
 						$ci->setTerm($t->getTermName());
 						$ci->setYear($t->getTermYear());
 						$ci->setActivationDate($request['activation_date']);
 						$ci->setExpirationDate($request['expiration_date']);
 						$ci->setEnrollment($request['enrollment']);
 						$ci->setStatus('ACTIVE');
-					
+				
 						$request['ci']=$ci->getCourseInstanceID();
 						unset($ci);
 					}
@@ -159,42 +178,8 @@ class copyClassManager
 					$targetClass->getPrimaryCourse();
 				}
 
-				if (isset($request['copyReserves']))
-				{
-					$sourceClass->getReserves();
-					$targetClass->getReserves();
-
-					for ($i=0;$i<count($sourceClass->reserveList);$i++)
-					{
-						$sourceClass->reserveList[$i]->getItem();
-
-						if (!$sourceClass->reserveList[$i]->item->isPhysicalItem())
-						{
-							$reserve = new reserve();
-							if ($reserve->createNewReserve($targetClass->getCourseInstanceID(), $sourceClass->reserveList[$i]->itemID))
-							{
-								$reserve->setActivationDate($targetClass->getActivationDate());
-								$reserve->setExpirationDate($targetClass->getExpirationDate());
-							}
-
-						} else {
-							//store reserve for physical items with status = IN PROCESS
-							$reserve = new reserve();
-
-							if($reserve->createNewReserve($targetClass->getCourseInstanceID(), $sourceClass->reserveList[$i]->itemID)) {
-								$reserve->setStatus("IN PROCESS");
-								$reserve->setActivationDate($targetClass->getActivationDate());
-								$reserve->setExpirationDate($targetClass->getExpirationDate());
-
-								//create request
-								$requst = new request();
-								$requst->createNewRequest($targetClass->getCourseInstanceID(), $sourceClass->reserveList[$i]->itemID);
-								$requst->setRequestingUser($user->getUserID());
-								$requst->setReserveID($reserve->getReserveID());
-							}
-
-						}
-					}
+				if(isset($request['copyReserves'])) {
+					$sourceClass->copyReserves($targetClass->getCourseInstanceID());
 					$copyStatus[]="Reserves List sucessfully copied";
 				}
 

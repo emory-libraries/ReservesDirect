@@ -6,48 +6,49 @@
 <? echo "<link rel=\"stylesheet\" href=\"" . $_SESSION['css'] ."\" type=\"text/css\">\n"; ?>
 
 <script language="JavaScript1.2" src="secure/javascript/jsFunctions.js"></script>
+
+<!-- start JSCalendar files -->
+<?php
+	//load JSCalendar JS files
+	$calendar->load_files();
+?>
+<!-- end JSCalendar files -->
 </head>
 
-<body bgcolor="#FFFFFF" text="#000000">
-<table width="100%" border="0" cellspacing="0" cellpadding="0">
+<body onload="focusOnForm();">
+<div id="container">
   	<!--banner.inc-->
 	<?php include("secure/html/banner.inc.html"); ?>
-	<!--func_nav-->
-	<?php include("secure/html/func_nav.inc.html"); ?>
-	<!--main_nav.inc-->
-    <?php include("secure/html/main_nav.inc.html"); ?>
-	<!--sub_nav.inc.html-->
-	<?php include("secure/html/sub_nav.inc.html"); ?>
+	<div id="Navigation">
+		<!--func_nav-->
+		<?php include("secure/html/func_nav.inc.html"); ?>
+		<!--main_nav.inc-->
+    	<?php include("secure/html/main_nav.inc.html"); ?>
+		<!--sub_nav.inc.html-->
+		<?php include("secure/html/sub_nav.inc.html"); ?>
+	</div>
 
-
-	<tr align="left" valign="top">
-		<td colspan="2" class="divider"><img src=../images/spacer.gif" width="1" height="10"></td>
-	</tr>    
+	<div id="divider">&nbsp;</div>
 	
 	<!--locationIndicator.inc-->
   	<?php include("secure/html/locationIndicator.inc.html"); ?>
   
-  <tr><td colspan="2">&nbsp;</td></tr>
-  
-  <?php
-  	//Display NoScript error if greater than proxy and javascript is not enabled
-  	if ($u->getDefaultRole() >= $g_permission['proxy'])
-  		echo "<noscript><tr><td colspan=\"2\" align=\"center\" class=\"failedText\">$g_no_javascript_msg</td></tr><tr><td colspan=\"2\">&nbsp;</td></tr></noscript>\n";
-  ?>
-  
-  <tr>
-    <td height="108" align="left" valign="top" colspan="2">
-        <div id="alertMsg" align="center" class="failedText">
-            <? if (isset($alertMsg)) echo $alertMsg; ?>
-        </div><br>
-  
-    	<? $mgr->display() ?>
-    
-    </td>
-  </tr>
-  <tr><td colspan="2">&nbsp;</td></tr>
-  <tr><td colspan="2"><?php include("secure/html/footer.inc.html"); ?></td></tr>
-  </table>
+  	<?php
+	  	//Display NoScript error if greater than proxy and javascript is not enabled
+	  	if ($u->getRole() >= $g_permission['proxy'])
+	  		echo "<noscript><div id=\"noJavaAlert\" class=\"failedText\">$g_no_javascript_msg</div></noscript>\n";
+	 ?>
+ 
+    <div id="alertMsg" class="failedText">
+        <? if (isset($alertMsg)) echo $alertMsg; ?>
+    </div>
+	<div id="Content">
+		<? $mgr->display() ?>
+	</div>
+    <div id="Footer">
+ 		<?php include("secure/html/footer.inc.html"); ?>
+ 	</div>
+</div>
 
 </body>
 </html>

@@ -31,6 +31,7 @@ $load_start_time = time();
 require_once("secure/config.inc.php");
 require_once("secure/common.inc.php");
 
+require_once("secure/classes/calendar.class.php");
 require_once("secure/classes/users.class.php");
 require_once("secure/classes/skins.class.php");
 
@@ -41,7 +42,9 @@ require_once("secure/interface/instructor.class.php");
 require_once("secure/interface/staff.class.php");
 require_once("secure/interface/admin.class.php");
 
-require_once ("secure/functional_permissions.inc.php");
+require_once("secure/managers/ajaxManager.class.php");
+
+require_once("secure/functional_permissions.inc.php");
 
 require_once("secure/session.inc.php");
 
@@ -49,7 +52,7 @@ require_once("secure/session.inc.php");
 if (isset($_SESSION['debug']))
 {
 	error_reporting(E_ALL);
-	print_r($_REQUEST);echo "<hr>";
+	echo "<pre>";print_r($_REQUEST);echo "</pre><hr>";
 } else {
 	error_reporting(0);
 	$old_error_handler = set_error_handler("common_ErrorHandler");
@@ -67,7 +70,7 @@ require_once('secure/auth.inc.php');
 //read cmd
 $cmd = $_REQUEST['cmd'];
 
-if (!key_exists($cmd, $functional_permissions) || ($u->getDefaultRole() < $functional_permissions[$cmd])) //user does not have permission kick to default page
+//test user permissions
 if (!key_exists($cmd, $functional_permissions) || ($u->getRole() < $functional_permissions[$cmd])) //user does not have permission kick to default page
 {
 	$cmd = "viewCourseList";
@@ -86,7 +89,7 @@ if (isset($_REQUEST['u']))
 	 unset($tmpUser);
 }
 
-if (isset($_REQUEST['ci']))
+//if selected set CourseInstance
 if (!empty($_REQUEST['ci']))
 {
 	$ci = new courseInstance($_REQUEST['ci']);
@@ -100,6 +103,15 @@ if (($u->getEmail() == "" || $u->getLastName() == "") && $cmd!="storeUser") //di
 {
 	 $cmd = 'newProfile';
 }
+
+//initiate calendar object, since some files must be included in the <head> by one of the html includes
+//this object should be global and used by all files (no need to create a new obj)
+$calendar = new Calendar();
+
+
+//if there is a command to delete a note, do it
+	common_deleteNote($_REQUEST['deleteNote']);
+	noteManager::deleteNote($_REQUEST['deleteNote']);
 }
 
 switch ($cmd)
@@ -138,6 +150,7 @@ switch ($cmd)
 	case 'editCrossListings':
 	case 'editTitle':
 	case 'reactivateClass':		// manageClass choose class to reactivate
+	case 'reactivateConfirm':	// confirm reactivation name/section
 	case 'reactivateList':
 	case 'editClass':			// manageClass edit class
 	case 'createClass':			// manageClass create class (enter meta-data)
@@ -149,7 +162,6 @@ switch ($cmd)
 	case 'deleteClass':
 	case 'confirmDeleteClass':
 	case 'viewEnrollment':		//manageClass - display enrolled students
-	case 'processViewEnrollment':
 	case 'deleteClassSuccess':
 	case 'copyItems':
 		require_once("secure/managers/classManager.class.php");		
@@ -184,12 +196,6 @@ switch ($cmd)
 		require_once("secure/managers/itemManager.class.php");
 		$mgr = new itemManager($cmd, $u);
 	
-	case 'checkDuplicateClass':
-	case 'checkDuplicateReactivation':
-		require_once("secure/managers/checkDuplicatesManager.class.php");
-		$mgr = new checkDuplicatesManager($cmd,$u);
-	break;
-
 
 	case 'displayRequest':
 	case 'processRequest':
@@ -201,11 +207,11 @@ switch ($cmd)
 	break;
 
 	case 'addDigitalItem':
-		if (!isset($_REQUEST['ci']) || !isset($_REQUEST['selected_instr']))
+	case 'addPhysicalItem':
 		if (!isset($_REQUEST['ci']))
-			//display selectClass
-			require_once("secure/managers/selectClassManager.class.php");
-			$mgr = new selectClassManager('lookupClass', $cmd, 'manageClass', 'Select Class', $u, $_REQUEST);
+		{
+			//display ajax class select
+			$mgr = new ajaxManager();
 			$mgr->lookup('lookupClass', $cmd, 'addReserve', 'Select Class');
 		} else {
 			//add Physical Item
@@ -213,20 +219,20 @@ switch ($cmd)
 			$mgr = new requestManager($cmd, $u, $ci, $_REQUEST);
 		}
 
-	case 'staffEditClass':
-		if (!isset($_REQUEST['ci']) || !isset($_REQUEST['selected_instr']))
-		{
-			//display selectClass
-			require_once("secure/managers/selectClassManager.class.php");
-			$mgr = new selectClassManager('lookupClass', $cmd, 'manageClass', 'Edit Class', $u, $_REQUEST);
-		} else {
-			require_once("secure/managers/classManager.class.php");
-			$mgr = new classManager('editClass', $u, $adminUser, $_REQUEST);
-		}
-	break;
+    case 'staffEditClass':
+            if (!isset($_REQUEST['ci']))
+            {
+       			//display ajax class select
+				$mgr = new ajaxManager();
+				$mgr->lookup('lookupClass', $cmd, 'manageClasses', 'Edit Class');                 
+            } else {
+                    require_once("secure/managers/classManager.class.php");
+                    $mgr = new classManager('editClass', $u, $adminUser, $_REQUEST);
+            }
+    break;
 	break;
 
-	case 'clearCopyClassLookup':
+	case 'copyClass':
 	case 'copyClassOptions':
 	case 'copyExisting':
 	case 'importClass':			//import reserves list from one ci to another
@@ -237,14 +243,15 @@ switch ($cmd)
 
 	case 'addNote':
 	case 'saveNote':
-		$mgr = new noteManager($cmd, $u, $_REQUEST['reserve_id']);
+		require_once("secure/managers/noteManager.class.php");
 		$mgr = new noteManager($cmd, $u);
 
 
-		if ($u->getDefaultRole() >= $g_permission['staff'] && (!isset($_REQUEST['ci']) || !isset($_REQUEST['selected_instr'])))
+		if ($u->getRole() >= $g_permission['staff'] && (!isset($_REQUEST['ci'])))
 		{
-			require_once("secure/managers/selectClassManager.class.php");
-			$mgr = new selectClassManager('lookupClass', $cmd, 'manageClass', 'Export Class', $u, $_REQUEST);
+			//display ajax class select
+			$mgr = new ajaxManager();
+			$mgr->lookup('lookupClass', $cmd, 'manageClasses', 'Export Class');
 		} else {
 			require_once("secure/managers/exportManager.class.php");
 			$mgr = new exportManager($cmd, $u, $_REQUEST);
@@ -263,6 +270,12 @@ switch ($cmd)
 	case 'viewReport':
 		$page = "reports";
 		require_once("secure/managers/reportManager.class.php");
+		$mgr = new reportManager($cmd, $u, $_REQUEST);
+	
+
+	case 'admin':
+		$page = 'admin';
+		require_once("secure/managers/adminManager.class.php");
 		$mgr = new adminManager($cmd, $u, $_REQUEST);
 		
 

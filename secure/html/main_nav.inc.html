@@ -5,27 +5,36 @@
 	$tab_myReserves		= "";
 	$tab_reserves		= "";	
 	$tab_search			= "";
+	$tab_reports		= "";
+	$tab_admin			= "";
 	$tab_selector = "tab_".$page;
 	$$tab_selector = "id=\"current\"";
 	
+	//Tab index defines order of tabs aphabetically hense the aa, y and z prefixes
 	$tabs = array();
-	$tabs['myReserves']		= "<li $tab_myReserves><a href=\"index.php\">MyReserves</a></li>\n";
+	$tabs['aamyReserves']		= "<li $tab_myReserves><a href=\"index.php\">MyReserves</a></li>\n";
 	$tabs['addReserves']	= null;
 	$tabs['manageClasses']	= null;
 	$tabs['manageUsers']	= null;
-	$tabs['search']			= null;
+	$tabs['ySearch']		= null;
+	$tabs['zReports']		= null;
+	$tabs['zzAdmin']		= null;
 	
 	switch ($userClass)
 	{
 		case 'admin':
+			$tabs['zzAdmin']	= "<li $tab_admin><a href=\"index.php?cmd=admin\">Admin</a></li>\n";
 		case 'staff':
+			$tabs['zReports']	= "<li $tab_reports><a href=\"index.php?cmd=reportsTab\">View Statistics</a></li>\n";
 			$tabs['manageUser'] = "<li $tab_manageUser><a href=\"index.php?cmd=manageUser\">Manage Users</a></li>\n";
 			$tabs['addReserve']	= "<li $tab_addReserve><a href=\"index.php?cmd=selectInstructor\">Add a Reserve</a></li>\n";
-			$tabs['zSearch']		= "<li $tab_search><a href=\"index.php?cmd=searchTab\">Search</a></li>\n";
+			$tabs['ySearch']	= "<li $tab_search><a href=\"index.php?cmd=searchTab\">Search</a></li>\n";
+			
 		case 'instructor':
-			$tabs['addReserve']	   = "<li $tab_addReserve><a href=\"index.php?cmd=addReserve\">Add a Reserve</a></li>\n";
-			$tabs['manageClasses'] = "<li $tab_manageClasses><a href=\"index.php?cmd=manageClasses\">Manage Classes</a></li>\n";
-			$tabs['manageUser']	   = "<li $tab_manageUser><a href=\"index.php?cmd=manageUser\">Manage Users</a></li>\n";
+			$tabs['addReserve']	   	= "<li $tab_addReserve><a href=\"index.php?cmd=addReserve\">Add a Reserve</a></li>\n";
+			$tabs['manageClasses'] 	= "<li $tab_manageClasses><a href=\"index.php?cmd=manageClasses\">Manage Classes</a></li>\n";
+			$tabs['manageUser']	   	= "<li $tab_manageUser><a href=\"index.php?cmd=manageUser\">Manage Users</a></li>\n";
+			$tabs['zReports']			= "<li $tab_reports><a href=\"index.php?cmd=reportsTab\">View Statistics</a></li>\n";
 		case 'proxy':
 			$myReserves = "<li $tab_reserves><a href=\"index.php?cmd=myReserves\">My Reserves</a></li>\n";
 			//if (is_null($addReserve)) 
@@ -37,27 +46,13 @@
 
 	}
 	
+	ksort($tabs);
 ?>
 
 
-
-
-  <tr>
-    <td colspan="2">
 		<div id="mainNav">
-			<table width="100%" border="0" cellspacing="0" cellpadding="0">  
-			  <tr>
-			  
-				<td>
-				
-					<ul>
-						<? foreach(array_keys($tabs) as $k) if (!is_null($tabs[$k])) echo $tabs[$k]; ?>
-					</ul>
-					
-				</td>
-				
-			  </tr>
-			</table>  
-		</div>
-	</td>
-  </tr>
+		    <ul>
+				<? foreach(array_keys($tabs) as $k) if (!is_null($tabs[$k])) echo $tabs[$k]; ?>
+		    </ul>
+  	  	</div>
+

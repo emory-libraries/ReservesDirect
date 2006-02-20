@@ -105,7 +105,7 @@ class exportDisplayer
 
 	function displayExportInstructions_blackboard($ci)
 	{
-		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\" align=\"center\">\n";
+		echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\" align=\"center\">\n";
 		echo "	<tr><td width=\"140\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
 		echo "	<tr>\n";
 		echo "		<td class=\"headingCell2\">Export Reserve List for ". $ci->course->displayCourseNo() . " -- " . $ci->course->getName() . " to Blackboard</td>\n";
@@ -137,7 +137,7 @@ class exportDisplayer
 
 	function displayExportInstructions_learnlink($ci)
 	{
-		echo "<table width=\"90%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\" align=\"center\">\n";
+		echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\" align=\"center\">\n";
 		echo "	<tr><td width=\"140\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
 		echo "	<tr>\n";
 		echo "		<td class=\"headingCell2\">Export Reserve List for ". $ci->course->displayCourseNo() . " -- " . $ci->course->getName() . " to Learnlink</td>\n";
@@ -166,7 +166,7 @@ class exportDisplayer
 
 	function displayExportInstructions_website($ci)
 	{
-		echo "<table width=\"90%\" border=\"1\" cellspacing=\"0\" cellpadding=\"3\" align=\"center\">\n";
+		echo "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"3\" align=\"center\">\n";
 		echo "	<tr><td width=\"140\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
 		echo "	<tr>\n";
 		echo "		<td class=\"headingCell2\">Export Reserve List for ". $ci->course->displayCourseNo() . " -- " . $ci->course->getName() . " to your Personal Web Page</td>\n";

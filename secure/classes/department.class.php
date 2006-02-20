@@ -66,7 +66,34 @@ class department extends library
 		}
 
 	}
+	
+	function createDepartment($name, $abbr, $library_id)
+	{
+		global $g_dbConn;
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql  = "INSERT INTO departments (name, abbreviation, library_id) VALUES (?,?,!)";
 
+		}
+		$rs = $g_dbConn->query($sql, array($name, $abbr, $library_id));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+	}
+
+	function updateDepartment()
+	{
+		global $g_dbConn;
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql  = "UPDATE departments SET name=?, abbreviation=?, library_id=! WHERE department_id = !";
+
+		}
+		$rs = $g_dbConn->query($sql, array($this->name, $this->abbr, $this->libraryID, $this->deptID));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		return true;
+	}
 
 	/**
 	* @return department recordset
@@ -101,6 +128,19 @@ class department extends library
 	function getName() { return $this->name; }
 	function getAbbr() { return $this->abbr; }
 	
+	
+	function setName($name){ $this->name = stripslashes($name);}
+	function setAbbr($abbr){ $this->abbr = stripslashes($abbr);}
+	function setLibraryID($library_id) 
+	{ 
+		$this->libraryID = $library_id;
+		
+		$l = new library($this->libraryID);
+		$this->library = $l;
+		$this->libraryNickname = $l->getLibraryNickname();
+		$this->libraryURL = $l->getLibraryURL();
+	}
+	
 	/**
 	 * Return an array of human readable loan periods from the db
 	 */
@@ -129,6 +169,31 @@ class department extends library
 		}
 		return $tmpArray;		
 	}
+	
+	function findByPartialName($deptName)
+	{
+		global $g_dbConn;
 
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql  = "SELECT d.department_id, d.abbreviation, d.name, l.library_id, l.nickname "
+					  . "FROM departments as d "
+					  .	"JOIN libraries as l ON d.library_id = l.library_id "
+					  .	"WHERE d.name like '$deptName%' or d.abbreviation like '$deptName%' AND d.status IS NULL "
+					  . "ORDER BY d.abbreviation LIMIT 30"
+					  ;
+
+		}
+
+		$rs = $g_dbConn->query($sql);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+		$tmpArray = null;
+		while ($row = $rs->fetchRow(DB_FETCHMODE_ASSOC)) {
+			$tmpArray[] = $row;
+		}		
+		return $tmpArray;		
+	}
 }
 ?>

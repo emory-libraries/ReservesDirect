@@ -10,6 +10,20 @@ function checkAll(form, theState)
 	}
 }
 
+function focusOnForm() {
+	if(document.forms.length > 0) {
+		if(document.forms[0].elements.length > 0) {
+			for(var x=0; x < document.forms[0].elements.length; x++) {
+//alert('x='+x+' id='+document.forms[0].elements[x].id+' value='+document.forms[0].elements[x].value+' type='+document.forms[0].elements[x].type);
+				if(document.forms[0].elements[x].type != "hidden") {
+					document.forms[0].elements[x].focus();
+					return;
+				}
+			}
+		}
+	}
+}
+
 /*
 *@desc - This Function is called via the onChange event, when a user updates the sortOrder for a reserve item
 *@desc - The function updates the Sort Order for all of the reserve records
@@ -96,7 +110,7 @@ var newWindow_returnValue;
 function openWindow(argList, size)
 {
 	var options  = size + ",toolbar=no,alwaysRaised=yes,dependent=yes,directories=no,hotkeys=no,menubar=no,resizable=yes,scrollbars=yes";
-	var location = "index.php?no_control" + argList;
+	var location = "index.php?" + argList;
 	
 	newWindow = window.open(location, "noteWindow", options);
 }
