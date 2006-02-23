@@ -637,6 +637,12 @@ INSERT INTO users (username, first_name, last_name, dflt_permission_level) VALUE
 
 INSERT INTO special_users VALUES (1, '21232f297a57a5a743894a0e4a801fc3', NULL);
 
+--
+-- Seed data for table `skins`
+--
+
+INSERT INTO `skins` VALUES (1, 'general', 'css/ReservesStyles.css', 'yes');
+
 -- 
 -- Dumping data for table `mimetypes`
 -- 
