@@ -57,7 +57,7 @@ class skins {
         }
 
         if (count($row) != 1) { 
-            trigger_error("No usable skin configuration: ".$rs->getMessage(), E_ERROR);
+            trigger_error("No usable skin configuration: ", E_ERROR);
         }
 
         return $row[0]; // relative pathname of CSS stylesheet
