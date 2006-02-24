@@ -104,7 +104,8 @@ class Calendar extends DHTML_Calendar {
 					array('date' => $date),
 					array(
 						'name'	=> $field_name,
-						'value'	=> $date
+						'value'	=> $date,
+						'size'	=> 10
 					)
 				);
 	}
