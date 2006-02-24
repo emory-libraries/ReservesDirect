@@ -284,17 +284,20 @@ class instructor extends proxy
 
 				$sql = 	"SELECT DISTINCT ci.course_instance_id "
 				.		"FROM access as a "
-				.		"  JOIN course_aliases as ca ON a.alias_id = ca.course_alias_id "
-				.		"  JOIN course_instances as ci ON ca.course_instance_id = ci.course_instance_id "
-				.		"  WHERE a.permission_level = " . $g_permission['instructor'] . " AND a.user_id = ! "
+				.		" JOIN course_aliases as ca ON a.alias_id = ca.course_alias_id "
+				.		" JOIN course_instances as ci ON ca.course_instance_id = ci.course_instance_id "
+				.		" JOIN courses AS c ON c.course_id=ca.course_id "
+				.		" JOIN departments AS d ON d.department_id=c.department_id "
+				.		" WHERE a.permission_level = " . $g_permission['instructor'] . " AND a.user_id = ! AND ci.status = 'ACTIVE'"
 				;
 
 				if ($PastOnly == true)
 					$sql .=	"  AND ci.expiration_date <= '$d' ";
 
-				$sql .=	"  ORDER BY ci.activation_date ASC ";
+				$sql .=	" ORDER BY ci.year DESC, ci.term DESC, d.abbreviation ASC, c.course_number ASC";
 
 		}
+		
 		$rs = $g_dbConn->query($sql, $this->getUserID());
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
@@ -374,95 +377,6 @@ class instructor extends proxy
 		return $tmpArray;
 	}
 
-	/**
-	* @return courseInstance
-	* @param courseInstance $oldCI
-	* @param int $course_id source course ID
-	* @param string $section
-	* @param string $newTerm
-	* @param string $newYear
-	* @param date $newActivation
-	* @param date $newExpiration
-	* @param string $status
-	* @desc creates a new courseInstance in the database with crosslistings and instructor from old courseInstance
-	*/
-	function copyCourseInstance($oldCI, $course_id, $section, $newTerm, $newYear, $newActivation, $newExpiration, $status="ACTIVE", $instructorList, $proxyList, $crossList, $reserveList, $request_loan_periods=null)
-	{
-		global $g_dbConn, $g_permission;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql_add_access = "INSERT INTO access (user_id, alias_id, permission_level) VALUES (!,!,!)";
-		}
-		
-		//create new CI in db
-		$newCI = new courseInstance();
-		$newCI->createCourseInstance();
-
-		//set new CI values
-		$newCI->setTerm($newTerm);
-		$newCI->setYear($newYear);
-		$newCI->setActivationDate($newActivation);
-		$newCI->setExpirationDate($newExpiration);
-		$newCI->setStatus($status);
-		$newCI->setEnrollment($oldCI->getEnrollment());
-
-		//set Primary Course Info
-		$newCI->setPrimaryCourse($course_id, $section);
-
-		//grant access to instructors
-		if(is_array($instructorList) && !empty($instructorList)) {
-			foreach($instructorList as $instr) {
-				//set Access
-				$rs = $g_dbConn->query($sql_add_access, array($instr, $newCI->primaryCourseAliasID, $g_permission['instructor']));
-				if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-			}
-		}
-
-/****************************************************
-		//grant access to proxies
-		
-
-######################
-#	temporary handler for proxy list
-#
-
-		if(!empty($proxyList)) {
-			$proxyList = unserialize(urldecode($proxyList));
-			
-######################
-# real handler follows
-//
-//		if(is_array($proxyList) && !empty($proxyList)) {
-//
-######################
-
-			foreach($proxyList as $p) {
-				$rs = $g_dbConn->query($sql_add_access, array($p, $newCI->primaryCourseAliasID, $g_permission['proxy']));
-				if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-			}
-		}
-*****************************************************/
-
-		//copy crosslistings
-		if(is_array($crossList) && !empty($crossList)) {
-			foreach($crossList as $cross_info) {	//each element is a serialized array of [0]course_id, [1]section
-				//get back the array				
-				$cross_info = unserialize(urldecode($cross_info));
-				
-				//create new crosslisting
-				$newCI->addCrossListing($cross_info[0], $cross_info[1]);
-			}
-		}
-		
-		//copy reserves
-		if(is_array($reserveList) && !empty($reserveList)) {
-			$oldCI->copyReserves($newCI->getCourseInstanceID(), $reserveList, $request_loan_periods);
-		}
-
-		return $newCI;
-	}
 	
     /**
      * Generate a list of available reports

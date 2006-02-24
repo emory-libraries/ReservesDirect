@@ -376,4 +376,104 @@ abstract class baseDisplayer {
 <?php
 	}
 	
+	
+	/**
+	 * @return void
+	 * @param int $default_dept (optional) ID of department to pre-select
+	 * @desc displays a <select> box that shows all available departments
+	 */
+	public function displayDepartmentSelect($default_dept=null) {
+		$department = new department();	//init a department object
+?>
+	<select name="department" id="department">
+		<option value="">-- Select a Department --</option>
+<?php
+		foreach($department->getAllDepartments() as $dep):
+			$selected = ($dep[0]==$default_dept) ? 'selected="selected"' : '';
+?>
+		<option value="<?=$dep[0]?>" <?=$selected?>><?=$dep[1]?> <?=$dep[2]?></option>
+<?php	endforeach; ?>			
+	</select>
+<?php
+	}
+	
+	
+	/**
+	 * @return void
+	 * @param int $default_term (optional) ID of term to pre-select
+	 * @param boolean $show_dates (optional) If true, will show input fields for activation and expiration dates; else will include them as hidden fields
+	 * @desc displays a <select> box of semesters and date fields
+	 */
+	public function displayTermSelect($default_term=null, $show_dates=false) {
+		global $calendar;
+		
+		$termsObj = new terms();
+		$terms = $termsObj->getTerms();
+		
+		if(empty($default_term)) {	//set default if none specified
+			$default_term = $terms[0]->getTermID();
+		}
+?>
+	<script language="JavaScript">
+		function term_setActiveDates(activateDate, expirationDate) {
+			if(document.getElementById('activation_date')) {
+				document.getElementById('activation_date').value = activateDate;
+			}
+			if(document.getElementById('expiration_date')) {
+				document.getElementById('expiration_date').value = expirationDate;
+			}
+		}
+	</script>
+
+	<select name="term" id="term">
+<?php
+		foreach($terms as $term):
+			$selected = '';
+			if($term->getTermID()==$default_term) {	//if the term matches default term
+				$selected = 'selected="selected"';	//preselect the field
+				//fetch the default dates
+				$activation_date = $term->getBeginDate();
+				$expiration_date = $term->getEndDate();
+			}
+?>
+		<option value="<?=$term->getTermID()?>" <?=$selected?> onclick="term_setActiveDates('<?=$term->getBeginDate()?>','<?=$term->getEndDate()?>')"><?=$term->getTerm()?></option>
+<?php	endforeach; ?>			
+	</select>
+	
+<?php	if($show_dates): //show date fields ?>
+
+	&mdash; <input type="text" id="activation_date" name="activation_date" size="10" maxlength="10" value="<?=$activation_date?>" /> <?=$calendar->getWidgetAndTrigger('activation_date', $activation_date)?> &raquo; <input type="text" id="expiration_date" name="expiration_date" size="10" maxlength="10" value="<?=$expiration_date?>" /> <?=$calendar->getWidgetAndTrigger('expiration_date', $expiration_date)?>
+	
+<?php 	else:	//include them as hidden fields ?>
+
+	<input type="hidden" id="activation_date" name="activation_date" value="<?=$activation_date?>" />
+	<input type="hidden" id="expiration_date" name="expiration_date" value="<?=$expiration_date?>" />
+	
+<?php						
+		endif;
+	}
+	
+	
+	/**
+	 * @return void
+	 * @param string $default_enrollment (optional) Enrollment option to check by default
+	 * @desc displays enrollment options as radio options
+	 */
+	public function displayEnrollmentSelect($default_enrollment='OPEN') {
+		//set default
+		$checked = array();
+		$options = array('OPEN', 'MODERATED', 'CLOSED');
+		if(!in_array($default_enrollment, $options)) {	//if not a valid default, set it to OPEN
+			$default_enrollment = 'OPEN';
+		}
+		//now set up the checks
+		foreach($options as $option) {
+			$checked[$option] = ($default_enrollment == $option) ? 'checked="checked"' : '';
+		}		
+?>
+		<input type="radio" name="enrollment" id="enrollment" value="OPEN" <?=$checked['OPEN']?> /> OPEN 
+		<input type="radio" name="enrollment" id="enrollment" value="MODERATED" <?=$checked['MODERATED']?> /> MODERATED 
+		<input type="radio" name="enrollment" id="enrollment" value="CLOSED" <?=$checked['CLOSED']?> /> CLOSED 
+<?php		
+	}	
 }

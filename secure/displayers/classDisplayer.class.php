@@ -50,7 +50,6 @@ class classDisplayer extends baseDisplayer {
 		echo "							<li><a href=\"index.php?cmd=createClass\" align=\"center\">Create Class</a></li>\n";
 		echo "							<li><a href=\"index.php?cmd=staffEditClass\">Edit Class</a></li>\n";
 		echo "							<li><a href=\"index.php?cmd=deleteClass\">Delete Class</a></li>\n";
-		echo "							<li><a href=\"index.php?cmd=reactivateClass\" align=\"center\">Reactivate Class</a></li>\n";
 		echo "						</ul>\n";
 		echo "					</td>\n";
 		
@@ -82,8 +81,6 @@ class classDisplayer extends baseDisplayer {
         echo "	<tr><td width=\"100%\" colspan=\"2\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>";
         echo "	<tr> ";
         echo "		<td width=\"70%\" align=\"left\" valign=\"top\"> ";
-        echo "			<p><a href=\"index.php?cmd=reactivateClass\" class=\"titlelink\">Reactivate Reserve Materials </a><br>";
-        echo "			Reactivate a course you have taught in the past or reserve readings you have used in the past</p>";
         echo "			<p><a href=\"index.php?cmd=createClass\" class=\"titlelink\">Create a New Course</a><br>";
         echo "      	Create a new course and reserves list from scratch.</p>";
         echo "			<p><a href=\"index.php?cmd=myReserves\" class=\"titlelink\">Edit an Existing Course</a><br>";
@@ -784,922 +781,199 @@ class classDisplayer extends baseDisplayer {
 		echo "</table>\n";
 		echo "</form>\n";
 	}
-
-	function displayReactivate($courses, $courseInstances, $nextPage, $request, $hidden_fields=null)
-	{
+	
+	
+	function displaySuccess($ci_id) {
+?>
+		<div class="borders" style="text-align: center;">
+			<div style="width:50%; margin:auto; text-align:left;">
+				<strong>You have successfully created a class. What would you like to do now?</strong>
+				<p />
+				<ul>
+					<li>
+						<a href="index.php?cmd=importClass&dst_ci=<?=$ci_id?>">Import materials into this class from another class (Reactivate)</a>
+						<p />
+					</li>
+					<li>
+						<a href="index.php?cmd=displaySearchItemMenu&ci=<?=$ci_id?>">Add materials to this class</a>
+						<p />
+					</li>
+					<li><a href="index.php?cmd=editClass&ci=<?=$ci_id?>">Go to this class.</a></li>
+					<li><a href="index.php?cmd=createClass">Create a New Class.</a></li>
+				</ul>
+			</div>
+		</div>
+<?php
+	}
+	
+	
+	function displayCreateClass($next_cmd, $hidden_fields=null) {
 		global $u, $g_permission;
-
-		if($u->getRole() >= $g_permission['staff']) {	//use ajax class lookup
-			//display selectClass
-			$mgr = new ajaxManager('lookupClass', $nextPage, 'manageClasses', 'Reactivate Class', $hidden_fields);
-			$mgr->display();
-		}
-		else {	//instructor class select
 		
-		    echo "<form action=\"index.php\" method=\"post\" name=\"reactivate\">\n";
-	
-			if (is_array($hidden_fields)){
-				$keys = array_keys($hidden_fields);
-				foreach($keys as $key){
-					if (is_array($hidden_fields[$key])){
-						foreach ($hidden_fields[$key] as $field){
-							echo "<input type=\"hidden\" name=\"".$key."[]\" value=\"". $field ."\">\n";	
-						}
-					} else {
-						echo "<input type=\"hidden\" name=\"$key\" value=\"". $hidden_fields[$key] ."\">\n";
-					}
+		//set defaults if they exists
+		$department = !empty($_REQUEST['department']) ? $_REQUEST['department'] : '';
+		$section = !empty($_REQUEST['section']) ? $_REQUEST['section'] : '';
+		$course_number = !empty($_REQUEST['course_number']) ? $_REQUEST['course_number'] : '';
+		$course_name = !empty($_REQUEST['course_name']) ? $_REQUEST['course_name'] : '';
+		$term = !empty($_REQUEST['term']) ? $_REQUEST['term'] : '';
+		$enrollment = !empty($_REQUEST['enrollment']) ? $_REQUEST['enrollment'] : '';
+?>
+		<script language="JavaScript">
+			function validate(form) {
+				var fieldCount = 0;
+				var requiredFields=true;
+				var errorMsg='The following fields are required: ';
+
+				if (!(form.department.value)) {
+					requiredFields=false;
+					errorMsg = errorMsg + 'Department';
+					fieldCount++;
 				}
-			}
-	
-		    echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-			echo "	<tr><td width=\"100%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
-	
-			echo "<tr><td height=\"14\" align=\"left\" valign=\"top\" class=\"helperText\">The classes you have taught in the past are listed below. Choose a class and reactivate it, then edit the class.</td></tr>\n";
-			echo "	<tr><td width=\"100%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
-			echo "	<tr>\n";
-			echo "		<td height=\"14\" align=\"left\" valign=\"top\">\n";
-			echo "			<table width=\"100%\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\">\n";
-			echo "				<tr align=\"left\" valign=\"top\">\n";
-			echo "					<td width=\"35%\" align=\"left\" class=\"headingCell1\"><div align=\"center\">YOUR PAST CLASSES</div></td>\n";
-			echo "					<td width=\"75%\"><div align=\"center\"></div></td>\n";
-			echo "				</tr>\n";
-			echo "			</table>\n";
-			echo "		</td>\n";
-			echo "	</tr>\n";
-	
-			echo "	<input type=\"hidden\" name=\"instructor\" value=\"" . $u->getUserID() ."\">\n";
-	
-			echo "	<tr>\n";
-			echo "		<td align=\"left\" valign=\"top\">\n";
-			echo "			<table width=\"100%\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\" class=\"borders\">\n";
-			echo "				<tr>\n";
-			echo "					<td>\n";
-			echo "						<table width=\"100%\" border=\"0\" align=\"center\" cellpadding=\"5\" cellspacing=\"0\" class=\"displayList\">\n";
-			echo "							<tr align=\"left\" valign=\"middle\" bgcolor=\"#CCCCCC\" class=\"headingCell1\">\n";
-			echo "								<td width=\"15%\">&nbsp;</td>\n";
-			echo "								<td>&nbsp;</td>\n";
-			echo "								<td>Last Active</td>\n";
-			echo "								<td width=\"20%\">Reserve List</td>\n";
-			echo "								<td width=\"10%\">Select</td>\n";
-			echo "							</tr>\n";
-	
-			for ($i=0;$i<count($courseInstances);$i++)
-			{
-				$ci = $courseInstances[$i];
-				$rowClass = ($i % 2) ? "evenRow" : "oddRow";
-				$selected_ci = ($request['ci_id']==$ci->getCourseInstanceID()) ? 'checked="true"' : '';
-	
-				echo "							<tr align=\"left\" valign=\"middle\" class=\"$rowClass\">\n";
-				echo "								<td width=\"15%\">". $ci->course->displayCourseNo() ."</td>\n";
-				echo "								<td>". $ci->course->getName() ."</td>\n";
-				echo "								<td width=\"20%\"><div align=\"center\">". $ci->displayTerm() ."</div></td>\n";
-				echo "								<td width=\"20%\" align=\"center\"><a href=\"javascript:openWindow('no_control=1&cmd=previewReservesList&ci=". $ci->getCourseInstanceID() ."','width=800,height=600');\">preview</a></td>\n";
-				echo "								<td width=\"10%\" align=\"center\"><input type=\"radio\" name=\"ci\" value=\"". $ci->getCourseInstanceID() ."\" onClick=\"this.form.submit.disabled=false;\" ".$selected_ci."></td>\n";
-				echo "							</tr>\n";
-			}
-	
-			echo "							<tr align=\"left\" valign=\"middle\" bgcolor=\"#CCCCCC\" class=\"headingCell1\">\n";
-			echo "								<td width=\"15%\">&nbsp;</td>\n";
-			echo "								<td>&nbsp;</td>\n";
-			echo "								<td>&nbsp;</td>\n";
-			echo "								<td width=\"20%\">&nbsp;</td>\n";
-			echo "								<td width=\"10%\">&nbsp;</td>\n";
-			echo "							</tr>\n";
-			echo "						</table>\n";
-			echo "					</td>\n";
-			echo "				</tr>\n";
-			echo "			</table>\n";
-			echo "		</td>\n";
-			echo "	</tr>\n";
-			echo "	<tr><td align=\"left\" valign=\"top\">&nbsp;</td></tr>\n";
-			echo "	<tr><td align=\"left\" valign=\"top\" align=\"center\"><input type=\"submit\" name=\"submit\" value=\"Re-activate Class\" DISABLED onClick=\"this.form.cmd.value='$nextPage';\"></td></tr>\n";
-			echo "	<tr><td align=\"left\" valign=\"top\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
-			echo "</table>\n";
-	
-			echo "</form>\n";
-		}
-	}
-	
-	
-	function displayReactivateConfirm($ci, &$terms, &$departments, $hidden_fields=null) {
-?>
-	<script languge="JavaScript">
-		function checkForm(frm) {
-			var alertMsg = '';
 
-			//if entering new course info, check for completeness
-			if(document.getElementById('same_no').checked) {
-				if(frm.department.value == '')
-					alertMsg = alertMsg + 'Please choose a department.<br />';
-				if(frm.course_number.value == '')
-					alertMsg = alertMsg + 'Please enter a course number.<br />';
-				if(frm.department.value == '')
-					alertMsg = alertMsg + 'Please enter a course name.<br />';
-			}
-			
-			if(alertMsg == '') {
-				frm.submit();
-			} 
-			else {
-				document.getElementById('alertMsg').innerHTML = alertMsg;
-				return false;
-			}
-		}
+				if (!(form.course_number.value)) {
+					requiredFields=false;
+					if (fieldCount>0) errorMsg = errorMsg + ', ';
+					errorMsg = errorMsg + 'Course Number';
+					fieldCount++;
+				}
+
+				if (!(form.course_name.value)) {
+					requiredFields=false;
+					if (fieldCount>0) errorMsg = errorMsg + ', ';
+					errorMsg = errorMsg + 'Course Name';
+					fieldCount++;
+				}
+				
+				if (!(form.term.value)) {
+					requiredFields=false;
+					if (fieldCount>0) errorMsg = errorMsg + ', ';
+					errorMsg = errorMsg + 'Term';
+					fieldCount++;
+				}
 		
-		function toggleOptions() {
-			if(document.getElementById('same_yes').checked) {
-				document.getElementById('old_info_block').style.visibility = 'visible';
-				document.getElementById('new_info_block').style.display = 'none';
-			}
-			else {
-				document.getElementById('old_info_block').style.visibility = 'hidden';
-				document.getElementById('new_info_block').style.display = '';				
-			}
-		}
-	</script>
-	
-	<form action="index.php" method="post" name="reactivate_confirm">
-	
-<?php	self::displayHiddenFields($hidden_fields); ?>
+				if (!(form.selected_instr.value)) {
+					requiredFields=false;
+					if (fieldCount>0) errorMsg = errorMsg + ', ';
+					errorMsg = errorMsg + 'Instructor';
+					fieldCount++;
+				}
 
-		<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
-			<tr>
-				<td width="100%"><img src="/images/spacer.gif" width="1" height="5"> </td>
-			</tr>
-			<tr>
-				<td height="14" align="left" valign="top">
-					<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0">
-		    			<tr align="left" valign="top">
-		      				<td width="35%" align="left" class="headingCell1"><div align="center">REACTIVATE A CLASS</div></td>
-		      				<td width="75%"><div align="right">[ <a href="index.php?cmd=manageClasses">Cancel Reactivation</a> ]</div></td>
-		    			</tr>
-					</table>
-				</td>
-			</tr>
-			<tr>
-				<td align="left" valign="top" class="borders" style="padding:10px;">				
-	            	<p class="helperText">You have selected to reactivate <span class="strong"><?=$ci->course->department->getAbbr().' '.$ci->course->getCourseNo().' '.$ci->course->getName()?></span>.</p>
-	            	
-					<p>Reactivate class for:&nbsp;
+				if (!(form.activation_date.value)) {
+					requiredFields=false;
+					if (fieldCount>0) errorMsg = errorMsg + ', ';
+					errorMsg = errorMsg + 'Activation Date';
+					fieldCount++;
+				}
 
-<?php
-		$first = true;
-		foreach($terms as $term):
-			$selected = $first ? 'checked="true"' : '';	//select the first option
-?>
-						<input type="radio" name="term" <?=$selected?> value="<?=$term->getTermID()?>" onclick="this.form.submit_confirmation.disabled=false" />&nbsp;<?=$term->getTerm()?> &nbsp;&nbsp;&nbsp; 
-<?php	
-			$first = false;
-		endforeach;
-?>
+				if (!(form.expiration_date.value)) {
+					requiredFields=false;
+					if (fieldCount>0) errorMsg = errorMsg + ', ';
+					errorMsg = errorMsg + 'Expiration Date';
+					fieldCount++;
+				}
 
-	            	</p>
-	            	
-	            	<p>Would you like to change the course number and name?</p>           	
-
-            		<input id="same_yes" name="keep_selection" type="radio" value="yes" checked="checked" onclick="toggleOptions();" /> No.&nbsp;&nbsp;
-            		<span id="old_info_block">
-            			Section:&nbsp;
-            			<input name="section" type="text" id="section" size="5" value="<?=$ci->course->getSection()?>" />
-            		</span>
-            		<br />
-            		<input id="same_no" name="keep_selection" type="radio" value="no"  onclick="toggleOptions();" /> Yes.&nbsp;&nbsp;
-            		<br />
-            		<div id="new_info_block" style="margin-left:3em;">
-						<span style="margin-right:30px;">Department:</span>
-			            <select name="department">
-        		    		<option value="">-- Select a Department -- </option>
-<?php
-		//build a list of departments
-		foreach($departments as $dept):
-			$selected = ($dept[0]==$ci->course->department->getDepartmentID()) ? ' selected="selected"' : '';		
-?>
-							<option value="<?=$dept[0]?>"<?=$selected?>><?=$dept[1].' '.$dept[2]?></option>
-<?php	endforeach; ?>
-						</select>
-						<br />
-						<span style="margin-right:7px;">Course Number:</span>
-						<input name="course_number" type="text" id="course_number" size="5" value="<?=$ci->course->getCourseNo()?>" />
-						<br />
-						<span style="margin-right:60px;">Section:</span>
-						<input name="section2" type="text" id="section2" size="5" value="<?=$ci->course->getSection()?>" />
-						<br />
-						<span style="margin-right:20px;">Course Name:</span>
-						<input name="course_name" type="text" id="course_name" size="50" value="<?=$ci->course->getName()?>" />
-					</div>
-	            </td>
-			</tr>
-			<tr>
-				<td align="center">
-					<br />
-					<input type="button" name="submit_confirmation" value="Re-activate Class" onclick="checkForm(this.form);"/>
-				</td>
-			</tr>
-		</table>
-	</form>
-	
-	<script languge="JavaScript">
-		//set option defaults (on page load)
-		toggleOptions();
-	</script>
-<?php
-	}
-
-
-	function displaySelectReservesToReactivate(&$ci, &$tree_walker, &$instructor_list, $hidden_fields=null, $loan_periods=null)
-	{
-		global $g_permission, $u, $calendar;
-		
-		echo "<form action=\"index.php\" method=\"POST\" name=\"reactivateList\">\n";
-
-		if (isset($_REQUEST['term'])) {
-			$term = new term($_REQUEST['term']);
-			
-			$course_activation_date = $term->getBeginDate();	
-			$course_expiration_date = $term->getEndDate();
-		}
-
-		if (is_array($hidden_fields)){
-			$keys = array_keys($hidden_fields);
-			foreach($keys as $key){
-				if (is_array($hidden_fields[$key])){
-					foreach ($hidden_fields[$key] as $field){
-						echo "<input type=\"hidden\" name=\"".$key."[]\" value=\"". $field ."\">\n";
-					}
+				if (requiredFields) {
+					return true;
 				} else {
-					echo "<input type=\"hidden\" name=\"$key\" value=\"". $hidden_fields[$key] ."\">\n";
+					alert (errorMsg);
+					return false;
 				}
 			}
-		}
-		
-		//set some info for new course
-		if(empty($hidden_fields['course'])) {	//no course_id passed, new course dept, number and name should have been passed instead
-			$d = new department($hidden_fields['dept_id']);
-			
-			//make a string label for the new course
-			$new_course_name = $dept = $d->getAbbr().' '.$hidden_fields['course_number'].'-'.$hidden_fields['section'].' '.$hidden_fields['course_name'];
-		}
-		else {	//we kept the old course, use that info
-			$new_course_name = $ci->course->displayCourseNo() . ' ' . $ci->course->getName();
-		}
-?>
-
-		<script language="javascript">
-		//<!--
-			//resets reserve dates
-			function resetDates(from, to) {
-				document.getElementById('course_activation_date').value = from;
-				document.getElementById('course_expiration_date').value = to;
-			}
-			
-			function checkAll2(form, theState)
-			{
-				for (var i=0; i < form.elements.length; i++) {
-					if (form.elements[i].type == 'checkbox' && form.elements[i].name == 'selected_reserves[]') {
-						form.elements[i].checked = theState;
-					}
-				}
-			}
-		//-->
 		</script>
 		
-<?php
-
-		echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "	<tr><td width=\"100%\" colspan=\"2\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
-		echo "	<tr>\n";
-		echo "		<td width=\"75%\" align=\"left\" valign=\"top\">\n";
-		echo "			<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n";
-		echo "				<tr>\n";
-		echo "					<td colspan=\"3\" align=\"left\" valign=\"top\" class=\"helperText\">\n";
-		if (isset($term))
-			echo "						You have chosen the following class to reactivate for <span class=\"strong\">".$term->getTermName()." ".$term->getTermYear()."</span>.\n";
-		echo "						Choose what options and readings you would like to retain for the new class:\n";
-		echo "					</td>\n";
-		echo "				</tr>\n";
-
-		echo "				<tr><td width=\"50%\" align=\"left\" valign=\"top\">&nbsp;</td><td width=\"15\" align=\"left\" valign=\"top\">&nbsp;</td><td width=\"50%\" align=\"left\" valign=\"top\">&nbsp;</td></tr>\n";
-
-		echo "				<tr><td colspan=\"3\" align=\"left\" valign=\"top\" class=\"courseTitle\">" . $new_course_name ."</td></tr>\n";
-		echo "				<tr align=\"left\" valign=\"top\">\n";
-		echo "					<td width=\"50%\"><span class=\"courseHeaders\">Last Active:</span> ". $ci->displayTerm() . " as " . $ci->course->displayCourseNo() . ' ' . $ci->course->getName() ."</td>\n";
-		echo "					<td width=\"15\">&nbsp;</td><td width=\"50%\">&nbsp;</td>\n";
-		echo "				</tr>\n";
-
-		echo "				<tr align=\"left\" valign=\"top\"><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>\n";
-		
-		//only show activation/expiration dates override to staff
-		if($u->getRole() >= $g_permission['staff']):
-?>
-				<tr valign="top">
-					<td>
-						<table width="100%" border="0" cellpadding="0" cellspacing="0">
-							<tr valign="top">
-								<td class="headingCell1" width="50%" align="center">DATES</td>
-								<td width="50%" align="center">&nbsp;</td>
-							</tr>
-							<tr valign="top">
-								<td colspan="3" class="borders" bgcolor="#CCCCCC">	
-									<div style="padding:5px;">
-										<strong>Active Dates</strong> (YYYY-MM-DD) &nbsp;&nbsp; [<a href="#" name="reset_dates" onclick="resetDates('<?=$course_activation_date?>', '<?=$course_expiration_date?>'); return false;">Reset dates</a>]
-										<br />
-										<div style="margin-left:10px;">
-											<strong>From:</strong>&nbsp;<input type="text" id="course_activation_date" name="course_activation_date" size="10" maxlength="10" value="<?=$course_activation_date?>" /> <?=$calendar->getWidgetAndTrigger('course_activation_date', $course_activation_date)?> &nbsp; &nbsp; <strong>To:</strong>&nbsp;<input type="text" id="course_expiration_date" name="course_expiration_date" size="10" maxlength="10" value="<?=$course_expiration_date?>" /> <?=$calendar->getWidgetAndTrigger('course_expiration_date', $course_expiration_date)?>
-										</div>
-									</div>									
-								</td>
-							</tr>
-						</table>
-					</td>
-					<td>&nbsp;</td>
-					<td>&nbsp;</td>
-				</tr>	
-				<tr><td colspan="3">&nbsp;</td></tr>
-<?php
-		endif;	//end activate/expiration override
-		
-		
-		echo "				<tr align=\"left\" valign=\"top\">\n";
-		echo "					<td width=\"50%\" class=\"courseHeaders\">\n";
-		echo "						<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
-		echo "							<tr align=\"left\" valign=\"top\">\n";
-		echo "								<td width=\"50%\" class=\"headingCell1\">INSTRUCTORS\n";
-		echo "									<!--If an instructor is reactivating the course, they are automatically defaulted to be the instructor for the new instance of the course. This field allows them to select any other instructors they would like to reactivate in addition to themselves. If login role=staff, then drop-down menu of all instructors appears in addition to previous instructors. Staff must select  one or more of the previous instructors or an instructor from the drop-down menu or form should return error \"You must select an instructor to reactivate this class.\"-->\n";
-		echo "								</td>\n";
-		echo "								<td>&nbsp;</td>\n";
-		echo "							</tr>\n";
-		echo "						</table>\n";
-		echo "					</td>\n";
-		echo "					<td width=\"15\">&nbsp;</td>\n";
-		echo "					<td width=\"50%\">\n";
-		echo "						<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
-		echo "							<tr align=\"left\" valign=\"top\">\n";
-		echo "								<td width=\"50%\" class=\"headingCell1\">CROSSLISTINGS</td>\n";
-		echo "								<td>&nbsp; </td>\n";
-		echo "							</tr>\n";
-		echo "						</table>\n";
-		echo "					</td>\n";
-		echo "				</tr>\n";
-
-		echo "				<tr align=\"left\" valign=\"top\">\n";
-		echo "					<td width=\"50%\" class=\"borders\">\n";
-		echo "						<table width=\"100%\" border=\"0\" cellpadding=\"2\" cellspacing=\"0\" class=\"displayList\">\n";
-		echo "							<tr align=\"left\" valign=\"middle\"><td bgcolor=\"#FFFFFF\" class=\"headingCell1\">&nbsp;</td><td class=\"headingCell1\">Select</td></tr>\n";
-
-		if (is_array($ci->instructorList) && !empty($ci->instructorList)) {
-			foreach($ci->instructorList as $ciInstructor) {
-				echo "							<tr align=\"left\" valign=\"middle\">\n";
-				echo "								<td bgcolor=\"#CCCCCC\">". $ciInstructor->getName() ."</td>\n";
-				echo "								<td width=\"8%\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"borders\" align=\"center\">\n";
-				
-				//attempt to prevent the reactivating instructors from de-selecting themselves
-				//so, if instructor id = current user id, do not show the checkbox
-				if($u->getUserID() == $ciInstructor->getUserID()) {
-					//add this instructor through hidden field
-					echo '<input type="hidden" name="carryInstructor[]" value="'.$ciInstructor->getUserID().'" />';
-				}
-				else {
-					//do normal checkbox
-					echo "									<input type=\"checkbox\" name=\"carryInstructor[]\" value=\"". $ciInstructor->getUserID() ."\" checked>\n";
-				}
-				
-				echo "								</td>\n";
-				echo "							</tr>\n";
-			}
-		}
-
-		if ($u->getRole() >= $g_permission['staff'])
-		{
-			echo "							<tr align=\"left\" valign=\"middle\" bgcolor=\"#CCCCCC\">\n";
-			echo "								<td colspan=\"2\">\n";
-			echo "									<select name=\"additionalInstructor\">\n";
-			echo "										<option value=\"\">-- Select Additional Instructors --</option>\n";
-
-			foreach ($instructor_list as $instr)
-			{
-				echo "										<option value=\"". $instr['user_id'] ."\">". $instr['full_name'] ."</option>\n";
-			}
-
-			echo "									</select>\n";
-			echo "								</td>\n";
-			echo "							</tr>\n";
-		}
-
-		echo "							<tr align=\"left\" valign=\"middle\"><td colspan=\"2\"  class=\"headingCell1\">&nbsp;</td></tr>\n";
-		echo "						</table>\n";
-		echo "					</td>\n";
-
-		echo "					<td width=\"15\"><img src=\images/spacer.gif\" width=\"15\" height=\"1\"></td>\n";
-		echo "					<td width=\"50%\">\n";
-		echo "						<table width=\"100%\" border=\"0\" cellpadding=\"2\" cellspacing=\"0\" class=\"borders\">\n";
-		echo "							<tr align=\"left\" valign=\"middle\">\n";
-		echo "								<td bgcolor=\"#FFFFFF\" class=\"headingCell1\">&nbsp;</td>\n";
-		echo "								<td class=\"headingCell1\">Select</td>\n";
-		echo "							</tr>\n";
-
-		//crosslistings
-		if(empty($ci->crossListings)):	//no crosslistings
-?>
-								<tr>
-									<td colspan="2" bgcolor="#CCCCCC">None</td>
-								</tr>
-<?php
-		else:
-			foreach($ci->crossListings as $crossListing):
-?>
-								<tr align="left" valign="middle">
-									<td bgcolor="#CCCCCC">
-										<?=$crossListing->displayCourseNo()?> -- <?=$crossListing->getName()?>
-									</td>
-									<td width="8%" valign="top" bgcolor="#CCCCCC" class="borders" align="center">
-										<input type="checkbox" name="carryCrossListing[]" value="<?=urlencode(serialize(array($crossListing->getCourseID(), $crossListing->getSection())))?>" checked>
-									</td>
-								</tr>
-<?php
-			endforeach;
-		endif;
-		
-		echo "							<tr align=\"left\" valign=\"middle\"><td colspan=\"2\"  class=\"headingCell1\">&nbsp;</td></tr>\n";
-		echo "						</table>\n";
-		echo "					</td>\n";
-		echo "				</tr>\n";
-
-		echo "				<tr><td>&nbsp;</td></tr>\n";
-		echo "			</table>\n";
-		
-		echo "		</td>\n";
-		echo "	</tr>\n";
-		
-/***********************************************
-		//proxy reactivation checkbox
-//this should probably be changed to a list with individual checkboxes (like for instructors) at a later date
-//the handler will have to be changed in copyCourseInstance()
-//for now, it will be a list of all proxies with a single checkbox -- dmitriy - 2005.10.13
-		if(!empty($ci->proxies)):
-?>
-		<tr>
-			<td class="borders" style="padding:5px;">
-				<strong>Proxies:</strong>
-				<br />
-				<div style="margin-left:15px;">
-<?php
-			//store all IDs
-			$carryProxy = array();
-		
-			foreach($ci->proxies as $proxy) {
-				//show name
-				echo $proxy->getName().'<br />';
-				//add the id to the array
-				$carryProxy[] = $proxy->getUserID();
-			}
-		
-			//prepare array for form
-			$carryProxy = urlencode(serialize($carryProxy));	
-?>
-				</div>	
-				<p />
-				<input type="checkbox" name="carryProxy" value="<?=$carryProxy?>" /> Restore Proxies
-			</td>
-		</tr>
-		<tr><td>&nbsp;</td></tr>
-<?php
-		endif;	//end proxy block
-***********************************************/
-
-
-		echo "	<tr>\n";
-		echo "		<td colspan=\"2\">\n";
-		echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
-		echo "				<tr align=\"left\" valign=\"top\">\n";
-		echo "					<td class=\"headingCell1\"><div align=\"center\">COURSE MATERIALS</div></td>\n";
-		echo "					<td width=\"75%\" align=\"right\"><div align=\"right\" class=\"small\"><a href=\"javascript:checkAll2(document.forms.reactivateList, 1)\">check all</a> | <a href=\"javascript:checkAll2(document.forms.reactivateList, 0)\">uncheck all</a></div></td>\n";
-		echo "				</tr>\n";
-		echo "			</table>\n";
-		echo "		</td>\n";
-		echo "	</tr>\n";
-		echo "	<tr>\n";
-		echo "		<td colspan=\"2\">\n";
-		
-		
-		echo '			<ul style="list-style:none; padding-left:0px; margin:0px;">';
-
-		//begin displaying individual reserves
-		//loop
-		$prev_depth = 0;
-		foreach($tree_walker as $leaf) {
-			//close list tags if backing out of a sublist
-			if($prev_depth > $tree_walker->getDepth()) {
-				echo str_repeat('</ol></li>', ($prev_depth-$tree_walker->getDepth()));
-			}
+		<form name="frmClass" action="index.php" method="post" onSubmit="return validate(this);">	
 			
+			<?php self::displayHiddenFields($hidden_fields); ?>
 		
-			$reserve = new reserve($leaf->getID());	//init a reserve object
-			$reserve->getItem();
-			
-			//set some additional info
-			
-			$reserve->selected = true;	//select all reserves by default
-			$reserve->additional_info = '';
-			
-			if($reserve->item->isPhysicalItem() && !is_null($loan_periods)) {
-				$reserve->additional_info .= '<br /><span class="itemMetaPre">Requested Loan Period:</span>';
-				$reserve->additional_info .= '<select name="requestedLoanPeriod['.$reserve->getReserveID().']">';
-				foreach($loan_periods as $loan_period) {
-					$selected = ($loan_period['default'] == 'true') ? 'selected="selected"' : '';
-					$reserve->additional_info .= '<option value="'.$loan_period['loan_period'].'" '.$selected.'>'.$loan_period['loan_period'].'</option>';
-				}
-				$reserve->additional_info .= '</select>';
-			}
-						
-			$rowStyle = ($rowStyle=='oddRow') ? 'evenRow' : 'oddRow';	//set the style
-
-			//display the info
-			echo '<li>';
-			if($reserve->item->isPhysicalItem() && $reserve->item->isPersonalCopy()):	//if physical personal item
-				$reserve->additional_info = '<br /><span class="failedText">Personal items cannot be reactivated. Please contact your reserves desk for assistance.</span>';
-?>
-				<div class="<?=$rowStyle?>">
-					<?php self::displayReserveInfo($reserve, 'class="metaBlock-wide"'); ?>
-					<!-- hack to clear floats -->
-					<div style="clear:both;"></div>
-					<!-- end hack -->
-				</div>			
+		<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+			<tr>
+				<td class="headingCell1" width="25%" align="center">CLASS DETAILS</td>
+				<td width="75%" align="center">&nbsp;</td>
+			</tr>
+		    <tr>
+		    	<td colspan="2" class="borders">
+			    	<table width="100%" border="0" cellspacing="0" cellpadding="5">
+			    		<tr>
+			    			<td width="30%" bgcolor="#CCCCCC" align="right" class="strong">
+			    				Department:
+			    			</td>
+			    			<td>
+			    				<?php self::displayDepartmentSelect($department); ?>
+			    			</td>
+			    		</tr>
+			    		<tr>
+			    			<td width="30%" bgcolor="#CCCCCC" align="right" class="strong">
+			    				Course Number:
+			    			</td>
+			    			<td>
+			    				<input name="course_number" type="text" id="course_number" size="5" value="<?=$course_number?>" />
+			    			</td>
+			    		</tr>
+			    		<tr>
+			    			<td width="30%" bgcolor="#CCCCCC" align="right" class="strong">
+			    				Section:
+			    			</td>
+			    			<td>
+			    				<input name="section" type="text" id="section" size="5" value="<?=$section?>" />
+			    			</td>
+			    		</tr>
+			    		<tr>
+			    			<td width="30%" bgcolor="#CCCCCC" align="right" class="strong">
+			    				Course Name:
+			    			</td>
+			    			<td>
+			    				<input name="course_name" type="text" id="course_name" size="50" value="<?=$course_name?>" />
+			    			</td>
+			    		</tr>
+			    		<tr>
+			    			<td width="30%" bgcolor="#CCCCCC" align="right" class="strong">
+			    				Term:
+			    			</td>
+			    			<td>
 <?php
-			else:
-				if($reserve->item->isHeading()) {
-					$rowStyle ='headingCell2'; 
-				}
-?>
-				<div class="<?=$rowStyle?>">
-					<div class="checkBox-right">
-						<input type="checkbox" checked="true" name="selected_reserves[]" value="<?=$reserve->getReserveID()?>" />
-					</div>
-					<?php self::displayReserveInfo($reserve, 'class="metaBlock-wide"'); ?>
-					<!-- hack to clear floats -->
-					<div style="clear:both;"></div>
-					<!-- end hack -->
-				</div>			
-<?php
-			endif;
-			
-			//start sublist or close list-item?
-			echo ($leaf->hasChildren()) ? '<ul style="list-style:none;">' : '</li>';
-			
-			$prev_depth = $tree_walker->getDepth();
-		}
-		echo str_repeat('</ul></li>', ($prev_depth));	//close all lists
-		
-		echo '			</ul>';
-		
-		
-		echo "		</td>\n";
-		echo "	</tr>\n";
-			
-		echo "	<tr><td colspan=\"3\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
-		echo "	<tr><td colspan=\"3\" align=\"center\" class=\"strong\"><input type=\"submit\" name=\"Submit\" value=\"Reactivate Class\"><br /><small>Note: Please be patient, large classes may take several minutes to process.</small></td></tr>\n";
-		echo "	<tr><td colspan=\"3\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
-		echo "</table>\n";
-
-		echo "</form>\n";
-	}
-
-
-	function displaySuccess($page, $ci)
-	{
-
-		echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n"
-		.	 "	<tbody>\n"
-		.	 "		<tr><td width=\"100%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n"
-		.	 "		<tr>\n"
-	    .	 "			<td align=\"left\" valign=\"top\" class=\"borders\">\n"
-	    .	 "				<table width=\"50%\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"5\">\n"
-		.	 "					<tr><td><strong>You have successfully added a class.  You May now:</strong></td></tr>\n"
-		.	 "					<tr><td>\n"
-		.	 "				<ul><li><a href=\"index.php?cmd=displaySearchItemMenu&ci=". $ci->getCourseInstanceID() ."\">Add materials to this class</a>		<br>\n"
-		.	 "							<br>\n"
-		.	 "						    <li><a href=\"index.php?cmd=editClass&ci=". $ci->getCourseInstanceID() ."\">Go to this class.</a></li>\n"
-		.	 "							<li><a href=\"index.php?cmd=reactivateClass\">Reactivate another class.</a></li>\n"
-		.	 "							<li><a href=\"index.php?cmd=createClass\">Create a New Class.</a></li>\n"
-		.	 "						</ul>\n"
-		.	 "					</td></tr>\n"
-		.	 "				</table>\n"
-		.	 "			</td>\n"
-		.	 "		</tr>\n"
-		.	 "		<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n"
-		.	 "	</tbody>\n"
-		.	 "</table>\n"
-		;
-	}
+		//allow staff or above to edit start/end dates
+		$show_dates = ($u->getRole() >= $g_permission['staff']) ? true : false;
 	
-	function displayCreateClass($departments, $terms, $next_cmd, $request, $hidden_fields=null)
-	{
-		global $u, $g_permission, $calendar;
-
-		echo "\n<script language=\"JavaScript\">\n";
-		echo "	function activateDates(frm, activateDate, expirationDate)\n";
-		echo "	{\n";
-		echo "		frm.activation_date.value = activateDate;\n";
-		echo "		frm.expiration_date.value = expirationDate;\n";
-		echo "	}\n";
-		echo "function validate(form)";
-		echo "	{";
-
-		echo "		var fieldCount = 0;";
-		echo "		var requiredFields=true;";
-		echo "		var errorMsg='The following fields are required: ';";
-
-		echo "		if (!(form.department.value)) {";
-		echo "			requiredFields=false;";
-		echo "			errorMsg = errorMsg + 'Department';";
-		echo "			fieldCount++;";
-		echo "		}";
-
-		echo "		if (!(form.course_number.value)) {";
-		echo "			requiredFields=false;";
-		echo "			if (fieldCount>0) errorMsg = errorMsg + ', ';";
-		echo "			errorMsg = errorMsg + 'Course Number';";
-		echo "			fieldCount++;";
-		echo "		}";
-
-		echo "		if (!(form.course_name.value)) {";
-		echo "			requiredFields=false;";
-		echo "			if (fieldCount>0) errorMsg = errorMsg + ', ';";
-		echo "			errorMsg = errorMsg + 'Course Name';";
-		echo "			fieldCount++;";
-		echo "		}";
-
-		echo "		var term_choice = false;";
-		echo "		for (counter = 0; counter < form.term.length; counter++)";
-		echo "		{";
-		echo "			if (form.term[counter].checked)";
-		echo "				term_choice = true; ";
-		echo "		}";
-		echo "		if (!term_choice) {";
-		echo "			requiredFields=false;";
-		echo "			if (fieldCount>0) errorMsg = errorMsg + ', ';";
-		echo "			errorMsg = errorMsg + 'Semester';";
-		echo "			fieldCount++;";
-		echo "		}";
-		
-		echo "		if (!(form.selected_instr.value)) {";
-		echo "			requiredFields=false;";
-		echo "			if (fieldCount>0) errorMsg = errorMsg + ', ';";
-		echo "			errorMsg = errorMsg + 'Instructor';";
-		echo "			fieldCount++;";
-		echo "		}";
-
-		echo "		if (!(form.activation_date.value)) {";
-		echo "			requiredFields=false;";
-		echo "			if (fieldCount>0) errorMsg = errorMsg + ', ';";
-		echo "			errorMsg = errorMsg + 'Activation Date';";
-		echo "			fieldCount++;";
-		echo "		}";
-
-		echo "		if (!(form.expiration_date.value)) {";
-		echo "			requiredFields=false;";
-		echo "			if (fieldCount>0) errorMsg = errorMsg + ', ';";
-		echo "			errorMsg = errorMsg + 'Expiration Date';";
-		echo "			fieldCount++;";
-		echo "		}";
-
-		echo "		if (requiredFields) {";
-		echo "			return true;";
-		echo "		} else {";
-		echo "			alert (errorMsg);";
-		echo "			return false;";
-		echo "		}		";
-
-		echo "	}";
-
-		echo "</script>\n";
-
-	    echo "<form action=\"index.php\" method=\"post\" name=\"frmClass\">\n";
-	
-	
-		if (!isset($request['term'])) {
-			$request['term'] = $terms[0]->getTermID();
-			$request['activation_date'] = $terms[0]->getBeginDate();
-			$request['expiration_date'] = $terms[0]->getEndDate();
-		}
-		
-		if (isset($request['course_number']))
-			$course_number = $request['course_number'];
-		else 
-			$course_number = '';
-			
-		if (isset($request['course_name']))
-			$course_name = stripslashes($request['course_name']);
-		else 
-			$course_name = '';
-			
-		if (isset($request['section']))
-			$section = $request['section'];
-		else 
-			$section = '';
-	    
-	    if (is_array($hidden_fields)){
-			$keys = array_keys($hidden_fields);
-			foreach($keys as $key){
-				if (is_array($hidden_fields[$key])){
-					foreach ($hidden_fields[$key] as $field){
-						echo "<input type=\"hidden\" name=\"".$key."[]\" value=\"". $field ."\">\n";
-					}
-				} else {
-					echo "<input type=\"hidden\" name=\"$key\" value=\"". $hidden_fields[$key] ."\">\n";
-				}
-			}
-		}
-
-		echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "	<tr><td width=\"100%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
-		echo "	<tr>\n";
-		echo "		<td>\n";
-		echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
-		echo "				<tr align=\"left\" valign=\"top\"><td class=\"headingCell1\" align=\"center\">CLASS DETAILS</td><td>&nbsp;</td></tr>\n";
-
-		/*
-		<!--The \"Show All Editable Item\" Links appears by default when this
-		page is loaded if some of the metadata fields for the document are blank.
-		Blank fields will be hidden upon page load. -->
-		*/
-
-
-		echo "			</table>\n";
-		echo "		</td>\n";
-		echo "	</tr>\n";
-		echo "	<tr>\n";
-		echo "		<td align=\"left\" valign=\"top\" class=\"borders\">\n";
-		echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
-		echo "				<tr valign=\"middle\">\n";
-		echo "					<td width=\"35%\" height=\"30\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\" class=\"strong\">Department:</td>\n";
-		echo "						<td align=\"left\">\n";
-		echo "							<select name=\"department\">\n";
-		echo "								<option value=''>-- Select a Department --</option>\n";
-			foreach ($departments as $dept) { 
-        		($dept[0] == $request['department']) ? $dept_selected = "selected" : $dept_selected = "";
-        		echo "<option $dept_selected value=\"". $dept[0] ."\">". $dept[1] ." " . $dept[2] ."</option>\n"; 
-        	}
-		echo "							</select>\n";
-		echo "						</td>\n";
-		echo "				</tr>\n";
-
-		echo "				<tr valign=\"middle\">\n";
-		echo "					<td width=\"35%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\" class=\"strong\">Course Number</td>\n";
-		echo "					<td align=\"left\"><input name=\"course_number\" value=\"$course_number\" type=\"text\" size=\"5\"></td>\n";
-		echo "				</tr>\n";
-
-		echo "				<tr valign=\"middle\">\n";
-		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\" class=\"strong\">Section:</td>\n";
-		echo "					<td align=\"left\"><input name=\"section\" value=\"$section\" type=\"text\" size=\"4\"></td>\n";
-		echo "				</tr>\n";
-
-		echo "				<tr valign=\"middle\">\n";
-		echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\" class=\"strong\">Course Name:</td>\n";
-		echo "					<td align=\"left\"><input name=\"course_name\" value=\"$course_name\" type=\"text\" size=\"50\"></td>\n";
-		echo "				</tr>\n";
-
-		echo "				<tr valign=\"middle\">\n";
-		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">Semester:</td>\n";
-		echo "					<td><table><tr>\n";
-
-		foreach($terms as $t)
-		{
-			($t->getTermID() == $request['term']) ? $term_checked = "checked" : $term_checked = "";
-			echo "								<td>\n";
-			echo "									<input type=\"radio\" name=\"term\" $term_checked value=\"". $t->getTermID() ."\" onClick=\"activateDates(this.form, '". $t->getBeginDate() ."','". $t->getEndDate() ."');\">". $t->getTerm() ."\n";
-			echo "								</td>\n";
-		}	
-		
-		echo "					</tr></table></td>";
-		echo "				</tr>\n";
-
-		if ($u->getRole() >= $g_permission['staff'])
-		{
-			echo "				<tr valign=\"middle\">\n";
-			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\" class=\"strong\">Instructor:</td>\n";
-			echo "					<td align=\"left\">\n";
-
+		//show term selection
+		self::displayTermSelect($term, $show_dates);
+?>
+			    			</td>
+			    		</tr>
+			    		<tr>
+			    			<td width="30%" bgcolor="#CCCCCC" align="right" class="strong">
+			    				Enrollment:
+			    			</td>
+			    			<td>
+			    				<?php self::displayEnrollmentSelect($enrollment); ?>
+			    			</td>
+			    		</tr>
+<?php	if($u->getRole() >= $g_permission['staff']): //show instructor lookup for staff ?>
+			    		<tr>
+			    			<td width="30%" bgcolor="#CCCCCC" align="right" class="strong">
+			    				Instructor:
+			    			</td>
+			    			<td>
+<?php
 			//ajax lookup
 			$mgr = new ajaxManager('lookupUser', null, null, null, null, false, array('min_user_role'=>3, 'field_id'=>'selected_instr'));
 			$mgr->display();
-			
-			echo "					</td>\n";
-			echo "				</tr>\n";
-
-			echo "				<tr valign=\"middle\">\n";
-			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\" class=\"strong\">Activation Date: (yyyy-mm-dd)</td>\n";
 ?>
+			    			</td>
+			    		</tr>
+<?php	 else:	//add instructor as hidden field ?>
 
-	<td><input type="text" id="activation_date" name="activation_date" size="10" maxlength="10" value="<?=$request['activation_date']?>" /> <?=$calendar->getWidgetAndTrigger('activation_date', $request['activation_date'])?></td>
+						<input type="hidden" id="selected_instr" name="selected_instr" value="<?=$u->getUserID()?>" />
 
+<?php	endif; ?>
+			    	</table>
+			    </td>
+			</tr>
+		</table>
+		<p />
+		<div style="text-align:center;"><input type="submit" name="Submit" value="Create Course" onClick="this.form.cmd.value='<?=$next_cmd?>';javascript:return validate(document.forms.frmClass);"></div>
 <?php
-			echo "				</tr>\n";
-
-			echo "				<tr valign=\"middle\">\n";
-			echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\" class=\"strong\">Expiration Date: (yyyy-mm-dd)</td>\n";	
-?>
-
-	<td><input type="text" id="expiration_date" name="expiration_date" size="10" maxlength="10" value="<?=$request['expiration_date']?>" /> <?=$calendar->getWidgetAndTrigger('expiration_date', $request['expiration_date'])?></td>
-
-<?php
-			echo "				</tr>\n";
-		} else { 
-			echo "			<input type=\"hidden\" name=\"selected_instr\" value=\"". $u->getUserID() . "\">\n";
-			echo "			<input type=\"hidden\" name=\"activation_date\" value=\"". $terms[0]->getBeginDate() ."\">\n";
-			echo "			<input type=\"hidden\" name=\"expiration_date\" value=\"". $terms[0]->getEndDate() ."\">\n";
-		}
-
-		echo "				<input type=\"hidden\" name=\"enrollment\" value=\"public\">\n";
-		//echo "				<tr valign=\"middle\">\n";
-		//echo "					<td align=\"right\" valign=\"middle\" bgcolor=\"#CCCCCC\" class=\"strong\">Enrollment:</td>\n";
-		//echo "					<td align=\"left\"><input type=\"radio\" name=\"enrollment\" value=\"public\"><font color=\"#009900\"><strong>PUBLIC</strong></font></td>\n";
-		//echo "					<td><input type=\"radio\" name=\"enrollment\" value=\"private\"><font color=\"#CC0000\"><strong>MODERATED</strong></font></td>\n";
-		//echo "				</tr>\n";
-
-		echo "			</table>\n";
-		echo "		</td>\n";
-		echo "	</tr>\n";
-		echo "	<tr><td align=\"center\"><input type=\"submit\" name=\"Submit\" value=\"Create Course\" onClick=\"this.form.cmd.value='".$next_cmd."';javascript:return validate(document.forms.frmClass);\"></td></tr>\n";
-		echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
-		echo "</table>\n";
-		echo "</form>\n";
-
 	}
 
-	/**
-	 * @return void
-	 * @param int $courseInstances
-	 * @desc Displays the Users Active Classes this is the first screen of the addReserve
-	 * 		expected next steps
-	 *			addReserve::displaySearchItemMenu
-	 *			manageClasses::createClass
-	 *			manageClasses::reactivateClass
-	*/
-	function displaySelectClasses($courseInstances)
-	{
-		echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "	<tbody>\n";
-		echo "		<tr><td width=\"100%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
-
-		if (is_array($courseInstances) && !empty($courseInstances))
-		{
-
-			echo "      <tr>\n";
-	        echo "          <td height=\"14\"><table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
-	        echo "              <tr align=\"left\" valign=\"top\">\n";
-	        echo "                <td height=\"14\" class=\"headingCell1\"><div align=\"center\">YOUR CLASSES</div>\n";
-	        echo "                </td>\n";
-	        echo "                <td width=\"75%\"><div align=\"center\"><font color=\"#CC0000\">Click on a class name to add reserves.</font></div></td>\n";
-	        echo "              </tr>\n";
-	        echo "            </table>\n";
-	        echo "          </td>\n";
-	        echo "		</tr>\n";
-
-	        echo "		<tr>\n";
-	        echo "			<td align=\"left\" valign=\"top\" class=\"borders\">\n";
-	        echo "				<table width=\"100%\" border=\"0\" cellpadding=\"5\" cellspacing=\"0\" class=\"displayList\">\n";
-
-	        $i=0;
-			foreach($courseInstances as $ci)
-			{
-				$rowClass = "oddRow";
-				if ($i++ % 2) $rowClass = "evenRow";
-				echo "				<tr align=\"left\" valign=\"middle\" class=\"$rowClass\">\n";
-				echo "					<td width=\"15%\">" . $ci->course->displayCourseNo() ."</td>\n";
-				echo "					<td width=\"40%\"><a href=\"index.php?cmd=displaySearchItemMenu&ci=" . $ci->getCourseInstanceID() . "\">" . $ci->course->getName() . "</a></td>\n";
-				echo "					<td width=\"10%\">" . $ci->getStatus() . "</td>\n";
-				echo "					<td width=\"15%\" NOWRAP>" . $ci->displayTerm() . "</td>\n";
-				echo "					<td width=\"25%\" NOWRAP>" . $ci->getActivationDate() . " - " . $ci->getExpirationDate() . "</td>\n";
-				echo "				</tr>\n";
-			}
-				echo "			</table>\n";
-				echo "		</td>\n";
-				echo "	</tr>\n";
-
-				echo "	<tr><td colspan=\'4\">&nbsp;</td></tr>\n";
-				echo "	<tr>\n";
-				echo "		<td align=\"left\" valign=\"top\">\n";
-				echo "			<p>\n";
-				echo "				<strong>Don't see the class you're looking for?</strong><br>\n";
-				echo "				&gt;&gt;<a href=\"index.php?cmd=reactivateClass\">Reactivate an old class</a><br>\n";
-				echo "				&gt;&gt;<a href=\"index.php?cmd=createClass\"> Create a new class</a>\n";
-				echo "			</p>\n";
-				echo "		</td>\n";
-				echo "	</tr>\n";
-
-		} else {
-			echo "		<tr><td>You have no associated classes.  Please select the Manage Classes tab.</td></tr>\n";
-		}
-
-		echo "		<tr><td align=\"left\" valign=\"top\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
-		echo "	</tbody>\n";
-		echo "</table>\n";
-	}
-
-	function displaySelectInstructor($user)
-	{
-		$user->selectUserForAdmin('instructor', 'selectClass');
-	}
 	
 	function displaySearchForClass($deptList, $request)
 	{
@@ -1946,62 +1220,6 @@ class classDisplayer extends baseDisplayer {
 	}
 
 
-	function old_displayClassEnrollment ($cmd, $u, $request)
-	{
-
-		switch ($cmd) {
-			case 'viewEnrollment':
-				echo "<form action=\"index.php\" method=\"POST\">\n";
-				echo "<input type=\"hidden\" name=\"cmd\" value=\"$cmd\">\n";
-
-				$tableHeading="VIEW STUDENT ENROLLMENT FOR:";
-				$selectClassMgr = new lookupManager($tableHeading, 'lookupClass', $u, $request);
-				$selectClassMgr->display();
-				if (isset($_REQUEST['ci']) && $_REQUEST['ci'] && $_REQUEST['ci'] != null)
-				{
-					echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-
-        			echo '<tr><td>&nbsp;</td></tr>';
-					echo "	<tr><td valign=\"top\" align=\"center\"><input type=\"submit\" name=\"performAction\" value=\"View Enrollment\" onClick=\"this.form.cmd.value='processViewEnrollment';\"></td></tr>\n";
-				}
-				else {
-					echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-					echo "	<tr><td valign=\"top\" align=\"center\"><input type=\"submit\" name=\"performAction\" value=\"View Enrollment\" DISABLED></td></tr>\n";
-				}
-				echo "	<tr><td align=\"left\" valign=\"top\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
-				echo "</table>\n";
-				echo "</form>\n";
-
-			break;
-
-			case 'processViewEnrollment':
-				$ci=new courseInstance($_REQUEST['ci']);
-				$ci->getStudents();
-				echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-				echo '<tr><td width="100%"><img src="images/spacer.gif" width="1" height="5"></td></tr>';
-				echo '<tr>';
-				echo 	'<td align="left" valign="top" class="helperText">'.count($ci->students).' Total Enrolled Students<br><br>';
-
-				for ($i=0; $i<count($ci->students); $i++)
-				{
-					echo '<span class="strong">'.$ci->students[$i]->getName().'</span>';
-					echo '<br>';
-				}
-
-
-
-				echo 	'</td>';
-        		echo '</tr>';
-        		echo '<tr><td align="left" valign="top">&nbsp;</td></tr>';
-        		echo '<tr><td>&gt;&gt;<a href="index.php?cmd=manageClasses">Return to &quot;Manage Classes&quot; home</a></td></tr>';
-        		echo '<tr><td align="left" valign="top">&nbsp;</td></tr>';
-				echo "</table>\n";
-			break;
-
-		}
-
-	}
-
 	function displayDeleteClass ($cmd, $u, $request) {
 		//display selectClass
 		$mgr = new ajaxManager('lookupClass', 'confirmDeleteClass', 'manageClasses', 'Delete Class');
@@ -2186,10 +1404,23 @@ class classDisplayer extends baseDisplayer {
 	}
 	
 	
-	function displayDuplicateCourses($user, $dupes, $prev_state, $instr_id=null) {
-		global $g_permission;
-		$msg_clash = $msg_reactivate = '';
-		$rowClass = '';
+	function displayDuplicateCourse(&$ci, $prev_state=null) {
+		global $u, $g_permission;
+			
+		$ci->getPrimaryCourse();	//pull in course object
+		$ci->getInstructors();	//pull in instructor info
+		
+		//link course name/num to editClass, if viewed by instructor
+		if($u->getRole() >= $g_permission['staff']) {
+			$course_num = '<a href="index.php?cmd=editClass&ci='.$ci->getCourseInstanceID().'">'.$ci->course->displayCourseNo().'</a>';
+			$course_name = '<a href="index.php?cmd=editClass&ci='.$ci->getCourseInstanceID().'">'.$ci->course->getName().'</a>';
+		}
+		else {
+			$course_num = $ci->course->displayCourseNo();
+			$course_name = $ci->course->getName();
+		}
+		
+		//begin display
 		
 		//make a form with hidden items and a button to return to previous screen
 		if(!empty($prev_state)):
@@ -2202,29 +1433,19 @@ class classDisplayer extends baseDisplayer {
 		</div>
 <?php
 		endif;
-		
-		//output tables
-		
-		if(!empty($dupes[0])):
-			$msg_clash = 'The course you are attempting to create/reactive is already active for this term!  Please double-check the department, course number, section, and term of your course.  If you believe this to be an error, or need further assistance, please contact your Reserves staff.';
-			
-			if($user->getRole() >= $g_permission['staff']) {
-				$msg_clash .= ' If you are trying to copy a class to a "new class", please copy "to existing" instead.';
-			}
-			
-			//link course name/num to editClass, if viewed by instructor
-			if($user->getRole() >= $g_permission['staff']) {
-				$course_num = '<a href="index.php?cmd=editClass&ci='.$dupes[0]->getCourseInstanceID().'">'.$dupes[0]->course->displayCourseNo().'</a>';
-				$course_name = '<a href="index.php?cmd=editClass&ci='.$dupes[0]->getCourseInstanceID().'">'.$dupes[0]->course->getName().'</a>';
-			}
-			else {
-				$course_num = $dupes[0]->course->displayCourseNo();
-				$course_name = $dupes[0]->course->getName();
-			}
 ?>	
 		<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
 			<tr><td width="100%"><img src="images/spacer.gif" width="1" height="5"></td></tr>
-			<tr><td class="failedText"><?=$msg_clash?></td></tr>
+			<tr>
+				<td class="failedText">
+					The course you are attempting to create is already active for this term!  Please double-check the department, course number, section, and term of your course.  If you believe this to be an error, or need further assistance, please contact your Reserves staff. 
+
+<?php	if($u->getRole() >= $g_permission['staff']):	//display additional message to staff ?>
+If you are trying to copy a class to a "new class", please copy "to existing" instead.
+<?php	endif; ?>
+					
+				</td>
+			</tr>
 			<tr><td>&nbsp;</td></tr>
 			<tr>
 				<td align="left" valign="top" class="borders">
@@ -2235,9 +1456,9 @@ class classDisplayer extends baseDisplayer {
 						<tr align="left" valign="middle" class="oddRow">
 							<td width="15%" align="center"><?=$course_num?></td>
 							<td><?=$course_name?></td>
-							<td width="20%" align="center"><?=$dupes[0]->displayInstructorList()?></td>
-							<td width="15%" align="center"><?=$dupes[0]->displayTerm()?></td>
-							<td width="10%" align="center"><a href="javascript:openWindow('no_control&cmd=previewReservesList&ci=<?=$dupes[0]->getCourseInstanceID()?>','width=800,height=600');">preview</a></td>
+							<td width="20%" align="center"><?=$ci->displayInstructorList()?></td>
+							<td width="15%" align="center"><?=$ci->displayTerm()?></td>
+							<td width="10%" align="center"><a href="javascript:openWindow('no_control&cmd=previewReservesList&ci=<?=$ci->getCourseInstanceID()?>','width=800,height=600');">preview</a></td>
 						</tr>
 					</table>
 				</td>
@@ -2245,90 +1466,6 @@ class classDisplayer extends baseDisplayer {
 			<tr><td align="left" valign="top">&nbsp;</td></tr>
 		</table>
 		<p />
-<?php
-			//do not show reactivatable items
-			return;
-		endif;
-		
-		//now handle reactivatable courses
-				
-		//customize output based on user role
-		if($user->getRole() >= $g_permission['staff']) {	//if staff, show courses for _all_ instructors, link to editClass
-			//merge the 2 arrays
-			$dupes_reac = array_merge($dupes[1], $dupes[2]);
-			//message
-			$msg_reactivate = 'A match exists for the course you are trying to create. You can <u>reactivate</u> one of the matching courses below, or create a new course.';
-		}
-		else {
-			$dupes_reac = $dupes[1];
-			$msg_reactivate = 'It appears that you have previously taught the course you are trying to create.  You can <u>reactivate</u> one of the matching courses below, or create a new course. If you need further assistance, please contact your Reserves staff.';
-		}
-		
-		//if there are dupes, display table
-		if(!empty($dupes_reac)):
-?>
-		<div>
-			<span class="failedText"><?=$msg_reactivate?></span>
-			<p />		
-			<table width="100%" border="0" align="center" cellpadding="5" cellspacing="0" class="displayList borders">
-				<tr align="left" valign="middle" bgcolor="#CCCCCC" class="headingCell1">
-					<td>Course Number</td><td align="left">Course Name</td>
-							
-<?php		if($user->getRole() >= $g_permission['staff']):	//show instructor ?>
-					<td align="left">Instructor</td>
-<?php		endif; ?>
-							
-					<td>Last Active</td><td>Reserve List</td><td>Reactivate</td>
-				</tr>
-<?php
-				foreach($dupes_reac as $dupe):
-					$rowClass = ($rowClass=='oddRow') ? 'evenRow' : 'oddRow';				
-					
-					//create links to reactivate screen					
-					$reactivate_url = 'index.php?cmd=reactivateConfirm&amp;ci='.$dupe->getCourseInstanceID();	//build the URL
-					//mark those courses where the instructor matches
-					$mark = (($user->getRole() >= $g_permission['staff']) && in_array($instr_id, $dupe->instructorIDs)) ? ' *' : '';
-?>
-				<tr align="left" valign="middle" class="<?=$rowClass?>">
-					<td width="15%" align="center"><?=$dupe->course->displayCourseNo()?></td>
-					<td><?=$dupe->course->getName()?></td>
-							
-<?php				if($user->getRole() >= $g_permission['staff']):	//show instructor ?>
-						<td width="20%"><?=$dupe->displayInstructorList()?></td>
-<?php				endif; ?>
-
-					<td width="10%" align="center" nowrap="nowrap"><?=$dupe->displayTerm()?></td>
-					<td width="10%" align="center" nowrap="nowrap"><a href="javascript:openWindow('no_control&cmd=previewReservesList&ci=<?=$dupe->getCourseInstanceID()?>','width=800,height=600');">preview</a></td>
-					<td width="10%" align="center" nowrap="nowrap"><a href="<?=$reactivate_url?>">Reactivate<?=$mark?></a></td>
-				</tr>
-<?php
-				endforeach;
-?>
-			</table>
-			<br />
-					
-<?php			if($user->getRole() >= $g_permission['staff']):	//show mark note ?>
-			<strong>*</strong> Selected instructor match
-<?php			endif; ?>
-		</div>
-<?php
-		endif; //if empty dupe array
-		
-		//override button		
-	
-		//show a button to confirm creation of new course (if do not wish to reactivate) -- pass on all the necessary info
-		//pass some necessary info
-		$info = $_REQUEST;
-		$info['cmd'] = 'createNewClass';
-		$info['confirm_new'] = 'true';
-?>		
-		<p />	
-		<div style="width:100%; margin:auto;">
-			<form action="index.php" method="post" name="confirm_new">	
-				<?php self::displayHiddenFields($info); ?>					
-				<input type="submit" name="confirm" value="Create New Course" />
-			</form>
-		</div>
 <?php
 	}
 }

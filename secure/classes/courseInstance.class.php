@@ -67,27 +67,61 @@ class courseInstance
 
 	}
 
-	function createCourseInstance()
-	{
+	/**
+	 * @return boolean
+	 * @param int $dept_id Department ID
+	 * @param string $course_number Course number
+	 * @param string $course_name Course name
+	 * @param string $section Course section
+	 * @param int $year Course year
+	 * @param string $term Course term
+	 * @desc True on success, false if there was a duplicate. MUST check return value, because this method _always_ initializes self to a valid CI (either dupe or new CI)
+	 */
+	function createCourseInstance($dept_id, $course_number, $course_name, $section, $year, $term) {
 		global $g_dbConn;
-
-
-
-		switch ($g_dbConn->phptype)
-		{
+		
+		//first check for a duplicate
+		if($this->getCourseInstanceByMatch($dept_id, $course_number, $section, $year, $term)) {	//there is a dupe
+			return false;
+		}
+	
+		//else, there is no dupe, create the course and course instance
+		
+		//create course instance		
+		switch ($g_dbConn->phptype) {
 			default: //'mysql'
-				$sql  				= "INSERT INTO course_instances () VALUES ()";
-				$sql_inserted_ci 	= "SELECT LAST_INSERT_ID() FROM course_instances";
+				$sql_insert_ci = 'INSERT INTO course_instances () VALUES ()';
+				$sql_last_insert_id = 'SELECT LAST_INSERT_ID() FROM course_instances';
 		}
 
-		$rs = $g_dbConn->query($sql);
+		//insert
+		$rs = $g_dbConn->query($sql_insert_ci);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		//get id
+		$ci_id = $g_dbConn->getOne($sql_last_insert_id);
+		if (DB::isError($ci_id)) { trigger_error($ci_id->getMessage(), E_USER_ERROR); }
+		
+		//set the ID -- needed for setting of the course info
+		$this->courseInstanceID = $ci_id;		
+		
+		//now get or create a course
+		
+		$c  = new course(null);					
+		//see if a matching course exists
+		if($c->getCourseByMatch($dept_id, $course_number, $course_name)) {
+			//course found, reuse it
+			$this->setPrimaryCourse($c->getCourseID(), $section);
+		}
+		else {	//no such course, create new
+			$c->createNewCourse($this->courseInstanceID);
+			$c->setCourseNo($course_number);
+			$c->setDepartmentID($dept_id);
+			$c->setName($course_name);
+			$c->setSection($section);
+			$this->setPrimaryCourseAliasID($c->getCourseAliasID());
+		}
 
-		$rs = $g_dbConn->query($sql_inserted_ci);
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		$row = $rs->fetchRow();
-		$this->courseInstanceID = $row[0];
+		return true;	
 	}
 
 	private function getCourseInstance($courseInstanceID)
@@ -118,6 +152,48 @@ class courseInstance
 			$this->status				= $row[5];
 			$this->enrollment			= $row[6];
 	}
+	
+	
+	/**
+	 * @return boolean
+	 * @param int $dept_id Department ID
+	 * @param string $courseNumber Course number
+	 * @param string $section Course section
+	 * @param int $year Course year
+	 * @param string $term Course term
+	 * @desc Initializes $this to the matching CI and returns TRUE if match found, else returns FALSE
+	 */
+	function getCourseInstanceByMatch($dept_id, $courseNumber, $section, $year, $term) {
+		global $g_dbConn;
+		
+		//select matching course instance ID
+		switch($g_dbConn->phptype) {
+			default: //'mysql'
+				$sql = "SELECT ci.course_instance_id
+						FROM course_instances AS ci
+							JOIN course_aliases AS ca ON ca.course_alias_id = ci.primary_course_alias_id
+							JOIN courses AS c ON c.course_id = ca.course_id
+						WHERE c.department_id = !
+							AND c.course_number = ?
+							AND ca.section = ?
+							AND ci.year = ?
+							AND ci.term = ?";
+		}
+
+		//query
+		$rs = $g_dbConn->query($sql, array($dept_id, $courseNumber, $section, $year, $term));		
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		if($rs->numRows() == 0) {	//no match found
+			return false;
+		}
+		else {
+			$row = $rs->fetchRow();
+			$this->getCourseInstance($row[0]);	//init self to matching CI
+			return true;
+		}
+	}
+	
 
 	function getCrossListings()
 	{
@@ -151,11 +227,18 @@ class courseInstance
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
+				$sql_check_listing = "SELECT course_alias_id FROM course_aliases WHERE course_instance_id = ! AND course_id = ! AND section = ?";
 				$sql_cpy_listing = "INSERT INTO course_aliases (course_instance_id, course_id, section) VALUES (!,!,?)";
 		}
-
-		$rs = $g_dbConn->query($sql_cpy_listing, array($this->courseInstanceID, $courseID, $section));
+		
+		//check to see if the crosslisting -- maybe should just add a DB unique-constraint
+		$rs = $g_dbConn->query($sql_check_listing, array($this->courseInstanceID, $courseID, $section));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		if($rs->numRows() == 0) {	//crosslisting does not exist - add it
+			$rs = $g_dbConn->query($sql_cpy_listing, array($this->courseInstanceID, $courseID, $section));
+			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		}
 
 		$this->getCrossListings();
 	}
@@ -392,7 +475,6 @@ class courseInstance
 				;
 		}
 
-
 		$rs = $g_dbConn->query($sql, array($userID, $this->courseInstanceID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
@@ -560,9 +642,14 @@ class courseInstance
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 
-	function setEnrollment($enrollment)
-	{
+	function setEnrollment($enrollment) {
 		global $g_dbConn;
+		
+		//make sure this is a valid choice
+		$allowed_enrollment = array('OPEN', 'MODERATED', 'CLOSED');
+		if(!in_array($enrollment, $allowed_enrollment)) {
+			$enrollment = 'OPEN';	//if choice is not valid, change to OPEN
+		}
 
 		$this->enrollment = $enrollment;
 		switch ($g_dbConn->phptype)

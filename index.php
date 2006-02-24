@@ -141,17 +141,13 @@ switch ($cmd)
 		require_once("secure/managers/reservesManager.class.php");
 		$mgr = new reservesManager($cmd, $u);
 	break;
-	case 'addReserve':
-
+	
 	case 'deactivateClass':
 	case 'manageClasses':
 	case 'editProxies':
 	case 'editInstructors':
 	case 'editCrossListings':
 	case 'editTitle':
-	case 'reactivateClass':		// manageClass choose class to reactivate
-	case 'reactivateConfirm':	// confirm reactivation name/section
-	case 'reactivateList':
 	case 'editClass':			// manageClass edit class
 	case 'createClass':			// manageClass create class (enter meta-data)
 	case 'reactivate':			// managerClass reactivate class
@@ -235,6 +231,7 @@ switch ($cmd)
 	case 'copyClass':
 	case 'copyClassOptions':
 	case 'copyExisting':
+	case 'importClass':			//import reserves list from one ci to another
 	case 'importClass':			//import reserves list from one ci to another
 	case 'processCopyClass':
 		require_once("secure/managers/copyClassManager.class.php");

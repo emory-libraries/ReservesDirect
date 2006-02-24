@@ -2,7 +2,6 @@
 /*******************************************************************************
 copyClassDisplayer.class.php
 
-
 Created by Dmitriy Panteleyev (dpantel@emory.edu)
 
 This file is part of ReservesDirect
@@ -30,16 +29,239 @@ http://www.reservesdirect.org/
 *******************************************************************************/
 require_once("secure/managers/ajaxManager.class.php");
 
-class copyClassDisplayer {
+class copyClassDisplayer extends baseDisplayer {
 	
 	function displaySelectClass($next_cmd, $msg=null, $hidden_fields=null) {
+		global $u, $g_permission;
+		
 		if(!empty($msg)) {
 			echo '<span class="helperText">'.$msg.'</span><p />';
-		}
+		}				
 		
-		//display selectClass
-		$mgr = new ajaxManager('lookupClass', $next_cmd, 'manageClasses', 'Continue', $hidden_fields);
-		$mgr->display();
+		if($u->getRole() >= $g_permission['staff']) {	//staff - use ajax class lookup
+			//display selectClass
+			$mgr = new ajaxManager('lookupClass', $next_cmd, 'manageClasses', 'Continue', $hidden_fields);
+			$mgr->display();
+		}
+		elseif($u->getRole() == $g_permission['instructor']) {	//instructor class select
+			//get all the course instances
+			$courses = $u->getAllCourseInstances(true);
+			
+			//begin display
+?>
+		<form action="index.php" method="post" name="select_class" id="select_class">
+			<input type="hidden" id="cmd" name="cmd" value="<?=$next_cmd?>" />		
+			<?php self::displayHiddenFields($hidden_fields); ?>
+			
+		<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+			<tr>
+				<td class="headingCell1" width="25%" align="center">CLASS DETAILS</td>
+				<td width="75%" align="center">&nbsp;</td>
+			</tr>
+			<tr>
+		    	<td colspan="2" class="borders">
+			    	<table width="100%" border="0" cellspacing="0" cellpadding="5" class="displayList">
+			    		<tr class="headingCell1" style="text-align:left;">
+			    			<td width="10%" style="text-align:center;">Select</td>
+			    			<td width="20%">Course Number</td>
+							<td>Course Name</td>
+							<td width="15%">Last Active</td>
+							<td width="10%" style="text-align:center;">Reserve List</td>							
+			    		</tr>
+			
+<?php		
+			$rowClass = 'evenRow';
+			//loop through the courses
+			foreach($courses as $ci):
+				$ci->getPrimaryCourse();	//fetch the course object
+				$rowClass = ($rowClass=='evenRow') ? 'oddRow' : 'evenRow';
+?>
+						<tr class="<?=$rowClass?>">
+							<td width="10%" style="text-align:center;"><input type="radio" id="ci" name="ci" value="<?=$ci->getCourseInstanceID()?>" onClick="this.form.submit.disabled=false;" /></td>
+			    			<td width="20%"><?=$ci->course->displayCourseNo()?></td>
+							<td><?=$ci->course->getName()?></td>
+							<td width="10%"><?=$ci->displayTerm()?></td>
+							<td width="10%" style="text-align:center;"><a href="javascript:openWindow('no_control=1&cmd=previewReservesList&ci=<?=$ci->getCourseInstanceID()?>','width=800,height=600');">preview</a></td>
+						</tr>   
+
+<?php		endforeach;	?>
+
+					</table>
+				</td>
+			</tr>
+		</table>
+		<p />		
+		<input type="submit" name="submit" value="Continue" disabled="disabled">
+		
+		</form>
+<?php
+		}
+	}
+	
+	function displayImportClassOptions(&$src_ci, &$tree_walker, $dst_ci_id, $next_cmd, $hidden_fields=null) {
+		global $u, $g_permission;
+		//pull in some needed info
+		$src_ci->getInstructors();				
+		$src_ci->getCrossListings();
+		$src_ci->getPrimaryCourse();
+		$src_ci->course->getDepartment();
+		$loan_periods = $src_ci->course->department->getInstructorLoanPeriods();
+		
+		//handle instructors and crosslistings lists
+		
+		//instructors - if there is only one instructor and s/he is performing the import, then hide instructors option
+		$instructors = $src_ci->instructorList;
+		if((sizeof($instructors)==1) && ($u->getUserID()==$instructors[0]->getUserID())) {
+			$instructors = null;
+		}
+		//hide crosslistings option if there are none
+		$crosslistings = !empty($src_ci->crossListings) ? $src_ci->crossListings : null;
+		
+		//begin display
+?>
+		<script language="javascript">
+		//<!--
+			function checkAll2(form, theState)
+			{
+				for (var i=0; i < form.elements.length; i++) {
+					if (form.elements[i].type == 'checkbox' && form.elements[i].name == 'selected_reserves[]') {
+						form.elements[i].checked = theState;
+					}
+				}
+			}
+		//-->
+		</script>
+		
+		<form action="index.php" method="post" name="reservesListForm">
+			<input type="hidden" name="importClass" value="importClass" />
+			<input type="hidden" name="cmd" value="<?=$next_cmd?>" />
+			<input type="hidden" name="ci" value="<?=$dst_ci_id?>" />
+			<input type="hidden" name="sourceClass" value="<?=$src_ci->getCourseInstanceID()?>" />
+			<?php self::displayHiddenFields($hidden_fields); ?>
+			
+			<div>
+			
+<?php	if(!empty($instructors) && !empty($crosslistings)): ?>
+				<div class="headingCell1" style="width:33%;">Import Options</div>
+				<div class="borders" style="background-color:#CCCCCC;" style="padding:10px;">
+<?php		if(!empty($instructors)): ?>
+					<div style="width:45%; float:left;">
+						<input type="checkbox" name="copyInstructors" value="checkbox" '.$instructors_checked.'>&nbsp;<strong>Copy Instructors</strong>
+						<ul>
+<?php			
+				foreach($instructors as $instr):
+					if($u->getUserID()==$instr->getUserID()) {
+						continue;	//skip the instructor doing the importing
+					}
+?>
+							<li><?=$instr->getName();?></li>
+<?php			endforeach; ?>
+						</ul>							
+					</div>
+<?php		
+			endif;
+			if(!empty($crosslistings)):
+?>
+					<div style="width:45%; float:left;">							
+						<input type="checkbox" name="copyCrossListings" value="checkbox" '.$crossListings_checked.'>&nbsp;<strong>Copy Crosslistings</strong>
+						<ul>
+<?php			foreach($crosslistings as $xlisting): ?>
+							<li><?=$xlisting->displayCourseNo()?> &mdash; <?=$xlisting->getName()?></li>
+<?php			endforeach; ?>
+						</ul>
+					</div>
+<?php		endif; ?>
+					<!-- hack to clear floats -->
+					<div style="clear:both;"></div>
+					<!-- end hack -->
+				</div>
+				<br />
+				<br />
+<?php	endif; ?>
+
+				<div style="float:right; text-align:right;"><a href="javascript:checkAll2(document.forms.reservesListForm, 1)">check all</a> | <a href="javascript:checkAll2(document.forms.reservesListForm, 0)">uncheck all</a></div>
+				<div class="headingCell1" style="width:33%;">Reserves List</div>
+					<ul style="list-style:none; padding-left:0px; margin:0px;">
+<?php
+		//begin displaying individual reserves
+		//loop
+		$prev_depth = 0;
+		$rowStyle = '';
+		foreach($tree_walker as $leaf) {
+			//close list tags if backing out of a sublist
+			if($prev_depth > $tree_walker->getDepth()) {
+				echo str_repeat('</ol></li>', ($prev_depth-$tree_walker->getDepth()));
+			}
+			
+		
+			$reserve = new reserve($leaf->getID());	//init a reserve object
+			$reserve->getItem();
+			
+			//set some additional info
+			
+			$reserve->selected = true;	//select all reserves by default
+			$reserve->additional_info = '';
+			
+			if($reserve->item->isPhysicalItem() && !is_null($loan_periods)) {
+				$reserve->additional_info .= '<br /><span class="itemMetaPre">Requested Loan Period:</span>';
+				$reserve->additional_info .= '<select name="requestedLoanPeriod['.$reserve->getReserveID().']">';
+				foreach($loan_periods as $loan_period) {
+					$selected = ($loan_period['default'] == 'true') ? 'selected="selected"' : '';
+					$reserve->additional_info .= '<option value="'.$loan_period['loan_period'].'" '.$selected.'>'.$loan_period['loan_period'].'</option>';
+				}
+				$reserve->additional_info .= '</select>';
+			}
+						
+			$rowStyle = ($rowStyle=='oddRow') ? 'evenRow' : 'oddRow';	//set the style
+
+			//display the info
+			echo '<li>';
+			if($reserve->item->isPhysicalItem() && $reserve->item->isPersonalCopy()):	//if physical personal item
+				$reserve->additional_info = '<br /><span class="failedText">Personal items cannot be imported. Please contact your reserves desk for assistance.</span>';
+?>
+				<div class="<?=$rowStyle?>">
+					<?php self::displayReserveInfo($reserve, 'class="metaBlock-wide"'); ?>
+					<!-- hack to clear floats -->
+					<div style="clear:both;"></div>
+					<!-- end hack -->
+				</div>			
+<?php
+			else:
+				if($reserve->item->isHeading()) {
+					$rowStyle ='headingCell2'; 
+				}
+?>
+				<div class="<?=$rowStyle?>">
+					<div class="checkBox-right">
+						<input type="checkbox" checked="true" name="selected_reserves[]" value="<?=$reserve->getReserveID()?>" />
+					</div>
+					<?php self::displayReserveInfo($reserve, 'class="metaBlock-wide"'); ?>
+					<!-- hack to clear floats -->
+					<div style="clear:both;"></div>
+					<!-- end hack -->
+				</div>			
+<?php
+			endif;
+			
+			//start sublist or close list-item?
+			echo ($leaf->hasChildren()) ? '<ul style="list-style:none;">' : '</li>';
+			
+			$prev_depth = $tree_walker->getDepth();
+		}
+		echo str_repeat('</ul></li>', ($prev_depth));	//close all lists
+?>
+					</ul>
+				</div>
+			</div>
+			<p />
+			<div style="text-align:center;">
+				<input type="submit" name="Submit" value="Import Class">
+				<br />
+				<small>Note: Please be patient, large classes may take several minutes to process.</small>				
+			</div>
+		</form>
+					
+<?php
 	}
 	
 	function displayCopyClassOptions(&$sourceClass) {
@@ -86,43 +308,24 @@ class copyClassDisplayer {
 <?php
 	}
 	
-	function displayCopySuccess ($sourceClass, $targetClass, $copyStatus) {
+	function displayCopySuccess (&$sourceClass, &$targetClass, $copyStatus, $imported=false) {
+		$copied_text = $imported ? 'imported into' : 'copied to'; 
 ?>
-
-		<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
-		<tr><td width="100%"><img src="images/spacer.gif" width="1" height="5"></td></tr>
-
-		<tr>
-		 	<td align="left" valign="top">
-         	  <p>
-         		<span class="strong">
-         			<?=$sourceClass->course->displayCourseNo()?> -- <?=$sourceClass->course->getName()?> (<?=$sourceClass->displayTerm()?>)
-         		</span>
-         		<span class="helperText"> has been copied to </span>
-         		<span class="strong">
-         			<?=$targetClass->course->displayCourseNo()?> -- <?=$targetClass->course->getName()?> (<?=$targetClass->displayTerm()?>)
-         		</span>
-         	  </p>
-         		<ul>
-<?php
-        for ($i=0; $i<count($copyStatus); $i++)
-        {
-        	echo 		'<li class="successText">'.$copyStatus[$i].'</li>';
-
-        }
-?>
-        		</ul>
-        	  <p>
-        		&gt;&gt;<a href="index.php?cmd=editClass&ci=<?=$targetClass->getCourseInstanceID()?>">Go to target class</a><br>
-        		&gt;&gt;<a href="index.php?cmd=copyClass">Copy another class</a><br>
-        		&gt;&gt;<a href="index.php?cmd=manageClasses">Return to &quot;Manage Classes&quot; home</a><br>
-        	  </p>
-        	</td>
-        </tr>
-
-        <tr><td align="left" valign="top">&nbsp;</td></tr>
-		</table>
-<?php
+		<div class="borders" style="text-align: center;">
+			<span class="strong"><?=$sourceClass->course->displayCourseNo()?> -- <?=$sourceClass->course->getName()?> (<?=$sourceClass->displayTerm()?>)</span> <span class="helperText"> has been <?=$copied_text?></span> <span class="strong"><?=$targetClass->course->displayCourseNo()?> -- <?=$targetClass->course->getName()?> (<?=$targetClass->displayTerm()?>)</span>
+			<p />
+			<ul>
+<?php	foreach($copyStatus as $msg): ?>
+				<li class="successText"><?=$msg?></li>
+<?php	endforeach; ?>
+			</ul>
+			<p />
+			<ul>
+				<li><a href="index.php?cmd=editClass&ci=<?=$targetClass->getCourseInstanceID()?>">Go to target class</a></li>
+<?php	if(!$imported): ?>
+				<li><a href="index.php?cmd=copyClass">Copy another class</a></li>
+				<li><a href="index.php?cmd=manageClasses">Return to &quot;Manage Classes&quot; home</a></li>
+<?php	endif;
 
 	}
 

@@ -2,7 +2,6 @@
 /*******************************************************************************
 copyClassManager.class.php
 
-
 Created by Dmitriy Panteleyev (dpantel@emory.edu)
 
 This file is part of ReservesDirect
@@ -45,14 +44,30 @@ class copyClassManager extends baseManager {
 		global $g_permission, $page, $loc;
 
 		$this->displayClass = "copyClassDisplayer";
+		$page = 'manageClasses';
 
 		switch ($cmd)
 		{
+			case 'importClass':			
+				if(!empty($_REQUEST['dst_ci']) && !empty($_REQUEST['ci'])) { //display import options
+					//get the source ci
+					$ci = new courseInstance($_REQUEST['ci']);
+					//get reserves as a tree + recursive iterator
+					$walker = $ci->getReservesAsTreeWalker('getReserves');
+					
+					$loc = 'import class >> import details';
+					$this->displayFunction = 'displayImportClassOptions';
+					$this->argList = array($ci, $walker, $_REQUEST['dst_ci'], 'processCopyClass');
+				}
+				elseif(empty($_REQUEST['ci'])) {	//need source class 
+					$loc = 'import class >> select source class';
+					$this->displayFunction = 'displaySelectClass';
+					$this->argList = array('importClass', 'Select course to import FROM:', array('dst_ci'=>$_REQUEST['dst_ci']));
+				}				
+			break;
 
 			case 'copyClass':
-				$page = 'manageClasses';
-				$loc  = "copy course reserves list >> select source class";
-				
+				$loc  = "copy course reserves list >> select source class";				
 				$this->displayFunction = 'displaySelectClass';
 				$this->argList = array('copyClassOptions', 'Select class to copy FROM:');
 			break;
@@ -62,15 +77,12 @@ class copyClassManager extends baseManager {
 				$sourceClass->getPrimaryCourse();
 				$sourceClass->getInstructors();
 
-				$page = 'manageClasses';
-				$loc  = "copy course reserves list >> copy options";
-				
+				$loc  = "copy course reserves list >> copy options";				
 				$this->displayFunction = 'displayCopyClassOptions';
 				$this->argList = array($sourceClass);				
 			break;
 
 			case 'copyExisting':
-				$page = 'manageClasses';
 				$loc = 'copy course reserves list >> select destination class';
 				
 				//propogate the info
@@ -88,7 +100,6 @@ class copyClassManager extends baseManager {
 			break;
 
 			case 'copyNew':
-				$page = 'manageClasses';
 				$loc = 'copy course reserves list >> create destination class';
 				
 				$dept = new department();
@@ -108,61 +119,39 @@ class copyClassManager extends baseManager {
 
 				$this->displayClass = 'classDisplayer';
 				$this->displayFunction = 'displayCreateClass';
-				$this->argList = array($dept->getAllDepartments(), $terms->getTerms(), 'processCopyClass', $_REQUEST, $needed_info);
+				$this->argList = array('processCopyClass', $needed_info);
 			break;
 
 			case 'processCopyClass':
-				$page = 'manageClasses';
-				$loc = 'copy course';
+				//determine if we are copying or importing
+				$importing = isset($_REQUEST['importClass']) ? true : false;
 
-				if(isset($request['copyNew']))
-				{
+				if(isset($request['copyNew'])) {
 					$t = new term($request['term']);
-					
-					//first, check to see if resulting class has a duplicate active class
-					//do not care about instructor(s), because we are looking for active course matches, no matter who teaches them
-					require_once("secure/managers/classManager.class.php");
-					$dupes = classManager::getDuplicates($request['department'], $request['course_number'], $request['section'], $t->getTermYear(), $t->getTermName());
-					if(!is_null($dupes[0])) {	//found an active dupe
-						require_once("secure/displayers/classDisplayer.class.php");
-						$this->displayClass = 'classDisplayer';
-						$this->displayFunction = 'displayDuplicateCourses';
-						//leave a trail to return
-						$_REQUEST['cmd'] = 'copyNew';
-						$this->argList = array($user, $dupes, urlencode(serialize($_REQUEST)));
-						//break out of the case if we hit a dupe
-						break;
-					}
-					else {	
-						$c  = new course(null);
-						$ci = new courseInstance(null);
-					
-						$ci->createCourseInstance();
-						
-						//see if the course exists
-						if( !is_null($c->getCourseByMatch($request['department'], $request['course_number'], $request['course_name'])) ) {
-							//course found, reuse it
-							$ci->setPrimaryCourse($c->getCourseID(), $request['section']);
-						}
-						else {	//no such course, create new
-							$c->createNewCourse($ci->getCourseInstanceID());
-							$c->setCourseNo($request['course_number']);
-							$c->setDepartmentID($request['department']);
-							$c->setName($request['course_name']);
-							$c->setSection($request['section']);
-							$ci->setPrimaryCourseAliasID($c->getCourseAliasID());
-						}
-	
+					$ci = new courseInstance(null);
+									
+					//attempt to create the course instance
+					if($ci->createCourseInstance($request['department'], $request['course_number'], $request['course_name'], $request['section'], $t->getTermYear(), $t->getTermName())) {	//course created successfully, insert data
 						$ci->addInstructor($ci->getPrimaryCourseAliasID(), $request['selected_instr']);
 						$ci->setTerm($t->getTermName());
 						$ci->setYear($t->getTermYear());
-						$ci->setActivationDate($request['activation_date']);
-						$ci->setExpirationDate($request['expiration_date']);
+						$ci->setActivationDate(date('Y-m-d', strtotime($request['activation_date'])));
+						$ci->setExpirationDate(date('Y-m-d', strtotime($request['expiration_date'])));
 						$ci->setEnrollment($request['enrollment']);
-						$ci->setStatus('ACTIVE');
-				
-						$request['ci']=$ci->getCourseInstanceID();
-						unset($ci);
+						$ci->setStatus('ACTIVE');	
+						
+						$request['ci']=$ci->getCourseInstanceID();	//this will be picked up as $targetClass after this block
+						unset($ci);						
+					}
+					else {	//could not create course -- the CI must be a duplicate
+						//display duplicate info
+						$this->displayClass = 'classDisplayer';
+						$this->displayFunction = 'displayDuplicateCourse';						
+						$_REQUEST['cmd'] = 'copyNew';	//leave a trail to return back here
+						$this->argList = array($ci, urlencode(serialize($_REQUEST)));
+						
+						//break out of the case if we hit a dupe
+						break;
 					}
 				}
 
@@ -178,9 +167,63 @@ class copyClassManager extends baseManager {
 					$targetClass->getPrimaryCourse();
 				}
 
-				if(isset($request['copyReserves'])) {
-					$sourceClass->copyReserves($targetClass->getCourseInstanceID());
+				//split the difference b/n copying and importing
+				
+				if($importing) {	//importing only
+					//copy reserves
+					$sourceClass->copyReserves($targetClass->getCourseInstanceID(), $_REQUEST['selected_reserves'], $_REQUEST['requestedLoanPeriod']);
 					$copyStatus[]="Reserves List sucessfully copied";
+				}
+				else {	//copying only
+					if(isset($request['copyReserves'])) {
+						$sourceClass->copyReserves($targetClass->getCourseInstanceID());
+						$copyStatus[]="Reserves List sucessfully copied";
+					}
+
+					if (isset($request['copyProxies']))
+					{
+						$sourceClass->getProxies();
+	
+						for ($i=0; $i<count($sourceClass->proxyIDs); $i++)
+						{
+							$targetClass->addProxy($targetClass->getPrimaryCourseAliasID(),$sourceClass->proxyIDs[$i]);
+						}
+	
+						$copyStatus[]="Proxies successfully copied";
+					}
+	
+					if (isset($request['copyEnrollment']) || isset($request['deleteSource']))
+					{
+						$sourceClass->getStudents();
+	
+						for ($i=0; $i<count($sourceClass->students); $i++)
+						{
+							//KAW: Do We want the students to be added to the same crossListing from the original/source class?
+							$sourceClass->students[$i]->attachCourseAlias($targetClass->getPrimaryCourseAliasID());
+						}
+	
+						$copyStatus[]="Enrollment List successfully copied";
+					}
+	
+					if (isset($request['deleteSource']))
+					{
+						$sourceClass->destroy();
+						$copyStatus[]="Source Class successfully deleted";
+					}
+				}
+				
+				//both
+				
+				if (isset($request['copyCrossListings']))
+				{
+					$sourceClass->getCrossListings();
+
+					for ($i=0; $i<count($sourceClass->crossListings); $i++)
+					{
+						$targetClass->addCrossListing($sourceClass->crossListings[$i]->getCourseID(),$sourceClass->crossListings[$i]->getSection());
+					}
+
+					$copyStatus[]="Crosslistings successfully copied";
 				}
 
 				if (isset($request['copyInstructors']))
@@ -200,54 +243,10 @@ class copyClassManager extends baseManager {
 					}
 
 					$copyStatus[]="Instructors successfully copied";
-				}
-
-				if (isset($request['copyCrossListings']))
-				{
-					$sourceClass->getCrossListings();
-
-					for ($i=0; $i<count($sourceClass->crossListings); $i++)
-					{
-						//KAW: Add check for duplicate to the addCrossListing Method in the courseInstance class
-						$targetClass->addCrossListing($sourceClass->crossListings[$i]->getCourseID(),$sourceClass->crossListings[$i]->getSection());
-					}
-
-					$copyStatus[]="Crosslistings successfully copied";
-				}
-
-				if (isset($request['copyProxies']))
-				{
-					$sourceClass->getProxies();
-
-					for ($i=0; $i<count($sourceClass->proxyIDs); $i++)
-					{
-						$targetClass->addProxy($targetClass->getPrimaryCourseAliasID(),$sourceClass->proxyIDs[$i]);
-					}
-
-					$copyStatus[]="Proxies successfully copied";
-				}
-
-				if (isset($request['copyEnrollment']) || isset($request['deleteSource']))
-				{
-					$sourceClass->getStudents();
-
-					for ($i=0; $i<count($sourceClass->students); $i++)
-					{
-						//KAW: Do We want the students to be added to the same crossListing from the original/source class?
-						$sourceClass->students[$i]->attachCourseAlias($targetClass->getPrimaryCourseAliasID());
-					}
-
-					$copyStatus[]="Enrollment List successfully copied";
-				}
-
-				if (isset($request['deleteSource']))
-				{
-					$sourceClass->destroy();
-					$copyStatus[]="Source Class successfully deleted";
-				}
+				}	
 
 				$this->displayFunction = 'displayCopySuccess';
-				$this->argList = array($sourceClass, $targetClass, $copyStatus);
+				$this->argList = array($sourceClass, $targetClass, $copyStatus, $importing);
 
 			break;
 		}
