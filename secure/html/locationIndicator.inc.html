@@ -28,8 +28,7 @@ if (isset($progress) && is_array($progress))
 	echo "</tr>\n";
 }
 
-if ($ci instanceof courseInstance)
-{
+if(($ci instanceof courseInstance) && !empty($ci->getCourseInstanceID())) {
 	if (!$ci->course instanceof course) $ci->getCourseForUser($u->getUserID());
 	if (isset($ci->course)) $currentClass = $ci->course->displayCourseNo() . " " . $ci->course->getName();
 } else {
