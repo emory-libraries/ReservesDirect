@@ -168,11 +168,11 @@ class course
 	}
 
 	/**
-	 * @return course object or null
+	 * @return boolean
 	 * @param int $dept_id Department ID
 	 * @param string $course_number Course number
 	 * @param string $name Course name
-	 * @desc Searches for a match on dept, course number, and name; loads object on success
+	 * @desc Searches for a match on dept, course number, and name; loads object on success and return TRUE, else FALSE
 	 */
 	function getCourseByMatch($dept_id, $course_number, $course_name) {
 		global $g_dbConn;
@@ -188,11 +188,12 @@ class course
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_ERROR); }
 		
 		if($rs->numRows() == 0) {
-			return null;
+			return false;
 		}
 		else {
 			$row = $rs->fetchRow();
-			return $this->getCourseByID($row[0]);
+			$this->getCourseByID($row[0]);
+			return true;
 		}
 	}
 	
