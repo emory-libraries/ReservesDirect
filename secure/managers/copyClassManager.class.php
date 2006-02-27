@@ -156,6 +156,15 @@ class copyClassManager extends baseManager {
 				}
 
 				$copyStatus = array();
+				
+				//make sure that not trying to merge the same course
+				if($sourceClass->getCourseInstanceID() == $targetClass->getCourseInstanceID()) {
+					$copyStatus[] = "Cannot merge a class into itself!";
+					//make sure we do nothing else
+					$this->displayFunction = 'displayCopySuccess';
+					$this->argList = array($sourceClass, $targetClass, $copyStatus, $importing);
+					break;
+				}
 
 				if (isset($request['sourceClass'])) {
 					$sourceClass = new courseInstance($request['sourceClass']);
@@ -204,12 +213,6 @@ class copyClassManager extends baseManager {
 	
 						$copyStatus[]="Enrollment List successfully copied";
 					}
-	
-					if (isset($request['deleteSource']))
-					{
-						$sourceClass->destroy();
-						$copyStatus[]="Source Class successfully deleted";
-					}
 				}
 				
 				//both
@@ -244,6 +247,12 @@ class copyClassManager extends baseManager {
 
 					$copyStatus[]="Instructors successfully copied";
 				}	
+				
+				//delete source?
+				if(!$importing && isset($request['deleteSource'])) {
+					$sourceClass->destroy();
+					$copyStatus[]="Source Class successfully deleted";
+				}
 
 				$this->displayFunction = 'displayCopySuccess';
 				$this->argList = array($sourceClass, $targetClass, $copyStatus, $importing);
