@@ -60,26 +60,6 @@ class reservesManager
 		//$this->user = $user;
 		switch ($cmd)
 		{
-			case 'removeStudent':
-				if ($_REQUEST['deleteAlias'])
-				{
-					$aliases = $_REQUEST['alias'];
-					if (is_array($aliases) && !empty($aliases)){
-						foreach($aliases as $a)
-						{
-							$user->detachCourseAlias($a);
-						}
-					}
-				}
-			case 'addStudent':
-				if ($_REQUEST['aID']) {
-					$user->attachCourseAlias($_REQUEST['aID']);
-				}
-				
-				//display course list
-				classManager::classManager('viewCourseList', null, null, null);
-			break;
-			
 			case 'previewStudentView':	//see if($cmd==...) statement in previewReservesList	
 			case 'previewReservesList':
 				$ci = new courseInstance($_REQUEST['ci']);

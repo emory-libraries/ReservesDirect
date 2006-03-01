@@ -380,18 +380,21 @@ abstract class baseDisplayer {
 	/**
 	 * @return void
 	 * @param int $default_dept (optional) ID of department to pre-select
+	 * @param boolean $abbreviation_only (optional) If true will only display the abbreviation, instead of ABBR+NAME
+	 * @param string $field_name (optional) If set, then the select id and name are set to this string
 	 * @desc displays a <select> box that shows all available departments
 	 */
-	public function displayDepartmentSelect($default_dept=null) {
+	public function displayDepartmentSelect($default_dept=null, $abbreviation_only=false, $field_name='department') {
 		$department = new department();	//init a department object
 ?>
-	<select name="department" id="department">
+	<select name="<?=$field_name?>" id="<?=$field_name?>">
 		<option value="">-- Select a Department --</option>
 <?php
 		foreach($department->getAllDepartments() as $dep):
-			$selected = ($dep[0]==$default_dept) ? 'selected="selected"' : '';
+			$selected = ($dep->getDepartmentID()==$default_dept) ? 'selected="selected"' : '';
+			$label = $abbreviation_only ? $dep->getAbbr() : $dep->getAbbr().' '.$dep->getName();
 ?>
-		<option value="<?=$dep[0]?>" <?=$selected?>><?=$dep[1]?> <?=$dep[2]?></option>
+		<option value="<?=$dep->getDepartmentID()?>" <?=$selected?>><?=$label?></option>
 <?php	endforeach; ?>			
 	</select>
 <?php
@@ -523,7 +526,7 @@ abstract class baseDisplayer {
 			$mgr = new ajaxManager('lookupClass', $next_cmd, 'manageClasses', 'Continue', $hidden_fields);
 			$mgr->display();
 		}
-		elseif(($u->getRole() == $g_permission['proxy']) || ($u->getRole() == $g_permission['instructor'])) {	//proxy/instructor class select
+		else {	//all others class select
 			//begin display
 ?>
 		<form action="index.php" method="post" name="select_class" id="select_class">
@@ -539,30 +542,36 @@ abstract class baseDisplayer {
 		    	<td colspan="2" class="borders">
 			    	<table width="100%" border="0" cellspacing="0" cellpadding="5" class="displayList">
 			    		<tr class="headingCell1" style="text-align:left;">
-			    			<td width="10%" style="text-align:center;">Select</td>
-			    			<td width="20%">Course Number</td>
+			    			<td width="5%" style="text-align:center;">Select</td>
+			    			<td width="15%">Course Number</td>
 							<td>Course Name</td>
-							<td width="15%">Last Active</td>
-							<td width="10%" style="text-align:center;">Reserve List</td>							
+							<td width="10%">Term</td>
+							<td width="20%">Instructors</td>
+<?php		if($u->getRole() >= $g_permission['instructor']):	//show preview link ?>
+							<td width="10%" style="text-align:center;">Reserve List</td>
+<?php		endif; ?>							
 			    		</tr>
 			
-<?php		
+<?php	
 			$rowClass = 'evenRow';
 			//loop through the courses
 			foreach($course_instances as $ci):
-				$ci->getPrimaryCourse();	//fetch the course object
+				$ci->getCourseForUser();	//fetch the course object
+				$ci->getInstructors();	//get a list of instructors
 				$rowClass = ($rowClass=='evenRow') ? 'oddRow' : 'evenRow';
 ?>
 						<tr class="<?=$rowClass?>">
-							<td width="10%" style="text-align:center;"><input type="radio" id="ci" name="ci" value="<?=$ci->getCourseInstanceID()?>" onClick="this.form.submit.disabled=false;" /></td>
-			    			<td width="20%"><?=$ci->course->displayCourseNo()?></td>
+							<td style="text-align:center;"><input type="radio" id="ci" name="ci" value="<?=$ci->getCourseInstanceID()?>" onClick="this.form.submit.disabled=false;" /></td>
+			    			<td><?=$ci->course->displayCourseNo()?></td>
 							<td><?=$ci->course->getName()?></td>
-							<td width="10%"><?=$ci->displayTerm()?></td>
-							<td width="10%" style="text-align:center;"><a href="javascript:openWindow('no_control=1&cmd=previewReservesList&ci=<?=$ci->getCourseInstanceID()?>','width=800,height=600');">preview</a></td>
+							<td><?=$ci->displayTerm()?></td>
+							<td><?=$ci->displayInstructors()?></td>
+<?php		if($u->getRole() >= $g_permission['instructor']):	//show preview link ?>
+							<td style="text-align:center;"><a href="javascript:openWindow('no_control=1&cmd=previewReservesList&ci=<?=$ci->getCourseInstanceID()?>','width=800,height=600');">preview</a></td>
+<?php		endif; ?>
 						</tr>   
 
 <?php		endforeach;	?>
-
 					</table>
 				</td>
 			</tr>

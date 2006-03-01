@@ -96,6 +96,19 @@ class student extends user
 	
 	
 	/**
+	 * @return array
+	 * @param int $instr_id Instructor ID
+	 * @desc Returns array of currently active CIs that this instructor is teaching
+	 */
+	public function getCourseInstancesByInstr($instr_id) {
+		$today = date('Y-m-d');
+		$instr = new user($instr_id);
+		//return all currently active courses that this user is teaching
+		return $instr->fetchCourseInstances('instructor', 'ACTIVE', $today, $today);
+	}
+	
+	
+	/**
 	* @return void
 	* @desc surpresses a reserve from display --Not Yet Implemented
 	*/

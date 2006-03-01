@@ -133,8 +133,6 @@ switch ($cmd)
 	case 'faxReserve': //addReserve - Fax Reserve Screen
 	case 'getFax': //addReserve - Claim Fax Screen
 	case 'addFaxMetadata': //addReserve - Fax Meta Data Screen
-	case 'addStudent': //myReserves - give a user student access to class
-	case 'removeStudent': //myReserves - remove a students access to a class
 	case 'editMultipleReserves':	//edit common reserve data for multiple reserves in a class
 		require_once("secure/managers/reservesManager.class.php");
 		$mgr = new reservesManager($cmd, $u);
@@ -152,7 +150,6 @@ switch ($cmd)
 	case 'editTitle':
 	case 'editClass':			// manageClass edit class
 	case 'createClass':			// manageClass create class (enter meta-data)
-	case 'searchForClass':		// myReserves - search for a class by Instructor or Dept
 	case 'createNewClass':		// manageClass create class (store meta-data to DB)
 	case 'addClass':			// myReserves - add a class as a student
 	case 'removeClass':			// myReserves - remove a class you are a student in

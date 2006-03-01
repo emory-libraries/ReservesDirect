@@ -106,10 +106,10 @@ class department extends library
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql  = "SELECT d.department_id, d.abbreviation, d.name "
+				$sql  = "SELECT d.department_id "
 					  . "FROM departments d "
 					  .	"WHERE d.name IS NOT NULL "
-					  . "ORDER BY d.abbreviation"
+					  . "ORDER BY d.abbreviation ASC"
 					  ;
 
 		}
@@ -118,8 +118,8 @@ class department extends library
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$tmpArray = array();
-		while ($row = $rs->fetchRow()) {
-			$tmpArray[] = $row;
+		while($row = $rs->fetchRow()) {
+			$tmpArray[] = new department($row[0]);
 		}
 		return $tmpArray;
 	}

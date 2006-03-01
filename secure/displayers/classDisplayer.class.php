@@ -356,7 +356,7 @@ class classDisplayer extends baseDisplayer {
 <?php
 	}
 
-	function displayEditTitle($ci, $deptList, $deptID)
+	function displayEditTitle($ci, $deptID)
 	{
 		echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "<tr>\n";
@@ -396,20 +396,10 @@ class classDisplayer extends baseDisplayer {
 		echo "			<td align=\"center\" valign=\"middle\"><input name=\"primaryCourse\" type=\"radio\" value=\"".$ci->course->courseAliasID."\" checked></td>\n";
 		echo"			<INPUT TYPE=\"HIDDEN\" NAME=\"oldPrimaryCourse\" VALUE=\"".$ci->course->courseAliasID."\">\n";
 		echo "          <td align=\"right\" valign=\"middle\" class=\"strong\">Dept:</td>\n";
-		echo "          <td align=\"left\" valign=\"middle\"> <select name=\"primaryDept\">\n";
-		echo "	            <option value=\"\">--Select-- \n";
+		echo "          <td align=\"left\" valign=\"middle\">\n";
 
-		foreach($deptList as $department)
-				{
-					echo "<option value=\"" . $department[0] . "\"\n";
+		self::displayDepartmentSelect($deptID, true, 'primaryDept');
 
-					if ($department[0] == $deptID) {
-						echo " selected\n";
-					}
-					echo ">" . $department[1] . "</option>\n\n";
-				}
-
-		echo " 				</select>\n";
 		echo "     		</td>\n";
 		echo "          <td align=\"right\" valign=\"middle\">Course#:</td>\n";
 		echo "          <td align=\"left\" valign=\"middle\"> <input name=\"primaryCourseNo\" type=\"text\" size=\"5\" maxlength=\"8\" value=\"".$ci->course->getCourseNo()."\"></td>\n";
@@ -427,20 +417,10 @@ class classDisplayer extends baseDisplayer {
 			echo "		<tr class=\"".$rowClass."\"> \n";
 			echo "			<td align=\"center\" valign=\"middle\"><!--<input type=\"radio\" name=\"primaryCourse\" value=\"".$ci->crossListings[$i]->courseAliasID."\">--></td>\n";
 			echo "			<td align=\"right\" valign=\"middle\" class=\"strong\">Dept:</td>\n";
-			echo "			<td align=\"left\" valign=\"middle\"> <select name=\"cross_listings[".$ci->crossListings[$i]->courseAliasID."][dept]\">\n";
-			echo "			<option value=\"\">--Select-- \n";
-				foreach($deptList as $department)
-				{
-						echo "<option value=\"" . $department[0] . "\"\n";
-	
-						if ($department[0] == $ci->crossListings[$i]->deptID) {
-							echo " selected\n";
-						}
-						echo ">" . $department[1] . "</option>\n\n";
-				}
-	
-	
-			echo "			            </select></td>\n";
+			echo "			<td align=\"left\" valign=\"middle\">\n";
+
+			self::displayDepartmentSelect($ci->crossListings[$i]->deptID, true, 'cross_listings['.$ci->crossListings[$i]->courseAliasID.'][dept]');
+			
 			echo "			<td align=\"right\" valign=\"middle\">Course#:</td>\n";
 			echo "			<td align=\"left\" valign=\"middle\"> <input name=\"cross_listings[".$ci->crossListings[$i]->courseAliasID."][courseNo]\" type=\"text\" size=\"5\" maxlength=\"8\" value=\"".$ci->crossListings[$i]->courseNo."\"></td>\n";
 			echo "			<td align=\"right\" valign=\"middle\">Section:</td>\n";
@@ -501,16 +481,11 @@ class classDisplayer extends baseDisplayer {
 		."			</tr>\n"
 		."          <tr> "
 		."          	<td align=\"left\" valign=\"middle\" class=\"strong\"><div align=\"center\">Department:</div></td>\n"
-		."              <td align=\"left\" valign=\"middle\"> <select name=\"newDept\">\n"
-		."                    <option selected value=\"\">--Select-- \n";
-		foreach($deptList as $department)
-			{
-					echo "<option value=\"" . $department[0] . "\"\n";
-					echo ">\n" . $department[1] . "</option>\n\n";
-			}
+		."              <td align=\"left\" valign=\"middle\">\n";
+		
+		self::displayDepartmentSelect(null, true, 'newDept');
 
-		echo "				</select> </td>\n"
-		."              <td align=\"left\" valign=\"middle\" class=\"strong\"><div align=\"center\">Course Number:</div></td>\n"
+		echo "          <td align=\"left\" valign=\"middle\" class=\"strong\"><div align=\"center\">Course Number:</div></td>\n"
 		."              <td align=\"left\" valign=\"middle\"> <div align=\"left\"><input name=\"newCourseNo\" type=\"text\" id=\"Title2\" size=\"4\" maxlength=\"6\"></div></td>\n"
 		."              <td align=\"left\" valign=\"middle\" class=\"strong\"><div align=\"center\">Section:</div></td>\n"
 		."              <td align=\"left\" valign=\"middle\"> <div align=\"left\"><input name=\"newSection\" type=\"text\" size=\"4\" maxlength=\"6\"></div></td>\n"
@@ -987,217 +962,63 @@ class classDisplayer extends baseDisplayer {
 	}
 
 	
-	function displaySearchForClass($deptList, $request)
-	{
-		global $u;
-        global $g_permission;
-
-		echo '<table width="95%" border="0" cellspacing="0" cellpadding="0" align="center">';
-		echo '	<tr>';
-		echo '    	<td width="100%"><img src=images/spacer.gif" width="1" height="5"></td>';
-		echo '	</tr>';
-		echo '    <tr>';
-		echo '    	<td align="left" valign="top">';
-		echo '    	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0">';
-		echo '        	<tr align="left" valign="top" class="headingCell1">';
-		echo '            	<td width="50%">Search by Instructor</td>';
-		echo '                <td width="50%">Search by Department</td>';
-		echo '            </tr>';
-		echo '			<tr>';
-		echo '        		<td width="50%" class="borders"><div align="center"><br>';
-		echo '<FORM METHOD=POST ACTION="index.php">';
-		//echo '<INPUT TYPE="HIDDEN" NAME="cmd" VALUE="addClass">';
-		//echo "<input type=\"hidden\" name=\"cmd\" value=\"$cmd\">\n";
-		echo '<INPUT TYPE="HIDDEN" NAME="cmd" VALUE="searchForClass">';
-		/*
-		echo '                	    <select name="prof">';
-		echo '                    	  <option value="" selected>Choose an Instructor ';
-		foreach($instructorList as $instructor)
-		{
-			echo '<option value="' . $instructor['username'] . '">' . $instructor['full_name'] . '</option>';
-		}
-
-		echo '                    	</select>';
-		*/
-		$selectClassMgr = new lookupManager('','lookupInstructor', $u, $request);
-		$selectClassMgr->display();
-		//echo '                    	<br>';
-		echo '                    	<br>';
-		echo '                    	<input type="submit" name="Submit2" value="Lookup Classes" onClick="this.form.cmd.value=\'addClass\'">';
-		echo '                    	<br>';
-		echo '                    	<br>';
-		echo '                    	<br>';
-		echo '</form>';
-		echo '              	</div></td>';
-		echo '              	<td width="50%" align="left" valign="top" class="borders"><div align="center"><br>';
-		echo '<FORM METHOD=POST ACTION="index.php">';
-		echo '<INPUT TYPE="HIDDEN" NAME="cmd" VALUE="addClass">';
-		echo '                	    <select name="dept">';
-		echo '                      	<option value="" selected>-- Choose a Department --</option>';
-		while ($row = $deptList->fetchRow())
-		{
-                echo '<OPTION VALUE="'.$row[0].'">'.$row[1].'</OPTION>';
-        }
-        echo '                    	</select>';
-        echo '                    	<br>';
-        echo '                    	<br>';
-        echo '                    	<input type="submit" name="Submit" value="Lookup Classes">';
-        echo '                    	<br>';
-        echo '</form>';
-        echo '              	</div></td>';
-        //echo '			/td>';
-        echo '			</tr>';
-        if ($u->getRole() >= $g_permission['instructor']) {
-			echo '<tr><td colspan="2">&nbsp;</td></tr>';
-			echo '<tr><td colspan="2"><blockquote><strong>Instructors:</strong> Adding a class through this page will only allow you to see that class as a student would. Classes that you are teaching show up automatically in your MyReserves list with a pencil icon next to them. If you do not see your class under your MyReserves list you may:<br>';
-			echo "				&gt;&gt; <a href=\"index.php?cmd=reactivateClass\">Reactivate a class you have used in the past.</a><br>\n";
-			echo "				&gt;&gt;<a href=\"index.php?cmd=createClass\"> Create a new class</a></blockquote>\n";
-			echo "</td></tr>\n";
-		} else {
-			echo '<tr><td>&nbsp;</td></tr>';
-		}
-        echo '		</table>';
-        echo '		</td>';
-        echo '	</tr>';
-
-        echo '    <tr>';
-        echo '    	<td><img src=images/spacer.gif" width="1" height="15"></td>';
-        echo '	</tr>';
-        echo '</form>';
-        echo '</table>';
-	}
-
-	function displayAddClass($courseList, $searchParam)
-	{
-		$terms = new terms();
-        $currentTerm = $terms->getCurrentTerm();
-
-
-		echo '<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">';
-		echo '	<tr> ';
-		echo '    	<td width="100%" colspan="2"><img src=images/spacer.gif" width="1" height="5"></td>';
-		echo '	</tr>';
-		echo '    <tr> ';
-		echo '    	<td width="50%" c><span class="strong">';
-		if (is_a($searchParam,"instructor")) {
-			echo 'Instructor: '.$searchParam->getName();
-		} elseif (is_a($searchParam,"department")) {
-			echo 'Department: '.$searchParam->getAbbr();
-		}
-		echo '</span></td>';
-		echo '		<td width="50%" c><div align="right" class="strong">'.$currentTerm->term_name . " " . $currentTerm->term_year.'</div></td>';
-		echo '	</tr>';
-		echo '    <tr> ';
-		echo '    	<td colspan="2" c>&nbsp;</td>';
-		echo '	</tr>';
-		echo '	<tr> ';
-		echo '    	<td colspan="2" c>';
-		echo '    	<table width="100%" border="0" cellspacing="0" cellpadding="0">';
-		echo '        	<tr align="left" valign="top"> ';
-		echo '            	<td class="headingCell1"><div align="center">SELECT CLASSES</div></td>';
-		echo '                <td width="75%">&nbsp;</td>';
-		echo '			</tr>';
-		echo '		</table>';
-		echo '		</td>';
-		echo '	</tr>';
-		echo '    <tr> ';
-		echo '    	<td colspan="2" align="left" valign="top">';
-		echo '    	<table width="100%" border="0" cellpadding="2" cellspacing="0" class="displayList">';
-		$rowNumber = 0;
-		for ($i=0; $i<count($courseList); $i++)
-		{
-			$rowClass = "oddRow";
-			if ($rowNumber++ % 2) {$rowClass = "evenRow";}
-			echo '        	<tr align="left" valign="middle" class="'.$rowClass.'">';
-			echo '            	<td width="20%">'.$courseList[$i]->displayCourseNo().'</td>';
-			echo '              <td width="35%">'.$courseList[$i]->getName().'</td>';
-
-			echo '              <td width="30%"><div align="center"><a href="index.php?cmd=addStudent&aID='.$courseList[$i]->getCourseAliasID().'">click here to add</a></div></td>';
-			echo '			</tr>';
-		}
-		echo '		</table>';
-		echo '		</td>';
-		echo '	</tr>';
-
-		echo '    <tr> ';
-		echo '    	<td colspan="2"><img src=images/spacer.gif" width="1" height="15"></td>';
-		echo '	</tr>';
-		echo '</table>';
-	}
-
-	function displayRemoveClass($user)
-	{
-		global $u;
-        global $g_permission;
-
-
-		echo '<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">';
-		echo('<FORM METHOD=POST ACTION="index.php">');
-		echo('<INPUT TYPE="HIDDEN" NAME="cmd" VALUE="removeStudent">');
-		echo '	<tr> ';
-		echo '		<td width="100%"><img src=images/spacer.gif" width="1" height="5"></td>';
-		echo '	</tr>';
-		echo '    <tr> ';
-		echo '    	<td c>';
-		echo '    	<table width="100%" border="0" cellspacing="0" cellpadding="0">';
-		echo '        	<tr align="left" valign="top"> ';
-		echo '            	<td class="headingCell1"><div align="center">YOUR CLASSES</div></td>';
-		echo '                <td width="75%">&nbsp;</td>';
-		echo '			</tr>';
-		echo '		</table>';
-		echo '		</td>';
-		echo '	</tr>';
-		echo '    <tr> ';
-		echo '    	<td align="left" valign="top">';
-		echo '    	<table width="100%" border="0" align="center" cellpadding="0" cellspacing="0" class="borders">';
-		echo '        	<tr> ';
-		echo '            	<td align="left" valign="top"> ';
-		echo '                <table width="100%" border="0" align="center" cellpadding="2" cellspacing="0" class="displayList">';
-		echo '                	<tr align="left" valign="middle" bgcolor="#CCCCCC" class="headingCell1"> ';
-		echo '						<td width="18%">&nbsp;</td>';
-		echo '                      	<td width="71%">&nbsp;</td>';
-		echo '                      	<td width="11%">Select</td>';
-		echo '                    </tr>';
-		$numCourseInstances = count($u->courseInstances);
-		if ($numCourseInstances > 0){
-			$rowNumber = 0;
-			for ($j=0;$j<$numCourseInstances;$j++){
-				$ci = $u->courseInstances[$j];
-				$rowClass = "oddRow";
-				if ($rowNumber++ % 2) {$rowClass = "evenRow";}
-				echo '<tr align="left" valign="middle" class="'.$rowClass.'">';
-				echo '			<td width="18%">' . $ci->course->displayCourseNo() . '</td>';
-				echo '			<td width="71%">'.$ci->course->getName() . '</td>';
-				echo '			<td width="11%" align="center"><input type="checkbox" name="alias['.$ci->course->getCourseAliasID().']" value="'.$ci->course->getCourseAliasID().'"></td>';
-				echo "</tr>";
+	function displaySelectDept_Instr($hidden_fields=null) {
+		global $u, $g_permission;
+		
+		$depObj = new department();
+?>
+		<script>
+			function checkInstructor() {
+				var frm = document.getElementById('instructor_form');
+				if(frm.selected_instr.options[frm.selected_instr.selectedIndex].value == '') {
+					alert('Please select an instructor');
+					return false;					
+				}
+				else {
+					return true;					
+				}
 			}
-		} else {
-			echo "<tr><td align=\"center\">There are no classes to remove</td></tr>";
-		}
-		echo '                </table>';
-		echo '                </td>';
-		echo '			</tr>';
-		echo '		</table>';
-		echo '		</td>';
-		echo '	</tr>';
-		if ($u->getRole() >= $g_permission['proxy']) {
-			echo '<tr><td>&nbsp;</td></tr>';
-			echo '<tr><td><strong>Please note:</strong> If you are a proxy or instructor in a class, you may not remove it from your MyReserves list.';
-			if ($u->getRole() >= $g_permission['instructor']) {
-						echo '<br>If you would like to completely remove a class from ReservesDirect, please contact your reserves staff.';
-			}
-			echo '</td></tr>';
-		} else {
-			echo '<tr><td>&nbsp;</td></tr>';
-		}
-		echo '    <tr>';
-		echo '    	<td>&nbsp;</td>';
-		echo '	</tr>';
-		echo '    <tr> ';
-		echo '    	<td><div align="center"><img src=images/spacer.gif" width="1" height="15"><input type="submit" name="deleteAlias" value="Remove Selected Classes"></div></td>';
-		echo '	</tr>';
-		echo '</form>';
-		echo '</table>';
+		</script>
+		
+		<table width="100%" cellspacing="0" cellpadding="0" align="center">
+			<tr class="headingCell1" align="center">
+				<td>Search by Instructor</td>
+				<td>Search by Department</td>
+			</tr>
+			<tr align="center">
+				<td class="borders">
+					<br />
+					<form method="post" id="instructor_form" action="index.php">
+						<input type="hidden" name="cmd" value="addClass" />
+						<?php self::displayHiddenFields($hidden_fields); ?>
+						
+<?php
+		$lookupMgr = new lookupManager('', 'lookupInstructor', $u, $_REQUEST);
+		$lookupMgr->display();
+?>
+						<p />
+						<input type="submit" name="submit_instructor" value="Look Up Classes" onclick="return checkInstructor();" />
+					</form>
+				</td>
+				<td class="borders">
+					<br />
+					<form method="post" action="index.php">
+						<input type="hidden" name="cmd" value="addClass" />
+						<?php self::displayHiddenFields($hidden_fields); ?>
+						
+						<?php self::displayDepartmentSelect(); ?>
+
+						<p />
+						<input type="submit" name="submit_dept" value="Look Up Classes" />
+					</form>
+				</td>
+			</tr>
+		</table>
+		<p />
+<?php	if($u->getRole() >= $g_permission['instructor']): ?>
+		<strong>Instructors:</strong> Adding a class through this page will only allow you to see that class as a student would. Classes that you are teaching show up automatically in your MyCourses list with a pencil icon next to them. If you do not see your class under your MyCourses list, you may try <a href="index.php?cmd=createClass">creating a class</a> or contacting the Reserves staff.
+<?php		
+		endif;			
 	}
 	
 	
@@ -1505,7 +1326,7 @@ class classDisplayer extends baseDisplayer {
 			endforeach;
 ?>
 					</div>
-					<div style="float:right;"><span class="actions">[ <a href="LINK">Create a New Class</a> ]</span></div>
+					<div style="float:right;"><span class="actions">[ <a href="index.php?cmd=createClass">Create a New Class</a> ]</span></div>
 					<div style="clear:both;"></div>
 				</div>
 			</div>
@@ -1541,7 +1362,7 @@ class classDisplayer extends baseDisplayer {
 			<table width="100%" class="displayList">
 				<tr align="right" valign="middle" class="head">
 					<td colspan="4">
-						<span class="actions">[ <a href="LINK">Join a Class</a> ] [ <a href="LINK">Leave a Class</a> ]</span>
+						<span class="actions">[ <a href="index.php?cmd=addClass">Join a Class</a> ] [ <a href="index.php?cmd=removeClass">Leave a Class</a> ]</span>
 					</td>
 				</tr>
 <?php
@@ -1550,7 +1371,6 @@ class classDisplayer extends baseDisplayer {
 			foreach($student_CIs as $ci):
 				$ci->getCourseForUser();	//get course object
 				$ci->getInstructors();	//get a list of instructors				
-				$edit_icon = 'images/pencil.gif';
 				
 				$rowClass = ($rowClass=='oddRow') ? 'evenRow' : 'oddRow';	//set the row class
 ?>
