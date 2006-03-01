@@ -447,36 +447,7 @@ class user
 		
 		mail($to, $subject, $msg, $headers);
 	}
-	
-	function getCurrentClassesFor($user_id, $role=null)
-	{
-		global $g_dbConn;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql = "SELECT DISTINCT ca.course_instance_id "
-					.  "FROM course_instances AS ci "
-					.  	 " JOIN course_aliases AS ca ON ca.course_instance_id = ci.course_instance_id "
-					.    " JOIN access AS a ON a.alias_id = ca.course_alias_id "
-					.  "WHERE a.user_id = ! AND ci.activation_date <= ? AND ? <= ci.expiration_date AND ci.status = 'ACTIVE' "					
-					;
-					
-				if (!is_null($role))
-					$sql .= " AND a.permission_level = $role";
-
-				$d = date("Y-m-d"); //get current date
-		}
 		
-		$rs = $g_dbConn->query($sql, array($user_id, $d, $d));
-
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		unset($this->courseInstances);  // clean array
-		while ($row = $rs->fetchRow()) {
-			$this->courseInstances[] = new courseInstance($row[0]);
-		}
-	}
 	
 	function addNotTrained()
 	{
@@ -511,6 +482,75 @@ class user
 	}
 	
 	function isNotTrained() { return $this->not_trained; }
+	
+	
+	/**
+	 * @return array - Array of CourseInstances
+	 * @param string $access_level (optional) Level of access to CIs
+	 * @param string $status (optional) CIs with this status
+	 * @param string $act_date (optional) CIs activated on or after this date
+	 * @param string $exp_date (optional) CIs expiring before or on this date
+	 * @param int $dept_id (optional) CIs in this department
+	 * @desc Returns an array of CI objects for this user with the given qualifications. If a parameter is not specified, no restriction is placed.  This is the catch-all logic to get CIs to be used by public methods with selective criteria. 
+	 */
+	public function fetchCourseInstances($access_level=null, $status=null, $act_date=null, $exp_date=null, $dept_id=null) {
+		global $g_dbConn, $g_permission;
+		
+		//format access
+		if(!in_array($access_level, $g_permission)) {
+			$access_level = null;	//not a valid access level, do not restrict
+		}
+		//format dates
+		if(!empty($act_date)) { 
+			$act_date = date("Y-m-d", strtotime($act_date));
+		}
+		if(!empty($exp_date)) { 
+			$exp_date = date("Y-m-d", strtotime($exp_date));
+		}
+
+		//build query
+		switch ($g_dbConn->phptype) {
+			default:	//mysql
+				$sql = "SELECT DISTINCT ca.course_instance_id
+						FROM course_aliases AS ca
+							JOIN access AS a ON a.alias_id = ca.course_alias_id
+							JOIN course_instances AS ci ON ci.course_instance_id = ca.course_instance_id
+							JOIN courses AS c ON c.course_id = ca.course_id
+							JOIN departments AS d ON d.department_id = c.department_id
+						WHERE a.user_id = ".$this->userID;
+				
+				//add restrictions
+				if(!empty($access_level)) {
+					$sql .=	" AND a.permission_level = ".$g_permission[$access_level];
+				}
+				if(!empty($status)) {
+					$sql .= " AND ci.status = '$status'";
+				}
+				if(!empty($act_date)) {
+					$sql .= " AND ci.activation_date <= '$act_date'";
+				}
+				if(!empty($exp_date)) {
+					$sql .= " AND ci.expiration_date >= '$exp_date'";
+				}
+				if(!empty($dept_id)) {
+					$sql .= " AND d.department_id = '$dept_id'";
+				}
+				
+				//finish off with sorting
+				$sql .= " ORDER BY ci.activation_date ASC, d.abbreviation ASC, c.course_number ASC, ca.section ASC";				
+		}
+
+		//query
+		$rs = $g_dbConn->query($sql);
+		if(DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+		$course_instances = array();
+		while($row = $rs->fetchRow()) {
+			$course_instances[] = new courseInstance($row[0]);
+		}
+		
+		return $course_instances;
+	}
 	
 }
 ?>

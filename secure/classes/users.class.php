@@ -370,6 +370,7 @@ class users
 						LEFT JOIN access as a on a.alias_id = ca.course_alias_id
 						JOIN course_instances as ci on ci.course_instance_id = ca.course_instance_id
 						JOIN courses as c on ca.course_id = c.course_id
+						JOIN departments AS d ON d.department_id = c.department_id
 						LEFT JOIN terms as t on t.term_year = ci.year AND t.term_name = ci.term 
 					WHERE 1 ";
 				
@@ -382,7 +383,7 @@ class users
 				if(!is_null($term_id) && $term_id != "")
 					$sql .= "AND t.term_id = $term_id ";
 					
-				$sql .= "ORDER BY t.term_id DESC, c.course_name LIMIT 50";
+				$sql .= "ORDER BY t.term_id DESC, d.abbreviation ASC, c.course_number ASC, ca.section ASC LIMIT 50";
 		}
 
 		$rs = $g_dbConn->query($sql);	

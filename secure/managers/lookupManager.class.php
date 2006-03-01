@@ -56,28 +56,6 @@ class lookupManager
 
 		switch ($cmd)
 		{
-			case 'lookupClass':
-				if (isset($request['select_instr_by']) && isset($request['instr_qryTerm'])) //user is searching for an instructor
-				{
-					$users = new users();
-					$users->search($request['select_instr_by'], $request['instr_qryTerm'], $g_permission['proxy']);
-					$instr_list = $users->userList;
-				} else $instr_list = null;
-
-				if (isset($request['selected_instr'])) //user has selected an instructor will override dept selection
-				{
-					$course_list = $user->getCoursesByInstructor($request['selected_instr']);
-				} else $course_list = null;
-
-				if (isset($request['select_course'])) // user has selected a course look of course instances
-				{
-					$ci_list = $user->getCourseInstancesByCourse($request['select_course'], $request['selected_instr']);
-				} else $ci_list = null;
-
-				$this->displayFunction = 'classLookup';
-				$this->argList = array($tableHeading, $instr_list, $course_list, $ci_list, $request, $hidden_fields);
-			break;
-
 			case 'lookupInstructor':
 				
 				if (isset($request['select_instr_by']) && isset($request['instr_qryTerm'])) //user is searching for an instructor

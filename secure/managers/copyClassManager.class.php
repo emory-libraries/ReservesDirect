@@ -41,7 +41,7 @@ class copyClassManager extends baseManager {
 
 	function copyClassManager($cmd, $user, $request, $hidden_fields=null)
 	{
-		global $g_permission, $page, $loc;
+		global $g_permission, $page, $loc, $u;
 
 		$this->displayClass = "copyClassDisplayer";
 		$page = 'manageClasses';
@@ -59,17 +59,21 @@ class copyClassManager extends baseManager {
 					$this->displayFunction = 'displayImportClassOptions';
 					$this->argList = array($ci, $walker, $_REQUEST['dst_ci'], 'processCopyClass');
 				}
-				elseif(empty($_REQUEST['ci'])) {	//need source class 
+				elseif(empty($_REQUEST['ci'])) {	//need source class
+					$class_list = $u->getCourseInstancesToImport();
+				
 					$loc = 'import class >> select source class';
 					$this->displayFunction = 'displaySelectClass';
-					$this->argList = array('importClass', 'Select course to import FROM:', array('dst_ci'=>$_REQUEST['dst_ci']));
+					$this->argList = array('importClass', $class_list, 'Select course to import FROM:', array('dst_ci'=>$_REQUEST['dst_ci']));
 				}				
 			break;
 
 			case 'copyClass':
+				$class_list = $u->getCourseInstancesToEdit();
+				
 				$loc  = "copy course reserves list >> select source class";				
 				$this->displayFunction = 'displaySelectClass';
-				$this->argList = array('copyClassOptions', 'Select class to copy FROM:');
+				$this->argList = array('copyClassOptions', $class_list, 'Select class to copy FROM:');
 			break;
 				
 			case 'copyClassOptions':
@@ -94,9 +98,11 @@ class copyClassManager extends baseManager {
 				if(!empty($_REQUEST['copyInstructors']))	$needed_info['copyInstructors'] = $_REQUEST['copyInstructors'];
 				if(!empty($_REQUEST['copyProxies']))	$needed_info['copyProxies'] = $_REQUEST['copyProxies'];
 				if(!empty($_REQUEST['deleteSource']))	$needed_info['deleteSource'] = $_REQUEST['deleteSource'];	
+				
+				$class_list = $u->getCourseInstancesToEdit();
 
 				$this->displayFunction = 'displaySelectClass';
-				$this->argList = array('processCopyClass', 'Select class to copy TO:', $needed_info);	
+				$this->argList = array('processCopyClass', $class_list, 'Select class to copy TO:', $needed_info);	
 			break;
 
 			case 'copyNew':

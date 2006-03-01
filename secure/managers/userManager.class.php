@@ -394,7 +394,7 @@ class userManager
 			case 'removeProxy':
 				$page = "manageUser";
 
-				$courseInstances = $user->getCourseInstances($aDate=null,$eDate=null,$editableOnly=true);
+				$courseInstances = $user->getCourseInstancesToEdit();
 
 				$this->displayFunction = 'displayEditProxy';
 				$this->argList = array($courseInstances,'editProxies');

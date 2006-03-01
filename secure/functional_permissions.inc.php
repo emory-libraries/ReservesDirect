@@ -1,8 +1,6 @@
 <?
 $functional_permissions = array
 (
-	 'myReserves' 					=> $g_permission['student'],
-	 'viewCourseList' 				=> $g_permission['student'],  
 	 'viewReservesList' 			=> $g_permission['student'], 
 	 'previewReservesList' 			=> $g_permission['proxy'],
 	 'previewStudentView'			=> $g_permission['proxy'],
@@ -22,8 +20,11 @@ $functional_permissions = array
 	 'storeFaxMetadata' 			=> $g_permission['proxy'], 
 	 'addStudent' 					=> $g_permission['student'], 
 	 'removeStudent' 				=> $g_permission['student'], 
-	 'addReserve' 					=> $g_permission['proxy'],
 
+	 'myReserves' 					=> $g_permission['student'],
+	 'viewCourseList' 				=> $g_permission['student'],  
+	 'activateClass'				=> $g_permission['instructor'],
+	 'deactivateClass'				=> $g_permission['instructor'],
 	 'manageClasses' 				=> $g_permission['instructor'],
 	 'editProxies' 					=> $g_permission['instructor'],
 	 'editInstructors' 				=> $g_permission['instructor'],
@@ -32,7 +33,6 @@ $functional_permissions = array
 	 'editClass' 					=> $g_permission['proxy'],
 	 'createClass' 					=> $g_permission['instructor'],
 	 'createNewClass' 				=> $g_permission['instructor'],
-	 'reactivate' 					=> $g_permission['instructor'],
 	 'searchForClass' 				=> $g_permission['student'],		
 	 'addClass' 					=> $g_permission['student'],		
 	 'removeClass' 					=> $g_permission['student'],

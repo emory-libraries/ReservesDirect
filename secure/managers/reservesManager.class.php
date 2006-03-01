@@ -75,31 +75,10 @@ class reservesManager
 				if ($_REQUEST['aID']) {
 					$user->attachCourseAlias($_REQUEST['aID']);
 				}
-			case 'myReserves':
-			case 'viewCourseList':
-				$page = "myReserves";
-				$loc  = "home";
-
-				$user->getCourseInstances();
-				for ($i=0;$i<count($user->courseInstances);$i++)
-				{
-					$my_ci = $user->courseInstances[$i];
-					$my_ci->getInstructors();
-					$my_ci->getProxies();
-
-					//Look at this later - should this logic be handled by ci->getCourseForUser? - kawashi 11.2.2004
-					if (in_array($user->getUserID(),$my_ci->instructorIDs) || in_array($user->getUserID(),$my_ci->proxyIDs)) {
-						//$my_ci->getCourseForInstructor($user->getUserID());
-						$my_ci->getPrimaryCourse();
-					} else {
-						$my_ci->getCourseForUser($user->getUserID());  //load courses
-					}
-				}
-
-				$this->displayFunction = "displayCourseList";
-				$this->argList = array($user);
+				
+				//display course list
+				classManager::classManager('viewCourseList', null, null, null);
 			break;
-			
 			
 			case 'previewStudentView':	//see if($cmd==...) statement in previewReservesList	
 			case 'previewReservesList':
@@ -229,27 +208,18 @@ class reservesManager
 			case 'addReserve':
 				$page = "addReserve";
 				$progress = array ('total' => 4, 'full' => 0);
-
 				if ($user->getRole() >= $g_permission['staff']) {
-					//$courseInstances = $user->getCourseInstances($_REQUEST['u']);
 					$this->displayFunction = "displayStaffAddReserve";
 					$this->argList = array($_REQUEST);
 					break;
 				} elseif ($user->getRole() >= $g_permission['proxy']) { //2 = proxy
-					$courseInstances = $user->getCourseInstances();
+					$courseInstances = $user->getCourseInstancesToEdit();
 				} else {
 					trigger_error("Permission Denied:  Cannot add reserves. UserID=".$user->getUserID(), E_ERROR);
 				}
-
-				for($i=0;$i<count($courseInstances); $i++)
-				{
-					$ci = $courseInstances[$i];
-					//$ci->getCourseForUser($user->getUserID());
-					$ci->getPrimaryCourse();
-				}
-
-				$this->displayFunction = "displaySelectClasses";
-				$this->argList = array($courseInstances,$user);
+				
+				$this->displayFunction = 'displaySelectClass';
+				$this->argList = array('displaySearchItemMenu', $courseInstances);
 			break;
 			case 'displaySearchItemMenu':
 				$page="addReserve";

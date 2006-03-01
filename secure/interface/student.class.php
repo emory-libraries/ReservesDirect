@@ -44,16 +44,7 @@ class student extends user
 		else $this->getUserByUserName($userName);
 	}
 
-	/**
-	* @return void
-	* @desc Allows student to register themselves with the system
-	*/
-	/*
-	function registerSelf()
-	{
-		$this->createUser();
-	}
-	*/
+	
 	/**
 	* @return void
 	* @param int $courseAliasID
@@ -93,107 +84,17 @@ class student extends user
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 
+
 	/**
-	* @return array of courseInstances
-	* @desc get all of the user's courseInstances from the access table
-	*/
-	/*
-	function getMyCourseInstances()
-	{
-		global $g_dbConn;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$d = date ('Y-m-d');
-
-				$sql = "SELECT DISTINCT ca.course_instance_id "
-					.  "FROM access AS a LEFT JOIN course_aliases AS ca "
-					.  "  ON a.alias_id = ca.course_alias_id "
-					.  "WHERE a.user_id = !";
-		}
-
-		//$rs = $g_dbConn->query($sql, array($targetID, $targetTable));
-		$rs = $g_dbConn->query($sql, $this->userID);
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		$tmpArray = array();
-		while ($row = $rs->fetchRow()) {
-			$tmpArray[] = new courseInstance($row['course_instance_id']);
-		}
-
-		return $tmpArray;
+	 * @return array
+	 * @desc fetches all CIs that have status of ACTIVE, that this user is enrolled in, and whose date range includes today
+	 */
+	public function getCourseInstances() {
+		$today = date('Y-m-d');
+		return $this->fetchCourseInstances('student', 'ACTIVE', $today, $today);
 	}
-	*/
-	/**
-	* @return array of courseInstances
-	* @desc get current and active courseInstances from the access table
-	*/
-	/*
-	function getCurrentCourseInstances()
-	{
-		global $g_dbConn;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql = "SELECT DISTINCT ca.course_instance_id "
-					.  "FROM course_instances AS ci "
-					.  	 "LEFT  JOIN course_aliases AS ca ON ca.course_instance_id = ci.course_instance_id "
-					.    "LEFT  JOIN access AS a ON a.alias_id = ca.course_alias_id "
-					.  "WHERE a.user_id = ! AND ci.activation_date <= ? AND ? <= ci.expiration_date AND ci.status = 'ACTIVE'"
-					;
-
-				$d = date("Y-m-d"); //get current date
-		}
-
-		$rs = $g_dbConn->query($sql, array($this->getUserID(), $d, $d));
-
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		unset($this->courseInstances);  // clean array
-		while ($row = $rs->fetchRow()) {
-			$this->courseInstances[] = new courseInstance($row[0]);
-		}
-	}
-	*/
-	function getCourseInstances()
-	{
-		global $g_dbConn;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-			/*
-			$sql = "SELECT ca.course_instance_id, a.alias_id "
-					.  "FROM access as a "
-					.  	 "LEFT  JOIN course_aliases AS ca ON a.alias_id = ca.course_alias_id "
-					.  	 "LEFT  JOIN course_instances AS ci ON ca.course_instance_id = ci.course_instance_id "
-					.  "WHERE a.user_id = ! AND ci.activation_date <= ? AND ? <= ci.expiration_date AND ci.status = 'ACTIVE'"
-					;
-			*/
-			$sql = "SELECT DISTINCT ca.course_instance_id "
-					.  "FROM access as a "
-					.  	 "LEFT  JOIN course_aliases AS ca ON a.alias_id = ca.course_alias_id "
-					.  	 "LEFT  JOIN course_instances AS ci ON ca.course_instance_id = ci.course_instance_id "
-					.  "WHERE a.user_id = ! AND ci.activation_date <= ? AND ? <= ci.expiration_date AND ci.status = 'ACTIVE'"
-					;
-
-				$d = date("Y-m-d"); //get current date
-		}
-
-		$rs = $g_dbConn->query($sql, array($this->getUserID(), $d, $d));
-
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		unset($this->courseInstances);  // clean array
-		while ($row = $rs->fetchRow()) {
-			//$tempCi = new courseInstance($row[0]);
-			//$tempCi->aliasID = $row[1];
-			//$this->courseInstances[] = $tempCi;
-			$this->courseInstances[] = new courseInstance($row[0]);
-		}
-	}
+	
+	
 	/**
 	* @return void
 	* @desc surpresses a reserve from display --Not Yet Implemented
@@ -210,35 +111,7 @@ class student extends user
 	{
 	}
 
-	/**
-	* @return array of reserves
-	* @param int $courseInstanceID
-	* @desc getAllReserves for a course
-	*/
-	/*
-	function getAllReserves($courseInstanceID)
-	{
-		global $g_dbConn;
 
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql = "SELECT reserves_id "
-					.  "FROM reserves "
-					.  "WHERE course_instance_id = ! ";
-		}
-
-		$rs = $g_dbConn->query($sql, array($courseInstanceID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		$tmpArray = array();
-		while ($row = $rs->fetchRow()) {
-			$tmpArray[] = new reserve($row['reserves_id']);
-		}
-
-		return $tmpArray;
-	}
-	*/
 	/**
 	* @return array of reserves
 	* @param int $courseInstanceID
@@ -255,45 +128,6 @@ class student extends user
 	*/
 	function getUnhiddenReserves($courseInstanceID)
 	{
-	}
-
-	/**
-	* @return array of courseInstances
-	* @desc get current and active courseInstances from the access table by deptID
-	*/
-	function getCoursesByDept($deptID, $aDate=null, $eDate=null)
-	{
-		global $g_dbConn;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$d = date("Y-m-d"); //get current date
-
-				$sql = "SELECT DISTINCT ca.course_alias_id "
-					.  "FROM course_instances AS ci "
-					.  	 "LEFT  JOIN course_aliases AS ca ON ca.course_instance_id = ci.course_instance_id "
-					.    "LEFT  JOIN courses AS c ON c.course_id = ca.course_id "
-					.    "LEFT  JOIN departments AS d ON d.department_id = c.department_id "
-					.  "WHERE d.department_id = ! AND ci.status = 'ACTIVE' "
-					;
-
-				if (!is_null($aDate) && !is_null($eDate))
-					$sql .= "AND '$aDate' <= ci.activation_date AND ci.expiration_date <= '$eDate' ";
-				else
-					$sql .= "AND ci.activation_date <= '$d' AND '$d' <= ci.expiration_date ";
-
-				$sql .=	"ORDER BY ci.expiration_date ASC";
-		}
-
-		$rs = $g_dbConn->query($sql, $deptID);
-
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		unset($this->courseList);  // clean array
-		while ($row = $rs->fetchRow()) {
-			$this->courseList[] = new course($row[0]);
-		}
 	}
 }
 ?>

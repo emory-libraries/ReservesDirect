@@ -41,43 +41,6 @@ class staff extends instructor
 		if (!is_null($userName)) $this->getUserByUserName($userName);
 	}
 
-	function getCourseInstances($userID=null)
-	{
-		global $g_dbConn;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$d = date("Y-m-d");
-
-				$sql  = "SELECT DISTINCT ci.course_instance_id "
-				.  		"FROM access as a "
-				.  		"  JOIN course_aliases as ca on a.alias_id = ca.course_alias_id "
-				.		"  JOIN course_instances as ci ON ca.course_instance_id = ci.course_instance_id "
-				.		"WHERE a.user_id = ! "
-				;
-
-				if (!is_null($userID))
-					$sql .= "AND a.permission_level >= 2 "; //2 = proxy minimal edit permission
-				$sql .= "AND '$d' <= ci.expiration_date ";  //get any current or future classes
-
-				$sql .=	"ORDER BY ci.expiration_date ASC, ci.status DESC";
-		}
-
-		if (!is_null($userID))
-			$rs = $g_dbConn->query($sql, $userID);
-		else
-			$rs = $g_dbConn->query($sql, $this->getUserID());
-
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		unset($this->courseInstances);
-		$this->courseInstances = array();
-		while ($row = $rs->fetchRow()) {
-			$this->courseInstances[] = new courseInstance($row[0]);
-		}
-		return $this->courseInstances;
-	}
 
 	/**
 	* @return return array of classes

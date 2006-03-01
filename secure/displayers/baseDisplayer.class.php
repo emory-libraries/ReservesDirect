@@ -46,7 +46,7 @@ abstract class baseDisplayer {
 	 * @param string $referrer_string Query sub-string to be used for the DELETE links.  ex: 'reserveID=5' or 'itemID=10'
 	 * @desc outputs HTML for display of notes edit boxes in item/reserve edit screens
 	 */
-	protected function displayEditNotes(&$notes, $referrer_string) {
+	public function displayEditNotes(&$notes, $referrer_string) {
 		foreach($notes as $note):
 ?>
 			<tr>
@@ -71,7 +71,7 @@ abstract class baseDisplayer {
 	 * @param string $referrer_string String identifying object and its ID. ex: 'reserveID=5' or 'itemID=10'. Note: the addNote handler must recognize the object
 	 * @desc outputs HTML for display of addNote button
 	 */
-	protected function displayAddNoteButton($referrer_string) {
+	public function displayAddNoteButton($referrer_string) {
 ?>
 		<input type="button" name="addNote" value="Add Note" onClick="openWindow('no_table=1&amp;cmd=addNote&amp;<?=$referrer_string?>','width=600,height=400');">
 <?php
@@ -83,7 +83,7 @@ abstract class baseDisplayer {
 	 * @param array $itemNotes Reference to an array of note objects
 	 * @desc outputs HTML for display of notes in reserve listings
 	 */
-	protected function displayItemNotes(&$itemNotes) {
+	public function displayItemNotes(&$itemNotes) {
 		global $u, $g_permission, $g_notetype;
 		
 		if(empty($itemNotes))
@@ -105,7 +105,7 @@ abstract class baseDisplayer {
 	 * @param array $reserveNotes Reference to an array of note objects
 	 * @desc outputs HTML for display of notes in reserve listings
 	 */
-	protected function displayReserveNotes(&$reserveNotes) {
+	public function displayReserveNotes(&$reserveNotes) {
 		if(empty($reserveNotes))
 			return;
 		
@@ -120,7 +120,7 @@ abstract class baseDisplayer {
 	 * @param array $hidden_fields A reference to an array (may be two-dimensional) of keys/values
 	 * @desc outputs hidden <input> fields for the array
 	 */
-	protected function displayHiddenFields(&$hidden_fields) {
+	public function displayHiddenFields(&$hidden_fields) {
 		if(empty($hidden_fields))
 			return;
 			
@@ -144,7 +144,7 @@ abstract class baseDisplayer {
 	 * @param boolean $edit_options If set to true, will display editing options. If false, will show student view
 	 * @desc outputs HTML showing information about a reserve plus aditional links and info.  For use in class/reserve lists.
 	 */
-	protected function displayReserveRow(&$reserve, $block_style='', $edit_options=false) {
+	public function displayReserveRow(&$reserve, $block_style='', $edit_options=false) {
 		if(!($reserve->item instanceof reserveItem)) {
 			$reserve->getItem();	//pull in item info
 		}
@@ -223,7 +223,7 @@ abstract class baseDisplayer {
 	 * @param string $row_style styles the row
 	 * @desc outputs HTML showing information about a reserve.  For use in class/reserve lists.
 	 */
-	protected function displayReserveInfo(&$reserve, $meta_style) {
+	public function displayReserveInfo(&$reserve, $meta_style) {
 		global $u, $g_reservesViewer;
 	
 		//collect and set data	
@@ -413,8 +413,31 @@ abstract class baseDisplayer {
 		if(empty($default_term)) {	//set default if none specified
 			$default_term = $terms[0]->getTermID();
 		}
+		
+		//must build a javascript array with term dates
+		$term_dates_jscript = '';
+		foreach($terms as $term) {
+			$term_dates_jscript .= "term_dates[".$term->getTermID()."] = new Array();\n";
+			$term_dates_jscript .= "term_dates[".$term->getTermID()."][0] = '".$term->getBeginDate()."';\n";
+			$term_dates_jscript .= "term_dates[".$term->getTermID()."][1] = '".$term->getEndDate()."';\n";
+		}
+		
 ?>
 	<script language="JavaScript">
+		/*
+			This date change could be accomiplished much easier if you could call
+			the term_setActiveDates() function directly from <option onclick>. 
+			Howerver, IE does not support that even, so we must do the workaround where
+			we build a list of all possible dates ahead of time.
+		*/
+		
+		function term_setTermDates(term_id) {
+			var term_dates = new Array();			
+			<?=$term_dates_jscript?>
+
+			return term_setActiveDates(term_dates[term_id][0], term_dates[term_id][1]);
+		}
+		
 		function term_setActiveDates(activateDate, expirationDate) {
 			if(document.getElementById('activation_date')) {
 				document.getElementById('activation_date').value = activateDate;
@@ -422,10 +445,11 @@ abstract class baseDisplayer {
 			if(document.getElementById('expiration_date')) {
 				document.getElementById('expiration_date').value = expirationDate;
 			}
+			return false;
 		}
 	</script>
 
-	<select name="term" id="term">
+	<select name="term" id="term" onchange="term_setTermDates(this.options[this.selectedIndex].value);">
 <?php
 		foreach($terms as $term):
 			$selected = '';
@@ -436,7 +460,8 @@ abstract class baseDisplayer {
 				$expiration_date = $term->getEndDate();
 			}
 ?>
-		<option value="<?=$term->getTermID()?>" <?=$selected?> onclick="term_setActiveDates('<?=$term->getBeginDate()?>','<?=$term->getEndDate()?>')"><?=$term->getTerm()?></option>
+	<!--	<option value="<?=$term->getTermID()?>" <?=$selected?> onclick="term_setActiveDates('<?=$term->getBeginDate()?>','<?=$term->getEndDate()?>')"><?=$term->getTerm()?></option>	-->
+		<option value="<?=$term->getTermID()?>" <?=$selected?>><?=$term->getTerm()?></option>
 <?php	endforeach; ?>			
 	</select>
 	
@@ -475,5 +500,78 @@ abstract class baseDisplayer {
 		<input type="radio" name="enrollment" id="enrollment" value="MODERATED" <?=$checked['MODERATED']?> /> MODERATED 
 		<input type="radio" name="enrollment" id="enrollment" value="CLOSED" <?=$checked['CLOSED']?> /> CLOSED 
 <?php		
-	}	
+	}
+	
+	
+	/**
+	 * @return void
+	 * @param string $next_cmd The next command to execute
+	 * @param array $course_instances (optional) Array of courseInstance objects to show for proxy/instructor select; ignored for staff
+	 * @param string $msg (optional) Text to display above the class select
+	 * @param array $hidden_fields (optional) Array of info to pass on as hidden fields
+	 * @desc Displays class selector -- ajax for staff, list of classes for proxy/instructor
+	 */
+	public function displaySelectClass($next_cmd, $course_instances=null, $msg=null, $hidden_fields=null) {
+		global $u, $g_permission;
+		
+		if(!empty($msg)) {
+			echo '<span class="helperText">'.$msg.'</span><p />';
+		}				
+		
+		if($u->getRole() >= $g_permission['staff']) {	//staff - use ajax class lookup
+			//display selectClass
+			$mgr = new ajaxManager('lookupClass', $next_cmd, 'manageClasses', 'Continue', $hidden_fields);
+			$mgr->display();
+		}
+		elseif(($u->getRole() == $g_permission['proxy']) || ($u->getRole() == $g_permission['instructor'])) {	//proxy/instructor class select
+			//begin display
+?>
+		<form action="index.php" method="post" name="select_class" id="select_class">
+			<input type="hidden" id="cmd" name="cmd" value="<?=$next_cmd?>" />		
+			<?php self::displayHiddenFields($hidden_fields); ?>
+			
+		<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+			<tr>
+				<td class="headingCell1" width="25%" align="center">SELECT CLASS</td>
+				<td width="75%" align="center">&nbsp;</td>
+			</tr>
+			<tr>
+		    	<td colspan="2" class="borders">
+			    	<table width="100%" border="0" cellspacing="0" cellpadding="5" class="displayList">
+			    		<tr class="headingCell1" style="text-align:left;">
+			    			<td width="10%" style="text-align:center;">Select</td>
+			    			<td width="20%">Course Number</td>
+							<td>Course Name</td>
+							<td width="15%">Last Active</td>
+							<td width="10%" style="text-align:center;">Reserve List</td>							
+			    		</tr>
+			
+<?php		
+			$rowClass = 'evenRow';
+			//loop through the courses
+			foreach($course_instances as $ci):
+				$ci->getPrimaryCourse();	//fetch the course object
+				$rowClass = ($rowClass=='evenRow') ? 'oddRow' : 'evenRow';
+?>
+						<tr class="<?=$rowClass?>">
+							<td width="10%" style="text-align:center;"><input type="radio" id="ci" name="ci" value="<?=$ci->getCourseInstanceID()?>" onClick="this.form.submit.disabled=false;" /></td>
+			    			<td width="20%"><?=$ci->course->displayCourseNo()?></td>
+							<td><?=$ci->course->getName()?></td>
+							<td width="10%"><?=$ci->displayTerm()?></td>
+							<td width="10%" style="text-align:center;"><a href="javascript:openWindow('no_control=1&cmd=previewReservesList&ci=<?=$ci->getCourseInstanceID()?>','width=800,height=600');">preview</a></td>
+						</tr>   
+
+<?php		endforeach;	?>
+
+					</table>
+				</td>
+			</tr>
+		</table>
+		<p />		
+		<input type="submit" name="submit" value="Continue" disabled="disabled">
+		
+		</form>
+<?php
+		}
+	}
 }

@@ -104,19 +104,19 @@ class searchManager
 				$loc  = "add items to class";
 				
 				//get CI and set up dates
-				if(!empty($request['ci'])) {
+				if(empty($request['ci'])) {	//no ci, show lookup
+					$this->displayFunction = 'displaySelectClass';
+					$this->argList = array('addResultsToClass', null, 'Select class to add items TO:', $request);
+					break;
+				}
+				else {	//we have a CI
 					$ci = new courseInstance($request['ci']);
 					
 					//set dates based on CI
 					$activation_date = $ci->getActivationDate();
 					$expiration_date = $ci->getExpirationDate();
 				}
-				else {
-					//set dates based on today
-					$activation_date = date('Y-m-d');
-					$expiration_date = date('Y-m-d');
-				}
-					
+				
 				if (!isset($request['submitButton']) || $request['submitButton'] != 'Add Items to Class')
 				{
 					//class not yet selected

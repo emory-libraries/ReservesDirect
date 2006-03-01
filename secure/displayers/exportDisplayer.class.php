@@ -64,26 +64,14 @@ class exportDisplayer
 		echo "				<tr align=\"left\" valign=\"middle\">\n";
 		echo "					<td align=\"right\" valign=\"middle\" class=\"strong\">Choose Class: </td>\n";
 		echo "					<td class=\"strong\">\n";
-
-		if (is_array($classList) && !empty($classList) && !($ci instanceof courseInstance))
-		{
-			//This drop-down should contain all current and future courses taught by the instructor who is logged in.
-			echo "						<select name=\"ci\"> \n";
-
-			foreach ($classList as $class)
-				echo "							<option value=\"". $class->getCourseInstanceID() ."\">". $class->course->displayCourseNo() . " -- " . $class->course->getName() .  "</option>\n";
-
-			echo "						</select>\n";
-		} else {
-			echo "						<input type=\"hidden\" name=\"ci\" value=\"".$ci->getCourseInstanceID()."\">\n";
+		echo "						<select name=\"ci\"> \n";
+		
+		foreach($classList as $class) {
+			echo "						<option value=\"". $class->getCourseInstanceID() ."\">". $class->course->displayCourseNo() . " -- " . $class->course->getName() .  "</option>\n";
 		}
 
 		echo "					</td>\n";
 		echo "				</tr>\n";
-
-
-
-
 		echo "				<tr>\n";
 		echo "					<td align=\"right\" valign=\"middle\" class=\"strong\">Export To:</td>\n";
 		echo "					<td>\n";

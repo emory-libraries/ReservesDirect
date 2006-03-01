@@ -39,128 +39,21 @@ class proxy extends student
 		if (!is_null($userName)) $this->getUserByUserName($userName);
 	}
 
+	
 	/**
-	* @return courseInstance Array
-	* @desc returns non-expired Course Instances
-	*/
-	/*
-	function getEditableCourseInstances($aDate=null, $eDate=null)
-	{
-		global $g_dbConn;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$d = date("Y-m-d");
-
-				$sql  = "SELECT DISTINCT ca.course_instance_id "
-				.  		"FROM access as a "
-				.  		"  JOIN course_aliases as ca on a.alias_id = ca.course_alias_id "
-				.		"  JOIN course_instances as ci ON ca.course_instance_id = ci.course_instance_id "
-				.		"WHERE a.user_id = ! AND a.permission_level >= 2 " //2 = proxy minimal edit permission
-				;
-
-				if (!is_null($aDate) && !is_null($eDate))
-					$sql .= "AND '$aDate' <= ci.activation_date AND ci.expiration_date <= '$eDate' ";
-				else
-					$sql .= "AND '$d' <= ci.expiration_date ";  //get any current or future classes
-
-				$sql .=	"ORDER BY ci.expiration_date ASC, ci.status DESC";
-		}
-
-		$rs = $g_dbConn->query($sql, $this->getUserID());
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		unset($this->courseInstances);  // clean array
-		while ($row = $rs->fetchRow()) {
-			$this->courseInstances[] = new courseInstance($row[0]);
-		}
-		return $this->courseInstances;
+	 * @return array
+	 * @desc Returns an array of current and future CIs this user can edit
+	 */
+	public function getCourseInstancesToEdit() {
+		//show current courses, or those that will start within a year
+		//do not show expired courses
+		$activation_date = date('Y-m-d', strtotime('+1 year'));
+		$expiration_date = date('Y-m-d');
+		
+		//now query
+		return $this->fetchCourseInstances('proxy', null, $activation_date, $expiration_date);
 	}
-	*/
-
-	/**
-	* @return array of courseInstances
-	* @desc get current and active courseInstances from the access table
-	*/
-	/*
-	function getCurrentCourseInstances()
-	{
-		global $g_dbConn;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql = "SELECT DISTINCT ca.course_instance_id "
-					.  "FROM course_instances AS ci "
-					.  	 "LEFT  JOIN course_aliases AS ca ON ca.course_instance_id = ci.course_instance_id "
-					.    "LEFT  JOIN access AS a ON a.alias_id = ca.course_alias_id "
-					.  "WHERE a.user_id = ! AND ? <= ci.expiration_date"
-					;
-
-				$d = date("Y-m-d"); //get current date
-		}
-
-		$rs = $g_dbConn->query($sql, array($this->getUserID(), $d));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		unset($this->courseInstances);  // clean array
-		while ($row = $rs->fetchRow()) {
-			$this->courseInstances[] = new courseInstance($row[0]);
-		}
-	}
-	*/
-	function getCourseInstances($aDate=null, $eDate=null, $editableOnly=null)
-	{
-		global $g_dbConn, $g_permission;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$d = date("Y-m-d");
-
-				$sql  = "SELECT DISTINCT ca.course_instance_id "
-				.  		"FROM access as a "
-				.  		"  JOIN course_aliases as ca on a.alias_id = ca.course_alias_id "
-				.		"  JOIN course_instances as ci ON ca.course_instance_id = ci.course_instance_id "
-				.		"WHERE a.user_id = ! "
-				.		"AND a.permission_level >= ".$g_permission['proxy']." "
-				;
-
-		$sql_student = "SELECT DISTINCT ca.course_instance_id "
-					.  "FROM access as a "
-					.  	 "LEFT  JOIN course_aliases AS ca ON a.alias_id = ca.course_alias_id "
-					.  	 "LEFT  JOIN course_instances AS ci ON ca.course_instance_id = ci.course_instance_id "
-					.  "WHERE a.user_id = ! AND ci.activation_date <= ? AND ? <= ci.expiration_date AND ci.status = 'ACTIVE'"
-					.		"AND a.permission_level < ".$g_permission['proxy']." "
-					;
-
-				if (!is_null($aDate) && !is_null($eDate))
-					$sql .= "AND '$aDate' <= ci.activation_date AND ci.expiration_date <= '$eDate' ";
-				else
-					$sql .= "AND '$d' <= ci.expiration_date ";  //get any current or future classes
-
-				$sql .=	"ORDER BY ci.expiration_date ASC, ci.status DESC";
-		}
-
-		$rs = $g_dbConn->query($sql, $this->getUserID());
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		unset($this->courseInstances);  // clean array
-		while ($row = $rs->fetchRow()) {
-			$this->courseInstances[] = new courseInstance($row[0]);
-		}
-
-		if (is_null($editableOnly)) {
-			$rs = $g_dbConn->query($sql_student, array($this->getUserID(),$d,$d));
-			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-			while ($row = $rs->fetchRow()) {
-				$this->courseInstances[] = new courseInstance($row[0]);
-			}
-		}
-		return $this->courseInstances;
-	}
+	
 
 	/**
 	* @return $errorMsg
@@ -254,37 +147,6 @@ class proxy extends student
 		*/
 	}
 
-	/**
-	* @return array of courses
-	* @desc return courses taught by a given instructor
-	*/
-	function getCoursesByInstructor($instrID)
-	{
-		global $g_dbConn, $g_permission;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql = "SELECT DISTINCT ca.course_id "
-				.	   "FROM courses as c "
-				.	   "	LEFT JOIN course_aliases as ca ON c.course_id = ca.course_id "
-				.	   "	LEFT JOIN access as a ON ca.course_alias_id = a.alias_id "
-				.	   "WHERE a.user_id = ? AND a.permission_level = !";
-
-		}
-
-		$rs = $g_dbConn->query($sql, array($instrID, $g_permission['instructor']));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		$tmpArray = array();
-		while($row = $rs->fetchRow())
-		{
-			$c = new course();
-			$c->getCourseByID($row[0]);
-			$tmpArray[] = $c;
-		}
-		return $tmpArray;
-	}
 	
 	function getAllDocTypeIcons()
 	{

@@ -783,23 +783,35 @@ class classDisplayer extends baseDisplayer {
 	}
 	
 	
-	function displaySuccess($ci_id) {
+	function displayCreateSuccess($ci_id) {
 ?>
 		<div class="borders" style="text-align: center;">
 			<div style="width:50%; margin:auto; text-align:left;">
 				<strong>You have successfully created a class. What would you like to do now?</strong>
 				<p />
 				<ul>
-					<li>
-						<a href="index.php?cmd=importClass&dst_ci=<?=$ci_id?>">Import materials into this class from another class (Reactivate)</a>
-						<p />
-					</li>
-					<li>
-						<a href="index.php?cmd=displaySearchItemMenu&ci=<?=$ci_id?>">Add materials to this class</a>
-						<p />
-					</li>
+					<li><a href="index.php?cmd=importClass&dst_ci=<?=$ci_id?>">Import materials into this class from another class (Reactivate)</a></li>
+					<li><a href="index.php?cmd=displaySearchItemMenu&ci=<?=$ci_id?>">Add materials to this class</a></li>
 					<li><a href="index.php?cmd=editClass&ci=<?=$ci_id?>">Go to this class.</a></li>
 					<li><a href="index.php?cmd=createClass">Create a New Class.</a></li>
+				</ul>
+			</div>
+		</div>
+<?php
+	}
+	
+	
+	function displayActivateSuccess($ci_id) {
+?>
+		<div class="borders" style="text-align: center;">
+			<div style="width:50%; margin:auto; text-align:left;">
+				<strong>You are opening this class for the first time this semester.  What would you like to do?</strong>
+				<p />
+				<ul>
+					<li><a href="index.php?cmd=importClass&dst_ci=<?=$ci_id?>">Import materials into this class from another class (Reactivate)</a></li>
+					<li><a href="index.php?cmd=displaySearchItemMenu&ci=<?=$ci_id?>">Add materials to this class</a></li>
+					<li><a href="index.php?cmd=editClass&ci=<?=$ci_id?>">Go to this class.</a></li>
+					<li><a href="index.php?cmd=deactivateClass&ci=<?=$ci_id?>"><strong>Cancel</strong> - I do not wish students to see this class.</a></li>
 				</ul>
 			</div>
 		</div>
@@ -1311,68 +1323,7 @@ class classDisplayer extends baseDisplayer {
 
 	}
 	
-	function displayCopyItems ($cmd, $user, $request) {
-		global $u, $g_permission;
 
-		if($u->getRole() >= $g_permission['staff']) {	//use ajax class lookup
-			//display selectClass
-			$mgr = new ajaxManager('lookupClass', 'processCopyItems', 'manageClasses', 'Copy', $request);
-			$mgr->display();
-		}
-		else {	//instructor class select
-			echo "<form action=\"index.php\" method=\"POST\">\n";
-			echo "<input type=\"hidden\" name=\"cmd\" value=\"$cmd\">\n";
-			
-			$hidden_fields = array('originalClass'=>$request['originalClass'], 'reservesArray'=>$request['reservesArray']);		
-			self::displayHiddenFields($hidden_fields);
-
-			$ci_list = $user->getCourseInstances(null, null, 'true');
-			echo "			<table width=\"100%\" border=\"0\" align=\"center\" cellpadding=\"5\" cellspacing=\"0\" class=\"displayList\">\n";
-			echo "				<tr align=\"left\" valign=\"middle\" bgcolor=\"#CCCCCC\" class=\"headingCell1\">\n";
-			echo "					<td width=\"10%\">&nbsp;</td>\n";
-			echo "					<td width=\"15%\">Course Number</td>\n";
-			echo "					<td>Course Name</td><td>Taught By</td><td>Last Active</td><td width=\"20%\">Reserve List</td>\n";
-			echo "				</tr>\n";
-	
-			for($i=0; $i<count($ci_list); $i++)
-			{
-				
-				$ci_list[$i]->getPrimaryCourse();
-				$ci_list[$i]->getInstructors();
-				
-				$rowClass = ($i % 2) ? "evenRow" : "oddRow";
-			
-				echo "				<tr align=\"left\" valign=\"middle\" class=\"$rowClass\">\n";
-				
-				$class_SELECTED = ((isset($request['ci']) && $request['ci'] != null) && ($ci_list[$i]->getCourseInstanceID()==$request['ci'])) ? "CHECKED" : "";		
-			
-				echo "					<td width=\"10%\" align=\"center\"><input type=\"radio\" name=\"ci\" $class_SELECTED value=\"". $ci_list[$i]->getCourseInstanceID() ."\" onClick=\"this.form.submit();\"></td>\n";
-				
-				echo "					<td width=\"15%\">".$ci_list[$i]->course->displayCourseNo()."</td>\n";
-				echo "					<td>".$ci_list[$i]->course->getName()."</td>\n";
-	
-				echo "					<td>".$ci_list[$i]->displayInstructorList()."</td>\n";
-				echo "					<td width=\"20%\" align=\"center\">".$ci_list[$i]->displayTerm()."</td>\n";
-				echo "					<td width=\"20%\" align=\"center\"><a href=\"javascript:openWindow('no_control&cmd=previewReservesList&ci=".$ci_list[$i]->courseInstanceID . "','width=800,height=600');\">preview</a></td>\n";
-				echo "				</tr>\n";
-			}
-	
-			echo "				<tr align=\"left\" valign=\"middle\" bgcolor=\"#CCCCCC\" class=\"headingCell1\"><td colspan=\"6\">&nbsp;</td></tr>\n";
-			if (isset($request['ci']) && $request['ci'] && $request['ci'] != null)
-			{
-				echo "	<tr><td valign=\"top\" align=\"center\" colspan=\"6\"><input type=\"submit\" name=\"performAction\" value=\"Copy\" onClick=\"this.form.cmd.value='processCopyItems'\"></td></tr>\n";
-			} else {
-				//echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-				echo "	<tr><td valign=\"top\" align=\"center\" colspan=\"6\"><input type=\"submit\" name=\"performAction\" value=\"Copy\" DISABLED></td></tr>\n";
-			}
-			
-			echo "			</table>\n";
-	
-			echo "</form>\n";		
-		}
-	}
-	
-	
 	function displayCopyItemsSuccess ($targetClass, $originalClass, $numberCopied) {
 
 		echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
@@ -1402,6 +1353,279 @@ class classDisplayer extends baseDisplayer {
 		echo "</table>\n";		
 		
 	}
+	
+	
+	/**
+	 * @return void
+	 * @param array $student_CIs Reference to an array of CI objects this user is enrolled in
+	 * @param array $intructor_CIs Reference to an array of CI objects this user is teaching
+	 * @param array $proxy_CIs Reference to an array of CI objects this user is proxying
+	 * @desc Display the user's courses
+	 */
+	public function displayCourseList(&$student_CIs, &$instructor_CIs, &$proxy_CIs) {
+		global $u, $g_permission;	
+		
+		//need term info
+		$termsObj = new terms();
+		$terms = array();
+		$term_blocks_string = '';
+		//rearrange the info as Array[year][term] = term_obj_id
+		foreach($termsObj->getTerms() as $term) {
+			$terms[$term->getTermYear()][$term->getTermName()] = $term->getTermID();
+		}
+		
+		//separate instructor/proxy lists by term
+		//put in sub-arrays indexed by term_id
+		$instructor_ci_array = array();
+		foreach($instructor_CIs as $ci) {	//instructor courses
+			$instructor_ci_array[$terms[$ci->year][$ci->term]][] = $ci;
+		}
+		$proxy_ci_array = array();
+		foreach($proxy_CIs as $ci) {	//proxy courses
+			$proxy_ci_array[$terms[$ci->year][$ci->term]][] = $ci;
+		}
+		
+		//this will hold the jscript calls to select the initial tab view
+		//it will be run after everything is rendered
+		$onload_jscript = '';
+		if(!empty($proxy_ci_array)) {	//show proxy on top			
+			$onload_jscript .= "showBlock('proxy_tab', 'proxy_block');\n";
+			//add call to preselect the first term sub-block
+			$keys = array_keys($proxy_ci_array);
+			$onload_jscript .= "showTermBlock('proxy_block_".$keys[0]."');\n";
+		}
+		if(!empty($student_CIs)) {	//show student on top
+			$onload_jscript .= "showBlock('student_tab', 'student_block');\n";
+		}
+		if(!empty($instructor_ci_array)) {	//show instructor on top
+			$onload_jscript .= "showBlock('instructor_tab', 'instructor_block');\n";
+			$keys = array_keys($instructor_ci_array);		
+			$onload_jscript .= "showTermBlock('instructor_block_".$keys[0]."');\n";
+		}
+		if(empty($onload_jscript)) {	//hide everything
+			$onload_jscript = "showBlock(null, 'no_classes_block');";
+		}
+		
+		//note that by default, only the student block is visible
+		//this is done so that if the user cannot process jscript, but does
+		//recognize display:none style, then s/he will still see the student block
+		
+		//begin display
+?>		
+
+	<script language="JavaScript" type="text/javascript">
+		var current_tab_id = 'student_tab';
+		var current_block_id = 'student_block';
+		var current_term_blocks = new Array();
+		
+		/**
+		 * @return false
+		 * @param strin tab_id - id of the tab
+		 * @param string block_id - id of the associated block
+		 * @desc Marks the selected tab and switches to the associated block
+		 */
+		function showBlock(tab_id, block_id) {
+			//unmark the last selected tab
+			if(document.getElementById(current_tab_id)) {
+				document.getElementById(current_tab_id).className = '';
+			}
+			//mark the new selection
+			if(document.getElementById(tab_id)) {
+				document.getElementById(tab_id).className = 'current';
+			}
+			
+			//do the same with the blocks
+			if(document.getElementById(current_block_id)) {
+				document.getElementById(current_block_id).style.display = 'none';
+			}
+			//mark the new selection
+			if(document.getElementById(block_id)) {
+				document.getElementById(block_id).style.display = 'block';
+			}
+		
+			//remember the current selections
+			current_tab_id = tab_id;
+			current_block_id = block_id;
+			
+			//try to set the term block
+			if(current_term_blocks[block_id]) {
+				showTermBlock(current_term_blocks[block_id]);
+			}
+			
+			return false;
+		}
+		
+		function showTermBlock(term_block_id) {
+			//unmark the last selected term block
+			if(document.getElementById(current_term_blocks[current_block_id])) {
+				document.getElementById(current_term_blocks[current_block_id]).style.display = 'none';
+			}
+			//mark the new selection
+			if(document.getElementById(term_block_id)) {
+				document.getElementById(term_block_id).style.display = '';
+			}
+			
+			//remember the selection
+			current_term_blocks[current_block_id] = term_block_id;		
+		}
+	</script>
+	
+	<div class="contentTabs">
+		<ul>
+<?php	if(!empty($instructor_CIs)): ?>
+			<li id="instructor_tab"><a href="#" onclick="return showBlock('instructor_tab', 'instructor_block');">You are teaching:</a></li>
+<?php	endif; ?>
+<?php	if(!empty($student_CIs)): ?>
+			<li id="student_tab" class="current"><a href="#" onclick="return showBlock('student_tab', 'student_block');">You are enrolled in:</a></li>
+<?php	endif; ?>
+<?php	if(!empty($proxy_CIs)): ?>
+			<li id="proxy_tab"><a href="#" onclick="return showBlock('proxy_tab', 'proxy_block');">You are proxy for:</a></li>
+<?php	endif; ?>
+		</ul>
+	</div>
+	<div class="clear">
+	
+<?php	if(!empty($instructor_ci_array)): //onclick="return showTermBlock('instructor_block_<?=$term_id? >');"?>
+		<div id="instructor_block" style="display:none;">
+			<div width="100%" class="displayList">
+				<div style="padding:4px;" class="head">
+					<div style="float:left;">
+<?php
+			//show a radio choices for terms, to act as a filter for class list display
+			//pre-select first option
+			$select_option = true;
+			foreach(array_keys($instructor_ci_array) as $term_id):
+				$term = new term($term_id);
+				$select = ($select_option) ? 'checked="true"' : '';
+?>
+							<input type="radio" name="instructor_term_block" onclick="showTermBlock('instructor_block_<?=$term_id?>');" <?=$select?> /><?=$term->getTermName().' '.$term->getTermYear()?>&nbsp;
+<?php		
+				//stop pre-selecting
+				$select_option = false;
+			endforeach;
+?>
+					</div>
+					<div style="float:right;"><span class="actions">[ <a href="LINK">Create a New Class</a> ]</span></div>
+					<div style="clear:both;"></div>
+				</div>
+			</div>
+<?php		foreach($instructor_ci_array as $term_id=>$term_ci_list):	//split up the subarrays by term ?>
+			<table id="instructor_block_<?=$term_id?>" class="displayList" style="display:none;" width="100%">
+<?php
+				//begin looping through courses		
+				$rowClass = 'evenRow';
+				foreach($term_ci_list as $ci):
+					$ci->getCourseForUser();	//get course object
+					$ci->getInstructors();	//get a list of instructors				
+					$edit_icon = 'images/pencil.gif';
+					
+					$rowClass = ($rowClass=='oddRow') ? 'evenRow' : 'oddRow';	//set the row class
+?>
+				<tr align="left" valign="middle" class="<?=$rowClass?>">
+					<td width="5%"><img src="<?=$edit_icon?>" alt="edit" width="24" height="20"></td>
+					<td width="15%"><a href="index.php?cmd=editClass&ci=<?=$ci->getCourseInstanceID()?>"><?=$ci->course->displayCourseNo()?></a></td>
+					<td><a href="index.php?cmd=editClass&ci=<?=$ci->getCourseInstanceID()?>"><?=$ci->course->getName()?></a></td>
+					<td width="30%"><?=$ci->displayInstructors()?></td>			
+				</tr>
+<?php			endforeach; ?>
+			</table>
+<?php		endforeach; ?>
+			<p />
+			<img src="images/pencil.gif" width="24" height="20"> <span style="font-size:small;">= courses you may edit</span>
+			<p />
+		</div>
+<?php	endif; ?>
+
+<?php	if(!empty($student_CIs)): ?>
+		<div id="student_block">
+			<table width="100%" class="displayList">
+				<tr align="right" valign="middle" class="head">
+					<td colspan="4">
+						<span class="actions">[ <a href="LINK">Join a Class</a> ] [ <a href="LINK">Leave a Class</a> ]</span>
+					</td>
+				</tr>
+<?php
+			//begin looping through courses		
+			$rowClass = 'evenRow';
+			foreach($student_CIs as $ci):
+				$ci->getCourseForUser();	//get course object
+				$ci->getInstructors();	//get a list of instructors				
+				$edit_icon = 'images/pencil.gif';
+				
+				$rowClass = ($rowClass=='oddRow') ? 'evenRow' : 'oddRow';	//set the row class
+?>
+				<tr align="left" valign="middle" class="<?=$rowClass?>">
+					<td width="15%"><a href="index.php?cmd=viewReservesList&ci=<?=$ci->getCourseInstanceID()?>"><?=$ci->course->displayCourseNo()?></a></td>
+					<td><a href="index.php?cmd=viewReservesList&ci=<?=$ci->getCourseInstanceID()?>"><?=$ci->course->getName()?></a></td>
+					<td width="10%"><?=$ci->displayTerm()?></td>
+					<td width="25%"><?=$ci->displayInstructors()?></td>			
+				</tr>
+<?php		endforeach; ?>
+			</table>
+			<p />
+		</div>
+<?php	endif; ?>
+
+<?php	if(!empty($proxy_ci_array)): ?>
+		<div id="proxy_block" style="display:none;">
+			<div width="100%" class="displayList">
+				<div style="padding:4px;" class="head">
+<?php
+			//show a radio choices for terms, to act as a filter for class list display
+			//pre-select first option
+			$select_option = true;
+			foreach(array_keys($proxy_ci_array) as $term_id):
+				$term = new term($term_id);
+				$select = ($select_option) ? 'checked="true"' : '';
+?>
+							<input type="radio" name="proxy_term_block" onclick="showTermBlock('proxy_block_<?=$term_id?>');" <?=$select?> /><?=$term->getTermName().' '.$term->getTermYear()?>&nbsp;
+<?php		
+				//stop pre-selecting
+				$select_option = false;
+			endforeach;
+?>
+				</div>
+			</div>
+<?php		foreach($proxy_ci_array as $term_id=>$term_ci_list):	//split up the subarrays by term ?>
+			<table id="proxy_block_<?=$term_id?>" class="displayList" style="display:none;" width="100%">
+<?php
+				//begin looping through courses		
+				$rowClass = 'evenRow';
+				foreach($term_ci_list as $ci):
+					$ci->getCourseForUser();	//get course object
+					$ci->getInstructors();	//get a list of instructors				
+					$edit_icon = 'images/pencil.gif';
+					
+					$rowClass = ($rowClass=='oddRow') ? 'evenRow' : 'oddRow';	//set the row class
+?>
+				<tr align="left" valign="middle" class="<?=$rowClass?>">
+					<td width="5%"><img src="<?=$edit_icon?>" alt="edit" width="24" height="20"></td>
+					<td width="20%"><a href="index.php?cmd=editClass&ci=<?=$ci->getCourseInstanceID()?>"><?=$ci->course->displayCourseNo()?></a></td>
+					<td width="45%"><a href="index.php?cmd=editClass&ci=<?=$ci->getCourseInstanceID()?>"><?=$ci->course->getName()?></a></td>
+					<td width="30%"><?=$ci->displayInstructors()?></td>			
+				</tr>
+<?php			endforeach; ?>
+			</table>
+<?php		endforeach; ?>
+			<p />
+			<img src="images/pencil.gif" width="24" height="20"> <span style="font-size:small;">= courses you may edit</span>
+			<p />
+		</div>
+<?php	endif; ?>
+
+		<div id="no_classes_block" style="display:none;">
+<?php	if($u->getRole() >= $g_permission['instructor']): ?>
+			You are not teaching any courses this semester;
+<?php	else: ?>
+			You are not enrolled in any classes this semester;
+<?php	endif; ?>			
+		</div>
+
+		<script>
+			<?=$onload_jscript?>
+		</script>
+<?php
+	} //displayCourseList()
 	
 	
 	function displayDuplicateCourse(&$ci, $prev_state=null) {

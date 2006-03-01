@@ -458,53 +458,47 @@ class courseInstance
 	{
 		$this->course = new course($this->primaryCourseAliasID);
 	}
-
-	function getCourseForUser($userID)
-	{
-
-		global $g_dbConn;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-
-				$sql  = "SELECT DISTINCT a.alias_id "
-				.  		"FROM access as a "
-				.  		"  LEFT JOIN course_aliases as ca on a.alias_id = ca.course_alias_id AND a.user_id = ! "
-				.	    "WHERE ca.course_instance_id = !"
-				;
+	
+	
+	/**
+	 * @return void
+	 * @param int $user_id (optional) User for which to get the course
+	 * @desc Returns the course (crosslisting) for a user.  If user is not specified, attempts to get course for current user.  If user has no course specified (staff) this method gets primary course.  In the end $this->course is set.
+	 */
+	public function getCourseForUser($user_id=null) {
+		global $u, $g_dbConn;
+		
+		//build the query
+		switch($g_dbConn) {
+			default:	//mysql
+				$sql = "SELECT DISTINCT ca.course_alias_id
+						FROM course_aliases AS ca
+							JOIN access AS a ON a.alias_id = ca.course_alias_id
+						WHERE a.user_id = !
+							AND ca.course_instance_id = !";
 		}
-
-		$rs = $g_dbConn->query($sql, array($userID, $this->courseInstanceID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		while ($row = $rs->fetchRow()) {
-			$this->course = new course($row[0]);
+		
+		//make sure we have a user ID
+		if(empty($user_id)) {	//if not passed an ID
+			$user_id = $u->getUserID();	//use the current user
 		}
-
-	}
-
-
-	function getCoursesForInstructor($userID)
-	{
-		global $g_dbConn;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql  = "SELECT DISTINCT a.alias_id "
-				.  		"FROM access as a "
-				.  		"  LEFT JOIN course_aliases as ca on a.alias_id = ca.course_alias_id AND a.user_id = ! "
-				.	    "WHERE ca.course_instance_id = !"
-				;
+		
+		//if the user is an instructor for this class
+		if(in_array($user_id, $this->instructorIDs)) {
+			$this->course = new course($this->primaryCourseAliasID);	//use primary course
 		}
-
-		$rs = $g_dbConn->query($sql, array($userID, $this->courseInstanceID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		while ($row = $rs->fetchRow()) {
-			$this->courseList[] = new course($row[0]);
-		}
+		else {	//user not an instructor, query DB
+			$rs = $g_dbConn->query($sql, array($user_id, $this->courseInstanceID));
+			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+			
+			if($rs->numRows() > 0) {	//if user has a specified course
+				$row = $rs->fetchRow();
+				$this->course = new course($row[0]);	//use it
+			}
+			else {	//no specified course
+				$this->course = new course($this->primaryCourseAliasID);	//use primary course
+			}
+		}		
 	}
 
 
@@ -1043,8 +1037,9 @@ class courseInstance
 		$retValue = "";
 		for($i=0;$i<count($this->instructorList);$i++)
 		{
-			$retValue .=  $this->instructorList[$i]->getName() . "; ";
+			$retValue .=  $this->instructorList[$i]->getName(false) . ", ";
 		}
+		$retValue = rtrim($retValue, ', ');	//trim the last comma
 		return ($retValue == "" ? "None" : $retValue);
 	}
 

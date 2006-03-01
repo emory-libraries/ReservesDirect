@@ -268,116 +268,41 @@ class instructor extends proxy
 			if (DB::isError($rs3)) { trigger_error($rs3->getMessage(), E_USER_ERROR);}
 		}
 	}
-
-	/**
-	* @return array of courseInstances
-	* @desc return all the class this user has ever instructed
-	*/
-	function getAllCourseInstances($PastOnly=false)
-	{
-		global $g_dbConn, $g_permission;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$d = date('Y-m-d');
-
-				$sql = 	"SELECT DISTINCT ci.course_instance_id "
-				.		"FROM access as a "
-				.		" JOIN course_aliases as ca ON a.alias_id = ca.course_alias_id "
-				.		" JOIN course_instances as ci ON ca.course_instance_id = ci.course_instance_id "
-				.		" JOIN courses AS c ON c.course_id=ca.course_id "
-				.		" JOIN departments AS d ON d.department_id=c.department_id "
-				.		" WHERE a.permission_level = " . $g_permission['instructor'] . " AND a.user_id = ! AND ci.status = 'ACTIVE'"
-				;
-
-				if ($PastOnly == true)
-					$sql .=	"  AND ci.expiration_date <= '$d' ";
-
-				$sql .=	" ORDER BY ci.year DESC, ci.term DESC, d.abbreviation ASC, c.course_number ASC";
-
-		}
-		
-		$rs = $g_dbConn->query($sql, $this->getUserID());
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		$tmpArray = array();
-		while($row = $rs->fetchRow())
-		{
-			$tmpArray[] = new courseInstance($row[0]);
-		}
-		return $tmpArray;
-	}
-
-	/**
-	* @return array of courses
-	* @desc return all the courses this user has ever instructed
-	*/
-	function getAllCourses()
-	{
-		global $g_dbConn, $g_permission;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql = 	"SELECT DISTINCT c.course_id "
-				.		"FROM access as a "
-				.		"  JOIN course_aliases as ca ON a.alias_id = ca.course_alias_id AND a.permission_level = " . $g_permission['instructor'] . " AND a.user_id = ! "
-				.		"  JOIN courses as c ON c.course_id = ca.course_id "
-				.		"  JOIN departments as d ON c.department_id = d.department_id "
-				.		"  ORDER BY d.abbreviation, c.course_number "
-				;
-
-		}
-		$rs = $g_dbConn->query($sql, $this->getUserID());
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		$tmpArray = array();
-		while($row = $rs->fetchRow())
-		{
-			$tmpC = new course();
-			$tmpC->getCourseByID($row[0]);
-			$tmpArray[] = $tmpC;
-		}
-		return $tmpArray;
-	}
-
-	/**
-	* @return return array of classes
-	* @param $courseID - course to retrieve course instances for
-	* @desc return all of an instructor's classes for a given courseID
-	*/
-	function getMyCourseInstancesByCourseID($courseID)
-	{
-		global $g_dbConn, $g_permission;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql = "SELECT DISTINCT ca.course_instance_id "
-				.	   "FROM course_aliases as ca  "
-				.	   "JOIN access as a ON ca.course_alias_id = a.alias_id "
-				.	   "WHERE ca.course_id = ! "
-				.	   "AND a.user_id = ! "
-				.	   "AND a.permission_level = ".$g_permission['instructor']." ";
-
-		}
-
-		$rs = $g_dbConn->query($sql, array($courseID, $this->userID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		$tmpArray = array();
-		while($row = $rs->fetchRow())
-		{
-			$ci = new courseInstance($row[0]);
-			$ci->getPrimaryCourse();
-			$ci->getInstructors();
-			$tmpArray[] = $ci;
-		}
-		return $tmpArray;
-	}
-
 	
+	
+	/**
+	 * @return array
+	 * @desc Returns an array of current and future CIs this user can edit
+	 */
+	public function getCourseInstancesToEdit() {
+		//show current courses, or those that will start within a year
+		//do not show expired courses
+		$activation_date = date('Y-m-d', strtotime('+1 year'));
+		$expiration_date = date('Y-m-d');
+	
+		//get CIs where user is an instructor
+		$intructor_CIs = $this->fetchCourseInstances('instructor', null, $activation_date, $expiration_date);
+		//get CIs where user is a proxy
+		$proxy_CIs = $this->fetchCourseInstances('proxy', null, $activation_date, $expiration_date);
+		
+		//return the combined list
+		return array_merge($intructor_CIs, $proxy_CIs);
+	}
+	
+	
+	/**
+	 * @return array
+	 * @desc Returns an array of current and past CIs this user can edit
+	 */
+	public function getCourseInstancesToImport() {
+		//show current courses, or those that have already expired
+		$activation_date = date('Y-m-d');
+			
+		//return list of CIs
+		return $this->fetchCourseInstances('instructor', null, $activation_date);
+	}
+
+
     /**
      * Generate a list of available reports
      *

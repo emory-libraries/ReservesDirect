@@ -77,6 +77,89 @@ class classManager
 				}
 			break;
 			
+			case 'myReserves':
+			case 'viewCourseList':
+				$page = "myReserves";
+				$loc  = "home";
+				
+				//get editable CIs for proxy or better
+				if($user->getRole() >= $g_permission['proxy']) {
+					//get current courses, or those that will start within a year
+					//do not get expired courses
+					$activation_date = date('Y-m-d', strtotime('+1 year'));
+					$expiration_date = date('Y-m-d');
+				
+					//get CIs where user is an instructor
+					$ciList_instructor = $user->fetchCourseInstances('instructor', null, $activation_date, $expiration_date);
+					//get CIs where user is a proxy
+					$ciList_proxy = $user->fetchCourseInstances('proxy', null, $activation_date, $expiration_date);					
+				}
+				
+				//get viewable CIs for everyone
+				$ciList_student = $user->getCourseInstances();
+
+				$this->displayFunction = "displayCourseList";
+				$this->argList = array($ciList_student, $ciList_instructor, $ciList_proxy);
+			break;
+			
+/*******************
+	###### redo ##########
+	
+	
+			case 'addClass':
+				$page = "myReserves";
+				
+				$prof = $_REQUEST['selected_instr'];
+				$dept = $_REQUEST['dept'];
+
+				if ($prof) {
+					$courseList = array ();
+					
+					$user->get Current Classes For($prof, $g_permission['instructor']);
+					
+					for ($i=0;$i<count($user->courseInstances);$i++)
+					{
+						$ci = $user->courseInstances[$i];						
+						$ci->getCourses();
+						$courseList = array_merge($courseList, $ci->courseList);
+					}
+					
+					$searchParam = new instructor();
+					$searchParam->getUserByID($prof);		
+				} elseif ($dept) {
+					$user->get Courses By Dept($dept);
+					$courseList = $user->courseList;
+
+					$searchParam = new department($dept);
+				} else {
+					$alertMsg = "You must choose either an Instructor Name or a Department";
+					return;
+				}
+
+				$this->displayFunction = "displayAddClass";
+				$this->argList = array($courseList, $searchParam);
+			break;
+
+			case 'removeClass':
+				$page = "myReserves";
+
+				if ($user->getRole() < $g_permission['proxy']) {
+					$user->get Course Instances();
+				} else {
+					$user->get Current Classes For($user->getUserID());
+				}
+				for ($i=0;$i<count($user->courseInstances);$i++)
+				{
+					$ci = $user->courseInstances[$i];
+					$ci->getCourseForUser($user->getUserID());  //load courses
+				}
+
+				$this->displayFunction = "displayRemoveClass";
+				$this->argList = "";
+			break;
+
+*****************************/
+			
 			case 'activateClass':
 				if(empty($_REQUEST['ci'])) {
 					return false;
@@ -87,8 +170,23 @@ class classManager
 				$ci->setStatus('ACTIVE');
 				
 				//show success screen
-				$this->displayFunction = 'displaySuccess';
+				$this->displayFunction = 'displayActivateSuccess';
 				$this->argList = array($ci->getCourseInstanceID());			
+			break;
+			
+			case 'deactivateClass':
+				global $u, $adminUser;
+				
+				if(empty($_REQUEST['ci'])) {
+					return false;
+				}
+				
+				//just need to change the class status to active
+				$ci = new courseInstance($_REQUEST['ci']);
+				$ci->setStatus('INACTIVE');
+				
+				//go to course listing
+				classManager::classManager('viewCourseList', $u, $adminUser, null);
 			break;	
 			
 			case 'editClass':
@@ -372,58 +470,6 @@ class classManager
 				$this->argList = array($deptList, $request);
 			break;
 
-			case 'addClass':
-				$page = "myReserves";
-				
-				$prof = $_REQUEST['selected_instr'];
-				$dept = $_REQUEST['dept'];
-
-				if ($prof) {
-					$courseList = array ();
-					
-					$user->getCurrentClassesFor($prof, $g_permission['instructor']);
-					
-					for ($i=0;$i<count($user->courseInstances);$i++)
-					{
-						$ci = $user->courseInstances[$i];						
-						$ci->getCourses();
-						$courseList = array_merge($courseList, $ci->courseList);
-					}
-					
-					$searchParam = new instructor();
-					$searchParam->getUserByID($prof);		
-				} elseif ($dept) {
-					$user->getCoursesByDept($dept);
-					$courseList = $user->courseList;
-
-					$searchParam = new department($dept);
-				} else {
-					$alertMsg = "You must choose either an Instructor Name or a Department";
-					return;
-				}
-
-				$this->displayFunction = "displayAddClass";
-				$this->argList = array($courseList, $searchParam);
-			break;
-
-			case 'removeClass':
-				$page = "myReserves";
-
-				if ($user->getRole() < $g_permission['proxy']) {
-					$user->getCourseInstances();
-				} else {
-					$user->getCurrentClassesFor($user->getUserID());
-				}
-				for ($i=0;$i<count($user->courseInstances);$i++)
-				{
-					$ci = $user->courseInstances[$i];
-					$ci->getCourseForUser($user->getUserID());  //load courses
-				}
-
-				$this->displayFunction = "displayRemoveClass";
-				$this->argList = "";
-			break;
-
 
 			case 'viewEnrollment':
 				$page = "manageClasses";
@@ -469,7 +515,7 @@ class classManager
 					$ci->setStatus('ACTIVE');
 					
 					//show success screen
-					$this->displayFunction = 'displaySuccess';
+					$this->displayFunction = 'displayCreateSuccess';
 					$this->argList = array($ci->getCourseInstanceID());
 				}
 				else {	//could not create course -- the CI must be a duplicate
@@ -526,8 +572,9 @@ class classManager
 				$page = "manageClasses";
 				$loc = "copy reserve items to another class";
 				
-				$this->displayFunction = 'displayCopyItems';
-				$this->argList = array($cmd,$user,$request);
+				$class_list = $user->getCourseInstancesToEdit();
+				$this->displayFunction = 'displaySelectClass';
+				$this->argList = array('processCopyItems', $class_list, 'Select class to copy TO:', $request);
 			break;
 			
 			case 'processCopyItems':

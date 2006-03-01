@@ -56,13 +56,10 @@ class exportManager
 
 		if (!isset($request['course_ware']) || !isset($request['ci']))
 		{
-			$classList = null;
-			if ($u instanceof instructor)
-			{
-				$classList = $u->getCourseInstances($u->user_id);
-
-				for($i=0;$i<count($classList);$i++)
-					$classList[$i]->getPrimaryCourse();
+			$classList = $u->getCourseInstancesToEdit();
+			
+			for($i=0;$i<count($classList);$i++) {
+				$classList[$i]->getPrimaryCourse();
 			}
 
 			$this->displayFunction = 'displayExportSelectClass';

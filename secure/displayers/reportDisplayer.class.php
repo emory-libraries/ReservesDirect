@@ -30,8 +30,7 @@ http://www.reservesdirect.org/
 require_once("secure/classes/terms.class.php");
 require_once("secure/managers/ajaxManager.class.php");
 
-class reportDisplayer
-{
+class reportDisplayer extends baseDisplayer {
 	/**
 	 * Display List all reports available to user
 	 *
@@ -200,62 +199,14 @@ class reportDisplayer
 			break;
 			
 			case 'class':
+				//generate class list for instructors
+				$class_list = $u->getCourseInstancesToEdit();				
 ?>
 	<tr>
 		<td colspan="2" valign="top">
-<?php		
-				if($u->getRole() >= $g_permission['staff']) {
-					//display ajax class select
-					$mgr = new ajaxManager();
-					$mgr->lookup('lookupClass', 'viewReport', 'manageClass', 'Select Class', array('reportID'=>$_REQUEST['reportID']));
-					$mgr->display();
-				}
-				else {
-					$ci_array = $u->getAllCourseInstances(false);
-					rsort($ci_array);	//show the most recent classes first
+		
+			<?php self::displaySelectClass('viewReport', $class_list, '', array('reportID'=>$_REQUEST['reportID'])); ?>
 
-					//print out header row
-?>
-			<form method="post" action="index.php">
-			<input type="hidden" name="cmd" value="viewReport" />
-				<input type="hidden" name="reportID" value="<?=$report->getReportID()?>" />
-				
-			<table width="100%" cellspacing="0">
-				<tr class="headingCell1" align="left" style="text-align:left;">
-					<td width="5%">&nbsp;</td>
-					<td width="15%">Course Number</td>
-					<td width="30">Course Name</td>
-					<td width="30%">Instructor</td>
-					<td width="10%">Last Active</td>
-					<td width="10%">Reserve List</td>
-				</tr>
-<?php
-					//loop through CIs
-					foreach($ci_array as $ci):
-						$rowClass = ($rowClass=='oddRow') ? 'evenRow' : 'oddRow';
-						
-						$ci->getPrimaryCourse();
-						$ci->getInstructors();
-?>
-				<tr class="<?=$rowClass?>">
-					<td><input name="ci" type="radio" value="<?= $ci->getCourseInstanceID() ?>" onClick="document.getElementById('button').disabled=false"></td>
-					<td><?=$ci->course->displayCourseNo()?>&nbsp;</td>
-					<td><?=$ci->course->getName()?>&nbsp;</td>
-					<td><?=$ci->displayInstructorList()?>&nbsp;</td>
-					<td><?=$ci->displayTerm()?>&nbsp;</td>
-					<td><a href="javascript:openWindow('no_control&cmd=previewReservesList&ci=<?=$ci->courseInstanceID ?>','width=800,height=600');">preview</a></td>
-				</tr>
-<?php
-					endforeach;
-?>
-			</table>
-				
-				<p />
-				<center><input type="submit" name="submit" id="button" value="Generate Report" disabled="true" /></center>
-			</form>
-<?php					
-				}
-?>
 		</td>
 	</tr>
 <?php

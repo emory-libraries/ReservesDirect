@@ -115,8 +115,6 @@ $calendar = new Calendar();
 }
 
 switch ($cmd)
-	case 'myReserves':
-	case 'viewCourseList':  // myReserves Course List
 {
 	case 'viewReservesList': // myReserves Reserve List
 	case 'previewReservesList':
@@ -142,6 +140,10 @@ switch ($cmd)
 		$mgr = new reservesManager($cmd, $u);
 	break;
 	
+	case 'myReserves':
+	case 'viewCourseList':
+	case 'activateClass':
+	case 'deactivateClass':
 	case 'deactivateClass':
 	case 'manageClasses':
 	case 'editProxies':
@@ -150,7 +152,6 @@ switch ($cmd)
 	case 'editTitle':
 	case 'editClass':			// manageClass edit class
 	case 'createClass':			// manageClass create class (enter meta-data)
-	case 'reactivate':			// managerClass reactivate class
 	case 'searchForClass':		// myReserves - search for a class by Instructor or Dept
 	case 'createNewClass':		// manageClass create class (store meta-data to DB)
 	case 'addClass':			// myReserves - add a class as a student

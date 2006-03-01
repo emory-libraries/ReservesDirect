@@ -32,8 +32,7 @@ http://www.reservesdirect.org/
 require_once("secure/common.inc.php");
 require_once("secure/managers/lookupManager.class.php");
 
-class searchDisplayer 
-{
+class searchDisplayer extends baseDisplayer {
 	/**
 	* @return void
 	* @desc Display staff search screen
@@ -348,7 +347,7 @@ class searchDisplayer
 		global $calendar;
 		
 		echo "<form action=\"index.php\" method=\"POST\">\n";
-		
+		echo "<input type=\"hidden\" name=\"ci\" value=\"".$request['ci']."\">\n";
 		echo "<input type=\"hidden\" name=\"cmd\" value=\"$cmd\">\n";
 		echo "<input type=\"hidden\" name=\"removeItem\" value=\"\">\n";
 		if (is_array($hidden_fields)){
@@ -363,10 +362,6 @@ class searchDisplayer
 				}
 			}
 		}		
-		
-		
-		$selectClassMgr = new lookupManager('','lookupClass', $u, $request);
-		$selectClassMgr->display();
 		
 		echo "<table width=\"100%\" border=\"0\" align=\"center\" cellpadding=\"0\" cellspacing=\"0\">";
 		

@@ -2,9 +2,7 @@
 ReservesDirect Style Sheet  
 ReserveStyles.css
 
-Default implementation for General Libraries
-Emory University
-Atlanta, GA 30322
+Sample style sheet for Open Source distribution.
 
 Last Modified 11/26/2005
 */
@@ -490,6 +488,88 @@ the commented guidelines below are for creating standard tabs. */
 }
 /* end IE hack */
 
+/*contetTabs and displayList together control how most tables and lists display in the main content area */
+.contentTabs {
+    margin-left:0px;
+    background-color:#FFFFFF;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size:small;
+    } 
+	
+.contentTabs ul {
+	margin-left:0px;
+	padding:0px; 
+    list-style:none;
+    }
+.contentTabs li {
+    float:left;
+    margin:3px 3px 0 3px;
+    padding:0; 
+    border-right: 1px solid #666666;
+	border-left: 1px solid #666666;
+	border-top: 1px solid #666666;
+	}
+.contentTabs a {
+	float:left;
+	display:block;
+	background-color: #CCCCCC;
+	padding:4px 20px 4px 20px; /* left padding=right padding - pixel width of left image
+								bottom padding=desired overall bottom padding-pixel 
+								width of bottom border, if any */
+	color: #333333;
+	text-decoration: none;
+	font-weight: bold;
+    }
+	/* Commented Backslash Hack
+     hides rule from IE5-Mac \*/
+  .contentTabs a {float:none;}
+  /* End IE5-Mac hack */ 
+.contentTabs a:hover {
+     color: #000066;
+	text-decoration: underline;
+	background-color: #CCCC99;
+	  }	
+.contentTabs .current a, .contentTabs .current a:hover {
+	border-bottom: 1px solid #CCCCCC;
+	background-color: #333333;
+	color: #FFFFFF;
+	font-weight:bold;
+	text-decoration: none;
+	padding-bottom:4px; /* bottom padding=top padding of mainNav a */
+    }
+.contentTabs .current a:hover {
+	
+}
+table.displayList {	
+	border:1px solid #333333;
+	border-collapse:collapse;
+}
+table.displaylist td{
+	padding:4px;
+}
+.displayList .actions, .displayList .actions a {
+	color:#CCCCCC;
+	text-decoration:none;
+}
+.displayList .actions a:hover {
+	color:#CCCCCC;
+	text-decoration:underline;
+}
+.displayList .head, .displayList .foot{
+	background-color:#333333;
+	color:#FFFFFF;
+}
+
+.displayList .divider {
+
+	background-color: #CCCCFF;
+	color:#333333;
+	text-align: left;
+	border-top: 1px solid #333333;
+	border-bottom: 1px solid #333333;
+	
+}
+
 /* oddRow/evenRow define how alternating row colors appear in tables */
 .oddRow {
     padding-top:1px; /* this fixes a display error in IE for the default implementation. Change at your own risk. */
@@ -635,12 +715,7 @@ the commented guidelines below are for creating standard tabs. */
 	float: right;
 	right: 0px;
 }
-.displayList {	
-	font-size: small;
-	font-style: normal;
-	color: #333333;
-	text-decoration: none;
-}
+
 
 
 /*
@@ -716,6 +791,18 @@ itemMetaPre defines how some prefixes to metadata information appear, for exampl
 }
 
 /* Other text definition tags below.... */
+.button, .button:focus {
+    color: #fff;
+    background-color: #339;
+    border-bottom: 1px solid #333;
+    border-right: 1px solid #000;
+    border-left: 1px solid #C4C4B8;
+    border-top: 1px solid #C4C4B8;
+    -moz-border-radius: 5px;
+}
+.button:hover {
+    background-color: #66a;
+}
 
 .small {
 	font-family: Arial, Helvetica, sans-serif;
@@ -907,6 +994,9 @@ Help Screen Definitions
 	background-color: #CCCCCC;
 	text-align: center;
 }
+
+
+
 #helpTabs {
     float:left;
     width:100%;
