@@ -37,8 +37,18 @@
 	  	//Display NoScript error if greater than proxy and javascript is not enabled
 	  	if ($u->getRole() >= $g_permission['proxy'])
 	  		echo "<noscript><div id=\"noJavaAlert\" class=\"failedText\">$g_no_javascript_msg</div></noscript>\n";
-	 ?>
- 
+	?>
+    
+    <? 
+    	if (!is_null($news = news::getNews()))
+    	{
+    		for($i=0; $i < count($news); $i++)
+    		{
+    			echo "<div align=\"center\" id=\"displayMsg\" class=\"". $news[$i]['class'] ."\">" . $news[$i]['text'] . "</div>";
+    		}
+    	}        	
+    ?>
+    </div>	 	 
     <div id="alertMsg" class="failedText">
         <? if (isset($alertMsg)) echo $alertMsg; ?>
     </div>
