@@ -40,7 +40,7 @@
 	?>
     
     <? 
-    	if (!is_null($news = news::getNews()))
+    	if (!is_null($news = news::getNews($u->getRole())))
     	{
     		for($i=0; $i < count($news); $i++)
     		{
