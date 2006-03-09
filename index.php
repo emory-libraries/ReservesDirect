@@ -34,6 +34,7 @@ require_once("secure/common.inc.php");
 require_once("secure/classes/calendar.class.php");
 require_once("secure/classes/users.class.php");
 require_once("secure/classes/skins.class.php");
+require_once("secure/classes/news.class.php");
 
 require_once("secure/interface/student.class.php");
 require_once("secure/interface/custodian.class.php");
@@ -115,6 +116,8 @@ $calendar = new Calendar();
 }
 
 switch ($cmd)
+	case 'myReserves':
+	case 'viewCourseList':  // myReserves Course List
 {
 	case 'viewReservesList': // myReserves Reserve List
 	case 'previewReservesList':
@@ -133,23 +136,27 @@ switch ($cmd)
 	case 'faxReserve': //addReserve - Fax Reserve Screen
 	case 'getFax': //addReserve - Claim Fax Screen
 	case 'addFaxMetadata': //addReserve - Fax Meta Data Screen
+	case 'addStudent': //myReserves - give a user student access to class
+	case 'removeStudent': //myReserves - remove a students access to a class
 	case 'editMultipleReserves':	//edit common reserve data for multiple reserves in a class
 		require_once("secure/managers/reservesManager.class.php");
 		$mgr = new reservesManager($cmd, $u);
 	break;
-	
-	case 'myReserves':
-	case 'viewCourseList':
-	case 'activateClass':
-	case 'deactivateClass':
+	case 'addReserve':
+
 	case 'deactivateClass':
 	case 'manageClasses':
 	case 'editProxies':
 	case 'editInstructors':
 	case 'editCrossListings':
 	case 'editTitle':
+	case 'reactivateClass':		// manageClass choose class to reactivate
+	case 'reactivateConfirm':	// confirm reactivation name/section
+	case 'reactivateList':
 	case 'editClass':			// manageClass edit class
 	case 'createClass':			// manageClass create class (enter meta-data)
+	case 'reactivate':			// managerClass reactivate class
+	case 'searchForClass':		// myReserves - search for a class by Instructor or Dept
 	case 'createNewClass':		// manageClass create class (store meta-data to DB)
 	case 'addClass':			// myReserves - add a class as a student
 	case 'removeClass':			// myReserves - remove a class you are a student in
@@ -229,7 +236,6 @@ switch ($cmd)
 	case 'copyClass':
 	case 'copyClassOptions':
 	case 'copyExisting':
-	case 'importClass':			//import reserves list from one ci to another
 	case 'importClass':			//import reserves list from one ci to another
 	case 'processCopyClass':
 		require_once("secure/managers/copyClassManager.class.php");
