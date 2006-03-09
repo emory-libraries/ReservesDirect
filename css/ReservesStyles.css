@@ -13,6 +13,7 @@ Last Modified 11/26/2005
  ************************************************* 
 */
 
+
 body {
 	font-family: Arial, Helvetica, sans-serif;
 	background-color: #FFFFFF;
@@ -488,7 +489,40 @@ the commented guidelines below are for creating standard tabs. */
 }
 /* end IE hack */
 
-/*contetTabs and displayList together control how most tables and lists display in the main content area */
+/* courseInfo describes the block where course title, instructors, etc. (all courseHeaders elements) appears
+in the class view. courseActions is a block containing links that provide actions for the course in the edit
+class screen, and is next to the courseInfo block. */
+#courseInfo {
+	float:left;
+	width:65%;
+}
+#courseActions {
+	float:right;
+	width:30%;
+	border-right:2px solid #333333;
+	border-bottom:2px solid #333333;
+	background-color:#7A879F;
+	color:#FFFFFF;
+	padding:4px 4px 4px 6px;
+	margin-top:7px;
+}
+#courseActions a {
+	color:#FFFFFF;
+	text-decoration:none;
+	padding-bottom:5px;
+}
+#courseActions a:hover {
+	text-decoration:underline;
+}
+#courseActions ul {
+	margin-left:0px;
+}
+#courseActions li {
+	list-style-image:url(../../images/list-arrow-white.gif);
+	margin-left:0px;
+}
+
+/*contentTabs and displayList together control how most tables and lists display in the main content area */
 .contentTabs {
     margin-left:0px;
     background-color:#FFFFFF;
@@ -509,6 +543,10 @@ the commented guidelines below are for creating standard tabs. */
 	border-left: 1px solid #666666;
 	border-top: 1px solid #666666;
 	}
+.contentTabs .alert {
+	font-size:12px;
+	color:#009900;
+}
 .contentTabs a {
 	float:left;
 	display:block;
@@ -537,8 +575,15 @@ the commented guidelines below are for creating standard tabs. */
 	text-decoration: none;
 	padding-bottom:4px; /* bottom padding=top padding of mainNav a */
     }
-.contentTabs .current a:hover {
-	
+table.simpleList {
+	border:1px solid #CCCCCC;
+	background-color:#CCCCCC;
+	width:80%;
+}
+table.simpleList td {
+	padding:2px;
+	margin:1px;
+	background-color:#FFFFFF;
 }
 table.displayList {	
 	border:1px solid #333333;
@@ -894,6 +939,18 @@ of materials on reserve. */
 	font-weight: bold;
 
 }
+.openEnrollment {
+	color:#009900;
+	font-weight:bold;
+}
+.moderatedEnrollment {
+	color:#663300;
+	font-weight:bold;
+}
+.closedEnrollment {
+	color:#CC0000;
+	font-weight:bold;
+}
 
 /*Auto complete Definitions for search lookup screens*/
 
@@ -977,6 +1034,59 @@ border:1px solid #99b58d;
 Help Screen Definitions
 ****************************************
 */
+
+.helpTip {
+	position:absolute;
+	left:200px;
+	top:200px;
+	border:1px solid #333333;
+	background-color:#CCFFCC;
+	width:400px;
+	text-align:left;
+	padding:5px;
+	visibility:hidden;
+}
+.helpTip .actionLinks {
+	float:right;
+}
+.helpTip .helpIcon {
+	background-image: url(../../images/questionMark.gif);
+	width:30px;
+	float:left;
+	padding-bottom:15px;
+	margin:3px;
+}
+.helpTip .actionIcons {
+	float:right;
+	width:50px;
+	margin:5px 0px 5px 5px;
+}
+.helpTip .title {
+	float:left;
+	color:#333333;
+	font-size:medium;
+	font-weight:bold;
+	margin-left:8px;
+	margin-top:8px;
+}
+.helpTip .text {
+	display:block;
+	padding:10px;
+	margin: 28px 15px 15px 35px;
+}
+.helpTip .turnOffHelp {
+	color:#666666;
+	font-size:10px;
+	float:left;
+	width:200px;
+}
+.helpTip .turnOffHelp a {
+	color:#333333;
+	text-decoration:underline;
+}
+.helpTip .turnOffHelp a:hover {
+	color:#0000FF;
+}
 .headingCell-helpfileActive {
 	
 	font-size: small;
@@ -1144,5 +1254,6 @@ a.helpsubtopic:active {
 	text-decoration: underline;
 	text-indent: 8px;
 }
+
 
 
