@@ -57,7 +57,7 @@ http://www.reservesdirect.org/
 	    'debug'     => (string)$configure->database->debug
 	);
 
-    $ldap = array(
+    $g_ldap = array(
         'host'      => (string)$configure->ldap->ldapHost,
         'domain'    => (string)$configure->ldap->ldapDomain,
         'port'      => (string)$configure->ldap->ldapPort,
@@ -67,8 +67,11 @@ http://www.reservesdirect.org/
         'firstname' => (string)$configure->ldap->userAttributes->firstName,
         'lastname'  => (string)$configure->ldap->userAttributes->lastName,
         'email'     => (string)$configure->ldap->userAttributes->email,
+        'searchdn'	=> (string)$configure->ldap->searchDistinguishedName,
+        'searchpw'	=> (string)$configure->ldap->searchPassword,
+        'error'		=> NULL
     );
-
+    
 	//open connection
 	$g_dbConn = DB::connect($dsn, $options);
 	if (DB::isError($g_dbConn)) { trigger_error($g_dbConn->getMessage(), E_USER_ERROR); }
