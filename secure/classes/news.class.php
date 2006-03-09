@@ -39,11 +39,13 @@ class news
 				$now = date("Y-m-d H:i:s",strtotime("now"));
 			
 				$sql = 	"SELECT news_id, news_text, font_class, begin_time, end_time FROM news 
-						 WHERE (permission_level <= $permission_level) AND ((begin_time IS NULL AND end_time IS NULL) OR (begin_time <= '$now' AND '$now' <= end_time))
+						 WHERE (permission_level = '$permission_level' OR permission_level is null) 
+						 	AND ((begin_time IS NULL AND end_time IS NULL) OR (begin_time <= '$now' AND '$now' <= end_time))
+						 ORDER BY news_id DESC
 				"
 				;
 		}
-		
+	
 		$rs = $g_dbConn->query($sql);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
