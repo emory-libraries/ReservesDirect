@@ -41,11 +41,13 @@
     
     <? 
     	if (!is_null($news = news::getNews($u->getRole())))
-    	{
+    	{    		
+    		echo "<div id=\"displayMsg\">";
     		for($i=0; $i < count($news); $i++)
     		{
-    			echo "<div align=\"center\" id=\"displayMsg\" class=\"". $news[$i]['class'] ."\">" . $news[$i]['text'] . "</div>";
+    			echo "<div class=\"". $news[$i]['class'] ."\">" . $news[$i]['text'] . "</div>\n";
     		}
+    		echo "</div>";
     	}        	
     ?>
     </div>	 	 

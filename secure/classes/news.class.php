@@ -49,7 +49,7 @@ class news
 		$rs = $g_dbConn->query($sql);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
-		$news = array(0);
+		$news = null;
 		while ($row = $rs->fetchRow())
 		{
 			$n['id'] 	= $row[0];
