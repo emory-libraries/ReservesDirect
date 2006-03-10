@@ -56,7 +56,6 @@ class classDisplayer extends baseDisplayer {
 		echo "					<td width=\"33%\" class=\"borders\">\n";
 		echo "						<ul>\n";
 		echo "							<li><a href=\"index.php?cmd=copyClass\">Copy Reserve List or Merge Classes</a><!--Links to staff-mngClass-CopyList1.html --></li>\n";
-		echo "							<li><a href=\"index.php?cmd=viewEnrollment\">View Student Enrollment</a><!--Links to staff-mngClass-CopyList1.html --></li>\n";
 		echo "							<li><a href=\"index.php?cmd=exportClass\">Export a Class to Blackboard, etc.</a><!--Same screens as faculty use for exporting a class--></li>\n";
 		echo "						</ul>\n";
 		echo "					</td>\n";
@@ -118,140 +117,190 @@ class classDisplayer extends baseDisplayer {
 	}
 	
 	
-	function displayEditClass($cmd, &$ci, &$tree_walker) {
-		global $u, $g_permission, $calendar, $g_siteURL;
-		
-		
-?>
+	function displayEditClassHeader(&$ci, $next_cmd, $show_quicklinks_box=true) {
+		global $u, $g_permission, $calendar;
 
-		<form method="post" name="editReserves" action="index.php">		
-			<input type="hidden" name="cmd" value="<?=$cmd?>" />
-			<input type="hidden" name="ci" value="<?=$ci->getCourseInstanceID()?>" />
+		//grab all the necessary info
+		$ci->getCourseForUser();
+		$crosslistings = $ci->getCrossListings();
+		$instructors = $ci->getInstructors();
+		$proxies = $ci->getProxies();
 
-		<div>
-		
-			<div style="text-align:right;"><strong><a href="javascript:openWindow('no_control=1&cmd=previewStudentView&amp;ci=<?=$ci->courseInstanceID?>','width=800,height=600');">Preview Student View</a> | <a href="index.php">Exit class</a></strong></div>
-			
-			<div class="courseTitle"><?=$ci->course->displayCourseNo() . " " . $ci->course->getName()?>&nbsp;<small>[ <a href="index.php?cmd=editTitle&amp;ci=<?=$ci->getCourseInstanceID()?>" class="editlinks">edit</a> ]</small></div>
-			
-			<div class="courseHeaders"><span class="label"><?=$ci->displayTerm()?></span></div>
-			
-			<div class="courseHeaders">
-				<span class="label">Cross-listings&nbsp;</span><small>[ <a href="index.php?cmd=editCrossListings&ci=<?=$ci->getCourseInstanceID()?>" class="editlinks">edit</a> ]</small>:
-
-<?php
-		if(count($ci->crossListings)==0) {
-			echo 'None';
+		//build crosslistings display string
+		$crosslistings_string = '';
+		if(empty($crosslistings)) {
+			$crosslistings_string = 'None';
 		}
 		else {
-			for ($i=0; $i<count($ci->crossListings); $i++) {
-				if ($i>0) echo',&nbsp;';
-				echo $ci->crossListings[$i]->displayCourseNo();
+			foreach($crosslistings as $crosslisting) {
+				$crosslistings_string .= ', '.$crosslisting->displayCourseNo();
 			}
+			$crosslistings_string = ltrim($crosslistings_string, ', ');	//trim off the first comma
 		}
-?>
-			</div>			
-			<div class="courseHeaders"><span class="label">Instructor(s)&nbsp;<small></span>[ <a href="index.php?cmd=editInstructors&ci=<?=$ci->getCourseInstanceID()?>" class="editlinks">edit</a> ]</small>:
-
-<?php 
-		for($i=0;$i<count($ci->instructorList);$i++) {
-			if ($i!=0) echo ',&nbsp;';
-			echo '<a href="mailto:'.$ci->instructorList[$i]->getEmail().'">'.$ci->instructorList[$i]->getFirstName().'&nbsp;'.$ci->instructorList[$i]->getLastName().'</a>';
+		
+		//build instructors display string; assume there is at least one
+		$instructors_string = '';
+		foreach($instructors as $instructor) {
+			$instructors_string .= ', <a href="mailto:'.$instructor->getEmail().'">'.$instructor->getName(false).'</a>';
 		}
-?>
-			</div>
-			<div class="courseHeaders"><span class="label">Proxies&nbsp;</span><small>[ <a href="index.php?cmd=editProxies&ci=<?=$ci->getCourseInstanceID()?>" class="editlinks">edit</a> ]</small>:
-			
-<?php 
-		if(count($ci->proxies)==0) {
-			echo 'None';
+		$instructors_string = ltrim($instructors_string, ', ');	//trim off the first comma
+		
+		//build proxies display string
+		$proxies_string = '';
+		if(empty($proxies)) {
+			$proxies_string = 'None';
 		}
 		else {
-			for($i=0; $i<count($ci->proxies); $i++) {
-				if ($i>0) echo',&nbsp;';
-				 echo $ci->proxies[$i]->getFirstName().'&nbsp;'.$ci->proxies[$i]->getLastName().'</a>';
+			foreach($proxies as $proxy) {
+				$proxies_string .= ', '.$proxy->getName(false);
 			}
+			$proxies_string = ltrim($proxies_string, ', ');	//trim off the first comma
 		}
+		
 ?>
-
-			</div>
-			<div class="courseHeaders"><span class="label">Enrollment: </span><span class="<?=common_getStatusStyleTag($ci->getEnrollment())?>"><?=strtoupper($ci->getEnrollment())?></span></div>
+		<div style="text-align:right;"><strong><a href="index.php">Exit class</a></strong></div>
+		<p />
+		
+		<div>			
+			<div id="courseInfo">
+				<div class="courseTitle"><?=$ci->course->displayCourseNo() . " " . $ci->course->getName()?>&nbsp;<small>[ <a href="index.php?cmd=editTitle&amp;ci=<?=$ci->getCourseInstanceID()?>" class="editlinks">edit</a> ]</small></div>
+			
+				<div class="courseHeaders"><span class="label"><?=$ci->displayTerm()?></span></div>
+			
+				<div class="courseHeaders">
+					<span class="label">Cross-listings&nbsp;</span><small>[ <a href="index.php?cmd=editCrossListings&ci=<?=$ci->getCourseInstanceID()?>" class="editlinks">edit</a> ]</small>: <?=$crosslistings_string?>
+				</div>
+				
+				<div class="courseHeaders"><span class="label">Instructor(s)&nbsp;<small></span>[ <a href="index.php?cmd=editInstructors&ci=<?=$ci->getCourseInstanceID()?>" class="editlinks">edit</a> ]</small>: <?=$instructors_string?>
+				</div>
+				
+				<div class="courseHeaders"><span class="label">Proxies&nbsp;</span><small>[ <a href="index.php?cmd=editProxies&ci=<?=$ci->getCourseInstanceID()?>" class="editlinks">edit</a> ]</small>: <?=$proxies_string?>
+				</div>
+				
+				<div class="courseHeaders"><span class="label">Enrollment: </span><span class="<?=common_getEnrollmentStyleTag($ci->getEnrollment())?>"><?=strtoupper($ci->getEnrollment())?></span></div>
 
 <?php	if($u->getRole() >= $g_permission['staff']): 	//hide activate/deactivate dates from non-staff ?>
-
-			<div class="courseHeaders"><span class="label">Class Active Dates: </span><input type="text" id="activation" name="activation" size="10" maxlength="10" value="<?=$ci->getActivationDate()?>" /> <?=$calendar->getWidgetAndTrigger('activation', $ci->getActivationDate())?> to <input type="text" id="expiration" name="expiration" size="10" maxlength="10" value="<?=$ci->getExpirationDate()?>" /> <?=$calendar->getWidgetAndTrigger('expiration', $ci->getExpirationDate())?> <input type="submit" name="updateClassDates" value="Change Dates"></div>
-			
+				<div class="courseHeaders">
+					<form name="change_dates_form" action="index.php" method="post">
+						<input type="hidden" name="cmd" value="<?=$next_cmd?>" />
+						<input type="hidden" name="ci" value="<?=$ci->getCourseInstanceID()?>" />
+						<span class="label">Class Active Dates: </span><input type="text" id="activation" name="activation" size="10" maxlength="10" value="<?=$ci->getActivationDate()?>" /> <?=$calendar->getWidgetAndTrigger('activation', $ci->getActivationDate())?> to <input type="text" id="expiration" name="expiration" size="10" maxlength="10" value="<?=$ci->getExpirationDate()?>" /> <?=$calendar->getWidgetAndTrigger('expiration', $ci->getExpirationDate())?> <input type="submit" name="updateClassDates" value="Change Dates">
+					</form>
+				</div>			
 <?php	endif; ?>
-			
-			<br />
-			<br />
-			
-			<script languge="JavaScript">
-				//a bit of a hack to highlight all <span>s with class="highlightable"
-				function highlightAll() {				
-					var items = document.getElementsByTagName("span");
-					
-					for(var x=0; x<items.length; x++) {
-						if(items[x].className == "highlightable") {
-							items[x].style.background = "yellow";
+
+			</div>
+
+<?php	if($show_quicklinks_box): ?>
+			<div id="courseActions">
+				<script language="JavaScript">
+					function submit_tsv_export_form() {
+						if(document.getElementById('tsv_export_form')) {
+							document.getElementById('tsv_export_form').submit();
 						}
+		else {
+			alert('no form');
+		}
+						return false;
+					}
+				</script>
+				<ul>
+					<li><a href="javascript:openWindow('no_control=1&cmd=previewStudentView&amp;ci=<?=$ci->courseInstanceID?>','width=800,height=600');">Preview Student View</a></li>
+					<li><a href="index.php?cmd=exportClass">Export readings to Courseware</a></li>
+					<li><a href="#" onclick="return submit_tsv_export_form();">Export class to Spreadsheet</a></li>
+				</ul>
+			</div>
+<?php	endif; ?>
+
+			<div class="clear"></div>
+		</div>
+<?php		
+	} //displayEditClassHeader()
+	
+	
+	function displayEditClassReservesList(&$ci, $next_cmd, $show_students_pending_warning=false) {
+		global $u, $g_permission, $g_siteURL;
+		
+		if($show_students_pending_warning) {
+			$students_pending_warning = '<span class="alert">&nbsp;&nbsp;&nbsp;! students requesting to join class !</span>';
+		}
+		
+		//get reserves as a tree + recursive iterator
+		$tree_walker = $ci->getReservesAsTreeWalker('getReserves');
+		
+?>
+		<script languge="JavaScript">
+			//a bit of a hack to highlight all <span>s with class="highlightable"
+			function highlightAll() {				
+				var items = document.getElementsByTagName("span");
+				
+				for(var x=0; x<items.length; x++) {
+					if(items[x].className == "highlightable") {
+						items[x].style.background = "yellow";
 					}
 				}
-			</script>
-
-			<div>
-			
-				[ <a href="index.php?cmd=customSort&ci=<?=$ci->getCourseInstanceID()?>&parentID=" class="editlinks">sort main list</a> ]
+			}
+		</script>
+		
+		<div>
+			[ <a href="index.php?cmd=customSort&ci=<?=$ci->getCourseInstanceID()?>&parentID=" class="editlinks">sort main list</a> ]
 			
 <?php	if($u->getRole() >= $g_permission['staff']): ?>
 
-				[ <a href="index.php?cmd=addReserve&ci=<?=$ci->getCourseInstanceID()?>&selected_instr=<?=$ci->instructorList[0]->getUserID()?>" class="editlinks">add new materials</a> ] 
+			[ <a href="index.php?cmd=addReserve&ci=<?=$ci->getCourseInstanceID()?>&selected_instr=<?=$ci->instructorList[0]->getUserID()?>" class="editlinks">add new materials</a> ] 
 				
 <?php	else: ?>
 
-				[ <a href="index.php?cmd=displaySearchItemMenu&ci=<?=$ci->getCourseInstanceID()?>" class="editlinks">add new materials</a> ] 
+			[ <a href="index.php?cmd=displaySearchItemMenu&ci=<?=$ci->getCourseInstanceID()?>" class="editlinks">add new materials</a> ] 
 
 <?php 	endif; ?>
 
-				[ <a href="index.php?cmd=editHeading&ci=<?=$ci->getCourseInstanceID()?>" class="editlinks">add new heading</a> ]
-				[ <a href="#" class="editlinks" onclick="highlightAll(); return false;">show reserve links</a> ]
+			[ <a href="index.php?cmd=editHeading&ci=<?=$ci->getCourseInstanceID()?>" class="editlinks">add new heading</a> ]
+			[ <a href="#" class="editlinks" onclick="highlightAll(); return false;">highlight reserve links</a> ]
 		
-			</div>
-			
 		</div>
-		<br />		
 		
-		<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
-			<tr align="left" valign="middle">
-				<td class="headingCell1">COURSE MATERIALS</td>
-				<td width="75%" align="right">
-					<a href="javascript:checkAll(document.forms.editReserves, 1)">check all</a> | <a href="javascript:checkAll(document.forms.editReserves, 0)">uncheck all</a>
-				</td>
-			</tr>
-			<tr valign="middle">
-				<td class="headingCell1" align="right" colspan="2">
-					<div class="editOptionsTitles">
-						<div class="itemNumber">
-							#
-						</div>	
-						<div class="checkBox">
-							Select
+		<div class="contentTabs">
+			<ul>
+				<li class="current"><a href="index.php?cmd=<?=$next_cmd?>&amp;ci=<?=$ci->getCourseInstanceID()?>">Course Materials</a></li>
+				<li><a href="index.php?cmd=<?=$next_cmd?>&amp;ci=<?=$ci->getCourseInstanceID()?>&amp;tab=enrollment">Enrollment<?=$students_pending_warning?></a></li>	
+			</ul>
+		</div>
+		<div style="float:right;">
+			<a href="javascript:checkAll(document.forms.editReserves, 1)">check all</a> | <a href="javascript:checkAll(document.forms.editReserves, 0)">uncheck all</a>
+		</div>
+		<div class="clear"></div>
+		
+		<div id="course_materials_block">
+			<form method="post" name="editReserves" action="index.php">		
+				<input type="hidden" name="cmd" value="<?=$next_cmd?>" />
+				<input type="hidden" name="ci" value="<?=$ci->getCourseInstanceID()?>" />
+				
+			<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+				<tr valign="middle">
+					<td class="headingCell1" align="right" colspan="2">
+						<div class="editOptionsTitles">
+							<div class="itemNumber">
+								#
+							</div>	
+							<div class="checkBox">
+								Select
+							</div>
+							<div class="sortBox">
+								Sort
+							</div>	
+							<div class="editBox">
+								Edit
+							</div>	
+							<div class="statusBox">
+								Status
+							</div>					
 						</div>
-						<div class="sortBox">
-							Sort
-						</div>	
-						<div class="editBox">
-							Edit
-						</div>	
-						<div class="statusBox">
-							Status
-						</div>					
-					</div>
-				</td>
-			</tr>
-			<tr>
-				<td colspan="2">
-					<ul style="list-style:none; padding-left:0px; margin:0px;">
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<ul style="list-style:none; padding-left:0px; margin:0px;">
 <?php
 		//begin displaying individual reserves and building dataSet for TSV export
 		//loop
@@ -323,38 +372,183 @@ class classDisplayer extends baseDisplayer {
 		echo str_repeat('</ul></li>', ($prev_depth));	//close all lists
 ?>
 
-					</ul>
-				</td>
-			</tr>
-			<tr valign="middle">
-				<td class="headingCell1" style="text-align:right; padding:2px;" align="right" colspan="2">
-					Add checked items to a heading: <?php self::displayHeadingSelect($ci); ?>
-					<input type="submit" name="" value="Submit">
-					&nbsp;&nbsp;
-					<select name="reserveListAction">
-						<option selected>For all Selected Items:</option>
-						<option value="copyAll">Copy items to another class</option>
-						<option value="deleteAll">Delete all selected items</option>
-						<option value="activateAll">Set all Selected to ACTIVE</option>
-						<option value="deactivateAll">Set all Selected to INACTIVE</option>
-					</select>
-					<input type="submit" name="modifyReserveList" value="Submit">
-				</td>
-			</tr>			
-		</table>
-		</form>
-        <table width="100%"><tr><td align="center"><br/>
-            <form method="post" action="tsvGenerator.php">
-                <input type="hidden" name="dataSet" value="<?=urlencode(serialize($dataSet))?>">
+						</ul>
+					</td>
+				</tr>
+				<tr valign="middle">
+					<td class="headingCell1" style="text-align:right; padding:2px;" align="right" colspan="2">
+						Add checked items to a heading: <?php self::displayHeadingSelect($ci); ?>
+						<input type="submit" name="" value="Submit">
+						&nbsp;&nbsp;
+						<select name="reserveListAction">
+							<option selected>For all Selected Items:</option>
+							<option value="copyAll">Copy items to another class</option>
+							<option value="deleteAll">Delete all selected items</option>
+							<option value="activateAll">Set all Selected to ACTIVE</option>
+							<option value="deactivateAll">Set all Selected to INACTIVE</option>
+						</select>
+						<input type="submit" name="modifyReserveList" value="Submit">
+					</td>
+				</tr>			
+			</table>
+			</form>
+			<p />
+			<form method="post" id="tsv_export_form" name="tsv_export_form" action="tsvGenerator.php">
+				<input type="hidden" name="dataSet" value="<?=urlencode(serialize($dataSet))?>">
                 <input type="submit" name="exportTsv" value="Export to Spreadsheet">
             </form>
-        </td></tr></table>
-
-		<p />
-		<div style="margin-left:5%; margin-right:5%; text-align:right;"><strong><a href="index.php">Exit class</a></strong></div>
+		</div>
+<?php
+	} //displayEditClassReservesList()
+	
+	
+	function displayEditClassEnrollment(&$ci, &$roll, $next_cmd) {		
+		//split the roll by status
 				
+		//this status is for registrar-fed roll; the students are considered approved and non-removable
+		$autofed_roll = !empty($roll['AUTOFEED']) ? $roll['AUTOFEED'] : array();
+		//these are manually-added approved students
+		$approved_roll = !empty($roll['APPROVED']) ? $roll['APPROVED'] : array();
+		//these are students who have requested to join a moderated class
+		$pending_roll = !empty($roll['PENDING']) ? $roll['PENDING'] : array();
+		if(!empty($roll['unk'])) {
+			$pending_roll = array_merge($pending_roll, $roll['unk']);	//students with 'unk' status are treated as pending
+		}
+?>
+	<form method="post" name="editReserves" action="index.php">		
+		<input type="hidden" name="cmd" value="<?=$next_cmd?>" />
+		<input type="hidden" name="ci" value="<?=$ci->getCourseInstanceID()?>" />
+		<input type="hidden" name="tab" value="enrollment" />
+
+		<div class="contentTabs">
+			<ul>
+				<li><a href="index.php?cmd=<?=$next_cmd?>&amp;ci=<?=$ci->getCourseInstanceID()?>">Course Materials</a></li>
+				<li class="current"><a href="index.php?cmd=<?=$next_cmd?>&amp;ci=<?=$ci->getCourseInstanceID()?>&amp;tab=enrollment">Enrollment</a></li>	
+			</ul>
+		</div>
+		<div class="clear"></div>
+		
+		<div id="enrollment_block" class="borders">
+			<div id="class_enrollment" class="classEnrollmentOptions">
+				<strong>Enrollment Type:</strong>
+				<?php self::displayEnrollmentSelect($ci->getEnrollment(), true); ?>
+				<input type="submit" name="setEnrollment" value="Set Enrollment">
+			</div>
+			<div id="class_roll" class="classRoll">
+				<div class="classRollPending">
+					<strong>Add a new student to this class:</strong>
+					<br />
+<?php
+		//ajax user lookup
+		$mgr = new ajaxManager('lookupUser', null, null, null, null, false, array('min_user_role'=>0, 'field_id'=>'student_id'));
+		$mgr->display();
+?>
+					<br />
+					<small>Select a name from the menu and click "Add Student to Roll"</small>
+					<br />
+					<input type="hidden" name="rollAction" id="rollActionAdd" value="" />
+					<input type="submit" name="submit" value="Add Student to Roll" onclick="javascript: document.getElementById('rollActionAdd').value='add';" />
+					<p />
+<?php	if(!empty($pending_roll)): ?>
+					<strong>Students requesting to join this class:</strong>
+					<table align="center" class="simpleList">
+<?php		foreach($pending_roll as $student): ?>
+						<tr bgcolor="#FFFFFF">
+							<td width="60%">
+								<?=$student->getName()?>
+							</td>
+							<td width="40%" align="center">
+								<a href="index.php?cmd=<?=$next_cmd?>&amp;ci=<?=$ci->getCourseInstanceID()?>&amp;tab=enrollment&amp;rollAction=add&amp;student_id=<?=$student->getUserID()?>">approve</a> | <a href="index.php?cmd=<?=$next_cmd?>&amp;ci=<?=$ci->getCourseInstanceID()?>&amp;tab=enrollment&amp;rollAction=deny&amp;student_id=<?=$student->getUserID()?>">deny</a>
+							</td>
+						</tr>
+<?php		endforeach; ?>
+					</table>
+<?php 	else: ?>
+					<strong>There are no enrollment requests.</strong>
+<?php	endif; ?>			
+				</div>
+				<div class="classRollActive">
+<?php	if(!empty($autofed_roll) || !empty($approved_roll)): ?>
+					<strong>Currently enrolled in this class:</strong>
+					<table align="center" class="simpleList">
+<?php		if(!empty($autofed_roll)): ?>
+						<tr>
+							<td colspan="2">
+								<strong>Students added by the Registrar:</strong>
+							</td>
+						</tr>
+<?php			foreach($autofed_roll as $student): ?>
+						<tr>
+							<td colspan="2">
+								<?=$student->getName()?>
+							</td>
+						</tr>
+<?php
+				endforeach;
+			endif;
+		
+			if(!empty($approved_roll)):
+				if(!empty($autofed_roll)):	//only show the label if there are both kinds of students (autofed + manual)
+?>
+						<tr><td colspan="2" align="center"><strong>* * *</strong></td></tr>
+						<tr>
+							<td colspan="2">
+								<strong>Manually-added students:</strong>
+							</td>
+						</tr>
+<?php		
+				endif;
+				foreach($approved_roll as $student):
+?>
+						<tr>
+							<td width="80%">
+								<?=$student->getName()?>
+							</td>
+							<td width="20%" align="center">
+								<a href="index.php?cmd=<?=$next_cmd?>&amp;ci=<?=$ci->getCourseInstanceID()?>&amp;tab=enrollment&amp;rollAction=remove&amp;student_id=<?=$student->getUserID()?>">remove</a>
+							</td>
+						</tr>
+<?php		
+				endforeach;
+			endif;
+?>
+					</table>
+<?php	else: ?>
+					<strong>There are no enrolled students.</strong>
+<?php	endif; ?>	
+				</div>
+				<div class="clear"></div>
+			</div>
+		</div>		
+	</form>
+					
+<?php
+	} //displayEditClassEnrollment()
+	
+	
+	function displayEditClass(&$ci, $next_cmd, $tab=null) {
+		//get the class roll	
+		$roll = $ci->getRoll();
+		//show a warning if there are students pending enrollment approval
+		//check pending array
+		$show_students_pending_warning = (!empty($roll['PENDING']) || !empty($roll['unk'])) ? true : false;		
+		
+		if($tab=='enrollment') {	//display enrollment screen
+			self::displayEditClassHeader($ci, $next_cmd, false);	//display header without the quicklinks box
+			self::displayEditClassEnrollment($ci, $roll, $next_cmd);	//display enrollment info
+		}
+		else {	//display reserves list screen
+			self::displayEditClassHeader($ci, $next_cmd, true);	//display header with the quicklinks box
+			self::displayEditClassReservesList($ci, $next_cmd, $show_students_pending_warning);	//display reseves list
+		}
+		
+		//display footer
+?>
+		<p />
+		<div style="text-align:right;"><strong><a href="index.php">Exit class</a></strong></div>
 <?php
 	}
+	
 
 	function displayEditTitle($ci, $deptID)
 	{
@@ -931,7 +1125,7 @@ class classDisplayer extends baseDisplayer {
 			    				Enrollment:
 			    			</td>
 			    			<td>
-			    				<?php self::displayEnrollmentSelect($enrollment); ?>
+			    				<?php self::displayEnrollmentSelect($enrollment, true); ?>
 			    			</td>
 			    		</tr>
 <?php	if($u->getRole() >= $g_permission['staff']): //show instructor lookup for staff ?>
@@ -1020,37 +1214,6 @@ class classDisplayer extends baseDisplayer {
 <?php		
 		endif;			
 	}
-	
-	
-	function displayClassEnrollment(&$ci=null) {
-		if($ci instanceof courseInstance):	//CI set, show enrollment
-			if(!($ci->course instanceof course)) {	//get course
-				$ci->getPrimaryCourse();
-			}
-			
-			$student_count = count($ci->students);
-?>
-		<div>
-			<div class="headingCell1" style="width:33%;">Class Enrollment</div>
-			<div class="borders" style="padding:5px;">
-				Enrollment for <strong><?=$ci->course->displayCourseNo() . " " . $ci->course->getName()?></strong>
-				<br />
-				<?=$student_count?> Total Enrolled Students
-				<ul>				
-<?php		for($x=0; $x<$student_count; $x++): ?>
-				<li><?=$ci->students[$x]->getName();?></li>				
-<?php		endfor; ?>
-				</ul>
-			</div>
-		</div>
-		
-<?php
-		else :	//no CI, show class lookup
-			//ajax lookup
-			$mgr = new ajaxManager('lookupClass', 'viewEnrollment', 'manageClasses', 'View Enrollment');
-			$mgr->display();
-		endif;
-	}
 
 
 	function displayDeleteClass ($cmd, $u, $request) {
@@ -1062,6 +1225,8 @@ class classDisplayer extends baseDisplayer {
 	}
 
 	function displayConfirmDelete ($sourceClass) {
+		$roll_arrays = $sourceClass->getRoll();
+		$roll = array_merge($roll_arrays['AUTOFEED'], $roll_arrays['APPROVED']);
 
 		echo '<input type="hidden" name="ci" value="'.$sourceClass->getCourseInstanceID().'">';
 
@@ -1074,25 +1239,15 @@ class classDisplayer extends baseDisplayer {
         echo 		'<span class="courseTitle">';
         echo 			$sourceClass->course->displayCourseNo().' -- '.$sourceClass->course->getName().' ('.$sourceClass->displayTerm().')</span>,';
         echo 			' <span class="helperText">Instructors: ';
-
-        	for($i=0;$i<count($sourceClass->instructorList);$i++) {
-				if ($i>0)
-					echo ',&nbsp;';
-				echo $sourceClass->instructorList[$i]->getFirstName().'&nbsp;'.$sourceClass->instructorList[$i]->getLastName();
-			}
-
+        echo $sourceClass->displayInstructors();
 		echo 			'</span></p></td></tr>';
 		echo '<tr><td>&nbsp;</td></tr>';
 		echo '<tr>';
-				echo 	'<td align="left" valign="top"><p><span class="helperText">'.count($sourceClass->students).' Total Enrolled Students<br><br>';
-
-				for ($i=0; $i<count($sourceClass->students); $i++)
-				{
-					echo '<span class="strong">'.$sourceClass->students[$i]->getName().'</span>';
-					echo '<br>';
+				echo 	'<td align="left" valign="top"><p><span class="helperText">'.count($roll).' Total Enrolled Students<br><br>';
+				
+				foreach($roll as $student) {
+					echo '<strong>'.$student->getName().'</strong><br />';
 				}
-
-
 
 				echo 	'</p></td>';
         		echo '</tr>';
@@ -1346,7 +1501,8 @@ class classDisplayer extends baseDisplayer {
 					<td width="5%"><img src="<?=$edit_icon?>" alt="edit" width="24" height="20"></td>
 					<td width="15%"><a href="index.php?cmd=editClass&ci=<?=$ci->getCourseInstanceID()?>"><?=$ci->course->displayCourseNo()?></a></td>
 					<td><a href="index.php?cmd=editClass&ci=<?=$ci->getCourseInstanceID()?>"><?=$ci->course->getName()?></a></td>
-					<td width="30%"><?=$ci->displayInstructors()?></td>			
+					<td width="30%"><?=$ci->displayInstructors()?></td>	
+					<td width="10%"><span class="<?=common_getEnrollmentStyleTag($ci->getEnrollment())?>"><?=$ci->getEnrollment()?></span></td>		
 				</tr>
 <?php			endforeach; ?>
 			</table>
@@ -1366,21 +1522,55 @@ class classDisplayer extends baseDisplayer {
 					</td>
 				</tr>
 <?php
-			//begin looping through courses		
-			$rowClass = 'evenRow';
-			foreach($student_CIs as $ci):
-				$ci->getCourseForUser();	//get course object
-				$ci->getInstructors();	//get a list of instructors				
+			//begin looping through courses - separate by enrollment status
+			foreach($student_CIs as $status=>$courses):
+				if($status == 'PENDING'):	//show a label for pending courses
+?>
+				<tr align="left" valign="middle">
+					<td colspan="4" class="divider">
+						Courses you have requested to join (pending approval):
+					</td>
+				</tr>
 				
-				$rowClass = ($rowClass=='oddRow') ? 'evenRow' : 'oddRow';	//set the row class
+<?php			elseif($status == 'DENIED'):	//show label for denied courses ?>
+
+				<tr align="left" valign="middle">
+					<td colspan="4" class="divider">
+						Courses you may not join (denied enrollment):
+					</td>
+				</tr>
+<?php
+				endif;
+				
+				if(empty($rowClass)) {
+					$rowClass = 'evenRow';
+				}
+				foreach($courses as $ci):
+					$ci->getCourseForUser();	//get course object
+					$ci->getInstructors();	//get a list of instructors
+					
+					//only link enrolled classes
+					if(($status == 'AUTOFEED') || ($status == 'APPROVED')) {
+						$course_num = '<a href="index.php?cmd=viewReservesList&ci='.$ci->getCourseInstanceID().'">'.$ci->course->displayCourseNo().'</a>';
+						$course_name = '<a href="index.php?cmd=viewReservesList&ci='.$ci->getCourseInstanceID().'">'.$ci->course->getName().'</a>';
+					}
+					else {
+						$course_num = $ci->course->displayCourseNo();
+						$course_name = $ci->course->getName();
+					}
+					
+					$rowClass = ($rowClass=='oddRow') ? 'evenRow' : 'oddRow';	//set the row class
 ?>
 				<tr align="left" valign="middle" class="<?=$rowClass?>">
-					<td width="15%"><a href="index.php?cmd=viewReservesList&ci=<?=$ci->getCourseInstanceID()?>"><?=$ci->course->displayCourseNo()?></a></td>
-					<td><a href="index.php?cmd=viewReservesList&ci=<?=$ci->getCourseInstanceID()?>"><?=$ci->course->getName()?></a></td>
+					<td width="15%"><?=$course_num?></td>
+					<td><?=$course_name?></td>
 					<td width="10%"><?=$ci->displayTerm()?></td>
 					<td width="25%"><?=$ci->displayInstructors()?></td>			
 				</tr>
-<?php		endforeach; ?>
+<?php		
+				endforeach;
+			endforeach;
+?>
 			</table>
 			<p />
 		</div>
@@ -1420,9 +1610,10 @@ class classDisplayer extends baseDisplayer {
 ?>
 				<tr align="left" valign="middle" class="<?=$rowClass?>">
 					<td width="5%"><img src="<?=$edit_icon?>" alt="edit" width="24" height="20"></td>
-					<td width="20%"><a href="index.php?cmd=editClass&ci=<?=$ci->getCourseInstanceID()?>"><?=$ci->course->displayCourseNo()?></a></td>
-					<td width="45%"><a href="index.php?cmd=editClass&ci=<?=$ci->getCourseInstanceID()?>"><?=$ci->course->getName()?></a></td>
-					<td width="30%"><?=$ci->displayInstructors()?></td>			
+					<td width="15%"><a href="index.php?cmd=editClass&ci=<?=$ci->getCourseInstanceID()?>"><?=$ci->course->displayCourseNo()?></a></td>
+					<td><a href="index.php?cmd=editClass&ci=<?=$ci->getCourseInstanceID()?>"><?=$ci->course->getName()?></a></td>
+					<td width="30%"><?=$ci->displayInstructors()?></td>	
+					<td width="10%"><span class="<?=common_getEnrollmentStyleTag($ci->getEnrollment())?>"><?=$ci->getEnrollment()?></span></td>		
 				</tr>
 <?php			endforeach; ?>
 			</table>
@@ -1500,7 +1691,7 @@ If you are trying to copy a class to a "new class", please copy "to existing" in
 						<tr align="left" valign="middle" class="oddRow">
 							<td width="15%" align="center"><?=$course_num?></td>
 							<td><?=$course_name?></td>
-							<td width="20%" align="center"><?=$ci->displayInstructorList()?></td>
+							<td width="20%" align="center"><?=$ci->displayInstructors()?></td>
 							<td width="15%" align="center"><?=$ci->displayTerm()?></td>
 							<td width="10%" align="center"><a href="javascript:openWindow('no_control&cmd=previewReservesList&ci=<?=$ci->getCourseInstanceID()?>','width=800,height=600');">preview</a></td>
 						</tr>

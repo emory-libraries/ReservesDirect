@@ -615,6 +615,24 @@ table.displaylist td{
 	
 }
 
+/* styles for the class enrollment tab */
+.classEnrollmentOptions {
+	background-color: #FFFFCC;
+	padding: 5px;
+}
+.classRoll {
+	background-color: #CCCCCC;
+	padding: 5px;	
+}
+.classRollPending {
+	width: 50%; /* be careful setting widths - IE screws up % calculations b/c of the padding */
+	float: right;	
+}
+.classRollActive {
+	width: 45%; /* be careful setting widths - IE screws up % calculations b/c of the padding */
+	float: left;	
+}
+
 /* oddRow/evenRow define how alternating row colors appear in tables */
 .oddRow {
     padding-top:1px; /* this fixes a display error in IE for the default implementation. Change at your own risk. */

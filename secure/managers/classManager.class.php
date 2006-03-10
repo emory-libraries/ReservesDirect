@@ -92,9 +92,9 @@ class classManager
 					$expiration_date = date('Y-m-d');
 				
 					//get CIs where user is an instructor
-					$ciList_instructor = $user->fetchCourseInstances('instructor', null, $activation_date, $expiration_date);
+					$ciList_instructor = $user->fetchCourseInstances('instructor', $activation_date, $expiration_date);
 					//get CIs where user is a proxy
-					$ciList_proxy = $user->fetchCourseInstances('proxy', null, $activation_date, $expiration_date);					
+					$ciList_proxy = $user->fetchCourseInstances('proxy', $activation_date, $expiration_date);					
 				}
 				
 				//get viewable CIs for everyone
@@ -115,7 +115,13 @@ class classManager
 				if($ci_id) {	//we have a class
 					$ci = new courseInstance($ci_id);
 					$ci->getCourseForUser();
-					$user->attachCourseAlias($ci->course->getCourseAliasID());
+					
+					if($ci->getEnrollment() == 'OPEN') {	//if class has open enrollment, automatically approve the student
+						$user->joinClass($ci->course->getCourseAliasID(), 'APPROVED');
+					}
+					else {	//else, add the student as pending
+						$user->joinClass($ci->course->getCourseAliasID(), 'PENDING');
+					}
 					
 					//go to course listing
 					classManager::classManager('viewCourseList', $user, $adminUser, null);
@@ -125,13 +131,10 @@ class classManager
 						$this->displayFunction = 'displaySelectClass';
 						$this->argList = array('addClass', null, 'Select a class to add:');
 					}
-					else {				
+					elseif($instructor_id || $department_id) {	//searching by instructor or department
+						//grab the courses			
 						if($instructor_id) {	//search for class by instructor
 							$course_instances = $user->getCourseInstancesByInstr($instructor_id);
-							$msg = 'Select a class to add:';
-							
-							$this->displayFunction = 'displaySelectClass';
-							$this->argList = array('addClass', $course_instances, $msg);
 						}
 						elseif($department_id) {	//search by department
 							$termsObj = new terms();	
@@ -139,15 +142,22 @@ class classManager
 							$usersObj = new users();
 												
 							$course_instances = $usersObj->searchForCI(null, $department_id, null, $current_term->getTermID());
-							$msg = 'Select a class to add:';
+						}
 							
-							$this->displayFunction = 'displaySelectClass';
-							$this->argList = array('addClass', $course_instances, $msg);						
+						//do not display courses with closed enrollment
+						for($x=0; $x<sizeof($course_instances); $x++) {
+							if($course_instances[$x]->getEnrollment() == 'CLOSED') {
+								unset($course_instances[$x]);
+							}
 						}
-						else {	//need either instructor or dept					
-							$this->displayFunction = 'displaySelectDept_Instr';
-							$this->argList = array();
-						}
+						
+						$msg = 'Select a class to add:';							
+						$this->displayFunction = 'displaySelectClass';
+						$this->argList = array('addClass', $course_instances, $msg);
+					}
+					else {	//need either instructor or dept					
+						$this->displayFunction = 'displaySelectDept_Instr';
+						$this->argList = array();
 					}
 				}
 			break;
@@ -158,13 +168,23 @@ class classManager
 				if(!empty($_REQUEST['ci'])) {	//user selected class
 					$ci = new courseInstance($_REQUEST['ci']);
 					$ci->getCourseForUser();
-					$user->detachCourseAlias($ci->course->getCourseAliasID());
+					$user->leaveClass($ci->course->getCourseAliasID());
 					
 					//go to course listing
 					classManager::classManager('viewCourseList', $user, $adminUser, null);
 				}
 				else {	//show class list
-					$course_instances = $user->getCourseInstances();
+					$course_instances = array();
+					
+					//get all CIs in subarrays indexed by enrollment status
+					$course_instance_arrays = $user->getCourseInstances();
+					//cannot remove self from autofeed courses, so do not display those
+					unset($course_instance_arrays['AUTOFEED']);
+					//now merge all the remaining CIs					
+					foreach($course_instance_arrays as $courses) {
+						$course_instances = array_merge($course_instances, $courses);
+					}
+					
 					$msg = 'Select a class to remove:';
 						
 					$this->displayFunction = 'displaySelectClass';
@@ -230,7 +250,7 @@ class classManager
 					}
 				}
 
-				//perform other action
+				//perform reserve list action
 				if(isset($_REQUEST['reserveListAction']) && !empty($reserves)) {
 					//make sure the action is performed on all the children too
 					
@@ -254,6 +274,7 @@ class classManager
 					switch($_REQUEST['reserveListAction']) {
 						case 'copyAll':
 							classManager::classManager('copyItems', $user, $adminUser, array('originalClass'=>$_REQUEST['ci'], 'reservesArray'=>$reserves));
+							break 2;	//break out of this switch AND the big switch
 						break;
 						
 						case 'deleteAll':
@@ -286,31 +307,35 @@ class classManager
 						break;
 					}
 				}
-									
-				if($_REQUEST['reserveListAction'] != 'copyAll') {
-					if (isset($_REQUEST['updateClassDates'])) {
-						//if not empty, set activation and expiration dates
-						//try to convert dates to proper format
-						if(!empty($_REQUEST['activation'])) {
-							$ci->setActivationDate(date('Y-m-d', strtotime($_REQUEST['activation'])));
-						}
-						if(!empty($_REQUEST['expiration'])) {
-							$ci->setExpirationDate(date('Y-m-d', strtotime($_REQUEST['expiration'])));
-						}
-					}
-					$ci->getInstructors();
-					$ci->getCrossListings();
-					$ci->getProxies();
-					$ci->getPrimaryCourse();
-					$ci->course->getDepartment();
 					
-					//get reserves as a tree + recursive iterator
-					$walker = $ci->getReservesAsTreeWalker('getReserves');
-
-					//show screen
-					$this->displayFunction = 'displayEditClass';
-					$this->argList = array($cmd, $ci, $walker);
+				//perform other actions
+				
+				//update class dates
+				if(isset($_REQUEST['updateClassDates'])) {
+					//if not empty, set activation and expiration dates
+					//try to convert dates to proper format
+					if(!empty($_REQUEST['activation'])) {
+						$ci->setActivationDate(date('Y-m-d', strtotime($_REQUEST['activation'])));
+					}
+					if(!empty($_REQUEST['expiration'])) {
+						$ci->setExpirationDate(date('Y-m-d', strtotime($_REQUEST['expiration'])));
+					}
 				}
+				//change enrollment type
+				if(isset($_REQUEST['setEnrollment'])) {
+					$ci->setEnrollment($_REQUEST['enrollment']);					
+				}
+				//add/remove/approve/deny enrollment for student
+				if(isset($_REQUEST['rollAction'])) {
+					$user->editClassRoll($ci->getCourseInstanceID(), $_REQUEST['student_id'], $_REQUEST['rollAction']);
+				}
+				
+				//get the tab to show
+				$tab = !empty($_REQUEST['tab']) ? $_REQUEST['tab'] : null;
+
+				//show screen
+				$this->displayFunction = 'displayEditClass';
+				$this->argList = array($ci, $cmd, $tab);
 			break;
 
 			case 'editTitle':
@@ -324,7 +349,7 @@ class classManager
 					if (is_array($courses) && !empty($courses)){
 						foreach($courses as $c)
 						{
-							$alertMsg = $user->removeCrossListing($c);
+							$user->leaveClass($c);
 						}
 					}
 				}
@@ -473,19 +498,6 @@ class classManager
 				$this->argList = array($ci, $usersObj->userList, $_REQUEST);
 			break;
 
-			case 'viewEnrollment':
-				$page = "manageClasses";
-				$loc = "enrolled students";
-				
-				if(!empty($_REQUEST['ci'])) {	//if already looked up a class
-					$ci = new courseInstance($_REQUEST['ci']);
-					$ci->getStudents();
-				}
-
-				$this->displayFunction = 'displayClassEnrollment';
-				$this->argList = array($ci);
-			break;
-
 			case 'createClass':
 				$page = "manageClasses";
 				$loc = "create new class";
@@ -547,7 +559,6 @@ class classManager
 				{
 					$courseInstance = new courseInstance($request['ci']);
 					$courseInstance->getPrimaryCourse();
-					$courseInstance->getStudents();
 					$courseInstance->getInstructors();
 
 					$this->displayFunction = 'displayConfirmDelete';

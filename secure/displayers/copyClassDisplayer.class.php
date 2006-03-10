@@ -206,24 +206,24 @@ class copyClassDisplayer extends baseDisplayer {
 				<div class="headingCell1" style="width:33%;">Copy Options</div>
 				<div class="borders">
 					<div style="padding:5px;">
-						<strong>Copying from <?=$sourceClass->course->displayCourseNo()?> - <?=$sourceClass->course->getName()?> (<?=$sourceClass->displayTerm()?>)</strong> -- taught by <?=$sourceClass->displayInstructorList()?>
+						<strong>Copying from <?=$sourceClass->course->displayCourseNo()?> - <?=$sourceClass->course->getName()?> (<?=$sourceClass->displayTerm()?>)</strong> -- taught by <?=$sourceClass->displayInstructors()?>
 					</div>
 					<div style="background-color:#CCCCCC;" style="padding:10px;">
 						<div style="width:45%; float:left;">
-							<input name="copyReserves" type="checkbox" value="checkbox" '.$reserves_checked.'>&nbsp;Copy Reserve Materials
+							<input name="copyReserves" type="checkbox" value="checkbox">&nbsp;Copy Reserve Materials
 							<br />
-							<input type="checkbox" name="copyCrossListings" value="checkbox" '.$crossListings_checked.'>&nbsp;Copy Crosslistings
+							<input type="checkbox" name="copyCrossListings" value="checkbox">&nbsp;Copy Crosslistings
 							<br />
-							<input type="checkbox" name="copyEnrollment" value="checkbox" '.$enrollment_checked.'>&nbsp;Copy Enrollment List
+							<input type="checkbox" name="copyEnrollment" value="checkbox">&nbsp;Copy Enrollment List
 						</div>
 						<div style="width:45%; float:left;">
-							<input type="checkbox" name="copyInstructors" value="checkbox" '.$instructors_checked.'>&nbsp;Copy Instructors
+							<input type="checkbox" name="copyInstructors" value="checkbox">&nbsp;Copy Instructors
 							<br />
-							<input type="checkbox" name="copyProxies" value="checkbox" '.$proxies_checked.'>&nbsp;Copy Proxies
+							<input type="checkbox" name="copyProxies" value="checkbox">&nbsp;Copy Proxies
 						</div>
 						<div style="clear:left;">
 							<br />
-							<input type="checkbox" name="deleteSource" value="checkbox" '.$deleteSource_checked.'>&nbsp;DELETE Source Class (Merge Classes) <span style="color:#CC0000;"><strong>CAUTION! Deleting the Source Class cannot be undone!</strong></span>
+							<input type="checkbox" name="deleteSource" value="checkbox">&nbsp;DELETE Source Class (Merge Classes) <span style="color:#CC0000;"><strong>CAUTION! Deleting the Source Class cannot be undone!</strong></span>
 						</div>
 					</div>
 					<div style="padding:5px;">

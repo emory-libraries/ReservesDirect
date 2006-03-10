@@ -486,14 +486,15 @@ class user
 	
 	/**
 	 * @return array - Array of CourseInstances
-	 * @param string $access_level (optional) Level of access to CIs
-	 * @param string $status (optional) CIs with this status
+	 * @param string $access_level (optional) Level of access to CIs (student/proxy/instructor/etc)
 	 * @param string $act_date (optional) CIs activated on or after this date
 	 * @param string $exp_date (optional) CIs expiring before or on this date
+	 * @param string $ci_status (optional) CIs with this status
+	 * @param string $enrollment_status (optional) Enrollment status of this user [only really matters for students (access_level=0)]	
 	 * @param int $dept_id (optional) CIs in this department
 	 * @desc Returns an array of CI objects for this user with the given qualifications. If a parameter is not specified, no restriction is placed.  This is the catch-all logic to get CIs to be used by public methods with selective criteria. 
 	 */
-	public function fetchCourseInstances($access_level=null, $status=null, $act_date=null, $exp_date=null, $dept_id=null) {
+	public function fetchCourseInstances($access_level=null, $act_date=null, $exp_date=null, $ci_status=null, $enrollment_status=null, $dept_id=null) {
 		global $g_dbConn, $g_permission;
 		
 		//format access
@@ -523,8 +524,11 @@ class user
 				if(!empty($access_level)) {
 					$sql .=	" AND a.permission_level = ".$g_permission[$access_level];
 				}
+				if(!empty($enrollment_status)) {
+					$sql .= " AND a.enrollment_status = '$enrollment_status'";
+				}
 				if(!empty($status)) {
-					$sql .= " AND ci.status = '$status'";
+					$sql .= " AND ci.status = '$ci_status'";
 				}
 				if(!empty($act_date)) {
 					$sql .= " AND ci.activation_date <= '$act_date'";
@@ -543,7 +547,7 @@ class user
 		//query
 		$rs = $g_dbConn->query($sql);
 		if(DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
+		
 		$course_instances = array();
 		while($row = $rs->fetchRow()) {
 			$course_instances[] = new courseInstance($row[0]);

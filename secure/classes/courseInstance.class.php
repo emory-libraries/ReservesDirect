@@ -218,6 +218,8 @@ class courseInstance
 		while ($row = $rs->fetchRow()) {
 			$this->crossListings[] = new course($row[0]);
 		}
+		
+		return $this->crossListings;
 	}
 
 	function addCrossListing($courseID, $section="")
@@ -262,37 +264,47 @@ class courseInstance
 
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
-		unset($proxies);
-		$proxies = array();
+		$this->proxyIDs = $this->proxies = array();
 		while ($row = $rs->fetchRow()) {
 			$this->proxies[] = new proxy($row[0]);
 			$this->proxyIDs[] = $row[1];
 		}
+		
+		return $this->proxies;
 	}
 
-	function getStudents()
-	{
+	
+	/**
+	 * @return array
+	 * @desc Resturns array of arrays indexed by enrollment status; each subarray holds student objects
+	 */
+	function getRoll() {
 		global $g_dbConn;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql  = "SELECT DISTINCT u.username, u.user_id "
-					  . "FROM users u "
-					  .	"LEFT JOIN access AS a ON a.user_id = u.user_id "
-					  . "LEFT JOIN course_aliases AS ca ON ca.course_alias_id = a.alias_id "
-					  . "WHERE ca.course_instance_id = ! "
-					  . "AND a.permission_level = 0 "
-					  . "ORDER BY u.last_name, u.first_name, u.username";
+		
+		switch($g_dbConn->phptype) {
+			default:	//mysql
+				$sql = "SELECT DISTINCT u.username, a.enrollment_status
+						FROM users AS u
+							JOIN access AS a ON a.user_id = u.user_id
+							JOIN course_aliases AS ca ON ca.course_alias_id = a.alias_id
+						WHERE ca.course_instance_id = ".$this->courseInstanceID."
+							AND a.permission_level = 0
+						ORDER BY u.last_name, u.first_name, u.username";
 		}
-
-		$rs = $g_dbConn->query($sql, $this->courseInstanceID);
-
+		
+		//execute query
+		$rs = $g_dbConn->query($sql);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		while ($row = $rs->fetchRow()) {
-			$this->students[] = new student($row[0]);
+		
+		$roll = array();
+		while($row = $rs->fetchRow()) {
+			$status = !empty($row[1]) ? $row[1] : 'unk';
+			
+			//add students into subarrays indexed by enrollment status
+			$roll[$status][] = new student($row[0]);
 		}
+		
+		return $roll;
 	}
 
 	/**
@@ -967,13 +979,16 @@ class courseInstance
 
 		$rs = $g_dbConn->query($sql, array($this->courseInstanceID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
+		
+		$this->instructorIDs = $this->instructorList = array();
 		while ($row = $rs->fetchRow()) {
 			$tmpI = new instructor();
 			$tmpI->getUserByID($row[0]);
 			$this->instructorList[] = $tmpI;
 			$this->instructorIDs[] = $row[0];
 		}
+		
+		return $this->instructorList;
 	}
 
 	function addInstructor($courseAliasID, $instructorID)
@@ -1032,15 +1047,13 @@ class courseInstance
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 
-	function displayInstructors()
-	{
-		$retValue = "";
-		for($i=0;$i<count($this->instructorList);$i++)
-		{
-			$retValue .=  $this->instructorList[$i]->getName(false) . ", ";
+	function displayInstructors() {
+		$retValue = '';
+		foreach($this->instructorList as $instr) {
+			$retValue .= $instr->getName(false).', ';
 		}
 		$retValue = rtrim($retValue, ', ');	//trim the last comma
-		return ($retValue == "" ? "None" : $retValue);
+		return empty($retValue) ? "None" : $retValue;
 	}
 
 	function displayCrossListings()
@@ -1051,21 +1064,6 @@ class courseInstance
 			$retValue .=  $this->crossListings[$i]->getName() . " ";
 		}
 		return ($retValue == "" ? "No Crosslistings" : $retValue);
-	}
-
-	function displayInstructorList()
-	{
-		$retString = "";
-		for($i=0;$i<count($this->instructorList);$i++)
-		{
-			if ($this->instructorList[$i] instanceof user) {
-				if($i>0) {	//if not the first instructor
-					$retString .= '; ';
-				}
-				$retString .= $this->instructorList[$i]->getName(false);				
-			}
-		}
-		return $retString;
 	}
 
 

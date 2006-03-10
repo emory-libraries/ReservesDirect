@@ -48,35 +48,47 @@ class student extends user
 	/**
 	* @return void
 	* @param int $courseAliasID
-	* @desc Add course alias to the user profile
+	* @param string $enrollment_status (optional) APPROVED/PENDING/DENIED status
+	* @desc Add course alias to the user profile. If record already exists, the enrollment status is updated
 	*/
-	function attachCourseAlias($courseAliasID)
-	{
+	function joinClass($courseAliasID, $enrollment_status=null) {
 		global $g_dbConn;
-
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql = "SELECT access_id from access WHERE user_id = ! AND alias_id = ! and permission_level = 0";
-				$sql2 = "INSERT INTO access (user_id, alias_id, permission_level) VALUES (!,!,0)";
+		
+		if(empty($enrollment_status)) {
+			$enrollment_status = 'PENDING';
 		}
 
-		$rs = $g_dbConn->query($sql, array($this->userID, $courseAliasID));
+		switch ($g_dbConn->phptype)	{
+			default:	//mysql
+				$sql_check = "SELECT access_id from access WHERE user_id = ! AND alias_id = ! and permission_level = 0";
+				$sql_insert = "INSERT INTO access (user_id, alias_id, permission_level, enrollment_status) VALUES (!,!,0,?)";
+				$sql_update = "UPDATE access SET enrollment_status=? WHERE user_id = ! AND alias_id = !";
+		}
+
+		$rs = $g_dbConn->query($sql_check, array($this->userID, $courseAliasID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
-		if ($rs->numRows() == 0) {
-			$rs = $g_dbConn->query($sql2, array($this->userID, $courseAliasID));
+		if($rs->numRows() == 0) {	//insert
+			$rs = $g_dbConn->query($sql_insert, array($this->userID, $courseAliasID, $enrollment_status));
 			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		}
+		else {	//update
+			$rs = $g_dbConn->query($sql_update, array($enrollment_status, $this->userID, $courseAliasID));
+			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		}	
 	}
-
-	function detachCourseAlias($courseAliasID)
-	{
+	
+		
+	/**
+	* @return void
+	* @param int $courseAliasID
+	* @desc Remove the access record for this user and course alias
+	*/
+	function leaveClass($courseAliasID) {
 		global $g_dbConn;
 
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
+		switch($g_dbConn->phptype)	{
+			default:	//mysql
 				$sql = "DELETE FROM access WHERE user_id = ! AND alias_id = ! and permission_level = 0 LIMIT 1";
 		}
 
@@ -86,12 +98,35 @@ class student extends user
 
 
 	/**
-	 * @return array
-	 * @desc fetches all CIs that have status of ACTIVE, that this user is enrolled in, and whose date range includes today
+	 * @return array of arrays
+	 * @desc fetches all CIs that have status of ACTIVE, that this user is enrolled in, and whose date range includes today. Returns array of subarrays indexed by enrollment status
 	 */
 	public function getCourseInstances() {
 		$today = date('Y-m-d');
-		return $this->fetchCourseInstances('student', 'ACTIVE', $today, $today);
+		$courses = array();
+		
+		
+		//go through a $tmp var to avoid adding empty array()s to the $courses array
+		//this is done to simply running empty() on $courses, since
+		//empty(array(array())) returns false		
+		$tmp = $this->fetchCourseInstances('student', $today, $today, 'ACTIVE', 'AUTOFEED');	//enrolled by registrar
+		if(!empty($tmp)) {
+			$courses['AUTOFEED'] = $tmp;			
+		}
+		$tmp = $this->fetchCourseInstances('student', $today, $today, 'ACTIVE', 'APPROVED');	//enrolled manually
+		if(!empty($tmp)) {
+			$courses['APPROVED'] = $tmp;			
+		}
+		$tmp = $this->fetchCourseInstances('student', $today, $today, 'ACTIVE', 'PENDING');	//requested enrollment
+		if(!empty($tmp)) {
+			$courses['PENDING'] = $tmp;			
+		}
+		$tmp = $this->fetchCourseInstances('student', $today, $today, 'ACTIVE', 'DENIED');	//denied enrollment
+		if(!empty($tmp)) {
+			$courses['DENIED'] = $tmp;			
+		}
+		
+		return $courses;
 	}
 	
 	
@@ -104,7 +139,7 @@ class student extends user
 		$today = date('Y-m-d');
 		$instr = new user($instr_id);
 		//return all currently active courses that this user is teaching
-		return $instr->fetchCourseInstances('instructor', 'ACTIVE', $today, $today);
+		return $instr->fetchCourseInstances('instructor', $today, $today, 'ACTIVE');
 	}
 	
 	

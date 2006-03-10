@@ -233,6 +233,23 @@ function common_getStatusStyleTag($status)
 	return $statusTag;
 }
 
+function common_getEnrollmentStyleTag($enrollment) {
+	switch(strtoupper($enrollment)) {
+		case 'OPEN':
+			$tag = 'openEnrollment';
+		break;
+		case 'MODERATED':
+			$tag = 'moderatedEnrollment';
+		break;
+		case 'CLOSED':
+			$tag = 'closedEnrollment';
+		break;
+		default:
+			$tag = '';
+	}
+	return $tag;
+}
+
 function common_formatDate($d, $format)
 {
 		$D = split('-', $d);

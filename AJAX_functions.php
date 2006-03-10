@@ -158,7 +158,7 @@ http://www.reservesdirect.org/
 					$returnValue .= "	<div align=\"left\" style=\"width: 30px; float:left; text-align:left;\"><input name=\"ci\" type=\"radio\" value=\"". $ci_list[$i]->getCourseInstanceID() ."\" onClick=\"document.getElementById('editButton').disabled=false\"></div>\n";
 					$returnValue .= "	<div align=\"left\" style=\"width:15%; float:left;\">".$ci_list[$i]->course->displayCourseNo()."&nbsp;</div>\n";
 					$returnValue .= "	<div align=\"left\" style=\"width:30%; float:left;\">".$ci_list[$i]->course->getName()."&nbsp;</div>\n";
-					$returnValue .= "	<div align=\"left\" style=\"width:25%; float:left;\">".$ci_list[$i]->displayInstructorList()."&nbsp;</div>\n";
+					$returnValue .= "	<div align=\"left\" style=\"width:25%; float:left;\">".$ci_list[$i]->displayInstructors()."&nbsp;</div>\n";
 					$returnValue .= "	<div align=\"left\" style=\"width:14%; float:left;\">".$ci_list[$i]->displayTerm()."&nbsp;</div>\n";
 					$returnValue .= "	<div align=\"left\" style=\"width:55px; float:right;\"><a href=\"javascript:openWindow('no_control=1&cmd=previewReservesList&ci=".$ci_list[$i]->courseInstanceID . "','width=800,height=600');\">preview</a></div>\n";
 					$returnValue .= "	<div style=\"clear:both;\"></div>\n";

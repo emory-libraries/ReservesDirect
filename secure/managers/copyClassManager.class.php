@@ -206,18 +206,18 @@ class copyClassManager extends baseManager {
 	
 						$copyStatus[]="Proxies successfully copied";
 					}
-	
-					if (isset($request['copyEnrollment']) || isset($request['deleteSource']))
-					{
-						$sourceClass->getStudents();
-	
-						for ($i=0; $i<count($sourceClass->students); $i++)
-						{
-							//KAW: Do We want the students to be added to the same crossListing from the original/source class?
-							$sourceClass->students[$i]->attachCourseAlias($targetClass->getPrimaryCourseAliasID());
+					
+					if(isset($request['copyEnrollment'])) {
+						$roll = $sourceClass->getRoll();
+						$target_CA_id = $targetClass->getPrimaryCourseAliasID();
+						
+						foreach($roll as $status=>$students) {
+							foreach($students as $student) {
+								$student->joinClass($target_CA_id, $status);
+							}
 						}
-	
-						$copyStatus[]="Enrollment List successfully copied";
+
+						$copyStatus[] = "Enrollment list successfully copied";
 					}
 				}
 				

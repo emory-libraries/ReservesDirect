@@ -485,9 +485,10 @@ abstract class baseDisplayer {
 	/**
 	 * @return void
 	 * @param string $default_enrollment (optional) Enrollment option to check by default
+	 * @param boolean $show_descriptions (optional) If true, will show descriptions of each option on the line below.
 	 * @desc displays enrollment options as radio options
 	 */
-	public function displayEnrollmentSelect($default_enrollment='OPEN') {
+	public function displayEnrollmentSelect($default_enrollment='OPEN', $show_descriptions=false) {
 		//set default
 		$checked = array();
 		$options = array('OPEN', 'MODERATED', 'CLOSED');
@@ -497,12 +498,42 @@ abstract class baseDisplayer {
 		//now set up the checks
 		foreach($options as $option) {
 			$checked[$option] = ($default_enrollment == $option) ? 'checked="checked"' : '';
-		}		
+		}
+		
+		if($show_descriptions):
 ?>
-		<input type="radio" name="enrollment" id="enrollment" value="OPEN" <?=$checked['OPEN']?> /> OPEN 
-		<input type="radio" name="enrollment" id="enrollment" value="MODERATED" <?=$checked['MODERATED']?> /> MODERATED 
-		<input type="radio" name="enrollment" id="enrollment" value="CLOSED" <?=$checked['CLOSED']?> /> CLOSED 
-<?php		
+		<script language="JavaScript">
+			function showEnrollmentOptionDescription(option) {
+				var option_descriptions = new Array();
+				option_descriptions['OPEN'] = '<em>Any student may look up this class and join it.</em>';
+				option_descriptions['MODERATED'] = '<em>Students may request to join this class, but must be approved (below) before gaining access to it.</em>';
+				option_descriptions['CLOSED'] = '<em>Students may not add themselves to this class or request to join it.</em>';
+				
+				if(document.getElementById('enrollment_option_desc')) {
+					document.getElementById('enrollment_option_desc').innerHTML = option_descriptions[option];
+				}
+			}
+		</script>
+		
+		<input type="radio" name="enrollment" id="enrollment" value="OPEN" <?=$checked['OPEN']?> onclick="javascript: showEnrollmentOptionDescription('OPEN');" /> <span class="openEnrollment">OPEN</span>&nbsp; 
+		<input type="radio" name="enrollment" id="enrollment" value="MODERATED" <?=$checked['MODERATED']?> onclick="javascript: showEnrollmentOptionDescription('MODERATED');" /> <span class="moderatedEnrollment">MODERATED</span>&nbsp; 
+		<input type="radio" name="enrollment" id="enrollment" value="CLOSED" <?=$checked['CLOSED']?> onclick="javascript: showEnrollmentOptionDescription('CLOSED');" /> <span class="closedEnrollment">CLOSED</span>&nbsp;
+		<br />
+		<div id="enrollment_option_desc"></div>
+		
+		<script language="JavaScript">
+			showEnrollmentOptionDescription('<?=$default_enrollment?>');
+		</script>
+
+		
+<?php	else : ?>
+		
+		<input type="radio" name="enrollment" id="enrollment" value="OPEN" <?=$checked['OPEN']?> /> <span class="openEnrollment">OPEN</span>&nbsp; 
+		<input type="radio" name="enrollment" id="enrollment" value="MODERATED" <?=$checked['MODERATED']?> /> <span class="moderatedEnrollment">MODERATED</span>&nbsp; 
+		<input type="radio" name="enrollment" id="enrollment" value="CLOSED" <?=$checked['CLOSED']?> /> <span class="closedEnrollment">CLOSED</span>&nbsp;
+
+<?php	endif;
+
 	}
 	
 	
@@ -539,7 +570,7 @@ abstract class baseDisplayer {
 				<td width="75%" align="center">&nbsp;</td>
 			</tr>
 			<tr>
-		    	<td colspan="2" class="borders">
+		    	<td colspan="2">
 			    	<table width="100%" border="0" cellspacing="0" cellpadding="5" class="displayList">
 			    		<tr class="headingCell1" style="text-align:left;">
 			    			<td width="5%" style="text-align:center;">Select</td>
