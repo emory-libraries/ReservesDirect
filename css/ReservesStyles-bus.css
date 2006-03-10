@@ -682,6 +682,25 @@ whether there should be page breaks or no page breaks. */
  ************************************************* 
 */
 
+
+/* The following provide definitions for they system message display area.
+The style for individual system messages is set in the "news" table of the db,
+or from the admin tab. */
+#displayMsg {
+	padding:3px;
+	margin:0px 50px 0px 50px;
+}
+#displayMsg .emergency {
+	border:1px solid #660000;
+	background-color:#FFCCCC;
+	color:#CC0000;
+}
+#displayMsg .notice {
+	border:1px dashed #003300;
+	background-color:99FFCC;
+	color:#003300;
+}
+
 /* The following group of tags define how reserve items are listed, along with a.itemTitle 
 (see "Link Definitions" above).
 'itemTitle' defines the appearance of item titles for materials that do not have live links 
