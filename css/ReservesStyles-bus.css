@@ -687,17 +687,20 @@ whether there should be page breaks or no page breaks. */
 The style for individual system messages is set in the "news" table of the db,
 or from the admin tab. */
 #displayMsg {
-	padding:3px;
 	margin:0px 50px 0px 50px;
+	text-align:left;
+	
 }
 #displayMsg .emergency {
+	padding:5px;
 	border:1px solid #660000;
 	background-color:#FFCCCC;
 	color:#CC0000;
 }
 #displayMsg .notice {
+	padding:5px;
 	border:1px dashed #003300;
-	background-color:99FFCC;
+	background-color:CCFFCC;
 	color:#003300;
 }
 
