@@ -171,7 +171,7 @@ function common_formatFilename($src, $item_id) {
 	//get filename/ext
 	$file_path = pathinfo($src_name);	
 	
-	$md5_file = trim(exec("md5sum \"$src_file\" | cut -d\  -f1"));
+	$md5_file = md5_file($src_file);
 	
 	if ($md5_file == '' || $item_id == '')
 		trigger_error("Could not formatFilename common_formatFilename($src_name, $item_id) tmp_name=$src_file", E_USER_ERROR);
