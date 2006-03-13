@@ -129,7 +129,9 @@ class itemManager
 					if(isset($_REQUEST['documentType'])) {						
 						if($_REQUEST['documentType'] == 'DOCUMENT') {	//uploaded file?
 							$file = common_storeUploaded($_FILES['userFile'], $item->getItemID());
-							$item->setURL($g_documentURL.$file['name']);
+							
+							$file_loc = $g_documentURL . $file['dir'] . $file['name'] . $file['ext'];
+							$item->setURL($file_loc);
 							$item->setMimeTypeByFileExt($file['ext']);
 						}
 						elseif($_REQUEST['documentType'] == 'URL') {	//link?

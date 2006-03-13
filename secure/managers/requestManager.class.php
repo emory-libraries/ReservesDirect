@@ -324,8 +324,9 @@ class requestManager
 					elseif( $request['previous_cmd'] == 'addDigitalItem' ) {	//set electronic item data
 						//uploading a file
 						if( $request['documentType'] == 'DOCUMENT' ) {
-							$file = common_storeUploaded($_FILES['userFile'], $item->getItemID());
-							$item->setURL($g_documentURL.$file['name']);
+							$file = common_storeUploaded($_FILES['userFile'], $item->getItemID());														
+							$file_loc = $g_documentURL . $file['dir'] . $file['name'] . $file['ext'];
+							$item->setURL($file_loc);
 							$item->setMimeTypeByFileExt($file['ext']);
 						}
 						else {	//adding a URL

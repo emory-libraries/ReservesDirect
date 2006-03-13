@@ -157,22 +157,30 @@ function common_getDepartments()
 
 
 /**
- * @return assoc array (name, ext) of new filename.ext and ext (ext used to set mimetypes)
+ * @return assoc array (dir, name, ext) of new dir/filename.ext and ext (ext used to set mimetypes)
  * @param string $src_name filename to be formatted
  * @param int $item_id necessary to format the proper destination path
- * @desc cleans up filename and formats the destination filename
+ * @desc  create filename 
+ *		  <upload_directory>/dir/md4hash_itemID.ext where dir is the first 2 char or the md5hash
 */
-function common_formatFilename($src_name, $item_id) {
+function common_formatFilename($src, $item_id) {
+
+	$src_file = $src['tmp_name'];
+	$src_name = $src['name'];
+
 	//get filename/ext
-	$file_path = pathinfo($src_name);
-	//get the filename w/o extension
-	$filename = basename($file_path['basename'], '.'.$file_path['extension']);
-	//clean up filename - convert spaces to underscores and strip any non A-z, 0-9, or _ characters
-	$filename = preg_replace('[\W]', '', str_replace(' ', '_', $filename));
-	//format filename for storage (ID-name.ext)
-	$filename = $item_id.'-'.$filename.'.'.$file_path['extension'];
-	//return formatted filename/ext
-	return array('name'=>$filename, 'ext'=>$file_path['extension']);
+	$file_path = pathinfo($src_name);	
+	
+	$md5_file = trim(exec("md5sum \"$src_file\" | cut -d\  -f1"));
+	
+	if ($md5_file == '' || $item_id == '')
+		trigger_error("Could not formatFilename common_formatFilename($src_name, $item_id) tmp_name=$src_file", E_USER_ERROR);
+		
+	$filename = $md5_file . "_" . $item_id;
+	$dir = substr($md5_file,0,2) . "/";
+	$ext = ".".$file_path['extension'];
+	
+	return array('dir' => $dir, 'name'=>$filename, 'ext'=>$ext);
 }
 
 /**
@@ -191,11 +199,20 @@ function common_storeUploaded($src, $item_id) {
 	}
 	
 	//format the filename; extract extension
-	$file = common_formatFilename($src['name'], $item_id);
+	$file = common_formatFilename($src, $item_id);
 	
+	//test dir
+	if (!opendir($g_documentDirectory.$file['dir']))
+	{
+		//create directory
+		if(!mkdir($g_documentDirectory.$file['dir'], 0775, true))
+			trigger_error("Could not create directory " .$g_documentDirectory.$file['dir'], E_USER_ERROR);
+	}
+	
+	$newFile = $g_documentDirectory.$file['dir'].$file['name'].$file['ext'];
 	//store file
-	if( !move_uploaded_file($src['tmp_name'], $g_documentDirectory.$file['name']) ) {
-		trigger_error('Failed to move uploaded file '.$src['tmp_name'].' to '.$g_documentDirectory.$file['name'], E_USER_ERROR);
+	if( !move_uploaded_file($src['tmp_name'], $newFile) ) {
+		trigger_error('Failed to move uploaded file '.$src['tmp_name'].' to '.$newFile, E_USER_ERROR);
 	}
 	
 	//return destination filename/ext to store in DB
