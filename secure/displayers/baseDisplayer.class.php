@@ -506,7 +506,7 @@ abstract class baseDisplayer {
 			function showEnrollmentOptionDescription(option) {
 				var option_descriptions = new Array();
 				option_descriptions['OPEN'] = '<em>Any student may look up this class and join it.</em>';
-				option_descriptions['MODERATED'] = '<em>Students may request to join this class, but must be approved (below) before gaining access to it.</em>';
+				option_descriptions['MODERATED'] = '<em>Students may request to join this class, but must be approved before gaining access to it.</em>';
 				option_descriptions['CLOSED'] = '<em>Students may not add themselves to this class or request to join it.</em>';
 				
 				if(document.getElementById('enrollment_option_desc')) {
