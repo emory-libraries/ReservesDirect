@@ -163,15 +163,6 @@ class copyClassManager extends baseManager {
 
 				$copyStatus = array();
 				
-				//make sure that not trying to merge the same course
-				if($sourceClass->getCourseInstanceID() == $targetClass->getCourseInstanceID()) {
-					$copyStatus[] = "Cannot merge a class into itself!";
-					//make sure we do nothing else
-					$this->displayFunction = 'displayCopySuccess';
-					$this->argList = array($sourceClass, $targetClass, $copyStatus, $importing);
-					break;
-				}
-
 				if (isset($request['sourceClass'])) {
 					$sourceClass = new courseInstance($request['sourceClass']);
 					$sourceClass->getPrimaryCourse();
@@ -180,6 +171,15 @@ class copyClassManager extends baseManager {
 				if (isset($request['ci'])) {
 					$targetClass = new courseInstance($request['ci']);
 					$targetClass->getPrimaryCourse();
+				}
+				
+				//make sure that user is not trying to merge the same course
+				if($sourceClass->getCourseInstanceID() == $targetClass->getCourseInstanceID()) {
+					$copyStatus[] = "Cannot merge a class into itself!";
+					//make sure we do nothing else
+					$this->displayFunction = 'displayCopySuccess';
+					$this->argList = array($sourceClass, $targetClass, $copyStatus, $importing);
+					break;
 				}
 
 				//split the difference b/n copying and importing

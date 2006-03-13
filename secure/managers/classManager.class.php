@@ -505,8 +505,9 @@ class classManager
 				$dept = new department();
 				$terms = new terms();
 
+				$msg = 'Create your class below.  You will have a chance to reactivate readings from previous courses on the next screen.';
 				$this->displayFunction = 'displayCreateClass';
-				$this->argList = array('createNewClass', array('cmd'=>'createClass'));
+				$this->argList = array('createNewClass', array('cmd'=>'createClass'), $msg);
 			break;
 
 			case 'createNewClass':

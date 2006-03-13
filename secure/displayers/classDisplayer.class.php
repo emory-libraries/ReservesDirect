@@ -221,9 +221,7 @@ class classDisplayer extends baseDisplayer {
 	function displayEditClassReservesList(&$ci, $next_cmd, $show_students_pending_warning=false) {
 		global $u, $g_permission, $g_siteURL;
 		
-		if($show_students_pending_warning) {
-			$students_pending_warning = '<span class="alert">&nbsp;&nbsp;&nbsp;! students requesting to join class !</span>';
-		}
+		$students_pending_warning = $show_students_pending_warning ? '<span class="alert">&nbsp;&nbsp;&nbsp;! students requesting to join class !</span>' : '';
 		
 		//get reserves as a tree + recursive iterator
 		$tree_walker = $ci->getReservesAsTreeWalker('getReserves');
@@ -988,7 +986,7 @@ class classDisplayer extends baseDisplayer {
 	}
 	
 	
-	function displayCreateClass($next_cmd, $hidden_fields=null) {
+	function displayCreateClass($next_cmd, $hidden_fields=null, $msg=null) {
 		global $u, $g_permission;
 		
 		//set defaults if they exists
@@ -1065,6 +1063,10 @@ class classDisplayer extends baseDisplayer {
 		<form name="frmClass" action="index.php" method="post" onSubmit="return validate(this);">	
 			
 			<?php self::displayHiddenFields($hidden_fields); ?>
+
+<?php	if(!empty($msg)): ?>
+			<span class="helperText"><?=$msg?></span><p />
+<?php	endif; ?>
 		
 		<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
 			<tr>

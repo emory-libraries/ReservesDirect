@@ -39,6 +39,8 @@ class copyClassDisplayer extends baseDisplayer {
 		$src_ci->getPrimaryCourse();
 		$src_ci->course->getDepartment();
 		$loan_periods = $src_ci->course->department->getInstructorLoanPeriods();
+		$dst_ci = new courseInstance($dst_ci_id);
+		$dst_ci->getCourseForUser();
 		
 		//handle instructors and crosslistings lists
 		
@@ -52,6 +54,9 @@ class copyClassDisplayer extends baseDisplayer {
 		
 		//begin display
 ?>
+		<span class="helperText">The following readings will be imported from <u><?=$src_ci->course->displayCourseNo()?> - <?=$src_ci->course->getName()?></u> to <u><?=$dst_ci->course->displayCourseNo()?> - <?=$dst_ci->course->getName()?></u>. Please de-select any readings you do <u>not</u> want to import before continuing.</span>
+		<p />
+
 		<script language="javascript">
 		//<!--
 			function checkAll2(form, theState)
