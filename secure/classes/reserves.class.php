@@ -637,30 +637,40 @@ class reserve extends Notes {
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT DISTINCT a.permission_level, ci.activation_date, ci.expiration_date, ci.status
+				$sql = "SELECT DISTINCT a.permission_level, ci.activation_date, ci.expiration_date, ci.status, a.enrollment_status
 						FROM reserves as r
 							JOIN course_aliases as ca ON r.course_instance_id = ca.course_instance_id
 							JOIN course_instances as ci ON r.course_instance_id = ci.course_instance_id
 							JOIN access as a ON ca.course_alias_id = a.alias_id
-						WHERE a.user_id = ! 
-							AND r.reserve_id = !
-					   ";
+						WHERE a.user_id = ".$user->getUserID()." 
+							AND r.reserve_id = ".$this->reserveID;
+			
 				$d = date("Y-m-d"); //get current date
 		}
 		
-		$rs = $g_dbConn->query($sql, array($user->getUserID(), $this->reserveID));
+		$rs = $g_dbConn->query($sql);
 		if (DB::isError($rs)) { return false; }
 
-		if ($row = $rs->fetchRow(DB_FETCHMODE_ASSOC))
-		{
-			$active = (($row['activation_date'] <= $d) && ($d <= $row['expiration_date']) && ($row['status'] == 'ACTIVE')) ? "TRUE" : "FALSE";
-			if ($row['permission_level'] < $g_permission['proxy'] && $active != "TRUE")
-				return false;
-			else 
+		if($row = $rs->fetchRow(DB_FETCHMODE_ASSOC)) {
+			if($row['permission_level'] < $g_permission['proxy']) {	//if the user is below proxy (student, custodian)
+				//add restrictions - the CI must be current and active; the student must be on the approved roll
+				if(($row['activation_date'] <= $d) && ($row['expiration_date'] >= $d) && ($row['status'] == 'ACTIVE') && (($row['enrollment_status'] == 'AUTOFEED') || ($row['enrollment_status'] == 'APPROVED'))) {
+					//fetch the reserveItem object
+					$this->getItem();
+					return true;
+				}
+				else {	//student did not pass restrictions
+					return false;
+				}								
+			}
+			else {	//if proxy or better, do not need restrictions
 				$this->getItem();
 				return true;
-		} else 
-			return false;			
+			}
+		}
+		else {	//no access
+			return false;
+		}
 	}
 
 	function getReserveID(){ return $this->reserveID; }
