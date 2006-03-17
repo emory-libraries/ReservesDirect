@@ -32,37 +32,16 @@ function sendStatusCode($status_code)
 	switch ($status_code)
 	{
 		case '403':
-			header("HTTP/1.0 403 Permission Denied");
-	?>
-		<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
-		<html><head>
-		<title>403 Forbidden</title>
-		</head><body>
-		<h1>Forbidden</h1>
-		<p>You don't have permission to access the requested file on this server.</p>
-        <p><?=$_SERVER['REQUEST_URI']?></p>
-		<hr />
-		<? echo "ReservesDirect" . $_SERVER["SERVER_SIGNATURE"]; ?>
-		</body></html>
-	<?
-		break;
-
+			header("HTTP/1.0 403 Forbidden");
+            break;
         case '404':
             header("HTTP/1.0 404 Not Found");
-
-	?>
-		<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
-		<html><head>
-		<title>404 Not Found</title>
-		</head><body>
-		<h1>Not Found</h1>
-		<p>The requested resource was not found on this server.</p>
-        <p><?=$_SERVER['REQUEST_URI']?></p>
-		<hr />
-		<? echo "ReservesDirect" . $_SERVER["SERVER_SIGNATURE"]; ?>
-		</body></html>
-	<?
+            break;
+        default:
+            header("HTTP/1.0 $status_code");
+            break;
         
 	}
+        include("secure/html/403-404.html");
 }
 ?>
