@@ -474,7 +474,7 @@ class reserveItem extends item
 	function getPagesTimes() { return htmlentities(stripslashes($this->pagesTimes)); }
 	function getPerformer() { return htmlentities(stripslashes($this->performer)); }
 	function getLocalControlKey() { return stripslashes($this->localControlKey); }
-	function getURL() { return stripslashes($this->URL); }
+	function getURL() { return ($this->URL != '') ? stripslashes($this->URL) : false; }
 
 	function getMimeType()
 	{
