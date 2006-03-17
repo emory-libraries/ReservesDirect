@@ -64,7 +64,10 @@ http://www.reservesdirect.org/
 	//if we have an item object, then we try to serve the doc
 	if($item instanceof reserveItem) {
 		$url = $item->getURL();	//grab the url
-		$url = str_replace(" ", "%20", trim($url));	//replace all spaces with the hex values (sometimes RD chokes on URLs with spaces in them)
+        if ($url == FALSE) {
+            sendStatusCode('404');
+            exit;
+        }
 		
 		if(ereg('^https?://',$url) != 1) {	//if item URL points to local server, serve the document directly
 			if($stream = @fopen($g_documentDirectory . $url, r)) {	//open file for reading
