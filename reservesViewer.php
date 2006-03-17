@@ -68,8 +68,24 @@ http://www.reservesdirect.org/
 		
 		if(ereg('^https?://',$url) != 1) {	//if item URL points to local server, serve the document directly
 			if($stream = @fopen($g_documentDirectory . $url, r)) {	//open file for reading
-				//$filename = end(split('/', $url));	//grab the filename to suggest 'save-as' name
-                $filename = trim(trim("{$item->author} {$item->title}") . " {$item->itemID}.") . end(split('\.', $url));
+
+                $author = ereg_replace("[^A-Za-z0-9]", "", $item->author);
+                if ($author != "") {
+                    $author = substr(($author), 0, 24) . "_";
+                }
+                
+                $title = ereg_replace("[^A-Za-z0-9]", "", $item->title);
+                if ($title != "") {
+                    $title = substr(($title), 0, 24) . "_";
+                }
+
+                $ext = end(split('\.', $url));
+                if ($ext != "") {
+                    $ext = "." . $ext;
+                }
+
+                $filename = $author . $title . $item->itemID . $ext;
+
 				//serve the doc			
 				header('Content-Type: '.$item->getMimeType());
 				header('Content-Disposition: inline; filename="'.$filename.'"');
