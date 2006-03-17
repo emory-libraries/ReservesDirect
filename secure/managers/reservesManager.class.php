@@ -484,7 +484,7 @@ class reservesManager
 					
 					//store the fax
 					$md5 = md5_file($g_faxDirectory . $_REQUEST['file'][$file]);
-                    $dst_dir = substr($md5,0,2);
+                    $dst_dir = $g_documentDirectory . substr($md5,0,2);
 						
 					$dst_fname = "{$md5}_{$item->getItemID()}.pdf";
 					if(!copy($g_faxDirectory . $_REQUEST['file'][$file], "$dst_dir/$dst_fname")) {
