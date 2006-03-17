@@ -209,7 +209,7 @@ function common_storeUploaded($src, $item_id) {
 			trigger_error("Could not create directory " .$g_documentDirectory.$file['dir'], E_USER_ERROR);
 	}
 	
-	$newFile = $g_documentDirectory.$file['dir'].$file['name'].$file['ext'];
+	$newFile = $file['dir'].$file['name'].$file['ext'];
 	//store file
 	if( !move_uploaded_file($src['tmp_name'], $newFile) ) {
 		trigger_error('Failed to move uploaded file '.$src['tmp_name'].' to '.$newFile, E_USER_ERROR);

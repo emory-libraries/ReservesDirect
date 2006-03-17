@@ -60,6 +60,47 @@ class reservesManager
 		//$this->user = $user;
 		switch ($cmd)
 		{
+			case 'removeStudent':
+				if ($_REQUEST['deleteAlias'])
+				{
+					$aliases = $_REQUEST['alias'];
+					if (is_array($aliases) && !empty($aliases)){
+						foreach($aliases as $a)
+						{
+							$user->detachCourseAlias($a);
+						}
+					}
+				}
+			case 'addStudent':
+				if ($_REQUEST['aID']) {
+					$user->attachCourseAlias($_REQUEST['aID']);
+				}
+			case 'myReserves':
+			case 'viewCourseList':
+				$page = "myReserves";
+				$loc  = "home";
+
+				$user->getCourseInstances();
+				for ($i=0;$i<count($user->courseInstances);$i++)
+				{
+					$my_ci = $user->courseInstances[$i];
+					$my_ci->getInstructors();
+					$my_ci->getProxies();
+
+					//Look at this later - should this logic be handled by ci->getCourseForUser? - kawashi 11.2.2004
+					if (in_array($user->getUserID(),$my_ci->instructorIDs) || in_array($user->getUserID(),$my_ci->proxyIDs)) {
+						//$my_ci->getCourseForInstructor($user->getUserID());
+						$my_ci->getPrimaryCourse();
+					} else {
+						$my_ci->getCourseForUser($user->getUserID());  //load courses
+					}
+				}
+
+				$this->displayFunction = "displayCourseList";
+				$this->argList = array($user);
+			break;
+			
+			
 			case 'previewStudentView':	//see if($cmd==...) statement in previewReservesList	
 			case 'previewReservesList':
 				$ci = new courseInstance($_REQUEST['ci']);
@@ -188,18 +229,27 @@ class reservesManager
 			case 'addReserve':
 				$page = "addReserve";
 				$progress = array ('total' => 4, 'full' => 0);
+
 				if ($user->getRole() >= $g_permission['staff']) {
+					//$courseInstances = $user->getCourseInstances($_REQUEST['u']);
 					$this->displayFunction = "displayStaffAddReserve";
 					$this->argList = array($_REQUEST);
 					break;
 				} elseif ($user->getRole() >= $g_permission['proxy']) { //2 = proxy
-					$courseInstances = $user->getCourseInstancesToEdit();
+					$courseInstances = $user->getCourseInstances();
 				} else {
 					trigger_error("Permission Denied:  Cannot add reserves. UserID=".$user->getUserID(), E_ERROR);
 				}
-				
-				$this->displayFunction = 'displaySelectClass';
-				$this->argList = array('displaySearchItemMenu', $courseInstances);
+
+				for($i=0;$i<count($courseInstances); $i++)
+				{
+					$ci = $courseInstances[$i];
+					//$ci->getCourseForUser($user->getUserID());
+					$ci->getPrimaryCourse();
+				}
+
+				$this->displayFunction = "displaySelectClasses";
+				$this->argList = array($courseInstances,$user);
 			break;
 			case 'displaySearchItemMenu':
 				$page="addReserve";
@@ -337,13 +387,12 @@ class reservesManager
 	    		$item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
 
 	    		if ($_REQUEST['type'] == 'DOCUMENT'){
-	    			$file = common_storeUploaded($_FILES['userfile'], $item->getItemID());
-	    			
-	    			$file_loc = $g_documentURL . $file['dir'] . $file['name'] . $file['ext'];
-					$item->setURL($file_loc);
-					$item->setMimeTypeByFileExt($file['ext']);
+	    			$file = common_storeUploaded($_FILES['userFile'], $item->getItemID());
+     				$file_loc = $g_documentURL . $file['dir'] . $file['name'] . $file['ext'];
+	 			$item->setURL($file_loc);
+				$item->setMimeTypeByFileExt($file['ext']);
 	    		} else {
-	    			$file_path = pathinfo($_FILES['userfile']['name']);
+	    			$file_path = pathinfo($_FILES['userFile']['name']);
 	    			$item->setURL($_REQUEST['url']);
 	    			$item->setMimeTypeByFileExt($file_path['extension']);
 	    		}
@@ -434,12 +483,15 @@ class reservesManager
 					$item->setVolumeEdition($_REQUEST[$file]['volume']);
 					
 					//store the fax
-					$dst_fname = $item->getItemID().'-fax.pdf';
-					if(!copy($g_faxDirectory.$_REQUEST['file'][$file], $g_documentDirectory.$dst_fname)) {
-						trigger_error('Failed to copy file '.$g_faxDirectory.$_REQUEST['file'][$file].' to '.$g_documentDirectory.$dst_fname, E_USER_ERROR);
+					$md5 = md5_file($g_faxDirectory . $_REQUEST['file'][$file]);
+                    $dst_dir = substr($md5,0,2);
+						
+					$dst_fname = "{$md5}_{$item->getItemID()}.pdf";
+					if(!copy($g_faxDirectory . $_REQUEST['file'][$file], "$dst_dir/$dst_fname")) {
+						trigger_error('Failed to copy file '.$g_faxDirectory . $_REQUEST['file'][$file] . ' to ' . "$dst_dir/$dst_fname", E_USER_ERROR);
 					}
 	
-					$item->setURL($g_documentURL.$dst_fname);
+					$item->setURL($g_documentURL . substr($md5,0,2) . "/" . $dst_fname);
 					$item->setMimeType('application/pdf');
 
 					$p = $_REQUEST[$file]['pagefrom'] . "-" . $_REQUEST[$file]['pageto'];
