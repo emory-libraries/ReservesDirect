@@ -388,7 +388,7 @@ class reservesManager
 
 	    		if ($_REQUEST['type'] == 'DOCUMENT'){
 	    			$file = common_storeUploaded($_FILES['userFile'], $item->getItemID());
-     				$file_loc = $g_documentURL . $file['dir'] . $file['name'] . $file['ext'];
+     				$file_loc = $file['dir'] . $file['name'] . $file['ext'];
 	 			$item->setURL($file_loc);
 				$item->setMimeTypeByFileExt($file['ext']);
 	    		} else {
