@@ -491,7 +491,7 @@ class reservesManager
 						trigger_error('Failed to copy file '.$g_faxDirectory . $_REQUEST['file'][$file] . ' to ' . "$dst_dir/$dst_fname", E_USER_ERROR);
 					}
 	
-					$item->setURL($g_documentURL . substr($md5,0,2) . "/" . $dst_fname);
+					$item->setURL(substr($md5,0,2) . "/" . $dst_fname);
 					$item->setMimeType('application/pdf');
 
 					$p = $_REQUEST[$file]['pagefrom'] . "-" . $_REQUEST[$file]['pageto'];
