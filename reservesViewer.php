@@ -66,7 +66,7 @@ http://www.reservesdirect.org/
 		$url = $item->getURL();	//grab the url
 		$url = str_replace(" ", "%20", trim($url));	//replace all spaces with the hex values (sometimes RD chokes on URLs with spaces in them)
 		
-		if(ereg('^http://',$url) != 1) {	//if item URL points to local server, serve the document directly
+		if(ereg('^https?://',$url) != 1) {	//if item URL points to local server, serve the document directly
 			if($stream = @fopen($g_documentDirectory . $url, r)) {	//open file for reading
 				//$filename = end(split('/', $url));	//grab the filename to suggest 'save-as' name
                 $filename = trim(trim("{$item->author} {$item->title}") . " {$item->itemID}.") . end(split('\.', $url));
