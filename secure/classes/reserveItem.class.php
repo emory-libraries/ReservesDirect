@@ -326,6 +326,8 @@ class reserveItem extends item
 	{
 		global $g_dbConn;
 
+        $ext = str_replace(".", "", $ext);
+
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
