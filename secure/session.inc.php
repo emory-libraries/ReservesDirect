@@ -19,10 +19,14 @@ switch ($g_authenticationType)
 		
         $userName = $args[0];
 		
+        // if they have an invalid authcookie, bounce them to the login page.
+        // base64_encode the requested URL and send that with them (we'll
+        // decode it later when they get to the index and send them on their way)
 		if (trim($userName) == "")
 		{
-			//invalid user account direct to logout.php to destroy session and return to login
-			header("Location: secure/logout.php");
+            $req_url = base64_encode($_SERVER['REQUEST_URI']);
+            include("destroySession.inc.php");
+			header("Location: index.php?url=$req_url");
 			exit;
 		}	
 		
