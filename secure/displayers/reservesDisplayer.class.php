@@ -35,9 +35,13 @@ require_once('secure/classes/tree.class.php');
 class reservesDisplayer extends baseDisplayer {
 
 	function displayReserves($cmd, &$ci, &$tree_walker, $reserve_count, &$hidden_reserves=null, $no_control=false) {
+        
 		if(!($ci->course instanceof course)) {
 			$ci->getPrimaryCourse();
 		}
+        
+        // announce rss feed to capable browsers
+        echo "<link rel=\"alternate\" title=\"{$ci->course->department->name} {$ci->course->courseNo} {$ci->term} {$ci->year}\" href=\"rss.php?ci={$ci->courseInstanceID}\" type=\"application/rss+xml\"/>\n";
 		
 		$exit_class_link = $no_control ? '<a href="javascript:window.close();">Close Window</a>' : '<a href="index.php">Exit class</a>' ;		
 ?>
