@@ -26,7 +26,7 @@ switch ($g_authenticationType)
 		{
             $req_url = base64_encode($_SERVER['REQUEST_URI']);
             include("destroySession.inc.php");
-			header("Location: index.php?url=$req_url");
+			header("Location: index.php?redirect=$req_url");
 			exit;
 		}	
 		

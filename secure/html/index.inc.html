@@ -5,7 +5,7 @@
 <?php
     if (isset($_REQUEST['url'])) {
         $req_url = base64_decode($_REQUEST['url']);
-        echo "<meta http-equiv=\"Refresh\" content=\"1;url=$req_url\">\n";
+        echo "<meta http-equiv=\"Refresh\" content=\"1;redirect=$req_url\">\n";
     }
 ?>
 
