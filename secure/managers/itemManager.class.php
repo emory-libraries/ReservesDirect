@@ -103,9 +103,11 @@ class itemManager
 				{
 					$page = "manageClasses";
 					$loc  = "edit item";
-								
+					
 					$this->displayFunction = 'displayEditItemScreen';
 					$this->argList = array($item, $user, $reserve, $_REQUEST['search'], array('dubReserve'=>$_REQUEST['dubReserve'], 'selected_instr'=>$_REQUEST['selected_instr']));
+//$this->displayFunction = 'displayEditItem';
+//$this->argList = array($item, $reserve, $_REQUEST['search'], array('dubReserve'=>$_REQUEST['dubReserve'], 'selected_instr'=>$_REQUEST['selected_instr']), $_REQUEST['tab']);
 				} else {
 					//were we editing a reserve?
 					if($reserve instanceof reserve) {	//set some data;
@@ -122,7 +124,12 @@ class itemManager
 							if(!empty($_REQUEST['reserve_expiration_date'])) {
 								$reserve->setExpirationDate(date('Y-m-d', strtotime($_REQUEST['reserve_expiration_date'])));
 							}		
-						}											
+						}
+						
+						//set parent heading
+						if(!empty($_REQUEST['heading_select'])) {
+							$reserve->setParent($_REQUEST['heading_select']);
+						}			
 					}
 					
 					//if editing electronic item, manage files
