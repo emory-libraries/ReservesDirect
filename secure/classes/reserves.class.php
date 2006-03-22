@@ -309,26 +309,35 @@ class reserve extends Notes {
 	
 
 	/**
-	 * @return void
+	 * @return boolean
 	 * @param int $parent_id New parent reserve's ID
-	 * @desc sets $parent_id as this reserve's parent
+	 * @desc sets $parent_id as this reserve's parent; return true on success, false on failure
 	 */
 	function setParent($parent_id) {
 		global $g_dbConn;
+		
+		//setting parent_id to self breaks things
+		if($parent_id == $this->reserveID) {
+			return false;
+		}
 
 		switch ($g_dbConn->phptype) {
 			default:	//mysql
 				$sql = "UPDATE reserves	SET parent_id = !, last_modified = ? WHERE reserve_id = !";
 				$d = date("Y-m-d"); //get current date
 		}
-		//PEAR DB chokes on null values, so change it manually
-		$parent_id = empty($parent_id) ? 'NULL' : intval($parent_id);
+		
+		//handle 'null' or 'root' parent
+		//PEAR DB chokes on literal null values, so make them 'NULL'
+		$parent_id = (empty($parent_id) || ($parent_id=='root')) ? 'NULL' : intval($parent_id);
 		
 		$rs = $g_dbConn->query($sql, array($parent_id, $d, $this->reserveID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$this->parentID = $parent_id;
-		$this->lastModDate = $d;		
+		$this->lastModDate = $d;	
+		
+		return true;	
 	}
 	
 	
