@@ -75,7 +75,7 @@ if (!isset($_REQUEST['ci']))
     echo "<rss version=\"2.0\">\n";
     echo "	<channel>\n\n";
 
-    echo "		<title>" .  stripslashes($ci->course->displayCourseNo() . " " . $ci->course->name . " " . $ci->displayTerm()) . " - Reserve List</title>\n";
+    echo "		<title>" .  htmlentities(stripslashes($ci->course->displayCourseNo() . " " . $ci->course->name . " " . $ci->displayTerm())) . " - Reserve List</title>\n";
 // mantis #429
     echo "		<link>".$g_siteURL . "/index.php?cmd=viewReservesList&amp;ci=".$_REQUEST['ci']."</link>\n";
 
@@ -86,7 +86,7 @@ if (!isset($_REQUEST['ci']))
     echo "		<webMaster>$g_reservesEmail (Reserves Desk)</webMaster>\n";
 
     echo "		<description>";
-    echo 		"Course Reserves for " . stripslashes($ci->course->displayCourseNo() . " " . $ci->course->name . " " . $ci->displayTerm()) . ", ";
+    echo 		"Course Reserves for " . htmlentities(stripslashes($ci->course->displayCourseNo() . " " . $ci->course->name . " " . $ci->displayTerm())) . ", ";
     echo 		"taught by:";
     foreach($ci->instructorList as $instr)
     	echo " " . $instr->getName() . " (" . $instr->getEmail() . ") ";
@@ -111,7 +111,7 @@ if (!isset($_REQUEST['ci']))
 	        }
     	}
     	
-        echo "			<title>" . $rItem->item->getTitle() . "</title>\n";
+        echo "			<title>" . htmlentities($rItem->item->getTitle()) . "</title>\n";
 
     	echo "			<description>";
 
