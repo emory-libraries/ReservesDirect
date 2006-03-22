@@ -234,15 +234,8 @@ class classManager
 				if(!empty($_REQUEST['heading_select']) && !empty($reserves)) {
 					foreach($reserves as $r_id) {
 						$reserve = new reserve($r_id);
-						
-						//setting parent_id to self breaks things
-						if($_REQUEST['heading_select'] == $r_id) {
-							continue;
-						}						
-						//handle 'null' parent
-						$parent = ($_REQUEST['heading_select'] == 'root') ? null : $_REQUEST['heading_select'];
 											
-						$reserve->setParent($parent);
+						$reserve->setParent($_REQUEST['heading_select']);
 						
 						//try to insert into sort order
 						$reserve->getItem();
