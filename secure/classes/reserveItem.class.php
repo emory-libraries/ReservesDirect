@@ -530,4 +530,16 @@ class reserveItem extends item
 		else
 			return false;
 	}
+	
+	/**
+	 * @return boolean
+	 * @desc Attempts to guess if the file is stored locally or remotely. Returns true if local file, false otherwise
+	 */
+	function isLocalFile() {
+		//parse the url into its component parts
+		$parsed_url = parse_url($this->URL);
+		
+		//if the url does not contain a scheme (http, ftp, etc), assume it's local		
+		return empty($parsed_url['scheme']) ? true : false;
+	}
 }

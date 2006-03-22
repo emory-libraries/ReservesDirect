@@ -69,7 +69,7 @@ http://www.reservesdirect.org/
             exit;
         }
 		
-		if(ereg('^https?://',$url) != 1) {	//if item URL points to local server, serve the document directly
+		if($item->isLocalFile()) {	//if item URL points to local server, serve the document directly
 			if($stream = @fopen($g_documentDirectory . $url, "rb")) {	//open file for reading
 
                 $author = ereg_replace("[^A-Za-z0-9]", "", $item->author);
