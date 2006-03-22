@@ -647,7 +647,7 @@ INSERT INTO `skins` VALUES (1, 'general', 'css/ReservesStyles.css', 'yes');
 -- Dumping data for table `mimetypes`
 -- 
 
-INSERT INTO `mimetypes` (`mimetype`, `helper_app_url`, `helper_app_name`, `helper_app_icon`, `file_extentions`) VALUES ('application/pdf', 'http://www.adobe.com/products/acrobat/readstep2.html', 'Adobe Acrobat Reader', 'images/doc_type_icons/doctype-pdf.gif ', 'pdf');
+INSERT INTO `mimetypes` (`mimetype`, `helper_app_url`, `helper_app_name`, `helper_app_icon`, `file_extentions`) VALUES ('application/pdf', 'http://www.adobe.com/products/acrobat/readstep2.html', 'Adobe Acrobat Reader', 'images/doc_type_icons/doctype-pdf.gif', 'pdf');
 INSERT INTO `mimetypes` (`mimetype`, `helper_app_url`, `helper_app_name`, `helper_app_icon`, `file_extentions`) VALUES ('audio/x-pn-realaudio', 'http://www.real.com/', 'RealPlayer', 'images/doc_type_icons/doctype-sound.gif', 'ram');
 INSERT INTO `mimetypes` (`mimetype`, `helper_app_url`, `helper_app_name`, `helper_app_icon`, `file_extentions`) VALUES ('video/quicktime', 'http://www.apple.com/quicktime/', 'Quicktime Player', 'images/doc_type_icons/doctype-movie.gif', 'mov');
 INSERT INTO `mimetypes` (`mimetype`, `helper_app_url`, `helper_app_name`, `helper_app_icon`, `file_extentions`) VALUES ('application/msword', 'http://office.microsoft.com/Assistance/9798/viewerscvt.aspx', 'Microsoft Word', 'images/doc_type_icons/doctype-text.gif', 'doc');
