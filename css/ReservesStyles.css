@@ -614,6 +614,10 @@ table.displaylist td{
 	border-bottom: 1px solid #333333;
 	
 }
+.displayArea {	
+	border:1px solid #333333;
+	background-color:#CCCCCC;
+}
 
 /* styles for the class enrollment tab */
 .classEnrollmentOptions {
@@ -787,8 +791,8 @@ FORMATTING DEFINITIONS
 ************************************************* 
 */
 .indent {
-	text-indent: 25px;
-	left: 8px;
+	margin-left:10px;
+	padding: 3px;
 }
 .nobullet {
 	list-style-type: none;
@@ -991,7 +995,7 @@ of materials on reserve. */
 	font-weight:bold;
 }
 
-/*Auto complete Definitions for search lookup screens*/
+/*Auto complete Definitions for AJAX class search/lookup screens*/
 
 #keyword {
 margin: 0 25px 0 0;
