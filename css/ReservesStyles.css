@@ -578,12 +578,17 @@ class screen, and is next to the courseInfo block. */
 table.simpleList {
 	border:1px solid #CCCCCC;
 	background-color:#CCCCCC;
-	width:80%;
 }
 table.simpleList td {
-	padding:2px;
+	padding:4px;
 	margin:1px;
 	background-color:#FFFFFF;
+}
+.simpleList .labelCell1 {
+	background-color:#8195B8;
+}
+.simpleList .contentCell1 {
+	background-color:#CCCCFF;
 }
 table.displayList {	
 	border:1px solid #333333;
@@ -970,18 +975,30 @@ of materials on reserve. */
 	font-weight: bold;
 
 }
-
 .active {
 	color: #009900;
 	font-weight: bold;
 
 }
-
 .inactive {
 	color: #CC0000;
 	font-weight: bold;
 
 }
+
+.copyrightReview_hidden {
+	color: #666666;
+	font-weight: bold;
+}
+.copyrightReview_active {
+	color: #009900;
+	font-weight: bold;
+}
+.copyrightReview_denied {
+	color: #CC0000;
+	font-weight: bold;
+}
+
 .openEnrollment {
 	color:#009900;
 	font-weight:bold;
