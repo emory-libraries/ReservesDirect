@@ -252,16 +252,15 @@ class userManager
 				if (!isset($userToEdit))
 				{
 					if (isset($_REQUEST['selectedUser']))
-					{						
+					{			
 						$tmpUser = new user($_REQUEST['selectedUser']);
+						$role = (isset($_REQUEST['user']['defaultRole'])) ? $_REQUEST['user']['defaultRole'] : $tmpUser->getDefaultRole();
 						
-						$role = (isset($_REQUEST['user']['defaultRole'])) ? $_REQUEST['user']['defaultRole'] : $tmpUser->getDefaultClass();
-										
 						$userToEdit = $users->initUser($role, $tmpUser->getUsername());
 						$userToEdit->getUserByID($_REQUEST['selectedUser']);		
 						unset($tmpUser);
 						
-						if ($role >= 'instructor')
+						if ($role >= $g_permission['instructor'])
 							$userToEdit->getInstructorAttributes();
 						
 					} else
