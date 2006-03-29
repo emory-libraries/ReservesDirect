@@ -324,12 +324,7 @@ class classDisplayer extends baseDisplayer {
             }
             else {
             	//edit link
-            	if($u->getRole() >= $g_permission['staff']) {	//staff, show them the editItem link
-            		$editURL = 'index.php?cmd=editItem&reserveID='.$reserve->getReserveID();
-            	}
-            	else {	//user is instructor or proxy -- show editReserve link
-            		$editURL = "index.php?cmd=editReserve&reserveID=".$reserve->getReserveID();
-            	}
+           		$editURL = 'index.php?cmd=editItem&reserveID='.$reserve->getReserveID();
             	//status
             	$status = $reserve->getStatus();
             	//if the reserve is not supposed to be active yet, hide it

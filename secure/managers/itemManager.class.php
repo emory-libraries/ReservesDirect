@@ -98,17 +98,8 @@ class itemManager
 					break;
 				}
 				
-						
-				if (!isset($_REQUEST["Submit"]))		
-				{
-					$page = "manageClasses";
-					$loc  = "edit item";
-					
-					$this->displayFunction = 'displayEditItemScreen';
-					$this->argList = array($item, $user, $reserve, $_REQUEST['search'], array('dubReserve'=>$_REQUEST['dubReserve'], 'selected_instr'=>$_REQUEST['selected_instr']));
-//$this->displayFunction = 'displayEditItem';
-//$this->argList = array($item, $reserve, $_REQUEST['search'], array('dubReserve'=>$_REQUEST['dubReserve'], 'selected_instr'=>$_REQUEST['selected_instr']), $_REQUEST['tab']);
-				} else {
+				//form submitted
+				if(!empty($_REQUEST['submit_edit_item'])) {
 					//were we editing a reserve?
 					if($reserve instanceof reserve) {	//set some data;
 						//set status
@@ -129,7 +120,11 @@ class itemManager
 						//set parent heading
 						if(!empty($_REQUEST['heading_select'])) {
 							$reserve->setParent($_REQUEST['heading_select']);
-						}			
+							
+							//try to insert into sort order
+							$reserve->getItem();
+							$reserve->insertIntoSortOrder($ci->getCourseInstanceID(), $reserve->item->getTitle(), $reserve->item->getAuthor(), $_REQUEST['heading_select']);
+						}	
 					}
 					
 					//if editing electronic item, manage files
@@ -212,67 +207,14 @@ class itemManager
 						$this->displayFunction = 'displayItemSuccessScreen';
 						$this->argList = array($ci_id, urlencode($_REQUEST['search']));
 					}
-				}			
-			break;
-			
-			case 'editReserve':
-				if(empty($_REQUEST['reserveID']))
-					break;	//error, no reserveID set
-					
-				//init object
-				$reserve = new reserve($_REQUEST['reserveID']);	//init reserve obj and data
-				$reserve->getItem();	//fetch item object & data
-			
-				//init a courseInstance to show location				
-				$ci = new courseInstance($reserve->getCourseInstanceID());
-				
-				if(isset($_REQUEST['Submit'])) {	//submitting form, handle data
-					//set status
-					$reserve->setStatus($_REQUEST['reserve_status']);
-					
-					//set dates, if status is ACTIVE
-					if($_REQUEST['reserve_status']=='ACTIVE') {
-						//if not empty, set activation and expiration dates
-						//try to convert dates to proper format
-						if(!empty($_REQUEST['reserve_activation_date']))
-							$reserve->setActivationDate(date('Y-m-d', strtotime($_REQUEST['reserve_activation_date'])));
-						if(!empty($_REQUEST['reserve_expiration_date']))
-							$reserve->setExpirationDate(date('Y-m-d', strtotime($_REQUEST['reserve_expiration_date'])));		
-					}
-				
-					//set item data
-					$reserve->item->setURL($_REQUEST['url']);
-					$reserve->item->setTitle($_REQUEST['title']);
-					$reserve->item->setAuthor($_REQUEST['author']);
-					$reserve->item->setPerformer($_REQUEST['performer']);
-					$reserve->item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
-					$reserve->item->setVolumeTitle($_REQUEST['volumeTitle']);
-					$reserve->item->setVolumeEdition($_REQUEST['volumeEdition']);
-					$reserve->item->setPagesTimes($_REQUEST['pagesTimes']);
-					$reserve->item->setSource($_REQUEST['source']);
-					
-					//notes
-					if(!empty($_REQUEST['notes'])) {
-						foreach($_REQUEST['notes'] as $note_id=>$note_text) {
-							if(!empty($note_id)) {
-								$note = new note($note_id);
-								$note->setText($note_text);
-							}
-						}
-					}
-					
-					// display success
-					$this->displayFunction = 'displayItemSuccessScreen';
-					$this->argList = array($reserve->getCourseInstanceID());
 				}
-				else {	//display form					
+				else {	//display edit page
 					$page = "manageClasses";
-					$loc  = "edit reserve";
-
-					$this->displayFunction = 'displayEditReserveScreen';
-					$this->argList = array($reserve, $user);
-				}
-			
+					$loc  = "edit item";
+					
+					$this->displayFunction = 'displayEditItem';
+					$this->argList = array($item, $reserve, $_REQUEST['search'], array('dubReserve'=>$_REQUEST['dubReserve'], 'selected_instr'=>$_REQUEST['selected_instr']), $_REQUEST['tab']);
+				}			
 			break;
 
 			case 'editHeading':
