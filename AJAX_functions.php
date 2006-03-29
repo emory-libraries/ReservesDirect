@@ -31,9 +31,18 @@ http://www.reservesdirect.org/
 	require_once("secure/classes/department.class.php");
 	require_once("secure/classes/users.class.php");
 	require_once("secure/classes/terms.class.php");
+	require_once("secure/managers/noteManager.class.php");
+	require_once("secure/displayers/noteDisplayer.class.php");
 	require_once("PEAR/JSON.php");
 	require_once("secure/common.inc.php");
-
+	
+	//need to re-establish current user from session
+	require_once("secure/session.inc.php");
+	//init user based on type
+	$usersObject = new users();
+	$u = $usersObject->initUser($_SESSION['userClass'], $_SESSION['username']);
+	
+	//process passed arguments
 	$f = $_REQUEST['f'];
 	$qry = (isset($_REQUEST['qu'])) ? base64_decode($_REQUEST['qu']) : null;
 	$rf  = (isset($_REQUEST['rf'])) ? base64_decode($_REQUEST['rf']) : null;
@@ -172,6 +181,39 @@ http://www.reservesdirect.org/
 		case 'termsList':
 			$t = new terms();
 			$returnValue = $json->encode($t->getTerms(true));
+		break;
+		
+
+		case 'fetchNotes':
+			//parse the request
+			parse_str(base64_decode($_REQUEST['query']), $request);
+			
+			//fetch notes
+			$notes = noteManager::fetchNotesForObj($request['obj_type'], $request['id'], true);
+			
+			//start output buffering
+			ob_start();
+			//output edit-note blocks (table rows)
+			noteDisplayer::displayNotesContentAJAX($notes, $request['obj_type'], $request['id']);
+			//grab the content for return
+			$returnValue = ob_get_contents();
+			//end buffering
+			ob_end_clean();		
+		break;
+
+		
+		case 'saveNote':	
+			//parse the request
+			parse_str(base64_decode($_REQUEST['query']), $request);		
+			//save note
+			noteManager::saveNote($request['obj_type'], $request['id'], $request['note_text'], $request['note_type'], $request['note_id']);	
+		break;
+		
+		case 'deleteNote':
+			//parse the request
+			parse_str(base64_decode($_REQUEST['query']), $request);
+			//delete note
+			noteManager::deleteNote($request['id']);
 		break;
 		
 		default:

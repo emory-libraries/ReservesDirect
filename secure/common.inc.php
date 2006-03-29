@@ -281,18 +281,4 @@ function common_formatDate($d, $format)
 		} else return '';
 }
 
-
-	/**
-	 * @return void
-	 * @param int $note_id ID of note to delete
-	 * @desc Deletes the specified note
-	 */
-	function common_deleteNote($note_id) {
-		if(!empty($note_id)) {
-			$note = new note($note_id);
-			if($note->getID()) {
-				$note->destroy();
-			}
-		}		
-	}
 ?>

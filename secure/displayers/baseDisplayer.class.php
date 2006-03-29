@@ -28,6 +28,7 @@ http://www.reservesdirect.org/
 
 *******************************************************************************/
 
+require_once('secure/displayers/noteDisplayer.class.php');
 require_once('secure/classes/reserves.class.php');
 
 /**
@@ -39,81 +40,6 @@ require_once('secure/classes/reserves.class.php');
  *	its children currently use.
  */
 abstract class baseDisplayer {
-	
-	/**
-	 * @return void
-	 * @param array $notes Reference to an array of note objects
-	 * @param string $referrer_string Query sub-string to be used for the DELETE links.  ex: 'reserveID=5' or 'itemID=10'
-	 * @desc outputs HTML for display of notes edit boxes in item/reserve edit screens
-	 */
-	public function displayEditNotes(&$notes, $referrer_string) {
-		foreach($notes as $note):
-?>
-			<tr>
-				<td bgcolor="#CCCCCC" align="right">
-					<strong><?=$note->getType()?> Note:</strong>
-					<br />
-					[<a href="index.php?cmd=<?=$_REQUEST['cmd']?>&amp;<?=$referrer_string?>&amp;deleteNote=<?=$note->getID()?>">Delete this note</a>]&nbsp;
-				</td>
-				<td>
-					<textarea name="notes[<?=$note->getID()?>]" cols="50" rows="3"><?=stripslashes($note->getText())?></textarea>
-				</td>
-			</tr>								
-<?php
-		endforeach;
-		//rewind array
-		reset($notes);
-	}
-	
-	
-	/**
-	 * @return void
-	 * @param string $referrer_string String identifying object and its ID. ex: 'reserveID=5' or 'itemID=10'. Note: the addNote handler must recognize the object
-	 * @desc outputs HTML for display of addNote button
-	 */
-	public function displayAddNoteButton($referrer_string) {
-?>
-		<input type="button" name="addNote" value="Add Note" onClick="openWindow('no_table=1&amp;cmd=addNote&amp;<?=$referrer_string?>','width=600,height=400');">
-<?php
-	}
-	
-	
-	/**
-	 * @return void
-	 * @param array $itemNotes Reference to an array of note objects
-	 * @desc outputs HTML for display of notes in reserve listings
-	 */
-	public function displayItemNotes(&$itemNotes) {
-		global $u, $g_permission, $g_notetype;
-		
-		if(empty($itemNotes))
-			return;
-		
-		foreach($itemNotes as $note) {
-			if($note->getType() == $g_notetype['content']) {	//show content notes to everyone
-				echo '<br /><span class="noteType">Content Note:</span>&nbsp;<span class="noteText">'.stripslashes($note->getText()).'</span>';
-			}
-			elseif($u->getRole() >= $g_permission['staff']) {	//if other type of item note, only show to staff or greater
-				echo '<br /><span class="noteType">'.ucfirst($note->getType()).' Note:</span>&nbsp;<span class="noteText">'.stripslashes($note->getText()).'</span>';
-			}
-		}	
-	}
-	
-	
-	/**
-	 * @return void
-	 * @param array $reserveNotes Reference to an array of note objects
-	 * @desc outputs HTML for display of notes in reserve listings
-	 */
-	public function displayReserveNotes(&$reserveNotes) {
-		if(empty($reserveNotes))
-			return;
-		
-		foreach($reserveNotes as $note) {
-			echo '<br><span class="noteType">'.ucfirst($note->getType()).' Note:</span>&nbsp;<span class="noteText">'.stripslashes($note->getText()).'</span>';
-		}		
-	}
-	
 	
 	/**
 	 * @return void
@@ -268,8 +194,8 @@ abstract class baseDisplayer {
 <?php
 			echo $reserve->item->getTitle();
 			//show notes
-			self::displayItemNotes($itemNotes);
-			self::displayReserveNotes($reserveNotes);
+			noteDisplayer::displayNotes($itemNotes);
+			noteDisplayer::displayNotes($reserveNotes);
 ?>
 		</div>
 	
@@ -336,8 +262,8 @@ abstract class baseDisplayer {
 
 <?php
 			//show notes
-			self::displayItemNotes($itemNotes);
-			self::displayReserveNotes($reserveNotes);
+			noteDisplayer::displayNotes($itemNotes);
+			noteDisplayer::displayNotes($reserveNotes);
 			
 			//show additional info
 			if(!empty($reserve->additional_info)) {
@@ -355,22 +281,28 @@ abstract class baseDisplayer {
 	/**
 	 * @return void
 	 * @param courseInstance $ci Reference to a Course Instance object
+	 * @param mixed $default_heading (optional) Pre-select the option matching this value. null = no selection, 'root' = main list, <id> = folder id
 	 * @desc displays a <select> box that shows all available folders (headings) for a given CI
 	 */
-	public function displayHeadingSelect(&$ci) {
+	public function displayHeadingSelect(&$ci, $default_heading=null) {
 		//get headings as a tree + recursive iterator
 		$walker = $ci->getReservesAsTreeWalker('getHeadings');
+		
+		$select_none = empty($default_heading) ? ' selected="selected"' : '';
+		$select_root = (strtolower($default_heading)=='root') ? ' selected="selected"' : '';
 ?>
 	<select name="heading_select">
-		<option value= "" selected="selected">...</option>
-		<option value="root">Main List</option>
+		<option value=""<?=$select_none?>>...</option>
+		<option value="root"<?=$select_root?>>Main List</option>
 <?php
 		foreach($walker as $leaf):
 			$heading = new reserve($leaf->getID());
 			$heading->getItem();
 			$label = str_repeat('&nbsp;&nbsp;', ($walker->getDepth()+1)).$heading->item->getTitle();
+			//pre-select a heading
+			$select_other = ($leaf->getID()==$default_heading) ? ' selected="selected"' : '';
 ?>	
-			<option value="<?=$leaf->getID()?>"><?=$label?></option>
+			<option value="<?=$leaf->getID()?>"<?=$select_other?>><?=$label?></option>
 <?php	endforeach; ?>
 	</select>
 <?php

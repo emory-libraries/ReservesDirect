@@ -979,7 +979,7 @@ class requestDisplayer extends baseDisplayer {
 				if ($source)
 					echo '<br><span class="itemMetaPre">Source/Year:</span>&nbsp;<span class="itemMeta"> '.$source.'</span>';
 
-				self::displayItemNotes($itemNotes);
+				self::displayNotes($itemNotes);
 				
 				echo '	</td>';
 				echo '	<td width="17%" valign="top" align="right" nowrap="nowrap">[ <a href="index.php?cmd=editReserve&reserveID='.$reserve->getReserveID().'" class="editlinks">edit item</a> ]';

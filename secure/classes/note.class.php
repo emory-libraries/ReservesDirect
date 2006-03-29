@@ -44,7 +44,7 @@ class note
 	* @construct note and populate it passed noteID
 	*/
 	function note($noteID=NULL) {
-		if(!is_null($noteID))
+		if(!empty($noteID))
 			$this->getNoteByID($noteID);
 		else
 			$this->createNewNote();

@@ -532,7 +532,7 @@ function displaySearchItemMenu($ci)
 	            }
 
 				//show notes
-				self::displayItemNotes($itemNotes);
+				self::displayNotes($itemNotes);
 	            
 	        	if ($item->getItemGroup() != "ELECTRONIC" && !is_null($loan_periods)) 
 			    {
@@ -660,8 +660,8 @@ function displayReserveAdded($user, $reserve=null, $ci)
 	    	echo '<br><span class="itemMetaPre">Source/Year:</span>&nbsp;<span class="itemMeta"> '.$source.'</span>';
 	    	
 		//show notes
-		self::displayItemNotes($itemNotes);
-		self::displayReserveNotes($reserveNotes);
+		self::displayNotes($itemNotes);
+		self::displayNotes($reserveNotes);
 			
     	echo '	</td>';
     	echo '	<td width="17%" valign="top">[ <a href="index.php?cmd=editReserve&reserveID='.$reserve->getReserveID().'" class="editlinks">edit item</a> ]</td>';

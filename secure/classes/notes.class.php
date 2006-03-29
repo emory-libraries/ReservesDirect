@@ -171,10 +171,15 @@ abstract class Notes {
 	 * @desc Creates a new note object (or uses an old one if a note_id is provided) and sets its attributes in the DB. Returns resulting note object.
 	 */
 	public function setNote($note_text, $note_type=null, $note_id=null) {
+		if(empty($note_text)) {
+			return null;
+		}
+
 		//get note type
 		if(!is_null($type = $this->pickNoteType($note_type))) {
 			//create or fetch a note object
 			$note = new note($note_id);
+			
 			//set data
 			$note->setTarget($this->targetID, $this->targetTable);
 			$note->setType($type);

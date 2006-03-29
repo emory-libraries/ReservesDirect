@@ -761,6 +761,23 @@ class reserve extends Notes {
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 	}
+	
+	
+	/**
+	 * @return array of Note objects
+	 * @param boolean $include_item_notes (optional) If true, will also fetch notes for the reserveItem
+	 * @desc Overwrites the parent method to allow for inclusion of reserveItem notes. If param is true, will return merged array of reserve and item notes.
+	 */
+	public function getNotes($include_item_notes=false) {
+		$notes = parent::getNotes();
+		
+		if($include_item_notes) {	//include reserveItem notes
+			$this->getItem();	//fetch the reserveItem object
+			$notes = array_merge($notes, $this->item->getNotes());	//merge reserve notes and item notes
+		}
+		
+		return $notes;
+	}
 
 }
 ?>

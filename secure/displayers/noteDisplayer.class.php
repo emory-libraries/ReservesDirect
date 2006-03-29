@@ -3,7 +3,7 @@
 noteDisplayer.class.php
 
 
-Created by Kathy Washington (kawashi@emory.edu)
+Created by Dmitriy Panteleyev (dpantel@emory.edu)
 
 This file is part of ReservesDirect
 
@@ -30,6 +30,213 @@ http://www.reservesdirect.org/
 require_once('secure/displayers/baseDisplayer.class.php');
 
 class noteDisplayer extends baseDisplayer {
+
+	/**
+	 * @return void
+	 * @param array $notes Array of note objects
+	 * @param string $obj_type Type of object these notes are connected to (`reserve`, `item`, etc)
+	 * @param int $obj_id ID of the object
+	 * @param boolean $include_add_button If true, will include that add-note button
+	 * @desc Displays notes in a table with javascript links to edit and/or delete each note
+	 */
+	public function displayNotesBlockAJAX($notes, $obj_type, $obj_id, $include_add_button=true) {
+?>
+		<div id="item_notes">
+			<?php self::displayNotesContentAJAX($notes, $obj_type, $obj_id); //notes content ?>
+		</div>
+		
+		<?php self::displayNotesFormAJAX($obj_type, $obj_id); //include the add/edit-note form ?>
+		
+<?php
+		if($include_add_button) {	//include add-note button?
+			self::displayAddNoteButtonAJAX();
+		}
+	}
+	
+	
+	/**
+	 * @return void
+	 * @param array $notes Array of note objects
+	 * @param string $obj_type Type of object these notes are connected to (`reserve`, `item`, etc)
+	 * @param int $obj_id ID of the object
+	 * @desc Displays notes in a table with javascript links to edit and/or delete each note
+	 */
+	public function displayNotesContentAJAX(&$notes, $obj_type, $obj_id) {
+		global $u, $g_notetype, $g_permission;
+		
+		if(empty($notes)) {
+			return;
+		}
+		
+		//some notes should be shown only to staff
+		$restricted_note_types = array($g_notetype['staff'], $g_notetype['copyright'], $g_notetype['content']);
+		
+		//display notes
+?>
+		<table border="0" cellpadding="2" cellspacing="0">
+<?php		
+		foreach($notes as $note):
+			if(in_array($note->getType(), $restricted_note_types) && ($u->getRole() < $g_permission['staff'])) {
+				continue;	//skip the note if it is restricted and user is less than staff
+			}
+?>
+			<tr valign="top">
+				<td align="right">
+					<strong><?=$note->getType()?> Note:</strong>
+					<br />
+					<a href="#" onclick="javascript: notes_show_form(<?=$note->getID()?>, '<?=$note->getText()?>', '<?=$note->getType()?>'); return false;">edit</a> | <a href="#" onclick="javascript: notes_delete_note('<?=$obj_type?>', <?=$obj_id?>, <?=$note->getID()?>); return false;">delete</a>&nbsp;
+				</td>
+				<td>
+					<?=stripslashes($note->getText())?>
+				</td>
+			</tr>								
+<?php	endforeach; ?>
+
+		</table>
+<?php
+}
+
+
+	/**
+	 * @return void
+	 * @param string $referrer_string String identifying object and its ID. ex: 'reserveID=5' or 'itemID=10'. Note: the addNote handler must recognize the object
+	 * @desc outputs HTML for display of addNote button
+	 */
+	public function displayAddNoteButtonAJAX() {
+?>
+		<input type="button" value="Add Note" onclick="javascript: notes_show_form('', '', ''); return false;" />
+<?php
+	}
+	
+
+	/**
+	 * @return void
+	 * @param string $obj_type Type of object these notes are connected to (`reserve`, `item`, etc)
+	 * @param int $obj_id ID of the object
+	 * @desc Adds the note form to a page (hidden) and the add-note button
+	 */
+	public function displayNotesFormAJAX($obj_type, $obj_id) {
+		global $u, $g_notetype, $g_permission;
+?>
+			<div id="noteform_container" class="noteform_container" style="display:none;">
+				<div id="noteform_bg" class="noteform_bg"></div>
+				<div id="noteform" class="noteform"">
+					<form id="note_form" name="note_form" onsubmit="javascript: return false;">
+						<input type="hidden" id="note_id" name="note_id" value="" />
+						
+						<strong><big>Add/Edit Note</big></strong>
+						<br />
+						<textarea id="note_text" name="note_text"></textarea>
+						
+<?php	if($u->getRole() >= $g_permission['staff']): //allow staff or better to add all kinds of notes ?>
+						<small>
+							<strong>Note Type:</strong>
+<?php		if($obj_type=='reserve'): //allow instructor notes for reserves ?>
+							<label><input type="radio" id="note_type_<?=$g_notetype['instructor']?>" name="note_type" value="<?=$g_notetype['instructor']?>" checked="true">Instructor</label>
+<?php		endif; ?>			
+							<label><input type="radio" id="note_type_<?=$g_notetype['content']?>" name="note_type" value="<?=$g_notetype['content']?>" checked="true">Content</label>
+							<label><input type="radio" id="note_type_<?=$g_notetype['staff']?>" name="note_type" value="<?=$g_notetype['staff']?>">Staff</label>
+							<label><input type="radio" id="note_type_<?=$g_notetype['copyright']?>" name="note_type" value="<?=$g_notetype['copyright']?>">Copyright</label>
+						</small>
+<?php	else:	//automatically chose 'instructor' for instructors or less ?>
+						<input type="hidden" id="note_type_<?=$g_notetype['instructor']?>" name="note_type" value="<?=$g_notetype['instructor']?>" />			
+<?php	endif; ?>
+						<br />
+						<div style="text-align: center">
+							<input type="button" value="Cancel" onclick="javascript: notes_hide_form(); return false;" />
+							<input type="button" value="Save" onclick="javascript: notes_save_note('<?=$obj_type?>', <?=$obj_id?>, this.form); return false;" />					
+						</div>
+					</form>		
+				</div>
+			</div>			
+<?php	
+}
+
+
+	/**
+	 * @return void
+	 * @param array $notes Reference to an array of note objects
+	 * @param string $referrer_string Query sub-string to be used for the DELETE links.  ex: 'reserveID=5' or 'itemID=10'
+	 * @param boolean $use_ajax_delete_links (optional) If true `delete` links will send click events to a `delete_note(note_id)` JS function
+	 * @desc outputs HTML for display of notes edit boxes in item/reserve edit screens
+	 */
+	public function displayEditNotes(&$notes, $referrer_string, $use_ajax_delete_links=false) {
+		global $u, $g_notetype, $g_permission;
+		
+		if(empty($notes)) {
+			return;
+		}
+		
+		//some notes should be shown only to staff
+		$restricted_note_types = array($g_notetype['staff'], $g_notetype['copyright'], $g_notetype['content']);
+?>
+		<table border="0" cellpadding="2" cellspacing="0">
+<?php		
+		foreach($notes as $note):
+			if(in_array($note->getType(), $restricted_note_types) && ($u->getRole() < $g_permission['staff'])) {
+				continue;	//skip the note if it is restricted and user is less than staff
+			}
+?>
+			<tr>
+				<td align="right">
+					<strong><?=$note->getType()?> Note:</strong>
+					<br />
+<?php		if($use_ajax_delete_links): ?>
+					[<a href="#" onclick="javascript: notes_delete_note(<?=$note->getID()?>); return false;">Delete this note</a>]&nbsp;
+<?php		else: ?>
+					[<a href="index.php?cmd=<?=$_REQUEST['cmd']?>&amp;<?=$referrer_string?>&amp;deleteNote=<?=$note->getID()?>">Delete this note</a>]&nbsp;
+<?php		endif; ?>
+				</td>
+				<td>
+					<textarea name="notes[<?=$note->getID()?>]" cols="50" rows="3" wrap="virtual"><?=stripslashes($note->getText())?></textarea>
+				</td>
+			</tr>								
+<?php	endforeach; ?>
+
+		</table>
+<?php
+	}
+	
+	
+	/**
+	 * @return void
+	 * @param string $referrer_string String identifying object and its ID. ex: 'reserveID=5' or 'itemID=10'. Note: the addNote handler must recognize the object
+	 * @desc outputs HTML for display of addNote button
+	 */
+	public function displayAddNoteButton($referrer_string) {
+?>
+		<input type="button" name="addNote" value="Add Note" onClick="openWindow('no_table=1&amp;cmd=addNote&amp;<?=$referrer_string?>','width=600,height=400');">
+<?php
+	}
+	
+	
+	/**
+	 * @return void
+	 * @param array $notes Reference to an array of note objects
+	 * @desc outputs HTML for display of notes in reserve listings
+	 */
+	public function displayNotes(&$notes) {
+		global $u, $g_notetype, $g_permission;
+		
+		if(empty($notes)) {
+			return;
+		}
+		
+		//some notes should be shown only to staff
+		$restricted_note_types = array($g_notetype['staff'], $g_notetype['copyright']);
+
+		foreach($notes as $note):
+			if(in_array($note->getType(), $restricted_note_types) && ($u->getRole() < $g_permission['staff'])) {
+				continue;	//skip the note if it is restricted and user is less than staff
+			}
+?>
+		<br />
+		<span class="noteType"><?=ucfirst($note->getType())?> Note:</span>&nbsp;
+		<span class="noteText"><?=stripslashes($note->getText())?></span>
+<?php
+		endforeach;	
+	}
+	
 	
 	/**
 	* @return void

@@ -44,6 +44,7 @@ require_once("secure/interface/staff.class.php");
 require_once("secure/interface/admin.class.php");
 
 require_once("secure/managers/ajaxManager.class.php");
+require_once("secure/managers/noteManager.class.php");
 
 require_once("secure/functional_permissions.inc.php");
 
@@ -111,7 +112,7 @@ $calendar = new Calendar();
 
 
 //if there is a command to delete a note, do it
-	common_deleteNote($_REQUEST['deleteNote']);
+if(!empty($_REQUEST['deleteNote'])) {
 	noteManager::deleteNote($_REQUEST['deleteNote']);
 }
 
@@ -185,7 +186,6 @@ switch ($cmd)
 	case 'editItem':
 	case 'editHeading':
 	case 'processHeading':
-	case 'editReserve':
 	case 'duplicateReserve';
 		require_once("secure/managers/itemManager.class.php");
 		$mgr = new itemManager($cmd, $u);
