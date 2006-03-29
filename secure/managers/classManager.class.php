@@ -239,7 +239,7 @@ class classManager
 						
 						//try to insert into sort order
 						$reserve->getItem();
-						$reserve->insertIntoSortOrder($ci->getCourseInstanceID(), $reserve->item->getTitle(), $reserve->item->getAuthor(), $parent);
+						$reserve->insertIntoSortOrder($ci->getCourseInstanceID(), $reserve->item->getTitle(), $reserve->item->getAuthor(), $_REQUEST['heading_select']);
 					}
 				}
 
