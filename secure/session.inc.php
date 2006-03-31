@@ -1,4 +1,6 @@
 <?
+require_once("secure/classes/skins.class.php");
+require_once("secure/interface/admin.class.php");
 session_start();
 //session_unset();
 
@@ -17,7 +19,7 @@ switch ($g_authenticationType)
 		
 		$_SESSION['authKey'] = $keys[$ndx];
 		
-        $userName = $args[0];
+        $userName = "croddy";
 		
         // if they have an invalid authcookie, bounce them to the login page.
         // base64_encode the requested URL and send that with them (we'll
