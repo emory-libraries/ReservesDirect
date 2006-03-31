@@ -30,10 +30,10 @@ http://www.reservesdirect.org/
 require_once("secure/common.inc.php");
 require_once("secure/classes/terms.class.php");
 require_once("secure/classes/circRules.class.php");
-require_once('secure/displayers/baseDisplayer.class.php');
+require_once('secure/displayers/noteDisplayer.class.php');
 require_once('secure/managers/ajaxManager.class.php');
 
-class requestDisplayer extends baseDisplayer {
+class requestDisplayer extends noteDisplayer {
 	
 	function displayAllRequest($requestList, $libList, $request, $user, $msg="")
 	{

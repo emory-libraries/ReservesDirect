@@ -28,11 +28,11 @@ http://www.reservesdirect.org/
 
 *******************************************************************************/
 require_once("secure/common.inc.php");
-require_once('secure/displayers/baseDisplayer.class.php');
+require_once('secure/displayers/noteDisplayer.class.php');
 require_once('secure/classes/tree.class.php');
 
 
-class reservesDisplayer extends baseDisplayer {
+class reservesDisplayer extends noteDisplayer {
 
 	function displayReserves($cmd, &$ci, &$tree_walker, $reserve_count, &$hidden_reserves=null, $no_control=false) {
         
