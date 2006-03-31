@@ -19,7 +19,7 @@ switch ($g_authenticationType)
 		
 		$_SESSION['authKey'] = $keys[$ndx];
 		
-        $userName = "croddy";
+        $userName = $args[0];
 		
         // if they have an invalid authcookie, bounce them to the login page.
         // base64_encode the requested URL and send that with them (we'll
