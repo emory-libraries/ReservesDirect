@@ -286,16 +286,27 @@ class classManager
 						case 'activateAll':
 							foreach($reserves as $r) {
 								$reserve = new reserve($r);
-								$reserve->setStatus('ACTIVE');
+								
+								//do not allow instructors to change status for a physical item
+								$reserve->getItem();
+								if(!$reserve->item->isPhysicalItem() && ($u->getRole() >= $g_permission['staff'])) {
+									$reserve->setStatus('ACTIVE');
+								}
 							}
 						break;
 
 						case 'deactivateAll':
 							foreach($reserves as $r) {
 								$reserve = new reserve($r);
-								//Headings always have a status of active
-								if (!$reserve->isHeading())
-									$reserve->setStatus('INACTIVE');
+								
+								//do not allow instructors to change status for a physical item
+								$reserve->getItem();
+								if(!$reserve->item->isPhysicalItem() && ($u->getRole() >= $g_permission['staff'])) {
+									//Headings always have a status of active
+									if (!$reserve->isHeading()) {
+										$reserve->setStatus('INACTIVE');
+									}
+								}									
 							}
 						break;
 					}
