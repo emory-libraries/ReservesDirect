@@ -590,12 +590,19 @@ table.simpleList td {
 .simpleList .contentCell1 {
 	background-color:#CCCCFF;
 }
+.simpleList .emptyCell {      /* The background color of simpleList.emptyCell should be the same as .displayArea */
+	background-color:#CCCCCC;
+}
 table.displayList {	
 	border:1px solid #333333;
 	border-collapse:collapse;
 }
 table.displaylist td{
 	padding:4px;
+}
+.displayArea {	
+	border:1px solid #333333;
+	background-color:#CCCCCC;
 }
 .displayList .actions, .displayList .actions a {
 	color:#CCCCCC;
@@ -618,28 +625,6 @@ table.displaylist td{
 	border-top: 1px solid #333333;
 	border-bottom: 1px solid #333333;
 	
-}
-.displayArea {	
-	border:1px solid #333333;
-	background-color:#CCCCCC;
-}
-
-/* styles for the class enrollment tab */
-.classEnrollmentOptions {
-	background-color: #FFFFCC;
-	padding: 5px;
-}
-.classRoll {
-	background-color: #CCCCCC;
-	padding: 5px;	
-}
-.classRollPending {
-	width: 50%; /* be careful setting widths - IE screws up % calculations b/c of the padding */
-	float: right;	
-}
-.classRollActive {
-	width: 45%; /* be careful setting widths - IE screws up % calculations b/c of the padding */
-	float: left;	
 }
 
 /* oddRow/evenRow define how alternating row colors appear in tables */
@@ -669,6 +654,8 @@ table.displaylist td{
 	text-align: left;
 	padding: 0;
 	border: 1px solid #333333;
+	font-weight:bold;
+	color:#333333;
 	
 }
 .headingCell2 .headingText{
@@ -821,27 +808,6 @@ whether there should be page breaks or no page breaks. */
  ************************************************* 
 */
 
-/* The following provide definitions for they system message display area.
-The style for individual system messages is set in the "news" table of the db,
-or from the admin tab. */
-#displayMsg {
-	margin:0px 50px 0px 50px;
-	text-align:left;
-	
-}
-#displayMsg .emergency {
-	padding:5px;
-	border:1px solid #660000;
-	background-color:#FFCCCC;
-	color:#CC0000;
-}
-#displayMsg .notice {
-	padding:5px;
-	border:1px dashed #003300;
-	background-color:CCFFCC;
-	color:#003300;
-}
-
 /* The following group of tags define how reserve items are listed, along with a.itemTitle 
 (see "Link Definitions" above).
 'itemTitle' defines the appearance of item titles for materials that do not have live links 
@@ -975,17 +941,6 @@ of materials on reserve. */
 	font-weight: bold;
 
 }
-.active {
-	color: #009900;
-	font-weight: bold;
-
-}
-.inactive {
-	color: #CC0000;
-	font-weight: bold;
-
-}
-
 .copyrightReview_hidden {
 	color: #666666;
 	font-weight: bold;
@@ -998,7 +953,17 @@ of materials on reserve. */
 	color: #CC0000;
 	font-weight: bold;
 }
+.active {
+	color: #009900;
+	font-weight: bold;
 
+}
+
+.inactive {
+	color: #CC0000;
+	font-weight: bold;
+
+}
 .openEnrollment {
 	color:#009900;
 	font-weight:bold;
@@ -1011,6 +976,27 @@ of materials on reserve. */
 	color:#CC0000;
 	font-weight:bold;
 }
+#copyright .new {
+	background-color:#CADBEC;
+	color:##0B105D;
+	font-weight:bold;
+}
+#copyright .pending {
+	background-color:#FFFFCC;
+	color:#663300;
+	font-weight:bold;
+}
+#copyright .approved {
+	background-color:#CCECDE;
+	color:#003300;
+	font-weight:bold;
+}
+#copyright .denied {
+	background-color:#D2AAA0;
+	color:660000;
+	font-weight:bold;
+}
+
 
 /*Auto complete Definitions for AJAX class search/lookup screens*/
 
