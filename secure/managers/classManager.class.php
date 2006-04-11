@@ -51,7 +51,7 @@ class classManager
 
 	function classManager($cmd, $user, $adminUser, $request)
 	{
-		global $g_permission, $page, $loc, $ci, $alertMsg;
+		global $g_permission, $page, $loc, $ci, $alertMsg, $u;
 		
 //echo "classManager($cmd, $user, $adminUser)<P>"; //classManager
 
