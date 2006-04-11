@@ -186,7 +186,7 @@ class copyrightDisplayer extends baseDisplayer {
 			}
 			
 			function reload_page() {
-				window.location.reload(true);
+				window.location.href = window.location.href;
 			}
 		</script>
 
