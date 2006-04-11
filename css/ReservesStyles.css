@@ -586,6 +586,7 @@ table.simpleList td {
 }
 .simpleList .labelCell1 {
 	background-color:#8195B8;
+	text-align:right;
 }
 .simpleList .contentCell1 {
 	background-color:#CCCCFF;
@@ -1347,4 +1348,50 @@ Note Form Definitions
 	width: 370px;
 	height: 90px;
 	overflow: auto;
+}
+
+/*
+****************************************
+Copyright Contact Form Definitions
+****************************************
+*/
+
+.contactform_container {
+	position: relative; /* must be relative to align the child correctly */
+	z-index: 2;
+}
+
+/* this will show an opaque background behind the form; must be positioned in the same location as the form */
+.contactform_bg {
+	position: absolute; /* absolutely-positioned within the relatively-positioned parent */
+	width: 410px;
+	height: 255px;
+	
+	z-index: 3;
+	top: -245px; /* negative (height + any padding) */
+		
+	background: lightblue;
+	border: 1px solid black;
+	
+	/* transparency */
+	opacity: 0.80; /* css3 standard */
+	filter: alpha(opacity=80); /* IE */
+	-moz-opacity: 0.80; /* mozilla */
+}
+
+/* the form block */
+.contactform {
+	position: absolute; /* absolutely-positioned within the relatively-positioned parent */
+	width: 400px;
+	height: 245px;
+	text-align: left;
+	padding: 5px;
+	z-index: 4;
+	top: -245px; /* negative (height + any padding) */
+}
+
+/* table */
+.contactform th {
+	border: 1px solid black;
+	text-align: center;"
 }

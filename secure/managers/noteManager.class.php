@@ -30,6 +30,9 @@ http://www.reservesdirect.org/
 *******************************************************************************/
 require_once("secure/common.inc.php");
 require_once("secure/classes/note.class.php");
+require_once("secure/classes/reserves.class.php");
+require_once("secure/classes/reserveItem.class.php");
+require_once("secure/classes/copyright.class.php");
 require_once("secure/displayers/noteDisplayer.class.php");
 
 class noteManager
@@ -106,6 +109,11 @@ class noteManager
 				//get notes
 				$notes = $item->getNotes();
 			break;
+			
+			case 'copyright':
+				$copyright = new Copyright($obj_id);
+				$notes = $copyright->getNotes();
+			break;
 		}
 		
 		return $notes;
@@ -141,11 +149,25 @@ class noteManager
 				//init new rItem obj
 				$item = new reserveItem($obj_id);
 			break;
+			
+			case 'copyright':
+				$copyright = new Copyright($obj_id);
+			break;
 		}
 		
 		//add/edit instructor note to reserve
 		if(($note_type==$g_notetype['instructor']) && ($reserve instanceof reserve)) {
 			$reserve->setNote(trim($note_text), $note_type, $note_id);
+		}
+		elseif(($note_type==$g_notetype['copyright']) && ($copyright instanceof Copyright)) {	//add/edit copyright note to copyright
+			$copyright->setNote(trim($note_text), $note_type, $note_id);
+			//add to log
+			if(!empty($note_id)) {	//editing note
+				$copyright->log('edit note', '#'.$note_id.' - '.substr($note_text, 0, 30));
+			}
+			else {
+				$copyright->log('add note', substr($note_text, 0, 30));
+			}
 		}
 		elseif($item instanceof reserveItem) {	//add/edit all other types to item
 			$item->setNote(trim($note_text), $note_type, $note_id);
@@ -156,13 +178,24 @@ class noteManager
 	/**
 	 * @return void
 	 * @param int $note_id ID of note to delete
+	 * @param string $obj_type (optional) Object to witch this note is attached
+	 * @param int $obj_id (optional) Object id
 	 * @desc Deletes the specified note
 	 */
-	public function deleteNote($note_id) {
+	public function deleteNote($note_id, $obj_type=null, $obj_id=null) {
+		global $g_notetype;
+		
 		if(!empty($note_id)) {
 			$note = new note($note_id);
 			if($note->getID()) {
-				$note->destroy();
+				if($note->getType() == $g_notetype['copyright']) {
+					//attempt to log it
+					if(($obj_type=='copyright') && !empty($obj_id)) {
+						$copyright = new Copyright($obj_id);
+						$copyright->log('delete note', '#'.$note->getID());
+					}
+				}
+				$note->destroy();				
 			}
 		}		
 	}

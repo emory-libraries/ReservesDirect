@@ -28,15 +28,18 @@ http://www.reservesdirect.org/
 
 *******************************************************************************/
 	require_once("secure/config.inc.php");
+	require_once("secure/classes/copyright.class.php");
 	require_once("secure/classes/department.class.php");
 	require_once("secure/classes/users.class.php");
 	require_once("secure/classes/terms.class.php");
 	require_once("secure/managers/noteManager.class.php");
+	require_once("secure/managers/copyrightManager.class.php");
 	require_once("secure/displayers/noteDisplayer.class.php");
 	require_once("PEAR/JSON.php");
 	require_once("secure/common.inc.php");
 	
 	//need to re-establish current user from session
+	//this should throw an error if the user is not valid
 	require_once("secure/session.inc.php");
 	//init user based on type
 	$usersObject = new users();
@@ -90,19 +93,6 @@ http://www.reservesdirect.org/
 			
 			$returnValue = base64_encode($json->encode($data));
 			//$returnValue .= wrapResults($json->encode($data), $data['name']);		
-		break;
-		
-		case 'instList':			
-			$usersObj = new users();
-			$usersObj->search(null, $qry, 3);
-			
-			$returnValue = xmlHead();
-			
-			if (count($usersObj->userList) > 0)				
-				foreach($usersObj->userList as $instr)
-					$returnValue .=	wrapResults($json->encode($instr), $instr->getName() . ' -- ' . $instr->getUsername());			
-			
-			$returnValue .= xmlFoot();		
 		break;
 		
 		case 'userList':
@@ -204,7 +194,7 @@ http://www.reservesdirect.org/
 		
 		case 'saveNote':	
 			//parse the request
-			parse_str(base64_decode($_REQUEST['query']), $request);		
+			parse_str(base64_decode($_REQUEST['query']), $request);	
 			//save note
 			noteManager::saveNote($request['obj_type'], $request['id'], $request['note_text'], $request['note_type'], $request['note_id']);	
 		break;
@@ -213,7 +203,54 @@ http://www.reservesdirect.org/
 			//parse the request
 			parse_str(base64_decode($_REQUEST['query']), $request);
 			//delete note
-			noteManager::deleteNote($request['id']);
+			noteManager::deleteNote($request['id'], $request['obj_type'], $request['obj_id']);
+		break;
+		
+		case 'copyrightContactList':
+			//search for contacts
+			$copyright = new Copyright();
+			$contacts = $copyright->findContacts($qry);
+			
+			//add xml header
+			$returnValue = xmlHead();
+			
+			//add contacts to result as a li
+			foreach($contacts as $contact) {
+				$returnValue .= wrapResults($json->encode($contact['contact_id']), $contact['org_name']);
+			}
+		break;
+		
+		case 'fetchCopyrightContact':
+			//parse the request
+			parse_str(base64_decode($_REQUEST['query']), $request);
+			
+			//search for contacts
+			$copyright = new Copyright();
+			$contact = $copyright->getContact($request['contact_id']);	
+				
+			//return info
+			$returnValue = $json->encode($contact);
+		break;
+		
+		case 'saveCopyrightContact':
+			//parse the request
+			parse_str(base64_decode($_REQUEST['query']), $request);
+			
+			//init a blank object
+			$copyright = new Copyright();
+			//save contact
+			$copyright->saveContact($request['org_name'], $request['contact_name'], $request['address'], $request['phone'], $request['email'], $request['www'], $request['contact_id']);
+		break;
+		
+		case 'setCopyrightContact':
+			//parse the request
+			parse_str(base64_decode($_REQUEST['query']), $request);
+			
+			//set some vars
+			$_REQUEST['item_id'] = $request['item_id'];
+			$_REQUEST['contact_id'] = $request['contact_id'];
+			
+			copyrightManager::setContact();
 		break;
 		
 		default:

@@ -27,7 +27,9 @@ http://www.reservesdirect.org/
 
 *******************************************************************************/
 
+require_once('secure/classes/copyright.class.php');
 require_once('secure/displayers/noteDisplayer.class.php');
+require_once('secure/displayers/copyrightDisplayer.class.php');
 require_once('secure/managers/ajaxManager.class.php');
 
 class itemDisplayer extends noteDisplayer {
@@ -569,7 +571,7 @@ class itemDisplayer extends noteDisplayer {
 		<form id="item_form" name="item_form" action="index.php?cmd=editItem" method="post" onSubmit="return validateForm(this,true);">		
 <?php	endif; ?>
 
-			<input type="hidden" name="submit_edit_item" value="submit" />
+			<input type="hidden" name="submit_edit_item_meta" value="submit" />
 			<input type="hidden" name="itemID" value="<?=$item->getItemID()?>" />
 			<?php self::displayHiddenFields($dub_array); //add duplication info as hidden fields ?>	
 <?php	if($edit_reserve): ?>
@@ -605,9 +607,309 @@ class itemDisplayer extends noteDisplayer {
 		<strong style="color:#FF0000;">*</strong> <span class="helperText">= required fields</span>
 		<p />
 		<div style="padding:10px; text-align:center;">
-			<input type="button" name="submit_edit_item" value="Save Changes" onclick="javascript: submitForm();">
+			<input type="button" name="submit_edit_item_meta" value="Save Changes" onclick="javascript: submitForm();">
 		</div>
 <?php		
+	}
+	
+	
+	/**
+	 * @return void
+	 * @param reserveItem object $item
+	 * @desc Displays item history screen
+	 */
+	function displayItemHistory($item) {
+		//get dates and terms
+		$terms = new terms();
+		$creation_date = date('F m, Y', strtotime($item->getCreationDate()));
+		$creation_term = $terms->getTermByDate($item->getCreationDate());
+		$creation_term = ($creation_term instanceof term) ? $creation_term->getTerm() : 'n/a';
+		$modification_date = date('F m, Y', strtotime($item->getLastModifiedDate()));
+		$modification_term = $terms->getTermByDate($item->getLastModifiedDate());
+		$modification_term = ($modification_term instanceof term) ? $modification_term->getTerm() : 'n/a';
+		
+		//get creator (if electronic item), or home library (if physical item)
+		if($item->isPhysicalItem()) {	//physical
+			$home_lib_id = $item->getHomeLibraryID();
+			if(!empty($home_lib_id)) {
+				$home_lib = new library();
+				$owner = $home_lib->getLibrary();
+			}
+			else {
+				$owner = 'n/a';
+			}
+			$owner_label = 'Owning Library';			
+		}
+		else {	//electronic
+			$item_audit = new itemAudit($item->getItemID());
+			$creator_id = $item_audit->getAddedBy();
+			if(!empty($creator_id)) {
+				$creator = new user($creator_id);
+				$owner = $creator->getName(false).' ('.$creator->getUsername().') &ndash; '.$creator->getUserClass();
+			}
+			else {
+				$owner = 'n/a';
+			}			
+			$owner_label = 'Created By';
+			
+		}
+		
+		//get reserve history
+		$classes = $item->getAllCourseInstances();
+		
+		//get history totals
+		
+		//total # of classes
+		$total_classes = sizeof($classes);		
+		//total # of instructors
+		$instructors = array();
+		foreach($classes as $ci) {
+			$ci->getInstructors();
+			foreach($ci->instructorIDs as $instrID) {
+				$instructors[] = $instrID;
+			}
+		}
+		$instructors = array_unique($instructors);
+		$total_instructors = sizeof($instructors);
+?>
+	<div class="displayArea">
+		<div class="headingCell1">ITEM ORIGIN</div>
+		<div id="item_origin" style="padding:8px 8px 12px 8px;">
+			<div style="float:left; width:30%;">
+				<strong>Item Created On:</strong>
+				<br />
+				<?=$creation_date?> (<?=$creation_term?>)
+			</div>
+			<div style="float:left; width:30%;">
+				<strong><?=$owner_label?>:</strong>
+				<br />
+				<?=$owner?>
+			</div>
+			<div style="float:left; width:30%;">			
+				<strong>Last Modified:</strong>
+				<br />
+				<?=$modification_date?> (<?=$modification_term?>)	
+			</div>
+			<div class="clear"></div>
+		</div>
+		<div class="headingCell1">CLASS HISTORY</div>
+		<div id="item_history">
+			<div style="padding:8px; border-bottom:1px solid #333333;">
+				<strong>Total # of classes:</strong> <?=$total_classes?>
+				<br />
+				<strong>Total # of instructors:</strong> <?=$total_instructors?>
+<!--				
+				<br />
+				<strong>Total times viewed (all semesters):</strong> ###
+-->
+			</div>
+			
+			<table width="100%" border="0" cellpadding="4" cellspacing="0">
+				<tr class="headingCell2" align="left" style="text-align:left;">
+					<td width="5%">&nbsp;</td>
+					<td width="15%">Term</td>
+					<td width="15%">Course Number</td>
+					<td width="30%">Course Name</td>
+					<td width="25%">Instructor</td>					
+					<td width="10%">&nbsp;</td>					
+				</tr>
+<?php
+			$rowClass = 'evenRow';
+			//loop through the courses
+			foreach($classes as $ci):
+				$ci->getPrimaryCourse();	//fetch the course object
+				$ci->getInstructors();	//get a list of instructors
+				$rowClass = ($rowClass=='evenRow') ? 'oddRow' : 'evenRow';
+				
+				//determine if this is a currently-active class
+				if(($ci->getStatus()=='ACTIVE') && (strtotime($ci->getActivationDate()) <= time()) && (strtotime($ci->getExpirationDate()) >= time())) {
+					$icon = '<img src="../images/astx-green.gif" alt="**" width="15" height="15" />';
+				}
+				else {
+					$icon = '&nbsp;';
+				}
+?>
+				<tr class="<?=$rowClass?>">
+					<td align="center"><?=$icon?></td>
+					<td><?=$ci->displayTerm()?></td>
+	    			<td><?=$ci->course->displayCourseNo()?></td>
+					<td><?=$ci->course->getName()?></td>
+					<td><?=$ci->displayInstructors()?></td>					
+					<td style="text-align:center;"><a href="javascript:openWindow('no_control=1&cmd=previewReservesList&ci=<?=$ci->getCourseInstanceID()?>','width=800,height=600');">preview</a></td>
+				</tr> 
+<?php		endforeach;	?>
+
+			</table>
+			<div style="padding:8px; border-top:1px solid #333333;">
+				<img src="../images/astx-green.gif" alt="**" width="15" height="15" /> = classes currently using this item
+			</div>
+		</div>
+	</div>
+<?php
+	}
+	
+	
+	/**
+	 * @return void
+	 * @param reserveItem object $item
+	 * @desc Displays item-copyright edit screen
+	 */
+	function displayEditItemCopyright($item) {
+		$copyright = new Copyright($item->getItemID());
+
+		//get copyright library
+		$home_lib_id = $item->getHomeLibraryID();
+		if(!empty($home_lib_id)) {
+			$home_lib = new library($home_lib_id);
+			$copyright_lib = new library($home_lib->getCopyrightLibraryID());
+			$copyright_lib_name = $copyright_lib->getLibrary();
+		}
+		else {
+			$copyright_lib_name = 'n/a';
+		}
+		
+		//get status basis
+		$status_basis = $copyright->getStatusBasis();
+		$status_basis = !empty($status_basis) ? $status_basis : 'n/a';
+		
+		//get contact name
+		$contact = $copyright->getContact();
+		$contact_org = $contact['org_name'];
+?>
+	<script language="JavaScript1.2" src="secure/javascript/liveSearch.js"></script>
+	<script language="JavaScript1.2" src="secure/javascript/basicAJAX.js"></script>
+	<script language="JavaScript1.2" src="secure/javascript/notes_ajax.js"></script>
+	<script language="JavaScript1.2" src="secure/javascript/copyright_ajax.js"></script>
+	
+	<script language="JavaScript">
+		function toggleDisplay(element_id, show) {
+			if(document.getElementById(element_id)) {
+				if(show) {				
+					document.getElementById(element_id).style.display = '';
+				}
+				else {
+					document.getElementById(element_id).style.display = 'none';
+				}
+			}
+		}
+	</script>
+		
+	<div id="copyright" class="displayArea">
+		<div class="headingCell1">SUMMARY</div>
+		<table width="100%" class="simpleList">
+			<tr>
+				<td width="150" class="labelCell1"><strong>Current Status:</strong></td>
+				<td width="150" class="<?=$copyright->getStatus()?>"><?=$copyright->getStatus()?></td>
+				<td width="150" class="labelCell1"><strong>Review Library:</strong></td>
+				<td><?=$copyright_lib_name?></td>
+			</tr>
+			<tr>
+				<td width="150" class="labelCell1"><strong>Reason:</strong></td>
+				<td><?=$status_basis?></td>
+				<td width="150" class="labelCell1"><strong>Copyright Contact:</strong></td>
+				<td><?=$contact_org?></td>
+			</tr>		
+		</table>
+<?php
+		self::displayEditItemCopyrightStatus($item->getItemID());
+		
+		//only show the rest of the sections if the record exists
+		$copyright_id = $copyright->getID();
+		if(!empty($copyright_id)) {
+			self::displayEditItemCopyrightContact($item->getItemID());
+			self::displayEditItemCopyrightNotes($item->getItemID());
+			self::displayEditItemCopyrightFiles($item->getItemID());
+			self::displayEditItemCopyrightLog($item->getItemID());	
+		}
+?>	
+	</div>
+<?php	
+	}
+	
+	
+	/**
+	 * @return void
+	 * @desc Displays form to edit copyright status.
+	 */
+	function displayEditItemCopyrightStatus($item_id) {
+		$copyright = new Copyright($item_id);
+?>
+		<div class="contentTabs" style="text-align:center; border-top:1px solid #333333;"><a href="#" onclick="javascript: toggleDisplay('copyright_edit_status', 1); return false;">STATUS</a></div>
+		<div id="copyright_edit_status" style="border-top:1px solid #333333; padding:10px; display:none;">		
+			<?php copyrightDisplayer::displayCopyrightEditStatus($item_id, $copyright->getStatus(), $copyright->getStatusBasisID()); ?>	
+			<input type="button" name="cancel" value="Close" onclick="javascript: toggleDisplay('copyright_edit_status', 0);" />
+		</form>
+		</div>
+<?php
+	}
+	
+	
+	/**
+	 * @return void
+	 * @desc Displays form to edit copyright status.
+	 */
+	function displayEditItemCopyrightContact($item_id) {
+?>		
+		<div class="contentTabs" style="text-align:center; border-top:1px solid #333333;"><a href="#" onclick="javascript: toggleDisplay('copyright_contact', 1); return false;">CONTACT</a></div>
+		<div id="copyright_contact" style="border-top:1px solid #333333; padding:10px; display:none;">
+			<?php copyrightDisplayer::displayCopyrightContactsBlockAJAX($item_id, true, true); ?>
+			<input type="button" name="cancel" value="Close" onclick="javascript: toggleDisplay('copyright_contact', 0);" />
+		</div>
+<?php
+	}
+	
+	
+	/**
+	 * @return void
+	 * @param int $item_id ID of item
+	 * @desc Displays copyright notes.
+	 */
+	function displayEditItemCopyrightNotes($item_id) {
+		//fetch notes
+		$notes = noteManager::fetchNotesForObj('copyright', $item_id);
+?>
+		<div class="contentTabs" style="text-align:center; border-top:1px solid #333333;"><a href="#" onclick="javascript: toggleDisplay('copyright_notes', 1); return false;">NOTES</a></div>
+		<div id="copyright_notes" style="border-top:1px solid #333333; padding:10px; display:none;">
+			<?php self::displayNotesBlockAJAX($notes, 'copyright', $item_id, true); ?>
+			<input type="button" name="cancel" value="Close" onclick="javascript: toggleDisplay('copyright_notes', 0);" />
+		</div>
+<?php
+	}
+	
+	
+	/**
+	 * @return void
+	 * @param int $item_id ID of item
+	 * @desc Displays copyright files.
+	 */
+	function displayEditItemCopyrightFiles($item_id) {
+		
+?>
+		<div class="contentTabs" style="text-align:center; border-top:1px solid #333333;"><a href="#" onclick="javascript: toggleDisplay('copyright_files', 1); return false;">SUPPORTING FILES</a></div>
+		<div id="copyright_files" style="border-top:1px solid #333333; padding:10px; display:none;">
+		
+<span style="color:red">DELETE ACTUAL FILE ON DELETE?</span>
+<br /><br />
+
+			<?php copyrightDisplayer::displayCopyrightSupportingFile($item_id); ?>
+			<input type="button" name="cancel" value="Close" onclick="javascript: toggleDisplay('copyright_files', 0);" />
+		</div>
+<?php
+	}
+	
+
+	/**
+	 * @return void
+	 * @desc Displays copyright log.
+	 */
+	function displayEditItemCopyrightLog($item_id) {
+?>
+		<div class="contentTabs" style="text-align:center; border-top:1px solid #333333;"><a href="#" onclick="javascript: toggleDisplay('copyright_log', 1); return false;">LOG</a></div>
+		<div id="copyright_log" style="display:none;">
+			<?php copyrightDisplayer::displayCopyrightLogs($item_id); ?>
+			<input type="button" name="cancel" value="Close" onclick="javascript: toggleDisplay('copyright_log', 0);" />
+		</div>
+<?php
 	}
 	
 	
@@ -616,10 +918,9 @@ class itemDisplayer extends noteDisplayer {
 	 * @param reserveItem $item reserveItem object
 	 * @param reserve $reserve (optional) reserve object
 	 * @param array $dub_array (optional) array of information pertaining to duplicating an item. currently 'dubReserve' flag and 'selected_instr'
-	 * @param string $tab (optional) indicates which sub-screen to show
 	 * @desc Displays form for editing item information (optionally: reserve information)
 	 */
-	function displayEditItem($item, $reserve=null, $dub_array=null, $tab=null) {
+	function displayEditItem($item, $reserve=null, $dub_array=null) {
 		global $u, $g_permission;
 		
 		//determine if editing a reserve
@@ -630,6 +931,29 @@ class itemDisplayer extends noteDisplayer {
 		else {
 			$edit_reserve = false;
 			$edit_item_href = 'itemID='.$item->getItemID();
+		}
+		
+		//style the tab
+		$tab_styles = array('meta'=>'', 'history'=>'', 'copyright'=>'');
+		switch($_REQUEST['tab']) {
+			case 'history':
+				$tab_styles['history'] = 'class="current"';
+			break;
+			
+			case 'copyright':
+				$tab_styles['copyright'] = 'class="current"';
+			break;
+			
+			default:
+				$tab_styles['meta'] = 'class="current"';
+			break;
+		}
+		
+		//check for a pending copyright-review
+		$copyright = new Copyright($item->getItemID());
+		$copyright_alert = '';
+		if(($copyright->getStatus() != 'APPROVED') && ($copyright->getStatus() != 'DENIED')) {
+			$copyright_alert = '<span class="alert">! pending review !</span>';
 		}
 ?>
 		<div id="alertMsg" align="center" class="failedText"></div>
@@ -643,10 +967,10 @@ class itemDisplayer extends noteDisplayer {
 
 		<div class="contentTabs">
 			<ul>
-				<li class="current"><a href="index.php?cmd=editItem&amp;<?=$edit_item_href?>">Item Info</a></li>
+				<li <?=$tab_styles['meta']?>><a href="index.php?cmd=editItem&amp;<?=$edit_item_href?>">Item Info</a></li>
 <?php		if($u->getRole() >= $g_permission['staff']): ?>
-				<li><a href="index.php?cmd=editItem&amp;<?=$edit_item_href?>&amp;tab=history">History</a></li>
-				<li><a href="index.php?cmd=editItem&amp;<?=$edit_item_href?>&amp;tab=copyright">Copyright <span class="alert">! pending review !</span></a></li>
+				<li <?=$tab_styles['history']?>><a href="index.php?cmd=editItem&amp;<?=$edit_item_href?>&amp;tab=history">History</a></li>
+				<li <?=$tab_styles['copyright']?>><a href="index.php?cmd=editItem&amp;<?=$edit_item_href?>&amp;tab=copyright">Copyright <?=$copyright_alert?></a></li>
 <?php		endif; ?>
 			</ul>
 		</div>
@@ -655,12 +979,15 @@ class itemDisplayer extends noteDisplayer {
 <?php
 		//switch screens
 		//only allow non-default tab for staff and better
+		$tab = isset($_REQUEST['tab']) ? $_REQUEST['tab'] : null;
 		$tab = ($u->getRole() >= $g_permission['staff']) ? $tab : null;				
 		switch($tab) {
 			case 'history':
+				self::displayItemHistory($item);
 			break;
 			
 			case 'copyright':
+				self::displayEditItemCopyright($item);
 			break;
 			
 			default:

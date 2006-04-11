@@ -542,4 +542,34 @@ class reserveItem extends item
 		//if the url does not contain a scheme (http, ftp, etc), assume it's local		
 		return empty($parsed_url['scheme']) ? true : false;
 	}
+	
+	
+	/**
+	 * @return array of courseInstance Objects
+	 * @desc Returns array of courseInstace objects that have used this item
+	 */
+	function getAllCourseInstances() {
+		global $g_dbConn;
+		
+		switch ($g_dbConn->phptype) {
+			default:	//mysql
+				$sql = "SELECT DISTINCT r.course_instance_id 
+						FROM reserves AS r
+							JOIN course_instances AS ci ON ci.course_instance_id = r.course_instance_id
+							JOIN course_aliases AS ca on ca.course_alias_id = ci.primary_course_alias_id
+							JOIN courses AS c ON c.course_id = ca.course_id
+							JOIN departments AS d ON d.department_id = c.department_id
+						WHERE r.item_id = ".$this->itemID."
+						ORDER BY ci.activation_date DESC, d.abbreviation ASC, c.course_number ASC, ca.section ASC";					
+		}
+		$rs = $g_dbConn->query($sql);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		$classes = array();
+		while($row = $rs->fetchRow()) {
+			$classes[] = new courseInstance($row[0]);
+		}
+		
+		return $classes;
+	}
 }

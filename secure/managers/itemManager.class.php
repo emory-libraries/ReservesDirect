@@ -29,6 +29,7 @@ http://www.reservesdirect.org/
 require_once("secure/common.inc.php");
 require_once("secure/displayers/itemDisplayer.class.php");
 require_once("secure/managers/classManager.class.php");
+require_once("secure/managers/copyrightManager.class.php");
 require_once('secure/managers/reservesManager.class.php');
 require_once('secure/classes/note.class.php');
 
@@ -98,8 +99,8 @@ class itemManager
 					break;
 				}
 				
-				//form submitted
-				if(!empty($_REQUEST['submit_edit_item'])) {
+				//form submitted - edit item meta
+				if(!empty($_REQUEST['submit_edit_item_meta'])) {
 					//were we editing a reserve?
 					if($reserve instanceof reserve) {	//set some data;
 						//set status
@@ -208,12 +209,33 @@ class itemManager
 						$this->argList = array($ci_id, urlencode($_REQUEST['search']));
 					}
 				}
+				elseif(!empty($_REQUEST['submit_edit_item_copyright'])) {	//form submitted - edit item copyright
+					switch($_REQUEST['form_id']) {
+						case 'copyright_status':
+							copyrightManager::setStatus();						
+						break;
+						
+						case 'copyright_supporting_items_delete':
+							copyrightManager::deleteSupportingItem();
+						break;
+						
+						case 'copyright_supporting_items_add':
+							copyrightManager::addSupportingItem();
+						break;
+					}
+					
+					//go back to edit item copyright screen
+					$page = "addReserve";
+					$loc  = "edit item";					
+					$this->displayFunction = 'displayEditItem';
+					$this->argList = array($item, $reserve);
+				}
 				else {	//display edit page
-					$page = "manageClasses";
+					$page = "addReserve";
 					$loc  = "edit item";
 					
 					$this->displayFunction = 'displayEditItem';
-					$this->argList = array($item, $reserve, $_REQUEST['search'], array('dubReserve'=>$_REQUEST['dubReserve'], 'selected_instr'=>$_REQUEST['selected_instr']), $_REQUEST['tab']);
+					$this->argList = array($item, $reserve, array('dubReserve'=>$_REQUEST['dubReserve'], 'selected_instr'=>$_REQUEST['selected_instr']));
 				}			
 			break;
 

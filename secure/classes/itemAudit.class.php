@@ -43,7 +43,7 @@ class itemAudit
 	function itemAudit($itemID=NULL)
 	{
 		if (!is_null($itemID)){
-			$this->getItemAuditByID($itemID);
+			$this->getItemAuditByItemID($itemID);
 		}
 	}
 
@@ -85,7 +85,7 @@ class itemAudit
 	* @param int $itemID
 	* @desc get itemAudit info from the database
 	*/
-	function getItemAuditByID($itemID)
+	function getItemAuditByItemID($itemID)
 	{
 		global $g_dbConn;
 

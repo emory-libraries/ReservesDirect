@@ -34,7 +34,7 @@ function notes_fetch_notes(obj_type, obj_id) {
 function notes_delete_note(obj_type, obj_id, note_id) {
 	if(confirm("Are you sure you want to delete this note?")) {
 		notes_ajax.setResponseCallback(notes_fetch_notes, obj_type, obj_id);
-		notes_ajax.get("AJAX_functions.php?f=deleteNote", "id=" + note_id);
+		notes_ajax.get("AJAX_functions.php?f=deleteNote", "id=" + note_id + "&obj_type=" + obj_type + "&obj_id=" + obj_id);
 	}
 }
 
@@ -54,17 +54,22 @@ function notes_save_note(obj_type, obj_id, note_form_obj) {
 	//must do this before hiding the form, b/c once the form is hidden, some elements are no longer accessible
 	note_text = note_form_obj.note_text.value;
 	note_id = note_form_obj.note_id.value;
-	//have to find the type
-	for(var x=0; x<note_form_obj.note_type.length; x++) {
-		if(note_form_obj.note_type[x].checked) {
-			note_type = note_form_obj.note_type[x].value;
-			break;
+	//get the note type
+	if(note_form_obj.note_type.length) { //multiple radio choices, have to find the checked one
+		for(var x=0; x<note_form_obj.note_type.length; x++) {
+			if(note_form_obj.note_type[x].checked) {
+				note_type = note_form_obj.note_type[x].value;
+				break;
+			}
 		}
 	}
-	
+	else {	//only one choice, just grab the value
+		note_type = note_form_obj.note_type.value;
+	}
+			
 	//hide the note form	
 	notes_hide_form();
-
+	
 	if(note_text != "") {	//do not bother doing anything with blank notes
 		notes_ajax.setResponseCallback(notes_fetch_notes, obj_type, obj_id);
 		notes_ajax.post("AJAX_functions.php?f=saveNote", "obj_type=" + obj_type + "&id=" + obj_id + "&note_text=" + note_text + "&note_type=" + note_type + "&note_id=" + note_id);
@@ -73,11 +78,11 @@ function notes_save_note(obj_type, obj_id, note_form_obj) {
 
 
 /**
- * @desc sets the `item_notes` div's contents to ajax response text
+ * @desc sets the `notes_content` div's contents to ajax response text
  */
 function notes_display_notes() {
-	if(document.getElementById('item_notes')) {
-		document.getElementById('item_notes').innerHTML = notes_ajax.getResponse('text');
+	if(document.getElementById('notes_content')) {
+		document.getElementById('notes_content').innerHTML = notes_ajax.getResponse('text');
 	}
 }
 

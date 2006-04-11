@@ -37,11 +37,11 @@ class noteDisplayer extends baseDisplayer {
 	 * @param string $obj_type Type of object these notes are connected to (`reserve`, `item`, etc)
 	 * @param int $obj_id ID of the object
 	 * @param boolean $include_add_button If true, will include that add-note button
-	 * @desc Displays notes in a table with javascript links to edit and/or delete each note
+	 * @desc Displays notes in a table with javascript links to edit and/or delete each note; NOTE: requires basicAJAX.js, notes_ajax.js
 	 */
 	public function displayNotesBlockAJAX($notes, $obj_type, $obj_id, $include_add_button=true) {
 ?>
-		<div id="item_notes">
+		<div id="notes_content">
 			<?php self::displayNotesContentAJAX($notes, $obj_type, $obj_id); //notes content ?>
 		</div>
 		
@@ -117,6 +117,27 @@ class noteDisplayer extends baseDisplayer {
 	 */
 	public function displayNotesFormAJAX($obj_type, $obj_id) {
 		global $u, $g_notetype, $g_permission;
+		
+		//filter the type of note that may be added, based on object type
+		$available_note_types = array();
+		switch($obj_type) {
+			case 'item':
+				$available_note_types = array('content', 'staff');
+			break;			
+			case 'reserve':
+				$available_note_types = array('instructor', 'content', 'staff');
+			break;			
+			case 'copyright':
+				$available_note_types = array('copyright');
+			break;
+		}
+		
+		//filter allowed note types based on permission level
+		$restricted_note_types = array('content', 'staff', 'copyright');
+		//filter out restricted notes if role is less than staff
+		if($u->getRole() < $g_permission['staff']) {
+			$available_note_types = array_diff($available_note_types, $restricted_note_types);
+		}
 ?>
 			<div id="noteform_container" class="noteform_container" style="display:none;">
 				<div id="noteform_bg" class="noteform_bg"></div>
@@ -127,20 +148,17 @@ class noteDisplayer extends baseDisplayer {
 						<strong><big>Add/Edit Note</big></strong>
 						<br />
 						<textarea id="note_text" name="note_text"></textarea>
-						
-<?php	if($u->getRole() >= $g_permission['staff']): //allow staff or better to add all kinds of notes ?>
 						<small>
 							<strong>Note Type:</strong>
-<?php		if($obj_type=='reserve'): //allow instructor notes for reserves ?>
-							<label><input type="radio" id="note_type_<?=$g_notetype['instructor']?>" name="note_type" value="<?=$g_notetype['instructor']?>" checked="true">Instructor</label>
-<?php		endif; ?>			
-							<label><input type="radio" id="note_type_<?=$g_notetype['content']?>" name="note_type" value="<?=$g_notetype['content']?>" checked="true">Content</label>
-							<label><input type="radio" id="note_type_<?=$g_notetype['staff']?>" name="note_type" value="<?=$g_notetype['staff']?>">Staff</label>
-							<label><input type="radio" id="note_type_<?=$g_notetype['copyright']?>" name="note_type" value="<?=$g_notetype['copyright']?>">Copyright</label>
+<?php
+		$first = true;
+		foreach($available_note_types as $note_type):
+			$checked = $first ? ' checked="true"' : '';
+			$first = false;			
+?>
+							<input type="radio" id="note_type_<?=$g_notetype[$note_type]?>" name="note_type" value="<?=$g_notetype[$note_type]?>"<?=$checked?> /><?=ucfirst(strtolower($g_notetype[$note_type]))?>
+<?php	endforeach; ?>
 						</small>
-<?php	else:	//automatically chose 'instructor' for instructors or less ?>
-						<input type="hidden" id="note_type_<?=$g_notetype['instructor']?>" name="note_type" value="<?=$g_notetype['instructor']?>" />			
-<?php	endif; ?>
 						<br />
 						<div style="text-align: center">
 							<input type="button" value="Cancel" onclick="javascript: notes_hide_form(); return false;" />

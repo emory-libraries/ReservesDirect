@@ -69,9 +69,22 @@ class terms
 		return $tmpArray;
 	}
 
-	function getCurrentTerm()
-	{
+	function getCurrentTerm() {
+		return $this->getTermByDate(date("Y-m-d"));				
+	}
+	
+	
+	/**
+	 * @return term object
+	 * @param string $date The date; format: YYYY-MM-DD
+	 * @desc Returns the term object that spans the date
+	 */
+	public function getTermByDate($date) {
 		global $g_dbConn;
+		
+		if(empty($date)) {
+			$date = date("Y-m-d");
+		}
 
 		switch ($g_dbConn->phptype)
 		{
@@ -81,15 +94,18 @@ class terms
 				.		"WHERE begin_date <= ? AND ? <= end_date "
 				.		"LIMIT 1"
 				;
-
-				$d = date("Y-m-d");
 		}
 
-		$rs = $g_dbConn->query($sql, array($d, $d));
+		$rs = $g_dbConn->query($sql, array($date, $date));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		$rows = $rs->fetchRow();
-		return new term($rows[0]);
+		
+		if($rs->numRows() == 0) {
+			return null;
+		}
+		else {
+			$rows = $rs->fetchRow();
+			return new term($rows[0]);
+		}
 	}
 }
 ?>
