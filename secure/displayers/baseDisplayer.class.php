@@ -447,9 +447,9 @@ abstract class baseDisplayer {
 			}
 		</script>
 		
-		<input type="radio" name="enrollment" id="enrollment" value="OPEN" <?=$checked['OPEN']?> onclick="javascript: showEnrollmentOptionDescription('OPEN');" /> <span class="openEnrollment">OPEN</span>&nbsp; 
-		<input type="radio" name="enrollment" id="enrollment" value="MODERATED" <?=$checked['MODERATED']?> onclick="javascript: showEnrollmentOptionDescription('MODERATED');" /> <span class="moderatedEnrollment">MODERATED</span>&nbsp; 
-		<input type="radio" name="enrollment" id="enrollment" value="CLOSED" <?=$checked['CLOSED']?> onclick="javascript: showEnrollmentOptionDescription('CLOSED');" /> <span class="closedEnrollment">CLOSED</span>&nbsp;
+		<input type="radio" name="enrollment" id="enrollment_open" value="OPEN" <?=$checked['OPEN']?> onclick="javascript: showEnrollmentOptionDescription('OPEN');" /> <span class="openEnrollment">OPEN</span>&nbsp; 
+		<input type="radio" name="enrollment" id="enrollment_moderated" value="MODERATED" <?=$checked['MODERATED']?> onclick="javascript: showEnrollmentOptionDescription('MODERATED');" /> <span class="moderatedEnrollment">MODERATED</span>&nbsp; 
+		<input type="radio" name="enrollment" id="enrollment_closed" value="CLOSED" <?=$checked['CLOSED']?> onclick="javascript: showEnrollmentOptionDescription('CLOSED');" /> <span class="closedEnrollment">CLOSED</span>&nbsp;
 		<br />
 		<div id="enrollment_option_desc"></div>
 		
