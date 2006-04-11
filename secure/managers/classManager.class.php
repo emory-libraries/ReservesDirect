@@ -289,7 +289,7 @@ class classManager
 								
 								//do not allow instructors to change status for a physical item
 								$reserve->getItem();
-								if(!$reserve->item->isPhysicalItem() && ($u->getRole() >= $g_permission['staff'])) {
+								if(!$reserve->item->isPhysicalItem() || ($u->getRole() >= $g_permission['staff'])) {
 									$reserve->setStatus('ACTIVE');
 								}
 							}
@@ -301,7 +301,7 @@ class classManager
 								
 								//do not allow instructors to change status for a physical item
 								$reserve->getItem();
-								if(!$reserve->item->isPhysicalItem() && ($u->getRole() >= $g_permission['staff'])) {
+								if(!$reserve->item->isPhysicalItem() || ($u->getRole() >= $g_permission['staff'])) {
 									//Headings always have a status of active
 									if (!$reserve->isHeading()) {
 										$reserve->setStatus('INACTIVE');
