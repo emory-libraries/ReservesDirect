@@ -27,8 +27,6 @@ ReservesDirect is located at:
 http://www.reservesdirect.org/
 
 *******************************************************************************/
-require_once("secure/classes/item.class.php");
-require_once("secure/classes/reserveItem.class.php");
 
 class itemAudit
 {
@@ -37,8 +35,6 @@ class itemAudit
 	var $itemID;
 	var $dateAdded;
 	var $addedBy;
-	var $reviewDate;
-	var $reviewedBy;
 
 	function itemAudit($itemID=NULL)
 	{
@@ -92,7 +88,7 @@ class itemAudit
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT audit_id, item_id, date_added, added_by, date_reviewed, reviewed_by "
+				$sql = "SELECT audit_id, item_id, date_added, added_by "
 					.  "FROM electronic_item_audit "
 					.  "WHERE item_id = !";
 		}
@@ -106,55 +102,10 @@ class itemAudit
 		$this->itemID		= $row[1];
 		$this->dateAdded	= $row[2];
 		$this->addedBy		= $row[3];
-		$this->reviewDate	= $row[4];
-		$this->reviewedBy	= $row[5];
-	}
-
-	/**
-	* @return void
-	* @param date $reviewDate
-	* @desc set reviewDate in database
-	*/
-	function setReviewDate($reviewDate)
-	{
-		global $g_dbConn;
-
-		$this->reviewDate = $reviewDate;
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql = "UPDATE electronic_item_audit SET review_date = ? WHERE audit_id = !";
-				$d = date("Y-m-d"); //get current date
-		}
-		$rs = $g_dbConn->query($sql, array($d, $this->auditID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-	}
-
-	/**
-	* @return void
-	* @param string $reviewedBy
-	* @desc set reviewedBy in database
-	*/
-	function setReviewedBy($reviewedBy)
-	{
-		global $g_dbConn;
-
-		$this->reviewedBy = $reviewedBy;
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql = "UPDATE electronic_item_audit SET reviewed_by = ? WHERE audit_id = !";
-		}
-
-		$rs = $g_dbConn->query($sql, array($reviewedBy, $this->auditID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 
 	function getAuditID() { return $this->auditID; }
 	function getItemID() { return $this->itemID; }
 	function getDateAdded() { return $this->dateAdded; }
 	function getAddedBy() { return htmlentities(stripslashes($this->addedBy)); }
-	function getReviewDate() { return $this->reviewDate; }
-	function getReviewedBy() { return htmlentities(stripslashes($this->reviewedBy)); }
-
 }
