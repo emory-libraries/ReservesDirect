@@ -152,7 +152,7 @@ class ldapAuthN	{
 			//set up some search criteria
 			$filter = $g_ldap['canonicalName'].'='.$this->username;	//search only for a person with the given username
 			//ask for the dn, uid, first & last name, and email (dn is fetched automatically, but might as well be complete)
-			$fetch_attribs = array('dn', $g_ldap['cannonicalName'], $g_ldap['firstname'], $g_ldap['lastname'], $g_ldap['email']);
+			$fetch_attribs = array('dn', $g_ldap['canonicalName'], $g_ldap['firstname'], $g_ldap['lastname'], $g_ldap['email']);
 						
 			//search
 			$result = ldap_search($this->conn, $g_ldap['basedn'], $filter, $fetch_attribs);			
@@ -164,9 +164,13 @@ class ldapAuthN	{
 					$this->user_info = $info[0];	//grab the first record
 					return true;
 				}
+				elseif ($info['count'] == 0) {
+					echo $this->username . " not found in LDAP";
+					return false;
+				}
 			}
 		}
-		return false;		
+		return false;
 	}
-}	
+}
 ?>
