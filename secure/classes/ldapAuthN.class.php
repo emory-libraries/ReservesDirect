@@ -117,7 +117,7 @@ class ldapAuthN	{
 		$host = ($g_ldap['port'] == '636') ? 'ldaps://'.$g_ldap['host'] : $g_ldap['host'];
 
 		//connect	
-		$conn = ldap_connect($host, $g_ldap['post']);		
+		$conn = ldap_connect($host, $g_ldap['port']);		
 		if($conn !== false) {
 			ldap_set_option($conn, LDAP_OPT_PROTOCOL_VERSION, $g_ldap['version']);	//set version
 			$this->conn = $conn;	//save resource link
