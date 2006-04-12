@@ -29,67 +29,39 @@ http://www.reservesdirect.org/
 *******************************************************************************/
 require_once("secure/common.inc.php");
 
-class exportDisplayer
-{
+class exportDisplayer extends baseDisplayer {
+	
 	function getRSS_URL($file)
 	{
 		return "http://".$_SERVER['SERVER_NAME'] . ereg_replace('index.php', $file, $_SERVER['PHP_SELF']);
 	}
-
-	function displayExportSelectClass($classList, $hidden_fields=null)
-	{
-		global $ci;
-
-		echo "<form action=\"index.php\" method=\"POST\">\n";
-
-		if (is_array($hidden_fields)){
-			$keys = array_keys($hidden_fields);
-			foreach($keys as $key){
-				if (is_array($hidden_fields[$key])){
-					foreach ($hidden_fields[$key] as $field){
-						echo "<input type=\"hidden\" name=\"".$key."[]\" value=\"". $field ."\">\n";
-					}
-				} else {
-					echo "<input type=\"hidden\" name=\"$key\" value=\"". $hidden_fields[$key] ."\">\n";
-				}
-			}
-		}
-
-		echo "<table width=\"60%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "	<tr><td width=\"140\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
-		echo "	<tr><td class=\"headingCell1\">Choose a Class and Courseware Package</td></tr>\n";
-		echo "	<tr>\n";
-		echo "		<td align=\"center\" class=\"borders\">\n";
-		echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
-		echo "				<tr align=\"left\" valign=\"middle\">\n";
-		echo "					<td align=\"right\" valign=\"middle\" class=\"strong\">Choose Class: </td>\n";
-		echo "					<td class=\"strong\">\n";
-		echo "						<select name=\"ci\"> \n";
-		
-		foreach($classList as $class) {
-			echo "						<option value=\"". $class->getCourseInstanceID() ."\">". $class->course->displayCourseNo() . " -- " . $class->course->getName() .  "</option>\n";
-		}
-
-		echo "					</td>\n";
-		echo "				</tr>\n";
-		echo "				<tr>\n";
-		echo "					<td align=\"right\" valign=\"middle\" class=\"strong\">Export To:</td>\n";
-		echo "					<td>\n";
-		echo "						<label><input type=\"radio\" name=\"course_ware\" value=\"blackboard\" checked value=\"radio\">Blackboard</label><br>\n";
-		echo "						<label><input type=\"radio\" name=\"course_ware\" value=\"learnlink\">Learnlink</label><br>\n";
-		echo "						<label><input type=\"radio\" name=\"course_ware\" value=\"website\">Personal Web Page</label>\n";
-		echo "					</td>\n";
-		echo "				</tr>\n";
-		echo "				<tr>\n";
-		echo "					<td colspan=\"2\" align=\"center\">\n";
-		echo "						<input type=\"submit\" name=\"Submit\" value=\"Get Instructions on How to Export Class\">\n";
-		echo "					</td>\n";
-		echo "				</tr>\n";
-		echo "			</table>\n";
-		echo "		</td>\n";
-		echo "	</tr>\n";
-		echo "</table>\n";
+	
+	function displaySelectExportOption($ci) {
+		$ci->getCourseForUser();
+?>
+		<form method="post" action="index.php">
+			<input type="hidden" name="cmd" value="exportClass" />
+			<input type="hidden" name="ci" value="<?=$ci->getCourseInstanceID()?>" />
+			
+			<div style="width:500px; margin:auto;">
+				<div class="headingCell1">Choose a Courseware Package</div>
+				<div class="borders" style="padding:10px;">
+					<strong>Class:</strong>
+					<?=$ci->course->displayCourseNo()." -- ".$ci->course->getName()?>
+					<p />
+					<strong>Export To:</strong>
+					<br />
+					<label><input type="radio" name="course_ware" value="blackboard" checked value=\"radio\">Blackboard</label><br>
+					<label><input type="radio" name="course_ware" value="learnlink">Learnlink</label><br>
+					<label><input type="radio" name="course_ware" value="website">Personal Web Page</label>
+					<p />
+					<input type="submit" name="Submit" value="Get Instructions on How to Export Class">
+				</div>
+			</div>
+		</form>
+<?php
 	}
+
 
 	function displayExportInstructions_blackboard($ci)
 	{

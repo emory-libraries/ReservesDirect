@@ -240,17 +240,10 @@ switch ($cmd)
 	case 'saveNote':
 		require_once("secure/managers/noteManager.class.php");
 		$mgr = new noteManager($cmd, $u);
+	
 
-
-		if ($u->getRole() >= $g_permission['staff'] && (!isset($_REQUEST['ci'])))
-		{
-			//display ajax class select
-			$mgr = new ajaxManager();
-			$mgr->lookup('lookupClass', $cmd, 'manageClasses', 'Export Class');
-		} else {
-			require_once("secure/managers/exportManager.class.php");
-			$mgr = new exportManager($cmd, $u, $_REQUEST);
-		}
+	case 'exportClass':
+		require_once("secure/managers/exportManager.class.php");
 		$mgr = new exportManager($cmd);
 	break;
 

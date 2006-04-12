@@ -205,8 +205,8 @@ class classDisplayer extends baseDisplayer {
 					}
 				</script>
 				<ul>
-					<li><a href="javascript:openWindow('no_control=1&cmd=previewStudentView&amp;ci=<?=$ci->courseInstanceID?>','width=800,height=600');">Preview Student View</a></li>
-					<li><a href="index.php?cmd=exportClass">Export readings to Courseware</a></li>
+					<li><a href="javascript:openWindow('no_control=1&cmd=previewStudentView&amp;ci=<?=$ci->getCourseInstanceID()?>','width=800,height=600');">Preview Student View</a></li>
+					<li><a href="index.php?cmd=exportClass&amp;ci=<?=$ci->getCourseInstanceID()?>">Export readings to Courseware</a></li>
 					<li><a href="#" onclick="return submit_tsv_export_form();">Export class to Spreadsheet</a></li>
 				</ul>
 			</div>
