@@ -63,7 +63,7 @@ class ldapAuthN	{
 		
 		//if the username is new, make sure it's not blank
 		//do not require the pass, in case some systems allow non-passworded accounts (i have no idea why they would)
-		if(empty($user)) {
+		if(empty($user) || empty($pass)) {
 			return false;	//return false if it is
 		}
 		else {	//else store the user and pass
