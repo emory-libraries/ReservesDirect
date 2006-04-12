@@ -114,7 +114,11 @@ class ldapAuthN	{
 		//determine if trying to go through SSL
 		//this is a bit of a hack, b/c we're just checking the port #
 		//	if the port matches "secure ldap" port, prepend "ldaps://" to hostname
-		$host = ($g_ldap['port'] == '636') ? 'ldaps://'.$g_ldap['host'] : $g_ldap['host'];
+		//also make sure the host does not already include the prefix
+		$host = $g_ldap['host'];	//default to plain host		
+		if(($g_ldap['port'] == '636') && (stripos($g_ldap['host'], 'ldaps://') === false)) {
+			$host = 'ldaps://'.$g_ldap['host'];
+		}
 
 		//connect	
 		$conn = ldap_connect($host, $g_ldap['port']);		
