@@ -105,9 +105,8 @@ class student extends user
 		$today = date('Y-m-d');
 		$courses = array();
 		
-		
 		//go through a $tmp var to avoid adding empty array()s to the $courses array
-		//this is done to simply running empty() on $courses, since
+		//this is done to simplify running empty() on $courses, since
 		//empty(array(array())) returns false		
 		$tmp = $this->fetchCourseInstances('student', $today, $today, 'ACTIVE', 'AUTOFEED');	//enrolled by registrar
 		if(!empty($tmp)) {

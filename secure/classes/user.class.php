@@ -497,9 +497,9 @@ class user
 	public function fetchCourseInstances($access_level=null, $act_date=null, $exp_date=null, $ci_status=null, $enrollment_status=null, $dept_id=null) {
 		global $g_dbConn, $g_permission;
 		
-		//format access - if trying to set the access level, but provided an improper level, then set it to 'student'
+		//format access - if trying to set the access level, but provided an improper level, then unset it
 		if(!empty($access_level) && !in_array($access_level, $g_permission)) {
-			$access_level = 'student';	//not a valid access level, do not restrict
+			$access_level = null;	//not a valid access level, do not restrict
 		}
 		//format dates
 		if(!empty($act_date)) { 
@@ -547,7 +547,7 @@ class user
 		//query
 		$rs = $g_dbConn->query($sql);
 		if(DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		
+			
 		$course_instances = array();
 		while($row = $rs->fetchRow()) {
 			$course_instances[] = new courseInstance($row[0]);
