@@ -1346,7 +1346,7 @@ class classDisplayer extends baseDisplayer {
 		foreach($termsObj->getTerms() as $term) {
 			$terms[$term->getTermYear()][$term->getTermName()] = $term->getTermID();
 		}
-		
+	
 		//separate instructor/proxy lists by term
 		//put in sub-arrays indexed by term_id
 		$instructor_ci_array = array();
@@ -1370,13 +1370,13 @@ class classDisplayer extends baseDisplayer {
 		if(!empty($student_CIs)) {	//show student on top
 			$onload_jscript .= "showBlock('student_tab', 'student_block');\n";
 		}
-		if(!empty($instructor_ci_array)) {	//show instructor on top
+		if($u->getDefaultRole() >= $g_permission['instructor']) {	//show instructor on top
 			$onload_jscript .= "showBlock('instructor_tab', 'instructor_block');\n";
 			$keys = array_keys($instructor_ci_array);		
 			$onload_jscript .= "showTermBlock('instructor_block_".$keys[0]."');\n";
 		}
 		if(empty($onload_jscript)) {	//hide everything
-			$onload_jscript = "showBlock(null, 'no_classes_block');";
+			$onload_jscript = "showBlock('student_tab', 'student_block');\n";
 		}
 		
 		//note that by default, only the student block is visible
@@ -1445,20 +1445,20 @@ class classDisplayer extends baseDisplayer {
 	
 	<div class="contentTabs">
 		<ul>
-<?php	if(!empty($instructor_CIs)): ?>
+<?php	if($u->getDefaultRole() >= $g_permission['instructor']): //check DEFAULT role, so that not-trained instructors still see this tab ?>
 			<li id="instructor_tab"><a href="#" onclick="return showBlock('instructor_tab', 'instructor_block');">You are teaching:</a></li>
 <?php	endif; ?>
-<?php	if(!empty($student_CIs)): ?>
+
 			<li id="student_tab" class="current"><a href="#" onclick="return showBlock('student_tab', 'student_block');">You are enrolled in:</a></li>
-<?php	endif; ?>
-<?php	if(!empty($proxy_CIs)): ?>
+
+<?php	if(!empty($proxy_CIs)): //only show proxy tab if user is currently proxying courses ?>
 			<li id="proxy_tab"><a href="#" onclick="return showBlock('proxy_tab', 'proxy_block');">You are proxy for:</a></li>
 <?php	endif; ?>
 		</ul>
 	</div>
 	<div class="clear">
 	
-<?php	if(!empty($instructor_ci_array)): //onclick="return showTermBlock('instructor_block_<?=$term_id? >');"?>
+<?php	if($u->getDefaultRole() >= $g_permission['instructor']): ?>
 		<div id="instructor_block" style="display:none;">
 			<div width="100%" class="displayList">
 				<div style="padding:4px;" class="head">
@@ -1478,39 +1478,73 @@ class classDisplayer extends baseDisplayer {
 			endforeach;
 ?>
 					</div>
+<?php		if($u->getRole() >= $g_permission['instructor']): ?>
 					<div style="float:right;"><span class="actions">[ <a href="index.php?cmd=createClass">Create a New Class</a> ]</span></div>
+<?php		endif; ?>
 					<div style="clear:both;"></div>
 				</div>
 			</div>
-<?php		foreach($instructor_ci_array as $term_id=>$term_ci_list):	//split up the subarrays by term ?>
+<?php
+			//loop through all the available terms/courses
+			if(!empty($instructor_ci_array)):
+				foreach($instructor_ci_array as $term_id=>$term_ci_list):	//split up the subarrays by term
+?>
 			<table id="instructor_block_<?=$term_id?>" class="displayList" style="display:none;" width="100%">
 <?php
-				//begin looping through courses		
-				$rowClass = 'evenRow';
-				foreach($term_ci_list as $ci):
-					$ci->getCourseForUser();	//get course object
-					$ci->getInstructors();	//get a list of instructors				
-					$edit_icon = 'images/pencil.gif';
-					
-					$rowClass = ($rowClass=='oddRow') ? 'evenRow' : 'oddRow';	//set the row class
+					if(!empty($term_ci_list)):
+						//begin looping through courses	for this term
+						$rowClass = 'evenRow';
+						foreach($term_ci_list as $ci):
+							$ci->getCourseForUser();	//get course object
+							$ci->getInstructors();	//get a list of instructors	
+							
+							//sort out the edit/activate/view links and icons, based on effective role		
+							if($u->getRole() < $g_permission['instructor']) {	//if the users's effective role is less than instructor (not-trained)
+								$edit_icon = '';	//they get no icon
+								$course_link = 'index.php?cmd=viewReservesList&ci='.$ci->getCourseInstanceID();	//only allowed to view course
+							}
+							else {	//full-fledged instructor
+								if($ci->getStatus() == 'AUTOFEED') {	//if the course has been fed through registrar, but not activated							
+									$edit_icon = 'A';	//show the 'activate-me' icon
+									$course_link = 'index.php?cmd=activateClass&ci='.$ci->getCourseInstanceID();	//link to activate course
+								}
+								else {
+									$edit_icon = '<img src="images/pencil.gif" alt="edit" width="24" height="20">';	//show the edit icon
+									$course_link = 'index.php?cmd=editClass&ci='.$ci->getCourseInstanceID();	//link to edit course
+								}								
+							}
+							
+							$rowClass = ($rowClass=='oddRow') ? 'evenRow' : 'oddRow';	//set the row class
 ?>
 				<tr align="left" valign="middle" class="<?=$rowClass?>">
-					<td width="5%"><img src="<?=$edit_icon?>" alt="edit" width="24" height="20"></td>
-					<td width="15%"><a href="index.php?cmd=editClass&ci=<?=$ci->getCourseInstanceID()?>"><?=$ci->course->displayCourseNo()?></a></td>
-					<td><a href="index.php?cmd=editClass&ci=<?=$ci->getCourseInstanceID()?>"><?=$ci->course->getName()?></a></td>
+					<td width="5%"><?=$edit_icon?></td>
+					<td width="15%"><a href="<?=$course_link?>"><?=$ci->course->displayCourseNo()?></a></td>
+					<td><a href="<?=$course_link?>"><?=$ci->course->getName()?></a></td>
 					<td width="30%"><?=$ci->displayInstructors()?></td>	
 					<td width="10%"><span class="<?=common_getEnrollmentStyleTag($ci->getEnrollment())?>"><?=$ci->getEnrollment()?></span></td>		
 				</tr>
-<?php			endforeach; ?>
+<?php					
+						endforeach;
+					endif;
+?>
 			</table>
-<?php		endforeach; ?>
+<?php
+				endforeach;
+			else:	//not teaching any courses
+?>
+			<div class="borders" style="padding:5px;">
+				You are not teaching any courses.
+			</div>
+<?php		endif; ?>
 			<p />
 			<img src="images/pencil.gif" width="24" height="20"> <span style="font-size:small;">= courses you may edit</span>
+			<br />
+			A <span style="font-size:small;">= courses you may ####</span>
 			<p />
 		</div>
 <?php	endif; ?>
 
-<?php	if(!empty($student_CIs)): ?>
+
 		<div id="student_block">
 			<table width="100%" class="displayList">
 				<tr align="right" valign="middle" class="head">
@@ -1518,7 +1552,8 @@ class classDisplayer extends baseDisplayer {
 						<span class="actions">[ <a href="index.php?cmd=addClass">Join a Class</a> ] [ <a href="index.php?cmd=removeClass">Leave a Class</a> ]</span>
 					</td>
 				</tr>
-<?php
+<?php	
+		if(!empty($student_CIs)):
 			//begin looping through courses - separate by enrollment status
 			foreach($student_CIs as $status=>$courses):
 				if($status == 'PENDING'):	//show a label for pending courses
@@ -1567,11 +1602,17 @@ class classDisplayer extends baseDisplayer {
 <?php		
 				endforeach;
 			endforeach;
+		else:	//not enrolled in any classes
 ?>
+			<tr>
+				<td>You are not enrolled in any classes this semester</td>
+			</tr>
+
+<?php	endif; ?>
 			</table>
 			<p />
 		</div>
-<?php	endif; ?>
+
 
 <?php	if(!empty($proxy_ci_array)): ?>
 		<div id="proxy_block" style="display:none;">
@@ -1621,15 +1662,7 @@ class classDisplayer extends baseDisplayer {
 		</div>
 <?php	endif; ?>
 
-		<div id="no_classes_block" style="display:none;">
-<?php	if($u->getRole() >= $g_permission['instructor']): ?>
-			You are not teaching any courses this semester;
-<?php	else: ?>
-			You are not enrolled in any classes this semester;
-<?php	endif; ?>			
-		</div>
-
-		<script>
+		<script language="JavaScript" type="text/javascript">
 			<?=$onload_jscript?>
 		</script>
 <?php

@@ -82,21 +82,24 @@ class classManager
 				$page = "myReserves";
 				$loc  = "home";
 				
-				$ciList_instructor = $ciList_proxy = $ciList_student = array();
+				$ciList_instructor = array();
+				$ciList_proxy = array();
+				$ciList_student = array();
 				
 				//get editable CIs for proxy or better
-				if($user->getRole() >= $g_permission['proxy']) {
+				//use getDefaultRole (instead of getRole) to account for not-trained instructors
+				if($user->getDefaultRole() >= $g_permission['proxy']) {
 					//get current courses, or those that will start within a year
 					//do not get expired courses
 					$activation_date = date('Y-m-d', strtotime('+1 year'));
 					$expiration_date = date('Y-m-d');
-				
+								
 					//get CIs where user is an instructor
 					$ciList_instructor = $user->fetchCourseInstances('instructor', $activation_date, $expiration_date);
 					//get CIs where user is a proxy
 					$ciList_proxy = $user->fetchCourseInstances('proxy', $activation_date, $expiration_date);					
 				}
-				
+								
 				//get viewable CIs for everyone
 				$ciList_student = $user->getCourseInstances();
 
@@ -216,7 +219,7 @@ class classManager
 				
 				//just need to change the class status to active
 				$ci = new courseInstance($_REQUEST['ci']);
-				$ci->setStatus('INACTIVE');
+				$ci->setStatus('AUTOFEED');
 				
 				//go to course listing
 				classManager::classManager('viewCourseList', $u, $adminUser, null);
