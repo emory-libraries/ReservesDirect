@@ -939,10 +939,14 @@ class itemDisplayer extends noteDisplayer {
 			case 'history':
 				$tab_styles['history'] = 'class="current"';
 			break;
-			
-			case 'copyright':
-				$tab_styles['copyright'] = 'class="current"';
-			break;
+
+#########################################
+#	HIDE COPYRIGHT UNTIL FURTHER NOTICE #			
+#########################################	
+#			case 'copyright':
+#				$tab_styles['copyright'] = 'class="current"';
+#			break;
+#########################################
 			
 			default:
 				$tab_styles['meta'] = 'class="current"';
@@ -970,7 +974,16 @@ class itemDisplayer extends noteDisplayer {
 				<li <?=$tab_styles['meta']?>><a href="index.php?cmd=editItem&amp;<?=$edit_item_href?>">Item Info</a></li>
 <?php		if($u->getRole() >= $g_permission['staff']): ?>
 				<li <?=$tab_styles['history']?>><a href="index.php?cmd=editItem&amp;<?=$edit_item_href?>&amp;tab=history">History</a></li>
-				<li <?=$tab_styles['copyright']?>><a href="index.php?cmd=editItem&amp;<?=$edit_item_href?>&amp;tab=copyright">Copyright <?=$copyright_alert?></a></li>
+<?php
+#########################################
+#	HIDE COPYRIGHT UNTIL FURTHER NOTICE #
+#	(remove spaces b/n <, >, and ?)		#
+#########################################
+
+#				<li < ?=$tab_styles['copyright']? >><a href="index.php?cmd=editItem&amp;< ?=$edit_item_href? >&amp;tab=copyright">Copyright < ?=$copyright_alert? ></a></li>
+#########################################
+?>
+
 <?php		endif; ?>
 			</ul>
 		</div>
@@ -986,9 +999,13 @@ class itemDisplayer extends noteDisplayer {
 				self::displayItemHistory($item);
 			break;
 			
-			case 'copyright':
-				self::displayEditItemCopyright($item);
-			break;
+#########################################
+#	HIDE COPYRIGHT UNTIL FURTHER NOTICE #			
+#########################################			
+#			case 'copyright':
+#				self::displayEditItemCopyright($item);
+#			break;
+#########################################
 			
 			default:
 				self::displayEditItemMeta($item, $reserve, $dub_array);
