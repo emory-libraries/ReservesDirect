@@ -603,10 +603,9 @@ function displayReserveAdded($user, $reserve=null, $ci)
   echo "							<ul><li class=\"nobullet\"><a href=\"index.php?cmd=editClass&ci=$ci\">Go to class</a></li>\n";
   echo "						</ul></td></tr>\n";
   echo "				<tr>\n";
-	echo "					<td align=\"left\" valign=\"top\"><p>Would you like to put more items on reserve?</p><ul>\n";
+  echo "					<td align=\"left\" valign=\"top\"><p>Would you like to put more items on reserve?</p><ul>\n";
   echo "						<li><a href=\"index.php\">No</a></li>\n";
-  //echo "						<li><a href=\"index.php?cmd=displaySearchItemMenu&ci=".$ci->getCourseInstanceID()."\">Yes, to this class.</a></li>\n";
-  echo "						<li><a href=\"index.php?cmd=displaySearchItemMenu&ci=$ci\">Yes, to this class.</a></li>\n";
+  echo "						<li><a href=\"index.php?cmd=addReserve&ci=$ci\">Yes, to this class.</a></li>\n";
   echo "						<li><a href=\"index.php?cmd=addReserve\">Yes, to another class.</a></li>\n";
   echo "					</ul></td>\n";
   echo "				</tr>\n";

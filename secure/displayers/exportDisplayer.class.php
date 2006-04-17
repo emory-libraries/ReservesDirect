@@ -39,6 +39,8 @@ class exportDisplayer extends baseDisplayer {
 	function displaySelectExportOption($ci) {
 		$ci->getCourseForUser();
 ?>
+		<div style="text-align:right; font-weight:bold;"><a href="index.php?cmd=editClass&amp;ci=<?=$ci->getCourseInstanceID()?>">Return to Class</a></div>
+		
 		<form method="post" action="index.php">
 			<input type="hidden" name="cmd" value="exportClass" />
 			<input type="hidden" name="ci" value="<?=$ci->getCourseInstanceID()?>" />

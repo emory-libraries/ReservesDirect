@@ -54,7 +54,7 @@ class reservesManager
 
 	function reservesManager($cmd, $user)
 	{
-		global $g_permission, $page, $loc, $g_faxDirectory, $g_documentDirectory, $g_documentURL, $ci, $g_notetype;
+		global $g_permission, $page, $loc, $g_faxDirectory, $g_documentDirectory, $g_documentURL, $ci, $g_notetype, $u;
 
 		$this->displayClass = "reservesDisplayer";
 		//$this->user = $user;
@@ -235,29 +235,21 @@ class reservesManager
 					$this->displayFunction = "displayStaffAddReserve";
 					$this->argList = array($_REQUEST);
 					break;
-				} elseif ($user->getRole() >= $g_permission['proxy']) { //2 = proxy
-					$courseInstances = $user->getCourseInstances();
-				} else {
-					trigger_error("Permission Denied:  Cannot add reserves. UserID=".$user->getUserID(), E_ERROR);
 				}
-
-				for($i=0;$i<count($courseInstances); $i++)
-				{
-					$ci = $courseInstances[$i];
-					//$ci->getCourseForUser($user->getUserID());
-					$ci->getPrimaryCourse();
+				elseif ($user->getRole() >= $g_permission['proxy']) { //2 = proxy
+					if(empty($_REQUEST['ci'])) {	//get ci
+						$courses = $u->getCourseInstancesToEdit();					
+						$this->displayFunction = 'displaySelectClass';					
+						$this->argList = array($cmd, $courses);						
+						break;
+					}
+					else {
+						$this->displayFunction = "displaySearchItemMenu";
+						$this->argList = array($_REQUEST['ci']);
+					}
 				}
-
-				$this->displayFunction = "displaySelectClasses";
-				$this->argList = array($courseInstances,$user);
 			break;
-			case 'displaySearchItemMenu':
-				$page="addReserve";
-				$progress = array ('total' => 4, 'full' => 1);
-
-				$this->displayFunction = "displaySearchItemMenu";
-				$this->argList = array($_REQUEST['ci']);
-			break;
+			
 			case 'searchScreen':
 				$page = "addReserve";
 

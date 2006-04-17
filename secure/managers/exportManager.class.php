@@ -37,7 +37,13 @@ class exportManager extends baseManager {
 
 		$this->displayClass = "exportDisplayer";
 		$loc = "export class";
-		$page = "manageClasses";
+		//set the page (tab)
+		if($u->getRole() >= $g_permission['staff']) {
+			$page = 'manageclasses';
+		}
+		else {
+			$page = 'myReserves';
+		}
 		
 		if(empty($_REQUEST['ci'])) {	//get ci
 			//get array of CIs (ignored for staff)

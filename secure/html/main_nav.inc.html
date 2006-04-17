@@ -12,37 +12,36 @@
 	
 	//Tab index defines order of tabs aphabetically hense the aa, y and z prefixes
 	$tabs = array();
-	$tabs['aamyReserves']		= "<li $tab_myReserves><a href=\"index.php\">MyCourses</a></li>\n";
+	$tabs['aamyReserves']		= "<li $tab_myReserves><a href=\"index.php\">My Courses</a></li>\n";
 	$tabs['addReserves']	= null;
 	$tabs['manageClasses']	= null;
-	$tabs['manageUsers']	= null;
+	$tabs['manageUser']	= null;
 	$tabs['ySearch']		= null;
 	$tabs['zReports']		= null;
 	$tabs['zzAdmin']		= null;
 	
-	switch ($userClass)
+	switch ($u->getUserClass())
 	{
 		case 'admin':
 			$tabs['zzAdmin']	= "<li $tab_admin><a href=\"index.php?cmd=admin\">Admin</a></li>\n";
 		case 'staff':
-			$tabs['zReports']	= "<li $tab_reports><a href=\"index.php?cmd=reportsTab\">View Statistics</a></li>\n";
+			$tabs['addReserve']	= "<li $tab_addReserve><a href=\"index.php?cmd=addReserve\">Manage Items</a></li>\n";
+			$tabs['manageClasses'] 	= "<li $tab_manageClasses><a href=\"index.php?cmd=manageClasses\">Manage Classes</a></li>\n";
 			$tabs['manageUser'] = "<li $tab_manageUser><a href=\"index.php?cmd=manageUser\">Manage Users</a></li>\n";
-			$tabs['addReserve']	= "<li $tab_addReserve><a href=\"index.php?cmd=selectInstructor\">Add a Reserve</a></li>\n";
 			$tabs['ySearch']	= "<li $tab_search><a href=\"index.php?cmd=searchTab\">Search</a></li>\n";
+			$tabs['zReports']	= "<li $tab_reports><a href=\"index.php?cmd=reportsTab\">View Statistics</a></li>\n";			
+		break;
 			
 		case 'instructor':
-			$tabs['addReserve']	   	= "<li $tab_addReserve><a href=\"index.php?cmd=addReserve\">Add a Reserve</a></li>\n";
-			$tabs['manageClasses'] 	= "<li $tab_manageClasses><a href=\"index.php?cmd=manageClasses\">Manage Classes</a></li>\n";
+			$tabs['addReserve']	   	= "<li $tab_addReserve><a href=\"index.php?cmd=addReserve\">Add a Reserve</a></li>\n";	
 			$tabs['manageUser']	   	= "<li $tab_manageUser><a href=\"index.php?cmd=manageUser\">Manage Users</a></li>\n";
 			$tabs['zReports']			= "<li $tab_reports><a href=\"index.php?cmd=reportsTab\">View Statistics</a></li>\n";
 		case 'proxy':
-			$myReserves = "<li $tab_reserves><a href=\"index.php?cmd=myReserves\">My Reserves</a></li>\n";
-			//if (is_null($addReserve)) 
-			//	$tabs['addReserve']	= "<li $tab_addReserve><a href=\"index.php?cmd=addReserve\">Add a Reserve</a></li>\n";
 		break;
 		
 		case 'custodian':
 			$tabs['manageUser']	= "<li $tab_manageUser><a href=\"index.php?cmd=manageUser\">Manage Users</a></li>\n";
+		break;
 
 	}
 	

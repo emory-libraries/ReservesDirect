@@ -56,25 +56,21 @@ class classManager
 //echo "classManager($cmd, $user, $adminUser)<P>"; //classManager
 
 		$this->displayClass = "classDisplayer";
-		$page = 'manageclasses';
+		
+		//set the page (tab)
+		if($u->getRole() >= $g_permission['staff']) {
+			$page = 'manageClasses';
+		}
+		else {
+			$page = 'myReserves';
+		}
 
 		switch ($cmd)
 		{
 			case 'manageClasses':
-				$page = "manageClasses";
-
-				if ($user->getRole() >= $g_permission['staff'])
-				{
-					$loc  = "manage classes home";
-
-					$this->displayFunction = 'displayStaffHome';
-					$this->argList = array($user);
-				} else {
-					$loc  = "manage classes home";
-
-					$this->displayFunction = 'displayInstructorHome';
-					$this->argList = "";
-				}
+				$loc  = "manage classes home";
+				$this->displayFunction = 'displayStaffHome';
+				$this->argList = array($user);
 			break;
 			
 			case 'myReserves':
@@ -109,8 +105,6 @@ class classManager
 			
 	
 			case 'addClass':
-				$page = "myReserves";
-				
 				$ci_id = !empty($_REQUEST['ci']) ? $_REQUEST['ci'] : null;
 				$instructor_id = !empty($_REQUEST['selected_instr']) ? $_REQUEST['selected_instr'] : null;
 				$department_id = !empty($_REQUEST['department']) ? $_REQUEST['department'] : null;
@@ -166,8 +160,6 @@ class classManager
 			break;
 			
 			case 'removeClass':
-				$page = 'myReserves';
-				
 				if(!empty($_REQUEST['ci'])) {	//user selected class
 					$ci = new courseInstance($_REQUEST['ci']);
 					$ci->getCourseForUser();
@@ -226,8 +218,16 @@ class classManager
 			break;	
 			
 			case 'editClass':
-				$page = "manageClasses";
 				$loc  = "edit class";
+				
+				if(empty($_REQUEST['ci'])) {	//get ci
+					//get array of CIs (ignored for staff)
+					$courses = $u->getCourseInstancesToEdit();					
+					$this->displayFunction = 'displaySelectClass';					
+					$this->argList = array($cmd, $courses, 'Select class to edit', $_REQUEST);
+					
+					break;
+				}
 
 				$ci = new courseInstance($_REQUEST['ci']);
 				$reserves = (isset($_REQUEST['selected_reserves'])) ? $_REQUEST['selected_reserves'] : null;
@@ -506,7 +506,6 @@ class classManager
 			break;
 
 			case 'createClass':
-				$page = "manageClasses";
 				$loc = "create new class";
 
 				$dept = new department();
@@ -518,7 +517,6 @@ class classManager
 			break;
 
 			case 'createNewClass':
-				$page = "manageClasses";
 				$loc = "create class";
 			
 				$t = new term($request['term']);
@@ -549,7 +547,6 @@ class classManager
 			break;
 
 			case 'deleteClass':
-				$page = "manageClasses";
 				$loc = "delete class";
 
 				if ($user->getRole() >= $g_permission['staff'])
@@ -560,7 +557,6 @@ class classManager
 			break;
 
 			case 'confirmDeleteClass':
-				$page = "manageClasses";
 				$loc = "confirm delete class";
 
 				if (isset($request['ci']))
@@ -575,7 +571,6 @@ class classManager
 			break;
 
 			case 'deleteClassSuccess':
-				$page = "manageClasses";
 				$loc = "delete class";
 
 				if (isset($request['ci']))
@@ -590,7 +585,6 @@ class classManager
 			break;
 			
 			case 'copyItems':
-				$page = "manageClasses";
 				$loc = "copy reserve items to another class";
 				
 				$class_list = $user->getCourseInstancesToEdit();
@@ -599,7 +593,6 @@ class classManager
 			break;
 			
 			case 'processCopyItems':
-				$page = "manageClasses";
 				$loc = "copy reserve items to another class";
 
 				$srcCI = new courseInstance($_REQUEST['originalClass']);

@@ -416,9 +416,21 @@ the commented guidelines below are for creating standard tabs. */
 	display: block;
 }
 .navItems { /* empty in default implementation of RD 2.x */
-	margin: 0;
-	padding: 0;
+	font-size: small;
+	font-weight: bold;
+	margin-top: 3px;
+	margin-bottom: 3px;
+	margin-left: 10px;
 	float: left;
+}
+.navItems ul {
+    margin: 0;
+    padding: 0;
+    list-style-position: inside;
+}
+.navItems li {
+    float: left;
+    margin-right: 20px;
 }
 .user {
 	font-size: small;
@@ -775,7 +787,6 @@ table.displaylist td{
 	float: right;
 	right: 0px;
 }
-
 
 
 /*

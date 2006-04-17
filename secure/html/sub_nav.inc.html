@@ -1,95 +1,33 @@
-<?
-
+<?php
 	unset($subMenu);
 	$subMenu = array();
-	switch ($page)
-	{
+	switch($page) {
 		case 'myReserves':
-			$subMenu[] = array('target' => 'home', 				'href' => '');
-			$subMenu[] = array('target' => 'edit My Reserves:', 'href' => null);
-			$subMenu[] = array('target' => 'add', 				'href' => 'page=myReserves&subpage=add');
-			$subMenu[] = array('target' => 'remove', 			'href' => 'page=myReserves&subpage=remove');
-		break;
-		
-		case 'manageUser':
-			$subMenu[] = array('target' => 'home', 				'href' => '');
-			$subMenu[] = array('target' => 'manage users:', 	'href' => null);
-			$subMenu[] = array('target' => 'edit my profile',  	'href' => 'page=manageUser&subpage=editProfile');
-			
-			switch ($u->getUserClass())
-			{
-				case 'custodian':
-					$subMenu[] = array('target' => 'special user',  'href' => 'page=manageUser&subpage=special');
-				break;
-				
-				case 'instructor':
-					$subMenu[] = array('target' => 'proxy', 		'href' => 'page=manageUser&subpage=proxy');
-				break;
-				
-				case 'admin':					
-					$subMenu[] = array('target' => 'special user',  'href' => 'page=manageUser&subpage=special');
-					$subMenu[] = array('target' => 'proxy', 		'href' => 'page=manageUser&subpage=proxy');
-					$subMenu[] = array('target' => 'create user',	'href' =>  'page=manageUser&subpage=addUser');
-					$subMenu[] = array('target' => 'edit user',		'href' =>  'page=manageUser&subpage=searchUser');					
-				break;
-				
-				case 'staff':
-					$subMenu[] = array('target' => 'special user',  'href' => 'page=manageUser&subpage=special');
-					$subMenu[] = array('target' => 'proxy', 		'href' => 'page=manageUser&subpage=proxy');
-					$subMenu[] = array('target' => 'create user',	'href' =>  'page=manageUser&subpage=addUser');
-					$subMenu[] = array('target' => 'edit user',		'href' =>  'page=manageUser&subpage=searchUser');					
-				break;				
+			if($u->getRole() >= $g_permission['instructor']) {
+				$subMenu[] = '<a href="index.php?cmd=createClass">Create New Class</a>';
+			}
+			if($u->getRole() >= $g_permission['proxy']) {
+				$subMenu[] = '<a href="index.php?cmd=exportClass">Export Class</a>';
+				$subMenu[] = '<a href="index.php?cmd=editClass&amp;tab=enrollment">Manage Class Enrollment</a>';
+			}
+			if($u->getRole() <= $g_permission['proxy']) {
+				$subMenu[] = '<a href="index.php?cmd=addClass">Join Class</a>';
+				$subMenu[] = '<a href="index.php?cmd=removeClass">Leave Class</a>';
 			}
 		break;
-		
-		case 'manageClasses':
-		
-			$subMenu[] = array('target' => 'home', 				'href' => '');
-		
-			switch ($u->getUserClass())
-			{
-				case 'admin':
-				case 'staff':
-					$subMenu[] = array('target' => 'courses',		'href' => null);
-					$subMenu[] = array('target' => 'add',			'href' 	=> 'page=manageClasses&subpage=createClass');
-					$subMenu[] = array('target' => 'reactivate', 	'href' 	=> 'page=manageClasses&subpage=reactivateClass');
-					//$subMenu[] = array('target' => 'merge',			'href' => '');
-					//$subMenu[] = array('target' => 'copy',			'href' => '');
-					
-					$subMenu[] = array('target' => 'Departments',	'href' => null);
-					//$subMenu[] = array('target' => 'add',		'href' => '');
-					//$subMenu[] = array('target' => 'edit',		'href' => '');
-				break;
-				
-				default:
-					$subMenu[] = array('target' => 'create new Class', 		'href' 	=> 'page=manageClasses&subpage=createClass');
-					$subMenu[] = array('target' => 'reactivate a Class', 	'href' 	=> 'page=manageClasses&subpage=reactivateClass');				
-			}
-		
-		default:
 	}
-//?>
-
-		<div id="subnav">
-			<div class="navItems">&nbsp;
-	
-	<?
-	/*	
-        		foreach ($subMenu as $sm)
-        		{
-        			if (!is_null($sm['href'])){
-        				echo "[<a href=\"index.php?" . $sm['href'] . "\">" . $sm['target'] . "</a>] ";
-        			} else { 
-        				echo " " . $sm['target'] . " ";
-        			}
-        		}
-		*/
-        	?>
-	
-        	</div>
-			<span class="user">
-				<? echo $u->getFirstName() . "&nbsp;" . $u->getLastName() .  "&nbsp; ( " . $u->getUserName() . " )"; ?>
-			</span>
-	    </div>
+?>
+	<div id="subnav">
+		<div class="navItems">
+			<ul>	
+<?php	foreach($subMenu as $sm_link): ?>
+				<li><?=$sm_link?></li>
+<?php	endforeach; ?>
+			</ul>
+		</div>
+		<div class="user">
+			<?=$u->getName(false);?> ( <?=$u->getUsername()?> )
+		</div>
+    </div>
 
 

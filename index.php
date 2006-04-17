@@ -123,8 +123,7 @@ switch ($cmd)
 	case 'previewStudentView';
 	case 'sortReserves':
 	case 'customSort':
-	case 'addReserve': //Proxy & Faculty Interface - add a reserve to a class
-	case 'displaySearchItemMenu': //addReserve - How would you like to put item on reserve? screen
+	case 'selectInstructor': //addReserve Staff Interface - Search for Class by Instructor or Dept
 	case 'addReserve': //add a reserve to a class
 	case 'searchScreen': //addReserve - Search for Item
 	case 'searchResults': //addReserve - Search Results Screen
@@ -212,18 +211,6 @@ switch ($cmd)
 			require_once("secure/managers/requestManager.class.php");
 			$mgr = new requestManager($cmd, $u, $ci, $_REQUEST);
 		}
-
-    case 'staffEditClass':
-            if (!isset($_REQUEST['ci']))
-            {
-       			//display ajax class select
-				$mgr = new ajaxManager();
-				$mgr->lookup('lookupClass', $cmd, 'manageClasses', 'Edit Class');                 
-            } else {
-                    require_once("secure/managers/classManager.class.php");
-                    $mgr = new classManager('editClass', $u, $adminUser, $_REQUEST);
-            }
-    break;
 	break;
 
 	case 'copyClass':

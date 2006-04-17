@@ -48,7 +48,7 @@ class classDisplayer extends baseDisplayer {
 		echo "					<td width=\"33%\" class=\"borders\">\n";
 		echo "						<ul>\n";
 		echo "							<li><a href=\"index.php?cmd=createClass\" align=\"center\">Create Class</a></li>\n";
-		echo "							<li><a href=\"index.php?cmd=staffEditClass\">Edit Class</a></li>\n";
+		echo "							<li><a href=\"index.php?cmd=editClass\">Edit Class</a></li>\n";
 		echo "							<li><a href=\"index.php?cmd=deleteClass\">Delete Class</a></li>\n";
 		echo "						</ul>\n";
 		echo "					</td>\n";
@@ -72,48 +72,6 @@ class classDisplayer extends baseDisplayer {
 		echo "	</tr>\n";
 		echo "	<tr><td>&nbsp;</td></tr>\n";
 		echo "</table>\n";
-	}
-
-	function displayInstructorHome()
-	{
-		echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\" align=\"center\">";
-        echo "	<tr><td width=\"100%\" colspan=\"2\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>";
-        echo "	<tr> ";
-        echo "		<td width=\"70%\" align=\"left\" valign=\"top\"> ";
-        echo "			<p><a href=\"index.php?cmd=createClass\" class=\"titlelink\">Create a New Course</a><br>";
-        echo "      	Create a new course and reserves list from scratch.</p>";
-        echo "			<p><a href=\"index.php?cmd=myReserves\" class=\"titlelink\">Edit an Existing Course</a><br>";
-        echo "			Advanced management of your classes. Edit class title, crosslistings, proxies, reserve materials, enrollment, and much more.</p>";
-        echo "		</td>";
-
-        echo "		<td width=\"30%\" align=\"left\" valign=\"top\">";
-		echo "			<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">";
-        echo "				<tr>";
-		echo "					<td class=\"headingCell1\">Quick Links</td>";
-        echo "      		</tr>";
-        echo "				<tr> ";
-        echo "					<td align=\"left\" valign=\"top\" class=\"borders\">";
-        echo "						<ul>";
-        //echo "						<li class=\"small\"><a href=\"link\">Sort my Reserves</a></li>";
-        //echo "            			<li class=\"small\"><a href=\"link\">Annotate my Reserves</a></li>";
-        echo "            			<li class=\"small\"><a href=\"index.php\">View my Reserves lists</a></li>";
-        echo "            			<li class=\"small\"><a href=\"index.php?cmd=exportClass\">Export my Reserves to Courseware class (Blackboard, Learnlink, etc.)</a></li>";
-        //echo "            			<li class=\"small\"><a href=\"link\">Get my URLs</a></li>";
-        //echo "            			<li class=\"small\"><a href=\"link\">Manage Enrollment for my classes</a></li>";
-        echo "         				</ul>";
-        echo "					</td>";
-        echo "    			</tr>";
-        echo "      		<tr>";
-        echo "        			<td>&nbsp;</td>";
-       	echo "       		</tr>";
-      	echo "			</table>";
-        echo "		</td>";
-
-      	echo "	</tr>";
-        echo "	<tr> ";
-     	echo "		<td colspan=\"2\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td>";
-        echo "	</tr>";
-      	echo "</table>";
 	}
 	
 	
@@ -198,9 +156,6 @@ class classDisplayer extends baseDisplayer {
 						if(document.getElementById('tsv_export_form')) {
 							document.getElementById('tsv_export_form').submit();
 						}
-		else {
-			alert('no form');
-		}
 						return false;
 					}
 				</script>
@@ -242,17 +197,7 @@ class classDisplayer extends baseDisplayer {
 		
 		<div>
 			[ <a href="index.php?cmd=customSort&ci=<?=$ci->getCourseInstanceID()?>&parentID=" class="editlinks">sort main list</a> ]
-			
-<?php	if($u->getRole() >= $g_permission['staff']): ?>
-
-			[ <a href="index.php?cmd=addReserve&ci=<?=$ci->getCourseInstanceID()?>&selected_instr=<?=$ci->instructorList[0]->getUserID()?>" class="editlinks">add new materials</a> ] 
-				
-<?php	else: ?>
-
-			[ <a href="index.php?cmd=displaySearchItemMenu&ci=<?=$ci->getCourseInstanceID()?>" class="editlinks">add new materials</a> ] 
-
-<?php 	endif; ?>
-
+			[ <a href="index.php?cmd=addReserve&ci=<?=$ci->getCourseInstanceID()?>&selected_instr=<?=$ci->instructorList[0]->getUserID()?>" class="editlinks">add new materials</a> ]
 			[ <a href="index.php?cmd=editHeading&ci=<?=$ci->getCourseInstanceID()?>" class="editlinks">add new heading</a> ]
 			[ <a href="#" class="editlinks" onclick="highlightAll(); return false;">highlight reserve links</a> ]
 		
@@ -953,7 +898,7 @@ class classDisplayer extends baseDisplayer {
 				<p />
 				<ul>
 					<li><a href="index.php?cmd=importClass&dst_ci=<?=$ci_id?>">Import materials into this class from another class (Reactivate)</a></li>
-					<li><a href="index.php?cmd=displaySearchItemMenu&ci=<?=$ci_id?>">Add materials to this class</a></li>
+					<li><a href="index.php?cmd=addReserve&ci=<?=$ci_id?>">Add materials to this class</a></li>
 					<li><a href="index.php?cmd=editClass&ci=<?=$ci_id?>">Go to this class.</a></li>
 					<li><a href="index.php?cmd=createClass">Create a New Class.</a></li>
 				</ul>
@@ -971,7 +916,7 @@ class classDisplayer extends baseDisplayer {
 				<p />
 				<ul>
 					<li><a href="index.php?cmd=importClass&dst_ci=<?=$ci_id?>">Import materials into this class from another class (Reactivate)</a></li>
-					<li><a href="index.php?cmd=displaySearchItemMenu&ci=<?=$ci_id?>">Add materials to this class</a></li>
+					<li><a href="index.php?cmd=addReserve&ci=<?=$ci_id?>">Add materials to this class</a></li>
 					<li><a href="index.php?cmd=editClass&ci=<?=$ci_id?>">Go to this class.</a></li>
 					<li><a href="index.php?cmd=deactivateClass&ci=<?=$ci_id?>"><strong>Cancel</strong> - I do not wish students to see this class.</a></li>
 				</ul>
@@ -1442,7 +1387,7 @@ class classDisplayer extends baseDisplayer {
 			current_term_blocks[current_block_id] = term_block_id;		
 		}
 	</script>
-	
+      			
 	<div class="contentTabs">
 		<ul>
 <?php	if($u->getDefaultRole() >= $g_permission['instructor']): //check DEFAULT role, so that not-trained instructors still see this tab ?>
@@ -1456,7 +1401,7 @@ class classDisplayer extends baseDisplayer {
 <?php	endif; ?>
 		</ul>
 	</div>
-	<div class="clear">
+	<div class="clear"></div>
 	
 <?php	if($u->getDefaultRole() >= $g_permission['instructor']): ?>
 		<div id="instructor_block" style="display:none;">
@@ -1500,7 +1445,7 @@ class classDisplayer extends baseDisplayer {
 							
 							//sort out the edit/activate/view links and icons, based on effective role		
 							if($u->getRole() < $g_permission['instructor']) {	//if the users's effective role is less than instructor (not-trained)
-								$edit_icon = '';	//they get no icon
+								$edit_icon = '<img src="images/activate.gif" alt="edit" width="24" height="20">';	//they get no icon
 								$course_link = 'index.php?cmd=viewReservesList&ci='.$ci->getCourseInstanceID();	//only allowed to view course
 							}
 							else {	//full-fledged instructor
@@ -1539,7 +1484,7 @@ class classDisplayer extends baseDisplayer {
 			<p />
 			<img src="images/pencil.gif" width="24" height="20"> <span style="font-size:small;">= courses you may edit</span>
 			<br />
-			A <span style="font-size:small;">= courses you may ####</span>
+			<img src="images/activate.gif" width="24" height="20"> <span style="font-size:small;">= new courses</span>
 			<p />
 		</div>
 <?php	endif; ?>
