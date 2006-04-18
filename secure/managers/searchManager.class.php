@@ -71,8 +71,8 @@ class searchManager
 			case 'doSearch':
 				$loc  = "search for documents";
 			
-//				$this->search_sql_statement = (isset($request['sql']) && $request['sql'] != '') ? stripslashes(urldecode($request['sql'])) : null;
-        $search_array = (isset($_GET['search'])) ? unserialize(urldecode($_GET['search'])) : $request['search'];
+				//$this->search_sql_statement = (isset($request['sql']) && $request['sql'] != '') ? stripslashes(urldecode($request['sql'])) : null;
+        		$search_array = (isset($_GET['search'])) ? unserialize(urldecode($_GET['search'])) : unserialize(urldecode($request['search']));
 				
 				$items = $this->doSearch($search_array, $request['limit'], $request['item'], $request['sort']);
 				
@@ -227,6 +227,7 @@ class searchManager
 					; 
 					
 					$sql_add = "";
+print_r($search); echo "<hr>";					
 					for($i=0;$i<count($search);$i++)
 					{
 						if ($search[$i]['field'] == 'n.note')
@@ -250,11 +251,13 @@ class searchManager
 								switch ($search[$i]['test'])
 								{
 									case 'LIKE':
-										$sql_where .= $conjunction . " match(" . $search[$i]['field'] . ") against ( \"" . strtolower($search[$i]['term']) . "\") ";
+										//$sql_where .= $conjunction . " match(" . $search[$i]['field'] . ") against ( \"" . strtolower($search[$i]['term']) . "\") ";
+										$sql_where .= $conjunction . " (" . $search[$i]['field'] . " LIKE \"%" . strtolower($search[$i]['term']) . "%\") ";
 									break;
 									
 									case '<>':
-										$sql_where .= $conjunction . " not match(" . $search[$i]['field'] . ") against ( \"" . strtolower($search[$i]['term']) . "\") ";
+										//$sql_where .= $conjunction . " not match(" . $search[$i]['field'] . ") against ( \"" . strtolower($search[$i]['term']) . "\") ";
+										$sql_where .= $conjunction . " (" . $search[$i]['field'] . " NOT LIKE \"%" . strtolower($search[$i]['term']) . "%\") ";
 									break;
 									
 									case '=':
