@@ -66,6 +66,38 @@ class department extends library
 		}
 
 	}
+
+	function getDepartmentByAbbr($abbr)
+	{
+		global $g_dbConn;
+
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql  = "SELECT d.name, d.abbreviation, l.library_id, l.name, l.nickname, l.url, d.department_id "
+					  . "FROM departments as d LEFT JOIN libraries as l ON d.library_id = l.library_id "
+					  . "WHERE d.abbreviation = ?";
+
+		}
+
+		$rs = $g_dbConn->query($sql, $abbr);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		//if($rs->numRows() > 0) 
+		//{
+			$row = $rs->fetchRow();
+				$this->name 			= $row[0];
+				$this->abbr 			= $row[1];
+				$this->libraryID 		= $row[2];
+				$this->library 			= $row[3];
+				$this->libraryNickname 	= $row[4];
+				$this->libraryURL 		= $row[5];
+				$this->deptID			= $row[6];		
+			return $row[6];
+		//} else {
+		//	return null;
+		//}
+	}	
 	
 	function createDepartment($name, $abbr, $library_id)
 	{
@@ -73,11 +105,15 @@ class department extends library
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql  = "INSERT INTO departments (name, abbreviation, library_id) VALUES (?,?,!)";
+				$sql['new']  = "INSERT INTO departments (name, abbreviation, library_id) VALUES (?,?,!)";
+				$sql['inserted'] = "SELECT LAST_INSERT_ID() FROM departments";
 
 		}
-		$rs = $g_dbConn->query($sql, array($name, $abbr, $library_id));
+		$rs = $g_dbConn->query($sql['new'], array($name, $abbr, $library_id));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		$d_id =  $g_dbConn->getOne($sql['inserted']);
+		$this->department($d_id);		
 	}
 
 	function updateDepartment()
