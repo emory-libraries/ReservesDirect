@@ -41,6 +41,7 @@ class course
 	public $courseNo;
 	public $section;
 	public $uniformTitle;
+	public $registrarKey;
 
 	/**
 	* @return course
@@ -60,30 +61,30 @@ class course
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql1 = "INSERT INTO courses (department_id, course_number, course_name, uniform_title) VALUES (0, NULL, NULL, 't')";
+				$sql1 = "INSERT INTO courses (department_id, course_number, uniform_title) VALUES (0, NULL, NULL, NULL, 't')";
 				$sql2 = "SELECT LAST_INSERT_ID() FROM courses";
-				$sql3 = "INSERT INTO course_aliases (course_id, course_instance_id, section) VALUES (!, !, NULL)";
+				$sql3 = "INSERT INTO course_aliases (course_id, course_instance_id, course_name, section) VALUES (!, !, NULL, NULL)";
 				$sql4 = "SELECT LAST_INSERT_ID() FROM course_aliases";
 		}
 
 		$rs = $g_dbConn->query($sql1);
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$rs = $g_dbConn->query($sql2);
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$row = $rs->fetchRow();
-		if (DB::isError($row)) { trigger_error($row->getMessage(), E_ERROR); }
+		if (DB::isError($row)) { trigger_error($row->getMessage(), E_USER_ERROR); }
 		$this->courseID = $row[0];
 
 		$rs = $g_dbConn->query($sql3, array($this->courseID, $courseInstanceID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$rs = $g_dbConn->query($sql4);
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$row = $rs->fetchRow();
-		if (DB::isError($row)) { trigger_error($row->getMessage(), E_ERROR); }
+		if (DB::isError($row)) { trigger_error($row->getMessage(), E_USER_ERROR); }
 		$this->courseAliasID = $row[0];
 
 	}
@@ -106,7 +107,7 @@ class course
 		}
 
 		$rs = $g_dbConn->query($sql, $this->courseID);
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 
 	/**
@@ -121,12 +122,12 @@ class course
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT ca.course_id, c.department_id, c.course_number, c.course_name, c.uniform_title, ca.section, ca.course_alias_id "
+				$sql = "SELECT ca.course_id, c.department_id, c.course_number, ca.course_name, c.uniform_title, ca.section, ca.course_alias_id, ca.registrar_key "
 					.  "FROM courses as c JOIN course_aliases as ca ON c.course_id = ca.course_id AND ca.course_alias_id = !";
 		}
 
 		$rs = $g_dbConn->query($sql, $courseAliasID);
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$row = $rs->fetchRow();
 			$this->courseID 		= $row[0];
@@ -136,6 +137,7 @@ class course
 			$this->uniformTitle 	= $row[4];
 			$this->section 			= $row[5];
 			$this->courseAliasID	= $row[6];
+			$this->registrarKey		= $row[7];
 	}
 
 	/**
@@ -150,21 +152,20 @@ class course
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT course_id, department_id, course_number, course_name, uniform_title "
+				$sql = "SELECT course_id, department_id, course_number, uniform_title "
 					.  "FROM courses "
 					.  "WHERE course_id = !"
 					;
 		}
 
 		$rs = $g_dbConn->query($sql, $courseID);
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$row = $rs->fetchRow();
 			$this->courseID 		= $row[0];
 			$this->deptID 			= $row[1];
 			$this->courseNo			= $row[2];
-			$this->name	 			= $row[3];
-			$this->uniformTitle 	= $row[4];
+			$this->uniformTitle 	= $row[3];
 	}
 
 	/**
@@ -174,18 +175,18 @@ class course
 	 * @param string $name Course name
 	 * @desc Searches for a match on dept, course number, and name; loads object on success and return TRUE, else FALSE
 	 */
-	function getCourseByMatch($dept_id, $course_number, $course_name) {
+	function getCourseByMatch($dept_id, $course_number, $uniform_title) {
 		global $g_dbConn;
 		
 		switch($g_dbConn->phptype) {
 			default:	//mysql
 				$sql = "SELECT course_id
 						FROM courses
-						WHERE department_id = ! AND course_number = ? AND course_name = ?";
+						WHERE department_id = ! AND course_number = ? AND uniform_title = ?";
 		}
 		
-		$rs = $g_dbConn->query($sql, array($dept_id, $course_number, stripslashes($course_name)));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_ERROR); }
+		$rs = $g_dbConn->query($sql, array($dept_id, $course_number, stripslashes($uniform_title)));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
 		if($rs->numRows() == 0) {
 			return false;
@@ -209,11 +210,11 @@ class course
 			default:	//mysql
 				$sql = "SELECT course_id
 						FROM courses
-						WHERE course_number LIKE '$qry%' OR course_name LIKE '%$qry%'";
+						WHERE course_number LIKE '$qry%' OR uniform_title LIKE '%$qry%'";
 		}
 		
 		$rs = $g_dbConn->query($sql, array());
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
 		$tmpArray = null;
 		while ($row = $rs->fetchRow())
@@ -236,14 +237,48 @@ class course
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "UPDATE courses SET course_name = ? WHERE course_id = !";
+				$sql = "UPDATE course_aliases SET course_name = ? WHERE course_alias_id = !";
 		}
 
-		$rs = $g_dbConn->query($sql, array($name, $this->courseID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_ERROR); }
+		$rs = $g_dbConn->query($sql, array($name, $this->courseAliasID));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 	}
 
+	function setUniformTitle($title)
+	{
+		global $g_dbConn;
+
+		$this->uniformTitle = stripslashes($title);
+
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "UPDATE courses SET uniform_title = ? WHERE course_id = !";
+		}
+
+		$rs = $g_dbConn->query($sql, array($title, $this->courseID));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+	}
+
+	function setRegistrarKey($key)
+	{
+		global $g_dbConn;
+
+		$this->registrarKey = stripslashes($key);
+
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "UPDATE course_aliases SET registrar_key = ? WHERE course_id = !";
+		}
+
+		$rs = $g_dbConn->query($sql, array($key, $this->courseID));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+	}
+	
 	function setCourseNo($courseNo)
 	{
 		global $g_dbConn;
@@ -257,7 +292,7 @@ class course
 		}
 
 		$rs = $g_dbConn->query($sql, array($courseNo, $this->courseID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 
 	function setSection($section)
@@ -274,7 +309,7 @@ class course
 		}
 
 		$rs = $g_dbConn->query($sql, array($section, $this->courseAliasID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 
 	function setDepartmentID($deptID)
@@ -290,7 +325,7 @@ class course
 		}
 
 		$rs = $g_dbConn->query($sql, array($deptID, $this->courseID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_ERROR); }
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 
 	/**
