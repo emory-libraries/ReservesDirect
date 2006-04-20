@@ -365,7 +365,7 @@ class users
 		{
 			default: //'mysql'
 				$sql = "
-					SELECT DISTINCT ci.course_instance_id, t.term_id, c.course_name
+					SELECT DISTINCT ci.course_instance_id, t.term_id, ca.course_name
 					FROM course_aliases as ca 
 						LEFT JOIN access as a on a.alias_id = ca.course_alias_id
 						JOIN course_instances as ci on ci.course_instance_id = ca.course_instance_id

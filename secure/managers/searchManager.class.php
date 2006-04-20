@@ -299,7 +299,7 @@ print_r($search); echo "<hr>";
 									break;
 									
 									case 'course_name':
-										$sql_limit = " AND c.course_name $test ";
+										$sql_limit = " AND ca.course_name $test ";
 								}
 								
 								$sql_where .= $conjunction . $sql_limit;
