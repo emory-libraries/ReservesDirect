@@ -541,13 +541,13 @@ class user
 				}
 				
 				//finish off with sorting
-				$sql .= " ORDER BY ci.activation_date ASC, d.abbreviation ASC, c.course_number ASC, ca.section ASC";				
+				$sql .= " ORDER BY d.abbreviation ASC, c.course_number ASC, ca.section ASC, ci.activation_date ASC";				
 		}
 
 		//query
 		$rs = $g_dbConn->query($sql);
 		if(DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-			
+				
 		$course_instances = array();
 		while($row = $rs->fetchRow()) {
 			$course_instances[] = new courseInstance($row[0]);
