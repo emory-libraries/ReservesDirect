@@ -1482,9 +1482,9 @@ class classDisplayer extends baseDisplayer {
 			</div>
 <?php		endif; ?>
 			<p />
-			<img src="images/pencil.gif" width="24" height="20"> <span style="font-size:small;">= courses you may edit</span>
+			<img src="images/pencil.gif" width="24" height="20"> <span style="font-size:small;">= active courses you may edit</span>
 			<br />
-			<img src="images/activate.gif" width="24" height="20"> <span style="font-size:small;">= new courses</span>
+			<img src="images/activate.gif" width="24" height="20" > <span style="font-size:small;">= new courses not yet in use</span>
 			<p />
 		</div>
 <?php	endif; ?>
