@@ -3,7 +3,10 @@
 	$subMenu = array();
 	switch($page) {
 		case 'myReserves':
-			if($u->getRole() >= $g_permission['instructor']) {
+		if($u->getRole() >= $g_permission['instructor']) {
+				$subMenu[] = '<a href="index.php" class="firstLink"> Home</a>';
+			}	
+		if($u->getRole() >= $g_permission['instructor']) {
 				$subMenu[] = '<a href="index.php?cmd=createClass">Create New Class</a>';
 			}
 			if($u->getRole() >= $g_permission['proxy']) {
