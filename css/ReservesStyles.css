@@ -222,7 +222,7 @@ a.itemTitle:hover {
 
 /* 'subnav' defines the appearance and links that appear
 in the subnavigation bar just below the main navigation tabs. */
-a.subnav:link {
+.navItems a:link {
 	
 	color: #333333;
 	text-decoration: none;
@@ -427,10 +427,20 @@ the commented guidelines below are for creating standard tabs. */
     margin: 0;
     padding: 0;
     list-style-position: inside;
+    list-style:none;
 }
 .navItems li {
     float: left;
-    margin-right: 20px;
+    padding-left:10px;
+    padding-right: 10px;
+    border-right:1px solid #CCCCCC;
+}
+
+.navItems a {
+	color: #59586D;
+	text-decoration: none;
+	font-size: 12px;
+	font-weight: normal;
 }
 .user {
 	font-size: small;
@@ -679,6 +689,24 @@ table.displaylist td{
 
 	
 }
+.classEnrollmentOptions {
+	background-color:#FFFFCC;
+	padding:10px;
+	border-bottom:1px solid #333333;
+}
+.classRoll {
+	background-color:#CCCCCC;
+	padding:10px;
+}
+.classRollPending {
+	float:left;
+	width:45%;
+}
+.classRollActive {
+	float:right;
+	width:45%;
+}
+
 .reserveItem {
 	margin:0px; 
 	padding:0px; 
