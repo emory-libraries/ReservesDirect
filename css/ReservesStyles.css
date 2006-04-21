@@ -437,10 +437,13 @@ the commented guidelines below are for creating standard tabs. */
 }
 
 .navItems a {
-	color: #59586D;
+	color: #373643;
 	text-decoration: none;
 	font-size: 12px;
 	font-weight: normal;
+}
+.navItems a:hover {
+	text-decoration:underline;
 }
 .user {
 	font-size: small;
