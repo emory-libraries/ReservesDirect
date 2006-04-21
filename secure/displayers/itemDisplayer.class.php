@@ -723,7 +723,7 @@ class itemDisplayer extends noteDisplayer {
 				
 				//determine if this is a currently-active class
 				if(($ci->getStatus()=='ACTIVE') && (strtotime($ci->getActivationDate()) <= time()) && (strtotime($ci->getExpirationDate()) >= time())) {
-					$icon = '<img src="../images/astx-green.gif" alt="**" width="15" height="15" />';
+					$icon = '<img src="images/astx-green.gif" alt="**" width="15" height="15" />';
 				}
 				else {
 					$icon = '&nbsp;';
@@ -741,7 +741,7 @@ class itemDisplayer extends noteDisplayer {
 
 			</table>
 			<div style="padding:8px; border-top:1px solid #333333;">
-				<img src="../images/astx-green.gif" alt="**" width="15" height="15" /> = classes currently using this item
+				<img src="images/astx-green.gif" alt="**" width="15" height="15" /> = classes currently using this item
 			</div>
 		</div>
 	</div>
