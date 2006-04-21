@@ -370,7 +370,7 @@ class classDisplayer extends baseDisplayer {
 			<div id="class_enrollment" class="classEnrollmentOptions">
 				<strong>Enrollment Type:</strong>
 				<?php self::displayEnrollmentSelect($ci->getEnrollment(), true); ?>
-				<input type="submit" name="setEnrollment" value="Set Enrollment">
+				<input type="submit" name="setEnrollment" value="Set Enrollment" style="margin-top:5px;">
 			</div>
 			<div id="class_roll" class="classRoll">
 				<div class="classRollPending">
@@ -385,7 +385,7 @@ class classDisplayer extends baseDisplayer {
 					<small>Select a name from the menu and click "Add Student to Roll"</small>
 					<br />
 					<input type="hidden" name="rollAction" id="rollActionAdd" value="" />
-					<input type="submit" name="submit" value="Add Student to Roll" onclick="javascript: document.getElementById('rollActionAdd').value='add';" />
+					<input type="submit" name="submit" value="Add Student to Roll" onclick="javascript: document.getElementById('rollActionAdd').value='add';" style="margin-top:5px;" />
 					<p />
 <?php	if(!empty($pending_roll)): ?>
 					<strong>Students requesting to join this class:</strong>
