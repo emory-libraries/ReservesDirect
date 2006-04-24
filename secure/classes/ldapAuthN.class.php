@@ -61,8 +61,7 @@ class ldapAuthN	{
 			return $this->user_authed;	//return previous result
 		}
 		
-		//if the username is new, make sure it's not blank
-		//do not require the pass, in case some systems allow non-passworded accounts (i have no idea why they would)
+		//requires username and password
 		if(empty($user) || empty($pass)) {
 			return false;	//return false if it is
 		}
