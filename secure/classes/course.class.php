@@ -61,7 +61,7 @@ class course
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql1 = "INSERT INTO courses (department_id, course_number, uniform_title) VALUES (0, NULL, NULL, NULL, 't')";
+				$sql1 = "INSERT INTO courses (uniform_title) VALUES ('')";
 				$sql2 = "SELECT LAST_INSERT_ID() FROM courses";
 				$sql3 = "INSERT INTO course_aliases (course_id, course_instance_id, course_name, section) VALUES (!, !, NULL, NULL)";
 				$sql4 = "SELECT LAST_INSERT_ID() FROM course_aliases";
