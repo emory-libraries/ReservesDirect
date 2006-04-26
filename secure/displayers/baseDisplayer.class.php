@@ -282,9 +282,10 @@ abstract class baseDisplayer {
 	 * @return void
 	 * @param courseInstance $ci Reference to a Course Instance object
 	 * @param mixed $default_heading (optional) Pre-select the option matching this value. null = no selection, 'root' = main list, <id> = folder id
+	 * @param boolean $truncate_heading (optional) If true, will trunkate the heading to the first 30 chars.
 	 * @desc displays a <select> box that shows all available folders (headings) for a given CI
 	 */
-	public function displayHeadingSelect(&$ci, $default_heading=null) {
+	public function displayHeadingSelect(&$ci, $default_heading=null, $truncate_heading=false) {
 		//get headings as a tree + recursive iterator
 		$walker = $ci->getReservesAsTreeWalker('getHeadings');
 		
@@ -299,6 +300,9 @@ abstract class baseDisplayer {
 			$heading = new reserve($leaf->getID());
 			$heading->getItem();
 			$label = str_repeat('&nbsp;&nbsp;', ($walker->getDepth()+1)).$heading->item->getTitle();
+			if($truncate_heading) {
+				$label = substr($label, 0, 30).'...';
+			}
 			//pre-select a heading
 			$select_other = ($leaf->getID()==$default_heading) ? ' selected="selected"' : '';
 ?>	

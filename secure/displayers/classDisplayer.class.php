@@ -315,7 +315,7 @@ class classDisplayer extends baseDisplayer {
 				</tr>
 				<tr valign="middle">
 					<td class="headingCell1" style="text-align:right; padding:2px;" align="right" colspan="2">
-						Add checked items to a heading: <?php self::displayHeadingSelect($ci); ?>
+						Add checked items to a heading: <?php self::displayHeadingSelect($ci, null, true); ?>
 						<input type="submit" name="" value="Submit">
 						&nbsp;&nbsp;
 						<select name="reserveListAction">
@@ -333,7 +333,6 @@ class classDisplayer extends baseDisplayer {
 			<p />
 			<form method="post" id="tsv_export_form" name="tsv_export_form" action="tsvGenerator.php">
 				<input type="hidden" name="dataSet" value="<?=urlencode(serialize($dataSet))?>">
-                <input type="submit" name="exportTsv" value="Export to Spreadsheet">
             </form>
 		</div>
 <?php
