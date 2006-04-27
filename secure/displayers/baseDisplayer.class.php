@@ -67,34 +67,20 @@ abstract class baseDisplayer {
 	 * @return void
 	 * @param reserve $reserve Reference to a reserve object
 	 * @param string $block_style String added to the main <div> to style it
-	 * @param boolean $edit_options If set to true, will display editing options. If false, will show student view
-	 * @desc outputs HTML showing information about a reserve plus aditional links and info.  For use in class/reserve lists.
+	 * @desc outputs HTML showing information about a reserve plus aditional links and info to edit reserve.  For use in class/reserve lists.
 	 */
-	public function displayReserveRow(&$reserve, $block_style='', $edit_options=false) {
+	public function displayReserveRowEdit(&$reserve, $block_style='') {
 		if(!($reserve->item instanceof reserveItem)) {
 			$reserve->getItem();	//pull in item info
 		}
 		
+		$checkbox_onchange = '';
 		if($reserve->item->isHeading()) {	//style as heading
 			$block_style ='class="headingCell2"';
+			$checkbox_onchange = 'onchange="javascript:alert(\'Checking this box will affect everything in this folder\')"';
 		}
-?>
-	
-	<div <?=$block_style?> >
-
-<?php	if($reserve->hidden): ?>
-		<div class="hiddenItem">
-<?php	endif; ?>
-
-		
-		
-<?php
-		//are we editing?
-		if($edit_options):	//yes, show editing info and options
-			//if item is heading, warn on checkbox click
-			$checkbox_onchange = $reserve->item->isHeading() ? 'onchange="javascript:alert(\'Checking this box will affect everything in this folder\')"' : '';
-			$meta_style = 'metaBlock';
-?>
+?>	
+	<div <?=$block_style?>>
 		<div class="editOptions">
 			<div class="itemNumber">
 				<?=$reserve->counter?>
@@ -112,24 +98,48 @@ abstract class baseDisplayer {
 				<span class="<?=common_getStatusStyleTag($reserve->status)?>"><?=$reserve->status?></span>
 			</div>
 		</div>
-<?php	
-		else:	//not editing -- "student view"
-			//if item is hidden, mark it as such
-			$checkbox_checked = ((isset($reserve->hidden) && $reserve->hidden) || (isset($reserve->selected) && $reserve->selected)) ? 'checked="checked"' : '';
-			//if item is heading, warn on checkbox click
-			$checkbox_onchange = $reserve->item->isHeading() ? 'onchange="javascript:alert(\'Checking/Unchecking this box will hide/unhide everything in this folder\')"' : '';
-			$meta_style = 'metaBlock-wide';
+		
+		<?php self::displayReserveInfo($reserve, 'class="metaBlock"'); ?>
 
-			
+		<!-- hack to clear floats -->
+		<div style="clear:both;"></div>
+		<!-- end hack -->
+	</div>
+<?php
+	}
+	
+	
+	/**
+	 * @return void
+	 * @param reserve $reserve Reference to a reserve object
+	 * @param string $block_style String added to the main <div> to style it
+	 * @desc outputs HTML showing information about a reserve plus aditional links for students.  For use in class/reserve lists.
+	 */
+	public function displayReserveRowView(&$reserve, $block_style='') {
+		if(!($reserve->item instanceof reserveItem)) {
+			$reserve->getItem();	//pull in item info
+		}
+		
+		$checkbox_onchange = '';
+		if($reserve->item->isHeading()) {	//style as heading
+			$block_style ='class="headingCell2"';
+			$checkbox_onchange = 'onchange="javascript:alert(\'Checking/Unchecking this box will hide/unhide everything in this folder\')"';
+		}
+		
+		$checkbox_checked = ((isset($reserve->hidden) && $reserve->hidden) || (isset($reserve->selected) && $reserve->selected)) ? 'checked="checked"' : '';
 ?>
+	
+	<div <?=$block_style?>>
+
+<?php	if($reserve->hidden): ?>
+		<div class="hiddenItem">
+<?php	endif; ?>
 
 			<div class="checkBox-right">
 				<input type="checkbox" <?=$checkbox_checked?> name="selected_reserves[]" value="<?=$reserve->getReserveID()?>" <?=$checkbox_onchange?> />
 			</div>
 		
-<?php		endif; ?>
-		
-<?php	self::displayReserveInfo($reserve, 'class="'.$meta_style.'"'); ?>
+			<?php self::displayReserveInfo($reserve, 'class="metaBlock-wide"'); ?>
 
 <?php	if($reserve->hidden): ?>
 		</div>
@@ -146,135 +156,151 @@ abstract class baseDisplayer {
 	/**
 	 * @return void
 	 * @param reserve $reserve Reference to a reserve object
+	 * @param string $block_style String added to the main <div> to style it
+	 * @desc outputs HTML showing information about a reserve; no addition functionality.  For use in class/reserve lists.
+	 */
+	public function displayReserveRowPreview(&$reserve, $block_style='') {
+		if(!($reserve->item instanceof reserveItem)) {
+			$reserve->getItem();	//pull in item info
+		}
+
+		if($reserve->item->isHeading()) {	//style as heading
+			$block_style ='class="headingCell2"';
+		}
+?>	
+	<div <?=$block_style?>>
+		<?php self::displayReserveInfo($reserve, 'class="metaBlock-wide"'); ?>
+		<!-- hack to clear floats -->
+		<div style="clear:both;"></div>
+		<!-- end hack -->
+	</div>
+<?php
+	}
+	
+	
+	/**
+	 * @return void
+	 * @param reserve $reserve Reference to a reserve object
 	 * @param string $row_style styles the row
 	 * @desc outputs HTML showing information about a reserve.  For use in class/reserve lists.
 	 */
-	public function displayReserveInfo(&$reserve, $meta_style) {
+	public function displayReserveInfo(&$reserve, $meta_style='') {
 		global $u, $g_reservesViewer;
-	
-		//collect and set data	
-		
+
 		if(!($reserve->item instanceof reserveItem)) {
 			$reserve->getItem();	//pull in item info
 		}
 		
-		if(!$reserve->item->isHeading()) {	//if not heading/folder, assign all the pertinent info
-			$title = $reserve->item->getTitle();
-			$author = $reserve->item->getAuthor();
-			$url = $reserve->item->getURL();
-			$performer = $reserve->item->getPerformer();
-			$volTitle = $reserve->item->getVolumeTitle();
-			$volEdition = $reserve->item->getVolumeEdition();
-			$pagesTimes = $reserve->item->getPagesTimes();
-			$source = $reserve->item->getSource();
-			$itemIcon = $reserve->item->getItemIcon();
-			
+		$notes = $reserve->getNotes(true);	//get notes
+		
+		#=== heading ===#
+		
+		//only show basic info about a heading
+		if($reserve->item->isHeading()):
+?>
+		<div class="headingText" style="border:0px solid red;">
+<?php
+			echo $reserve->item->getTitle();
+			//show notes
+			noteDisplayer::displayNotes($notes);
+?>
+		</div>
+<?php
+			return;	//nothing else to show, so just return
+		endif;
+		
+		#=== reserve ===#
+		
+		//for non-headings show all the meta info
+		$title = $reserve->item->getTitle();
+		$author = $reserve->item->getAuthor();
+		$url = $reserve->item->getURL();
+		$performer = $reserve->item->getPerformer();
+		$volTitle = $reserve->item->getVolumeTitle();
+		$volEdition = $reserve->item->getVolumeEdition();
+		$pagesTimes = $reserve->item->getPagesTimes();
+		$source = $reserve->item->getSource();
+		$itemIcon = $reserve->item->getItemIcon();
+		$viewReserveURL = "reservesViewer.php?reserve=" . $reserve->getReserveID();
+		
+		//for physical items, pull in some other info
+		if($reserve->item->isPhysicalItem()) {
 			$reserve->item->getPhysicalCopy();	//get physical copy info
 			$callNumber = $reserve->item->physicalCopy->getCallNumber();
 			//get home library/reserve desk
 			$lib = new library($reserve->item->getHomeLibraryID());
 			$reserveDesk = $lib->getReserveDesk();
 			
-			if($reserve->item->isPhysicalItem()) {
-				$viewReserveURL = $g_reservesViewer . $reserve->item->getLocalControlKey();
-			}
-			else {
-				$viewReserveURL = "reservesViewer.php?reserve=" . $reserve->getReserveID();
-			}
+			$viewReserveURL = $g_reservesViewer . $reserve->item->getLocalControlKey();
 		}
-		$itemNotes = $reserve->item->getNotes();
-		$reserveNotes = $reserve->getNotes();	
-		
-		//begin display of data
-
-		if($reserve->item->isHeading()):
 ?>
-
-		<div class="headingText" style="border:0px solid red;">
-<?php
-			echo $reserve->item->getTitle();
-			//show notes
-			noteDisplayer::displayNotes($itemNotes);
-			noteDisplayer::displayNotes($reserveNotes);
-?>
-		</div>
-	
-<?php	else: ?>
-
 		<div class="iconBlock">
 			<img src="<?=$itemIcon?>" alt="icon">&nbsp;
 		</div>
 
 		<div <?=$meta_style?>>
-<?php		if($reserve->item->isPhysicalItem()): ?>
-
-			
+		
+<?php	if($reserve->item->isPhysicalItem()): ?>	
+		
 			<span class="itemTitleNoLink"><?=$title?></span>
 			<br />
 			<span class="itemAuthor"><?=$author?></span>
 			<br />
 			<span class="itemMeta"><?=$callNumber?></span>
 			<br />
-			<span class="itemMetaPre">On Reserve at:</span><span class="itemMeta"><?=$reserveDesk?></span> [<a href="<?=$viewReserveURL?>" target="_blank" class="strong">more info</a>]
-	
-<?php		else: ?>
-		
-		
+			<span class="itemMetaPre">On Reserve at:</span><span class="itemMeta"><?=$reserveDesk?></span> [<a href="<?=$viewReserveURL?>" target="_blank" class="strong">more info</a>]	
+			
+<?php	else: ?>
+
 			<a href="<?=$viewReserveURL?>" target="_blank" class="itemTitle" style="margin:0px; padding:0px;"><?=$title?></a>
-		
-		<br />
-					
+			<br />
 			<span class="itemAuthor"><?=$author?></span>
 			
-<?php		endif; ?>
+<?php	endif; ?>
 
 
-<?php		if($performer): ?>
+<?php	if($performer): ?>
 
        		<br />
        		<span class="itemMetaPre">Performed by:</span><span class="itemMeta"><?=$performer?></span>
        		
-<?php		endif; ?>
-<?php		if($volTitle): ?>
+<?php	endif; ?>
+<?php	if($volTitle): ?>
 
        		<br />
        		<span class="itemMetaPre">From:</span><span class="itemMeta"><?=$volTitle?></span>
        		
-<?php		endif; ?>
-<?php		if($volEdition): ?>
+<?php	endif; ?>
+<?php	if($volEdition): ?>
 
        		<br />
        		<span class="itemMetaPre">Volume/Edition:</span><span class="itemMeta"><?=$volEdition?></span>
        		
-<?php		endif; ?>
-<?php		if($pagesTimes): ?>
+<?php	endif; ?>
+<?php	if($pagesTimes): ?>
 
        		<br />
        		<span class="itemMetaPre">Pages/Time:</span><span class="itemMeta"><?=$pagesTimes?></span>
        		
-<?php		endif; ?>
-<?php		if($source): ?>
+<?php	endif; ?>
+<?php	if($source): ?>
 
        		<br />
        		<span class="itemMetaPre">Source/Year:</span><span class="itemMeta"><?=$source?></span>
        		
-<?php		endif; ?>
+<?php	endif; ?>
 
 <?php
-			//show notes
-			noteDisplayer::displayNotes($itemNotes);
-			noteDisplayer::displayNotes($reserveNotes);
+		//show notes
+		noteDisplayer::displayNotes($notes);
 			
-			//show additional info
-			if(!empty($reserve->additional_info)) {
-				echo $reserve->additional_info;
-			}
+		//show additional info
+		if(!empty($reserve->additional_info)) {
+			echo $reserve->additional_info;
+		}
 ?>
-
 		</div>
-
-<?php 	
-		endif; 
+<?php
 	}
 	
 	

@@ -34,7 +34,7 @@ require_once('secure/classes/tree.class.php');
 
 class reservesDisplayer extends noteDisplayer {
 
-	function displayReserves($cmd, &$ci, &$tree_walker, $reserve_count, &$hidden_reserves=null, $no_control=false) {
+	function displayReserves($cmd, &$ci, &$tree_walker, $reserve_count, &$hidden_reserves=null, $preview_only=false) {
         
 		if(!($ci->course instanceof course)) {
 			$ci->getPrimaryCourse();
@@ -43,7 +43,7 @@ class reservesDisplayer extends noteDisplayer {
         // announce rss feed to capable browsers
         echo "<link rel=\"alternate\" title=\"{$ci->course->department->name} {$ci->course->courseNo} {$ci->term} {$ci->year}\" href=\"rss.php?ci={$ci->courseInstanceID}\" type=\"application/rss+xml\"/>\n";
 		
-		$exit_class_link = $no_control ? '<a href="javascript:window.close();">Close Window</a>' : '<a href="index.php">Exit class</a>' ;		
+		$exit_class_link = $preview_only ? '<a href="javascript:window.close();">Close Window</a>' : '<a href="index.php">Exit class</a>' ;		
 ?>
 
 		<div>		
@@ -93,8 +93,10 @@ class reservesDisplayer extends noteDisplayer {
 			<tr align="left" valign="middle">
 				<td class="headingCell1">COURSE MATERIALS</td>
 				<td width="75%" align="right">
+<?php	if(!$preview_only): ?>
 					<input type="submit" name="hideSelected" value="Hide Selected" />
 					<input type="submit" name="showAll" value="Show All" />
+<?php	endif; ?>
 				</td>
 			</tr>
 			<tr valign="middle">
@@ -126,7 +128,12 @@ class reservesDisplayer extends noteDisplayer {
 
 			//display the info
 			echo '<li>';
-			self::displayReserveRow($reserve, 'class="'.$rowStyle.'"');
+			if($preview_only) {
+				self::displayReserveRowPreview($reserve, 'class="'.$rowStyle.'"');
+			}
+			else {
+				self::displayReserveRowView($reserve, 'class="'.$rowStyle.'"');
+			}
 			
 			//start sublist or close list-item?
 			echo ($leaf->hasChildren()) ? '<ul style="list-style:none;">' : '</li>';

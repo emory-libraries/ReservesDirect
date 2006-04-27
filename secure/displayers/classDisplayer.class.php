@@ -294,7 +294,7 @@ class classDisplayer extends baseDisplayer {
 
 			//display the info
 			echo '<li>';
-			self::displayReserveRow($reserve, 'class="'.$rowStyle.'"', true);
+			self::displayReserveRowEdit($reserve, 'class="'.$rowStyle.'"');
 			
 			//start sublist or close list-item?
 			echo ($leaf->hasChildren()) ? '<ul style="list-style:none;">' : '</li>';
