@@ -49,7 +49,7 @@ class itemManager
 
 	function itemManager($cmd, $user)
 	{
-		global $g_permission, $g_documentURL, $page, $loc, $ci;
+		global $g_permission, $g_documentURL, $page, $loc, $ci, $u;
 
 		$this->displayClass = "itemDisplayer";
 		
@@ -240,7 +240,7 @@ class itemManager
 			break;
 
 			case 'editHeading':
-				$page = "myReserves";
+				$page = ($u->getRole() >= $g_permission['staff']) ? 'manageClasses' : 'addReserve';
 				$loc = "edit heading";
 				
 				$headingID = !empty($_REQUEST['headingID']) ? $_REQUEST['headingID'] : null;

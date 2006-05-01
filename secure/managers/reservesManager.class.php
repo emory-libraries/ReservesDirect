@@ -196,7 +196,7 @@ class reservesManager
 			break;
 
 			case 'customSort':
-				$page = "myReserves";
+				$page = ($u->getRole() >= $g_permission['staff']) ? 'manageClasses' : 'myReserves';
 				$loc  = "sort reserves list";
 				
 				$ci = new courseInstance($_REQUEST['ci']);
