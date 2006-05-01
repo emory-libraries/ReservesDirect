@@ -896,7 +896,7 @@ class classDisplayer extends baseDisplayer {
 				<strong>You have successfully created a class. What would you like to do now?</strong>
 				<p />
 				<ul>
-					<li><a href="index.php?cmd=importClass&dst_ci=<?=$ci_id?>">Import materials into this class from another class (Reactivate)</a></li>
+					<li><a href="index.php?cmd=importClass&new_ci=<?=$ci_id?>">Import materials into this class from another class (Reactivate)</a></li>
 					<li><a href="index.php?cmd=addReserve&ci=<?=$ci_id?>">Add materials to this class</a></li>
 					<li><a href="index.php?cmd=editClass&ci=<?=$ci_id?>">Go to this class.</a></li>
 					<li><a href="index.php?cmd=createClass">Create a New Class.</a></li>
@@ -925,7 +925,15 @@ class classDisplayer extends baseDisplayer {
 	}
 	
 	
-	function displayCreateClass($next_cmd, $hidden_fields=null, $msg=null) {
+	/**
+	 * @return void
+	 * @param string $preproc_cmd Command that is originating a call to this method (where should the script return in case of duplicate)
+	 * @param string $postproc_cmd Command to issue after the new class is successfully created [choices limited by switch() in classManager]
+	 * @param array $hidden_fields Data to be passed on as hidden fields
+	 * @param string $msg Helper message to display above the form
+	 * @desc Displays form for creating a new class; sends data to classManager, which actually handles class creation and then forwards user to $postproc_cmd with the ID of the newly-created CI passed in $_REQUEST['new_ci'].
+	 */	
+	function displayCreateClass($preproc_cmd, $postproc_cmd=null, $hidden_fields=null, $msg=null) {
 		global $u, $g_permission;
 		
 		//set defaults if they exists
@@ -935,6 +943,13 @@ class classDisplayer extends baseDisplayer {
 		$course_name = !empty($_REQUEST['course_name']) ? $_REQUEST['course_name'] : '';
 		$term = !empty($_REQUEST['term']) ? $_REQUEST['term'] : '';
 		$enrollment = !empty($_REQUEST['enrollment']) ? $_REQUEST['enrollment'] : '';
+		
+		//add the origin cmd and the next cmd to hidden fields
+		//this will tell the manager where to return in case of a dupe
+		//and where to proceed if class is created successfully
+		$hidden_fields['preproc_cmd'] = $preproc_cmd;
+		$hidden_fields['postproc_cmd'] = $postproc_cmd;
+		
 ?>
 		<script language="JavaScript">
 			function validate(form) {
@@ -1000,7 +1015,7 @@ class classDisplayer extends baseDisplayer {
 		</script>
 		
 		<form name="frmClass" action="index.php" method="post" onSubmit="return validate(this);">	
-			
+			<input type="hidden" name="cmd" value="<?=$preproc_cmd?>" />			
 			<?php self::displayHiddenFields($hidden_fields); ?>
 
 <?php	if(!empty($msg)): ?>
@@ -1092,7 +1107,7 @@ class classDisplayer extends baseDisplayer {
 			</tr>
 		</table>
 		<p />
-		<div style="text-align:center;"><input type="submit" name="Submit" value="Create Course" onClick="this.form.cmd.value='<?=$next_cmd?>';javascript:return validate(document.forms.frmClass);"></div>
+		<div style="text-align:center;"><input type="submit" name="Submit" value="Create Course" onClick="this.form.cmd.value='createNewClass';javascript:return validate(document.forms.frmClass);"></div>
 <?php
 	}
 
@@ -1650,14 +1665,15 @@ class classDisplayer extends baseDisplayer {
 					The course you are attempting to create is already active for this term!  Please double-check the department, course number, section, and term of your course.  If you believe this to be an error, or need further assistance, please contact your Reserves staff. 
 
 <?php	if($u->getRole() >= $g_permission['staff']):	//display additional message to staff ?>
-If you are trying to copy a class to a "new class", please copy "to existing" instead.
+					<p />
+					Staff: If you are trying to copy a class to a "new class", please copy "to existing" instead.
 <?php	endif; ?>
 					
 				</td>
 			</tr>
 			<tr><td>&nbsp;</td></tr>
 			<tr>
-				<td align="left" valign="top" class="borders">
+				<td align="left" valign="top">
 					<table width="100%" border="0" align="center" cellpadding="5" cellspacing="0" class="displayList">
 						<tr align="left" valign="middle" bgcolor="#CCCCCC" class="headingCell1">
 							<td>Course Number</td><td align="left">Course Name</td><td>Instructor</td><td>Active Term</td><td>Reserve List</td>

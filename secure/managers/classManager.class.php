@@ -508,12 +508,9 @@ class classManager
 			case 'createClass':
 				$loc = "create new class";
 
-				$dept = new department();
-				$terms = new terms();
-
-				$msg = 'Create your class below.  You will have a chance to reactivate readings from previous courses on the next screen.';
+//				$msg = 'Create your class below.  You will have a chance to reactivate readings from previous courses on the next screen.';
 				$this->displayFunction = 'displayCreateClass';
-				$this->argList = array('createNewClass', array('cmd'=>'createClass'), $msg);
+				$this->argList = array('createClass', null, null, $msg);
 			break;
 
 			case 'createNewClass':
@@ -534,14 +531,30 @@ class classManager
 					$ci->setEnrollment($request['enrollment']);
 					$ci->setStatus('ACTIVE');
 					
-					//show success screen
-					$this->displayFunction = 'displayCreateSuccess';
-					$this->argList = array($ci->getCourseInstanceID());
+					$new_ci = $ci->getCourseInstanceID();
+					
+					//course is now complete, decide what to do next
+					$postproc_cmd = !empty($_REQUEST['postproc_cmd']) ? $_REQUEST['postproc_cmd'] : '';					
+					switch($postproc_cmd) {
+						case 'importClass':	//turn control over to a different manager
+						case 'processCopyClass':
+							require_once("secure/managers/copyClassManager.class.php");
+							$_REQUEST['new_ci'] = $new_ci;
+							copyClassManager::copyClassManager($postproc_cmd, $u, $_REQUEST);
+						break;
+
+						default:	//do not need to do any post-processing
+							//show success screen
+							$this->displayFunction = 'displayCreateSuccess';
+							$this->argList = array($new_ci);
+					}
 				}
 				else {	//could not create course -- the CI must be a duplicate
 					//display duplicate info
 					$this->displayFunction = 'displayDuplicateCourse';
-					$_REQUEST['cmd'] = 'createClass';	//make sure we go back to the previous screen
+					//make sure we go back to the previous screen
+					$preproc_cmd = !empty($_REQUEST['preproc_cmd']) ? $_REQUEST['preproc_cmd'] : 'createClass';
+					$_REQUEST['cmd'] = $preproc_cmd;
 					$this->argList = array($ci, urlencode(serialize($_REQUEST)));
 				}
 			break;

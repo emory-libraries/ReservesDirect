@@ -44,12 +44,21 @@ class copyClassManager extends baseManager {
 		global $g_permission, $page, $loc, $u;
 
 		$this->displayClass = "copyClassDisplayer";
-		$page = 'manageClasses';
+		//set the page (tab)
+		if($u->getRole() >= $g_permission['staff']) {
+			$page = 'manageClasses';
+		}
+		else {
+			$page = 'myReserves';
+		}
 
 		switch ($cmd)
 		{
-			case 'importClass':			
-				if(!empty($_REQUEST['dst_ci']) && !empty($_REQUEST['ci'])) { //display import options
+			case 'importClass':	
+				$src_ci = !empty($_REQUEST['ci']) ? $_REQUEST['ci'] : null;
+				$dst_ci = !empty($_REQUEST['new_ci']) ? $_REQUEST['new_ci'] : null;
+				
+				if(!empty($dst_ci) && !empty($src_ci)) {	//have both source and destination, display options
 					//get the source ci
 					$ci = new courseInstance($_REQUEST['ci']);
 					//get reserves as a tree + recursive iterator
@@ -57,15 +66,38 @@ class copyClassManager extends baseManager {
 					
 					$loc = 'import class >> import details';
 					$this->displayFunction = 'displayImportClassOptions';
-					$this->argList = array($ci, $walker, $_REQUEST['dst_ci'], 'processCopyClass');
+					$this->argList = array($ci, $walker, $dst_ci, 'processCopyClass');
 				}
-				elseif(empty($_REQUEST['ci'])) {	//need source class
+				elseif(empty($src_ci)) {	//need source ci -- find it
 					$class_list = $u->getCourseInstancesToImport();
 				
 					$loc = 'import class >> select source class';
 					$this->displayFunction = 'displaySelectClass';
-					$this->argList = array('importClass', $class_list, 'Select course to import FROM:', array('dst_ci'=>$_REQUEST['dst_ci']));
-				}				
+					//pass on destination ci, in case it is already set
+					$this->argList = array('importClass', $class_list, 'Select course to import FROM:', array('new_ci'=>$dst_ci));
+				}
+				elseif(empty($dst_ci)) {	//need destination ci -- create it
+					//assume that we already have a source and initialize it
+					$ci = new courseInstance($_REQUEST['ci']);
+					$ci->getCourseForUser();	//get course info
+					$ci->course->getDepartment();	//get the department
+
+					//attempt to pre-fill create-class form by faking the $_REQUEST array	
+					$_REQUEST = array(
+						'department' => $ci->course->department->getDepartmentID(),
+						'section' => $ci->course->getSection(),
+						'course_number' => $ci->course->getCourseNo(),
+						'course_name' => $ci->course->getName(),
+						'enrollment' => $ci->getEnrollment()
+					);
+					//pass on the source CI id
+					$needed_info = array('ci' => $src_ci);
+					
+					$loc = 'import class >> create destination class';
+					$this->displayClass = 'classDisplayer';
+					$this->displayFunction = 'displayCreateClass';
+					$this->argList = array('importClass', 'importClass', $needed_info, 'Create course to import INTO:');								
+				}			
 			break;
 
 			case 'copyClass':
@@ -86,10 +118,8 @@ class copyClassManager extends baseManager {
 				$this->argList = array($sourceClass);				
 			break;
 
-			case 'copyExisting':
-				$loc = 'copy course reserves list >> select destination class';
-				
-				//propogate the info
+			case 'copyExisting':				
+				//propagate the info
 				$needed_info = array();
 				if(!empty($_REQUEST['sourceClass']))	$needed_info['sourceClass'] = $_REQUEST['sourceClass'];
 				if(!empty($_REQUEST['copyReserves']))	$needed_info['copyReserves'] = $_REQUEST['copyReserves'];
@@ -101,17 +131,13 @@ class copyClassManager extends baseManager {
 				
 				$class_list = $u->getCourseInstancesToEdit();
 
+				$loc = 'copy course reserves list >> select destination class';
 				$this->displayFunction = 'displaySelectClass';
 				$this->argList = array('processCopyClass', $class_list, 'Select class to copy TO:', $needed_info);	
 			break;
 
-			case 'copyNew':
-				$loc = 'copy course reserves list >> create destination class';
-				
-				$dept = new department();
-				$terms = new terms();
-				
-				//propogate the info
+			case 'copyNew':				
+				//propagate the info
 				$needed_info = array();
 				if(!empty($_REQUEST['sourceClass']))	$needed_info['sourceClass'] = $_REQUEST['sourceClass'];
 				if(!empty($_REQUEST['copyReserves']))	$needed_info['copyReserves'] = $_REQUEST['copyReserves'];
@@ -120,58 +146,35 @@ class copyClassManager extends baseManager {
 				if(!empty($_REQUEST['copyInstructors']))	$needed_info['copyInstructors'] = $_REQUEST['copyInstructors'];
 				if(!empty($_REQUEST['copyProxies']))	$needed_info['copyProxies'] = $_REQUEST['copyProxies'];
 				if(!empty($_REQUEST['deleteSource']))	$needed_info['deleteSource'] = $_REQUEST['deleteSource'];
-				$needed_info['cmd'] = 'copyNew';
-				$needed_info['copyNew'] = 'copyNew';
 
+				$loc = 'copy course reserves list >> create destination class';
 				$this->displayClass = 'classDisplayer';
 				$this->displayFunction = 'displayCreateClass';
-				$this->argList = array('processCopyClass', $needed_info);
+				$this->argList = array('copyNew', 'processCopyClass', $needed_info, 'Create course to copy TO:');	
 			break;
 
 			case 'processCopyClass':
 				//determine if we are copying or importing
 				$importing = isset($_REQUEST['importClass']) ? true : false;
-
-				if(isset($request['copyNew'])) {
-					$t = new term($request['term']);
-					$ci = new courseInstance(null);
-									
-					//attempt to create the course instance
-					if($ci->createCourseInstance($request['department'], $request['course_number'], $request['course_name'], $request['section'], $t->getTermYear(), $t->getTermName())) {	//course created successfully, insert data
-						$ci->addInstructor($ci->getPrimaryCourseAliasID(), $request['selected_instr']);
-						$ci->setTerm($t->getTermName());
-						$ci->setYear($t->getTermYear());
-						$ci->setActivationDate(date('Y-m-d', strtotime($request['activation_date'])));
-						$ci->setExpirationDate(date('Y-m-d', strtotime($request['expiration_date'])));
-						$ci->setEnrollment($request['enrollment']);
-						$ci->setStatus('ACTIVE');	
-						
-						$request['ci']=$ci->getCourseInstanceID();	//this will be picked up as $targetClass after this block
-						unset($ci);						
-					}
-					else {	//could not create course -- the CI must be a duplicate
-						//display duplicate info
-						$this->displayClass = 'classDisplayer';
-						$this->displayFunction = 'displayDuplicateCourse';						
-						$_REQUEST['cmd'] = 'copyNew';	//leave a trail to return back here
-						$this->argList = array($ci, urlencode(serialize($_REQUEST)));
-						
-						//break out of the case if we hit a dupe
-						break;
-					}
-				}
-
-				$copyStatus = array();
 				
-				if (isset($request['sourceClass'])) {
-					$sourceClass = new courseInstance($request['sourceClass']);
+				//init the source class
+				if(!empty($_REQUEST['sourceClass'])) {
+					$sourceClass = new courseInstance($_REQUEST['sourceClass']);
 					$sourceClass->getPrimaryCourse();
 				}
-
-				if (isset($request['ci'])) {
-					$targetClass = new courseInstance($request['ci']);
-					$targetClass->getPrimaryCourse();
+				//figure out the destination class ID
+				if(!empty($_REQUEST['ci'])) {
+					$dst_ci = $_REQUEST['ci'];	//destination class selected from existing classes
 				}
+				elseif(!empty($_REQUEST['new_ci'])) {
+					$dst_ci = $_REQUEST['new_ci'];	//destination class has just been created
+				}
+				//init the destination class
+				$targetClass = new courseInstance($dst_ci);
+				$targetClass->getPrimaryCourse();
+				
+				//init an array to store progress of import/copy/merge process				
+				$copyStatus = array();
 				
 				//make sure that user is not trying to merge the same course
 				if($sourceClass->getCourseInstanceID() == $targetClass->getCourseInstanceID()) {
