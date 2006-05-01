@@ -72,7 +72,8 @@ class searchManager
 				$loc  = "search for documents";
 			
 				//$this->search_sql_statement = (isset($request['sql']) && $request['sql'] != '') ? stripslashes(urldecode($request['sql'])) : null;
-        		$search_array = (isset($_GET['search'])) ? unserialize(urldecode($_GET['search'])) : unserialize(urldecode($request['search']));
+        		//$search_array = (isset($_GET['search'])) ? unserialize(urldecode($_GET['search'])) : unserialize(urldecode($request['search']));
+        		$search_array = is_string($_REQUEST['search']) ? unserialize(urldecode($_REQUEST['search'])) : $_REQUEST['search'];
 				
 				$items = $this->doSearch($search_array, $request['limit'], $request['item'], $request['sort']);
 				
@@ -227,7 +228,7 @@ class searchManager
 					; 
 					
 					$sql_add = "";
-print_r($search); echo "<hr>";					
+									
 					for($i=0;$i<count($search);$i++)
 					{
 						if ($search[$i]['field'] == 'n.note')
