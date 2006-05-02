@@ -322,10 +322,10 @@ class classManager
 					//if not empty, set activation and expiration dates
 					//try to convert dates to proper format
 					if(!empty($_REQUEST['activation'])) {
-						$ci->setActivationDate(date('Y-m-d', strtotime($_REQUEST['activation'])));
+						$ci->setActivationDate($_REQUEST['activation']);
 					}
 					if(!empty($_REQUEST['expiration'])) {
-						$ci->setExpirationDate(date('Y-m-d', strtotime($_REQUEST['expiration'])));
+						$ci->setExpirationDate($_REQUEST['expiration']);
 					}
 				}
 				//change enrollment type
@@ -526,8 +526,8 @@ class classManager
 					$ci->addInstructor($ci->getPrimaryCourseAliasID(), $request['selected_instr']);
 					$ci->setTerm($t->getTermName());
 					$ci->setYear($t->getTermYear());
-					$ci->setActivationDate(date('Y-m-d', strtotime($request['activation_date'])));
-					$ci->setExpirationDate(date('Y-m-d', strtotime($request['expiration_date'])));
+					$ci->setActivationDate($request['activation_date']);
+					$ci->setExpirationDate($request['expiration_date']);
 					$ci->setEnrollment($request['enrollment']);
 					$ci->setStatus('ACTIVE');
 					

@@ -35,6 +35,7 @@ require_once("secure/classes/reserveItem.class.php");
 require_once("secure/classes/reserves.class.php");
 require_once("secure/classes/request.class.php");
 require_once('secure/classes/tree.class.php');
+require_once('secure/classes/terms.class.php');
 
 class courseInstance
 {
@@ -606,33 +607,74 @@ class courseInstance
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 
-	function setActivationDate($activationDate)
-	{
+	
+	/**
+	 * @return void
+	 * @param string $activationDate New activation date (YYYY-MM-DD)
+	 * @desc Sets the activation date as long as it's within the boundaries defined by the term; otherwise term boundaries are used
+	 */
+	function setActivationDate($activationDate) {
 		global $g_dbConn;
-
-		$this->activationDate = $activationDate;
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql = "UPDATE course_instances SET activation_date = ? WHERE course_instance_id = !";
+		
+		//get bounding activation date (based on term)
+		//bound = term begin - 1 month
+		$term = new term();
+		$term->getTermByName($this->term, $this->year);
+		//get unix timestamp of the date 1 month before the beginning of term
+		$activation_limit = strtotime("-1 month", strtotime($term->getBeginDate()));
+				
+		//attempt to parse input date that may be in non-standard formats and get unix timestamp
+		$activation_unix_tstamp = strtotime($activationDate);
+		
+		//use either the input or the boundary, whichever occurs at a later date (greater unix tstamp)
+		$proper_tstamp = ($activation_unix_tstamp > $activation_limit) ? $activation_unix_tstamp : $activation_limit;
+		//now build the actual activation date
+		$activation_date = date('Y-m-d', $proper_tstamp);
+		
+		switch($g_dbConn->phptype) {
+			default:	//mysql
+				$sql = "UPDATE course_instances SET activation_date = '$activation_date' WHERE course_instance_id = {$this->courseInstanceID}";
 		}
-		$rs = $g_dbConn->query($sql, array($activationDate, $this->courseInstanceID));
+		$rs = $g_dbConn->query($sql);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		$this->activationDate = $activation_date;
 	}
-
-	function setExpirationDate($expirationDate)
-	{
+	
+	
+	/**
+	 * @return void
+	 * @param string $expirationDate New expiration date (YYYY-MM-DD)
+	 * @desc Sets the expiration date as long as it's within the boundaries defined by the term; otherwise term boundaries are used
+	 */
+	function setExpirationDate($expirationDate) {
 		global $g_dbConn;
-
-		$this->expirationDate = $expirationDate;
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql = "UPDATE course_instances SET expiration_date = ? WHERE course_instance_id = !";
+		
+		//get bounding expiration date (based on term)
+		//bound = term end + 1 month
+		$term = new term();
+		$term->getTermByName($this->term, $this->year);
+		//get unix timestamp of the date 1 month after the end of term
+		$expiration_limit = strtotime("+1 month", strtotime($term->getEndDate()));
+				
+		//attempt to parse input date that may be in non-standard formats and get unix timestamp
+		$expiration_unix_tstamp = strtotime($expirationDate);
+		
+		//use either the input or the boundary, whichever occurs at an earlier date (smaller unix tstamp)
+		$proper_tstamp = ($expiration_unix_tstamp < $expiration_limit) ? $expiration_unix_tstamp : $expiration_limit;
+		//now build the actual expiration date
+		$expiration_date = date('Y-m-d', $proper_tstamp);
+		
+		switch($g_dbConn->phptype) {
+			default:	//mysql
+				$sql = "UPDATE course_instances SET expiration_date = '$expiration_date' WHERE course_instance_id = {$this->courseInstanceID}";
 		}
-		$rs = $g_dbConn->query($sql, array($expirationDate, $this->courseInstanceID));
+		$rs = $g_dbConn->query($sql);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		$this->expirationDate = $expiration_date;
 	}
+	
 
 	function setStatus($status)
 	{

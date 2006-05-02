@@ -35,31 +35,104 @@ class term
 	public $term_year;
 	public $begin_date;
 	public $end_date;
-
-	function term($termID)
-	{
+	
+	
+	function __construct($term_id=null) {
+		if(!empty($term_id)) {
+			$this->getTermByID($term_id);
+		}
+	}
+	
+	
+	/**
+	 * @return boolean
+	 * @param int $term_id Term ID
+	 * @desc Fetches the object, based on term ID. Returns true on success, false otherwise;
+	 */
+	function getTermByID($term_id) {
 		global $g_dbConn;
+		
+		if(empty($term_id)) {
+			return false;
+		}
+		
+		switch($g_dbConn->phptype) {
+			default:	//mysql
+				$sql = "SELECT term_id, sort_order, term_name, term_year, begin_date, end_date FROM terms WHERE term_id = $term_id LIMIT 1";
+		}
+		$rs = $g_dbConn->query($sql);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		if($rs->numRows()==1) {
+			list($this->term_id, $this->sort_order, $this->term_name, $this->term_year, $this->begin_date, $this->end_date) = $rs->fetchRow();
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql = 	"SELECT term_id, sort_order, term_name, term_year, begin_date, end_date "
-				.		"FROM terms "
-				.		"WHERE term_id = !"
-				;
+	
+	/**
+	 * @return boolean
+	 * @param string $date The date; format: YYYY-MM-DD
+	 * @desc If possible, sets this object to the term spanning date and returns true; otherwise returns false;
+	 */
+	public function getTermByDate($date) {
+		global $g_dbConn;
+		
+		if(empty($date)) {
+			$date = date("Y-m-d");
 		}
 
-		$rs = $g_dbConn->query($sql, $termID);
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		switch ($g_dbConn->phptype) {
+			default:	//mysql
+				$sql = "SELECT term_id FROM terms WHERE begin_date <= '$date' AND '$date' <= end_date LIMIT 1";
+		}
 
-		$row = $rs->fetchRow();
-			$this->term_id 		= $row[0];
-			$this->sort_order 	= $row[1];
-			$this->term_name 	= $row[2];
-			$this->term_year 	= $row[3];
-			$this->begin_date 	= $row[4];
-			$this->end_date 	= $row[5];
+		$rs = $g_dbConn->getOne($sql);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		if(empty($rs)) {
+			return false;
+		}
+		else {
+			$this->getTermByID($rs);
+			return true;
+		}
 	}
+	
+	
+	/**
+	 * @return boolean
+	 * @param string $name Term name - spring/summer/fall/etc
+	 * @param int $year Term year - YYYY
+	 * @desc If possible, sets this object to the term matching name/year and returns true; otherwise returns false;
+	 */
+	public function getTermByName($name, $year) {
+		global $g_dbConn;
+		
+		if(empty($name) || empty($year)) {
+			return false;
+		}
+		
+		switch($g_dbConn->phptype) {
+			default:	//mysql
+				$sql = "SELECT term_id FROM terms WHERE term_name = '$name' AND term_year = $year LIMIT 1";
+		}
+		
+		$rs = $g_dbConn->getOne($sql);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		if(empty($rs)) {
+			return false;
+		}
+		else {
+			$this->getTermByID($rs);
+			return true;
+		}
+	}
+	
 
 	function getTermID() { return $this->term_id; }
 	function getSortOrder() { return $this->sort_order; }
@@ -68,48 +141,5 @@ class term
 	function getTermYear() { return $this->term_year; }
 	function getBeginDate() { return $this->begin_date; }
 	function getEndDate() { return $this->end_date; }
-
-	/**
-	* @return date
-	* @desc returns the date after which the term becomes modifiable
-	*/
-	function getModifyBeginDate()
-	{
-		$D = explode("-", $this->begin_date);
-
-		$m = $D[1];
-		$d = $D[2];
-		$y = $D[0];
-
-		if ($m == "01"){
-			$m = "12";
-			$y = $y - 1;
-		} else
-			$m = $m - 1;
-
-		return "$y-$m-$d";
-	}
-
-	/**
-	* @return date
-	* @desc returns the date after which the term is nolonger modifiable
-	*/
-	function getModifyEndDate()
-	{
-		$D = explode("-", $this->end_date);
-
-		$m = $D[1];
-		$d = $D[2];
-		$y = $D[0];
-
-		if ($m == "12"){
-			$m = "01";
-			$y = $y + 1;
-		} else
-			$m = $m + 1;
-
-		return "$y-$m-$d";
-	}
-
 }
 ?>

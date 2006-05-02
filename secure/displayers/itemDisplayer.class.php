@@ -620,13 +620,12 @@ class itemDisplayer extends noteDisplayer {
 	 */
 	function displayItemHistory($item) {
 		//get dates and terms
-		$terms = new terms();
 		$creation_date = date('F m, Y', strtotime($item->getCreationDate()));
-		$creation_term = $terms->getTermByDate($item->getCreationDate());
-		$creation_term = ($creation_term instanceof term) ? $creation_term->getTerm() : 'n/a';
+		$creation_term = new term();
+		$creation_term = $creation_term->getTermByDate($item->getCreationDate()) ? $creation_term->getTerm() : 'n/a';
 		$modification_date = date('F m, Y', strtotime($item->getLastModifiedDate()));
-		$modification_term = $terms->getTermByDate($item->getLastModifiedDate());
-		$modification_term = ($modification_term instanceof term) ? $modification_term->getTerm() : 'n/a';
+		$modification_term = new term();
+		$modification_term = $modification_term->getTermByDate($item->getLastModifiedDate()) ? $modification_term->getTerm() : 'n/a';
 		
 		//get creator (if electronic item), or home library (if physical item)
 		if($item->isPhysicalItem()) {	//physical
