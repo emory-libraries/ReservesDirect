@@ -14,8 +14,7 @@ function focusOnForm() {
 	if(document.forms.length > 0) {
 		if(document.forms[0].elements.length > 0) {
 			for(var x=0; x < document.forms[0].elements.length; x++) {
-//alert('x='+x+' id='+document.forms[0].elements[x].id+' value='+document.forms[0].elements[x].value+' type='+document.forms[0].elements[x].type);
-				if(document.forms[0].elements[x].type != "hidden") {
+				if(document.forms[0].elements[x].focus) {	//if element supports focus() method
 					document.forms[0].elements[x].focus();
 					return;
 				}
