@@ -219,8 +219,8 @@ class requestManager
 					//set item & reserve data
 					
 					//dates
-					$reserve->setActivationDate(date('Y-m-d', strtotime($request['reserve_activation_date'])));
-					$reserve->setExpirationDate(date('Y-m-d', strtotime($request['reserve_expiration_date'])));
+					$reserve->setActivationDate($request['reserve_activation_date']);
+					$reserve->setExpirationDate($request['reserve_expiration_date']);
 
 					//if adding multiple items, check display preference
 					if( ($request['selectItemsToDisplay']=='one') && ($x>0) ) {

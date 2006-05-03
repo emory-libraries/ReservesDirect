@@ -349,6 +349,9 @@ class reserve extends Notes {
 	function setActivationDate($date)
 	{
 		global $g_dbConn;
+		
+		//attempt to parse input date that may be in non-standard formats
+		$date = date('Y-m-d', strtotime($date));
 
 		switch ($g_dbConn->phptype)
 		{
@@ -371,6 +374,9 @@ class reserve extends Notes {
 	function setExpirationDate($date)
 	{
 		global $g_dbConn;
+		
+		//attempt to parse input date that may be in non-standard formats
+		$date = date('Y-m-d', strtotime($date));
 
 		switch ($g_dbConn->phptype)
 		{

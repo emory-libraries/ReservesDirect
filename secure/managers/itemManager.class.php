@@ -111,10 +111,10 @@ class itemManager
 							//if not empty, set activation and expiration dates
 							//try to convert dates to proper format
 							if(!empty($_REQUEST['reserve_activation_date'])) {
-								$reserve->setActivationDate(date('Y-m-d', strtotime($_REQUEST['reserve_activation_date'])));
+								$reserve->setActivationDate($_REQUEST['reserve_activation_date']);
 							}
 							if(!empty($_REQUEST['reserve_expiration_date'])) {
-								$reserve->setExpirationDate(date('Y-m-d', strtotime($_REQUEST['reserve_expiration_date'])));
+								$reserve->setExpirationDate($_REQUEST['reserve_expiration_date']);
 							}		
 						}
 						
