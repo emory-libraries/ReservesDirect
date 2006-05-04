@@ -48,25 +48,13 @@ require_once("secure/managers/noteManager.class.php");
 
 require_once("secure/functional_permissions.inc.php");
 
+//set up error-handling/debugging, skins, etc.
 require_once("secure/session.inc.php");
 
-// we will do our own error handling
-if (isset($_SESSION['debug']))
-{
-	error_reporting(E_ALL);
-	echo "<pre>";print_r($_REQUEST);echo "</pre><hr>";
-} else {
-	error_reporting(0);
-	$old_error_handler = set_error_handler("common_ErrorHandler");
-}
+//authenticate user
+//if user is valid, then initializes global user object as $u
+//else shows login page
 
-$userName = $_SESSION['username'];
-$userClass = $_SESSION['userClass'];
-
-//init user based on type
-$u = new user();
-$usersObject = new users();
-$u = $usersObject->initUser($userClass, $userName);
 require_once('secure/auth.inc.php');
 
 //read cmd

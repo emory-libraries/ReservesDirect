@@ -35,8 +35,9 @@ class ldapAuthN	{
 	private $conn;	//LDAP resource link identifier
 	private $username;	//username
 	private $password;	//password
-	private $user_info;	//a subset of the user's LDAP record
+	private $user_found;	//boolean stores search result
 	private $user_authed;	//boolean stores the authentication result
+	private $user_info;	//a subset of the user's LDAP record
 	
 	
 	/**
@@ -45,7 +46,7 @@ class ldapAuthN	{
 	 */
 	public function ldapAuthN() {
 		$this->conn = $this->user_info = $this->username = $this->password = null;
-		$this->user_authed = false;
+		$this->user_authed = $this->user_found = false;
 	}
 
 	
@@ -76,7 +77,8 @@ class ldapAuthN	{
 //not sure if should trigger error
 //or try another auth method
 //
-			trigger_error('LDAP: connection failed.', E_USER_ERROR);
+return false;
+//			trigger_error('LDAP: connection failed.', E_USER_ERROR);
 		}
 		
 		//search for the user in the directory
@@ -91,6 +93,15 @@ class ldapAuthN	{
 		$this->disconnect();
 		
 		return $this->user_authed;
+	}
+	
+	
+	/**
+	 * @return boolean
+	 * @desc returns true if user was found with LDAP (only true if LDAP returned exactly 1 entry)
+	 */
+	public function userExists() {
+		return $this->user_found;
 	}
 	
 	
@@ -149,6 +160,7 @@ class ldapAuthN	{
 		global $g_ldap;
 		
 		$this->user_info = null;	//clean out any previous info
+		$this->user_found = false;	//set this user to "not found" by default
 		
 		//bind to the LDAP w/ search credentials
 		if(ldap_bind($this->conn, $g_ldap['searchdn'], $g_ldap['searchpw'])) {	//if bound successfully, search for the user			
@@ -165,14 +177,12 @@ class ldapAuthN	{
 				
 				if($info['count'] == 1) {	//if only one record returned, then successfully found the user
 					$this->user_info = $info[0];	//grab the first record
+					$this->user_found = true;
 					return true;
-				}
-				elseif ($info['count'] == 0) {
-					echo $this->username . " not found in LDAP";
-					return false;
 				}
 			}
 		}
+		
 		return false;
 	}
 }

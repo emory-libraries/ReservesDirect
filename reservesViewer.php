@@ -33,14 +33,18 @@ http://www.reservesdirect.org/
 	require_once("secure/classes/reserveItem.class.php");
 	require_once("secure/classes/user.class.php");
 	require_once("secure/classes/skins.class.php");
-	
-	include("secure/session.inc.php");
-	include("statusCodes.php");
+	include("statusCodes.php");	
+    
+	//set up error-handling/debugging, skins, etc.
+	require_once("secure/session.inc.php");	
 	
 	header("Cache-control: private");	//send some headers
     header("Pragma: public");
 	
-	$user = new user($_SESSION['userID']);	//grab current user from session
+	//authenticate user
+	//if user is valid, then initializes global user object as $u
+	//else shows login page
+	require_once('secure/auth.inc.php');
 	
 	//get the reserve/item
 	//When previewing items we do not have a reserve_id and must use the item_id to view the URL
@@ -48,16 +52,16 @@ http://www.reservesdirect.org/
 	if(isset($_REQUEST['reserve'])) {	//requesting reserve
 		$reserve = new reserve($_REQUEST['reserve']);
 		
-		if($reserve->getItemForUser($user)) {	//make sure this user should be allowed access to the reserve
+		if($reserve->getItemForUser($u)) {	//make sure this user should be allowed access to the reserve
 			$item =& $reserve->item;	//grab the item for info
 		}
 	
 		//since a reserve was requested, track the views
-		if($user->getRole() < $g_permission['instructor']) {	//only count student views
-			$reserve->addUserView($user->getUserID());	//log user, reserve and access time
+		if($u->getRole() < $g_permission['instructor']) {	//only count student views
+			$reserve->addUserView($u->getUserID());	//log user, reserve and access time
 		}
 	}
-	elseif(isset($_REQUEST['item']) && ($user->getRole() >= $g_permission['proxy'])) {	//requesting item		
+	elseif(isset($_REQUEST['item']) && ($u->getRole() >= $g_permission['proxy'])) {	//requesting item		
 		$item = new reserveItem($_REQUEST['item']);	//grab the item for info
 	} 
 	

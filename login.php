@@ -1,12 +1,14 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<title>ReservesDirect Demo</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-<link rel="stylesheet" href="css/standalone_login.css" type="text/css">
-</head>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<body>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<title>ReservesDirect Login</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		<link rel="stylesheet" href="css/standalone_login.css" type="text/css">
+	</head>
+
+	<body>
+		
 <table width="600" border="0" align="center" cellpadding="10" cellspacing="0" bgcolor="#FFFFFF" class="borders2">
   <tr align="left" valign="top"> 
     <td width="50%">&nbsp;</td>
@@ -27,16 +29,15 @@
               <tr> 
                 <td height="103" colspan="3" align="left" valign="top"> 
                 
-                <form name="RDlogin" method="post" action="index.php">
+                <form name="RDlogin" method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
                 <table width="100%" border="0" align="center" cellpadding="5" cellspacing="0" class="loginBox" height="44">
                   <tr valign="top">
                     <td width="11%" height="10">&nbsp; </td>
                     <td width="75%">
                       <div id="loginText">
-					  <? 
-					  	if (isset($_REQUEST['1']))
-   						echo "<font color=\"red\">Invalid username or password</font>\n";
-					  ?>
+					  <?php if($login_error): ?>
+					  	<font color="red">Invalid username or password</font>
+					  <?php endif; ?>
 					  <p><strong>Username:</strong>
                           <input name="username" type="text" size="15"></p> 
                           
@@ -68,6 +69,6 @@
     <td colspan="2"><p align="center" class="small">For documentation and support, visit <a href="https://www.reservesdirect.org"><strong>ReservesDirect.org</strong></a></p></td>
   </tr>
 </table>
-</body>
-</html>
 
+	</body>
+</html>

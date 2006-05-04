@@ -30,6 +30,9 @@ http://www.reservesdirect.org/
 *******************************************************************************/
 require_once("secure/classes/user.class.php");
 require_once("secure/classes/courseInstance.class.php");
+//require the admin interface
+//this will require all the other interfaces (cascade)
+require_once('secure/interface/admin.class.php');
 
 class users
 {
@@ -38,8 +41,7 @@ class users
 	function users() { $userList = null; }
 
 	function initUser($userClass, $userName)
-	{
-	
+	{	
 		//When comparing a string and an int, PHP will convert the string to an int/float.
 		//Any string not containing a digit will become 0 (zero) --> ex: intval('admin') => 0)
 		//Because of this the numeric cases of the switch below must be expressed as strings --> ex: '0'

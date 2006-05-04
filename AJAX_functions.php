@@ -38,12 +38,13 @@ http://www.reservesdirect.org/
 	require_once("PEAR/JSON.php");
 	require_once("secure/common.inc.php");
 	
-	//need to re-establish current user from session
-	//this should throw an error if the user is not valid
-	require_once("secure/session.inc.php");
-	//init user based on type
-	$usersObject = new users();
-	$u = $usersObject->initUser($_SESSION['userClass'], $_SESSION['username']);
+	//set up error-handling/debugging, skins, etc.
+	//require_once("secure/session.inc.php");
+	
+	//authenticate user
+	//if user is valid, then initializes global user object as $u
+	//else shows login page
+	require_once('secure/auth.inc.php');
 	
 	//process passed arguments
 	$f = $_REQUEST['f'];
