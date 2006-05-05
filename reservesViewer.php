@@ -36,7 +36,7 @@ http://www.reservesdirect.org/
 	include("statusCodes.php");	
     
 	//set up error-handling/debugging, skins, etc.
-	require_once("secure/session.inc.php");	
+	//require_once("secure/session.inc.php");	
 	
 	header("Cache-control: private");	//send some headers
     header("Pragma: public");
