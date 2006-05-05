@@ -48,6 +48,7 @@ class classDisplayer extends baseDisplayer {
 		echo "					<td width=\"33%\" class=\"borders\">\n";
 		echo "						<ul>\n";
 		echo "							<li><a href=\"index.php?cmd=createClass\" align=\"center\">Create Class</a></li>\n";
+		echo "							<li><a href=\"index.php?cmd=importClass\">Reactivate Class</a></li>\n";		
 		echo "							<li><a href=\"index.php?cmd=editClass\">Edit Class</a></li>\n";
 		echo "							<li><a href=\"index.php?cmd=deleteClass\">Delete Class</a></li>\n";
 		echo "						</ul>\n";
