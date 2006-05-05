@@ -1221,11 +1221,25 @@ function displayCustomSort(&$ci, &$reserves) {
 			function highlightElement(element_id, onoff) {
 				if(document.getElementById(element_id)) {
 					if(onoff) {
-						document.getElementById(element_id).className = 'highlight';
+						document.getElementById(element_id).className = 'highlight';	
 					}
 					else {
 						document.getElementById(element_id).className = '';
 					}
+					
+					//enable/disable the form elements
+					toggleDisabled(document.getElementById(element_id).childNodes, !onoff);	
+				}
+			}
+			
+			//disable/enable form elements
+			function toggleDisabled(nodes, onoff) {
+				for(var x = 0; x < nodes.length; x++) {
+					if(nodes[x].disabled != undefined) {
+						nodes[x].disabled = onoff;
+					}					
+					//get all the children too
+					toggleDisabled(nodes[x].childNodes, onoff);
 				}
 			}
 		//-->
@@ -1236,7 +1250,7 @@ function displayCustomSort(&$ci, &$reserves) {
 		<div class="headingCell1" style="width:30%;">EDIT MULTIPLE RESERVES</div>
 		<div id="reserve_details" class="displayArea" style="padding:8px 8px 12px 8px;">	
 			<div class="helperText">
-				Warning: You are editing multiple reserves.  To apply changes, you must select the checkbox next to the set of changes you wish to make.  Any actions you perform will affect all selected reserves.  If you are editing headings, then status and date changes will also affect all reserves in those headings.
+				Warning: You are editing multiple reserves.  Select the checkbox next to the changes you wish to make.
 			</div>
 			<br />
 			
@@ -1253,9 +1267,10 @@ function displayCustomSort(&$ci, &$reserves) {
 						<td>			
 							<fieldset id="reserve_status">
 								<legend>Status</legend>					
-			
+								
 								<input type="radio" name="reserve_status" id="reserve_status_active" value="ACTIVE" />&nbsp;<span class="active">ACTIVE</span>
 								<input type="radio" name="reserve_status" id="reserve_status_inactive" value="INACTIVE" />&nbsp;<span class="inactive">INACTIVE</span>
+								<p><small>If you are editing headings, changes will also affect all reserves in those headings.</small></p>
 							</fieldset>
 						</td>
 					</tr>
@@ -1269,6 +1284,8 @@ function displayCustomSort(&$ci, &$reserves) {
 			
 								From:&nbsp;<input type="text" id="reserve_activation_date" name="reserve_activation_date" size="10" maxlength="10" value="<?=$course_activation_date?>" /> <?=$calendar->getWidgetAndTrigger('reserve_activation_date', $course_activation_date)?>
 								To:&nbsp;<input type="text" id="reserve_expiration_date" name="reserve_expiration_date" size="10" maxlength="10" value="<?=$course_expiration_date?>" />  <?=$calendar->getWidgetAndTrigger('reserve_expiration_date', $course_expiration_date)?>
+								
+								<p><small>If you are editing headings, changes will also affect all reserves in those headings.</small></p>
 							</fieldset>
 						</td>
 					</tr>
@@ -1315,6 +1332,16 @@ function displayCustomSort(&$ci, &$reserves) {
 		</div>
 		<br />
 		<div style="text-align:right; font-weight:bold;"><a href="index.php?cmd=editClass&amp;ci=<?=$ci->getCourseInstanceID()?>">Return to Class</a></div>
+		
+		<script language="JavaScript">
+		//<!--
+			//disable certain form elements by default by default
+			toggleDisabled(document.getElementById('reserve_status').childNodes, true);
+			toggleDisabled(document.getElementById('reserve_dates').childNodes, true);
+			toggleDisabled(document.getElementById('reserve_heading').childNodes, true);
+			toggleDisabled(document.getElementById('reserve_note').childNodes, true);
+		//-->
+		</script>
 <?php
 	}
 
