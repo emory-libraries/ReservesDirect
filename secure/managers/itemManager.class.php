@@ -109,7 +109,6 @@ class itemManager
 						//set dates, if status is ACTIVE
 						if($_REQUEST['reserve_status']=='ACTIVE') {
 							//if not empty, set activation and expiration dates
-							//try to convert dates to proper format
 							if(!empty($_REQUEST['reserve_activation_date'])) {
 								$reserve->setActivationDate($_REQUEST['reserve_activation_date']);
 							}
