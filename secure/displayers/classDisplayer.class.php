@@ -216,7 +216,7 @@ class classDisplayer extends baseDisplayer {
 		
 		<div id="course_materials_block">
 			<form method="post" name="editReserves" action="index.php">		
-				<input type="hidden" name="cmd" value="<?=$next_cmd?>" />
+				<input type="hidden" name="cmd" value="editMultipleReserves" />
 				<input type="hidden" name="ci" value="<?=$ci->getCourseInstanceID()?>" />
 				
 			<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
@@ -315,17 +315,9 @@ class classDisplayer extends baseDisplayer {
 				</tr>
 				<tr valign="middle">
 					<td class="headingCell1" style="text-align:right; padding:2px;" align="right" colspan="2">
-						Add checked items to a heading: <?php self::displayHeadingSelect($ci, null, true); ?>
-						<input type="submit" name="" value="Submit">
-						&nbsp;&nbsp;
-						<select name="reserveListAction">
-							<option selected>For all Selected Items:</option>
-							<option value="copyAll">Copy items to another class</option>
-							<option value="deleteAll">Delete all selected items</option>
-							<option value="activateAll">Set all Selected to ACTIVE</option>
-							<option value="deactivateAll">Set all Selected to INACTIVE</option>
-						</select>
-						<input type="submit" name="modifyReserveList" value="Submit">
+						<input type="submit" name="delete_multiple" value="Delete Selected" />
+						<input type="submit" name="copy_multiple" value="Copy Selected to Another Class" />
+						<input type="submit" name="edit_multiple" value="Edit Selected" />
 					</td>
 				</tr>			
 			</table>
@@ -1301,18 +1293,22 @@ class classDisplayer extends baseDisplayer {
 		$termsObj = new terms();
 		$terms = array();
 		$term_blocks_string = '';
-		//rearrange the info as Array[year][term] = term_obj_id
-		foreach($termsObj->getTerms() as $term) {
-			$terms[$term->getTermYear()][$term->getTermName()] = $term->getTermID();
-		}
-	
-		//separate instructor/proxy lists by term
-		//put in sub-arrays indexed by term_id
+		
+		//the idea is to separate instructor/proxy lists by term
+		//and also order those terms (according to their sort order)
 		$instructor_ci_array = array();
+		$proxy_ci_array = array();
+		foreach($termsObj->getTerms() as $term) {
+			//rearrange the term info as Array[year][term] = term_obj_id to quickly index it by CI-year/term
+			$terms[$term->getTermYear()][$term->getTermName()] = $term->getTermID();
+			//also initialize these arrays, so that the term arrays are in proper order
+			$instructor_ci_array[$term->getTermID()] = array();
+			$proxy_ci_array[$term->getTermID()] = array();
+		}	
+		//put CIs in sub-arrays indexed by term_id
 		foreach($instructor_CIs as $ci) {	//instructor courses
 			$instructor_ci_array[$terms[$ci->year][$ci->term]][] = $ci;
-		}
-		$proxy_ci_array = array();
+		}		
 		foreach($proxy_CIs as $ci) {	//proxy courses
 			$proxy_ci_array[$terms[$ci->year][$ci->term]][] = $ci;
 		}
@@ -1427,6 +1423,9 @@ class classDisplayer extends baseDisplayer {
 			//pre-select first option
 			$select_option = true;
 			foreach(array_keys($instructor_ci_array) as $term_id):
+				if(empty($instructor_ci_array[$term_id])) {
+					continue;	//skip empty term arrays
+				}
 				$term = new term($term_id);
 				$select = ($select_option) ? 'checked="true"' : '';
 ?>

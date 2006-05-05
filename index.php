@@ -122,6 +122,7 @@ switch ($cmd)
 	case 'faxReserve': //addReserve - Fax Reserve Screen
 	case 'getFax': //addReserve - Claim Fax Screen
 	case 'addFaxMetadata': //addReserve - Fax Meta Data Screen
+	case 'storeFaxMetadata': //addReserve - Store Fax Meta Data Screen
 	case 'editMultipleReserves':	//edit common reserve data for multiple reserves in a class
 		require_once("secure/managers/reservesManager.class.php");
 		$mgr = new reservesManager($cmd, $u);

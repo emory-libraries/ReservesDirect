@@ -1184,5 +1184,139 @@ function displayCustomSort(&$ci, &$reserves) {
 <?php
 }
 
+	/**
+	 * @return void
+	 * @param courseInstance object $ci CI containing all of these reserves
+	 * @param array $reserve_ids Array of reserve IDs
+	 * @desc Displays the screen to edit reserve-info of multiple reserves
+	 */
+	function displayEditMultipleReserves(&$ci, $reserve_ids) {
+		global $calendar, $u, $g_permission, $g_notetype;
+		
+		//set default activation/deactivation dates
+		$course_activation_date = $ci->getActivationDate();	
+		$course_expiration_date = $ci->getExpirationDate();
+		
+		//set up note form
+		$available_note_types = array('instructor', 'content', 'staff');	//all note types valid for a reserve		
+		//filter allowed note types based on permission level
+		$restricted_note_types = array('content', 'staff', 'copyright');
+		//filter out restricted notes if role is less than staff
+		if($u->getRole() < $g_permission['staff']) {
+			$available_note_types = array_diff($available_note_types, $restricted_note_types);
+		}
+		
+		//convert $reserve_ids into an associative array so that we can pass it to displayHiddenFields()
+		$reserves_array = array('selected_reserves'=>$reserve_ids);
+?>
+		<script language="JavaScript">
+		//<!--			
+			//resets reserve dates
+			function resetDates(from, to) {
+				document.getElementById('reserve_activation_date').value = from;
+				document.getElementById('reserve_expiration_date').value = to;
+			}
+			
+			//highlight a fieldset
+			function highlightElement(element_id, onoff) {
+				if(document.getElementById(element_id)) {
+					if(onoff) {
+						document.getElementById(element_id).className = 'highlight';
+					}
+					else {
+						document.getElementById(element_id).className = '';
+					}
+				}
+			}
+		//-->
+		</script>
+		
+		<div style="text-align:right; font-weight:bold;"><a href="index.php?cmd=editClass&amp;ci=<?=$ci->getCourseInstanceID()?>">Return to Class</a></div>
+		
+		<div class="headingCell1" style="width:30%;">EDIT MULTIPLE RESERVES</div>
+		<div id="reserve_details" class="displayArea" style="padding:8px 8px 12px 8px;">	
+			<div class="helperText">
+				Warning: You are editing multiple reserves.  To apply changes, you must select the checkbox next to the set of changes you wish to make.  Any actions you perform will affect all selected reserves.  If you are editing headings, then status and date changes will also affect all reserves in those headings.
+			</div>
+			<br />
+			
+			<form id="edit_multiple_form" name="edit_multiple_form" method="post" action="index.php">
+				<input type="hidden" name="ci" value="<?=$ci->getCourseInstanceID()?>" />
+				<input type="hidden" name="cmd" value="<?=$_REQUEST['cmd']?>" />
+				<?php self::displayHiddenFields($reserves_array); ?>
+				
+				<table width="100%">
+					<tr>
+						<td width="30" align="center">
+							<input type="checkbox" id="edit_status" name="edit_status" onclick="highlightElement('reserve_status', this.checked)" />
+						</td>
+						<td>			
+							<fieldset id="reserve_status">
+								<legend>Status</legend>					
+			
+								<input type="radio" name="reserve_status" id="reserve_status_active" value="ACTIVE" />&nbsp;<span class="active">ACTIVE</span>
+								<input type="radio" name="reserve_status" id="reserve_status_inactive" value="INACTIVE" />&nbsp;<span class="inactive">INACTIVE</span>
+							</fieldset>
+						</td>
+					</tr>
+					<tr>
+						<td align="center">
+							<input type="checkbox" id="edit_dates" name="edit_dates" onclick="javascript: highlightElement('reserve_dates', this.checked)" />
+						</td>
+						<td>					
+							<fieldset id="reserve_dates">
+								<legend>Active Dates (YYYY-MM-DD) <small>[<a href="#" name="reset_dates" onclick="resetDates('<?=$course_activation_date?>', '<?=$course_expiration_date?>'); return false;">Reset dates</a>]</small></legend>						
+			
+								From:&nbsp;<input type="text" id="reserve_activation_date" name="reserve_activation_date" size="10" maxlength="10" value="<?=$course_activation_date?>" /> <?=$calendar->getWidgetAndTrigger('reserve_activation_date', $course_activation_date)?>
+								To:&nbsp;<input type="text" id="reserve_expiration_date" name="reserve_expiration_date" size="10" maxlength="10" value="<?=$course_expiration_date?>" />  <?=$calendar->getWidgetAndTrigger('reserve_expiration_date', $course_expiration_date)?>
+							</fieldset>
+						</td>
+					</tr>
+					<tr>
+						<td align="center">
+							<input type="checkbox" id="edit_heading" name="edit_heading" onclick="javascript: highlightElement('reserve_heading', this.checked)" />
+						</td>
+						<td>				
+							<fieldset id="reserve_heading">
+								<legend>Heading</legend>
+								<?php self::displayHeadingSelect($ci); ?>
+							</fieldset>
+						</td>
+					</tr>
+					<tr>
+						<td align="center">
+							<input type="checkbox" id="edit_note" name="edit_note" onclick="javascript: highlightElement('reserve_note', this.checked)" />
+						</td>
+						<td>				
+							<fieldset id="reserve_note">
+								<legend>Note</legend>
+			
+								<textarea id="note_text" name="note_text" style="width:370px; height:90px; overflow:auto;"></textarea>
+								<br />
+								<small>
+									<strong>Note Type:</strong>
+			<?php
+					$first = true;
+					foreach($available_note_types as $note_type):
+						$checked = $first ? ' checked="true"' : '';
+						$first = false;			
+			?>
+									<input type="radio" id="note_type_<?=$g_notetype[$note_type]?>" name="note_type" value="<?=$g_notetype[$note_type]?>"<?=$checked?> /><?=ucfirst(strtolower($g_notetype[$note_type]))?>
+			<?php	endforeach; ?>
+								</small>
+										
+							</fieldset>
+						</td>
+					</tr>
+				</table>
+				<p />
+				<input type="submit" name="submit_edit_multiple" value="Submit Selected Changes" />
+			</form>
+		</div>
+		<br />
+		<div style="text-align:right; font-weight:bold;"><a href="index.php?cmd=editClass&amp;ci=<?=$ci->getCourseInstanceID()?>">Return to Class</a></div>
+<?php
+	}
+
 }
 ?>

@@ -52,6 +52,7 @@ $functional_permissions = array
 	 'addProxy' 					=> $g_permission['instructor'],
 	 'removeProxy' 					=> $g_permission['instructor'],
 	 'editItem' 					=> $g_permission['proxy'],
+	 'editMultipleReserves'			=> $g_permission['proxy'],
 	 'editHeading' 					=> $g_permission['proxy'],
 	 'processHeading' 				=> $g_permission['proxy'],
 	 'duplicateReserve'				=> $g_permission['staff'],

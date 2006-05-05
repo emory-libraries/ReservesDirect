@@ -1437,3 +1437,30 @@ Copyright Contact Form Definitions
 	border: 1px solid black;
 	text-align: center;"
 }
+
+
+/*
+**************************************
+Fieldsets
+
+NOTE: IE6 (maybe others) is dumb and ignores fieldset/legend css in this file.
+	Just as well, since it does not apply fieldset background css correctly
+**************************************
+*/
+
+fieldset {
+	border: 1px solid #666666;
+	background: #BBBBBB;
+	margin: 5px;
+}
+
+legend {
+	border: 1px solid #666666;
+	background: #DDDDDD;
+	font-weight: bold;
+	padding: 2px;
+}
+
+fieldset.highlight {
+	background: #DDDDDD;
+}

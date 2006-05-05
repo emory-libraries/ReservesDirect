@@ -35,6 +35,8 @@ require_once("secure/classes/request.class.php");
 require_once("secure/classes/faxReader.class.php");
 require_once("secure/classes/itemAudit.class.php");
 //require_once("classes/reserves.class.php");
+require_once('secure/managers/noteManager.class.php');
+require_once('secure/managers/classManager.class.php');
 
 class reservesManager
 {
@@ -521,7 +523,122 @@ class reservesManager
 				$this->displayFunction = "displayReserveAdded";
 				$this->argList = array($user, null, $_REQUEST['ci']);
 			break;
-
+			
+			case 'editMultipleReserves':
+				//determine what we are trying to do with the multiple reserves
+				
+				if(isset($_REQUEST['edit_multiple'])) {	//want to edit some reserve info
+					//show form
+					$ci = new courseInstance($_REQUEST['ci']);					
+					$page = 'addReserve';
+					$loc = 'edit multiple reserves';				
+					$this->displayFunction = 'displayEditMultipleReserves';
+					$this->argList = array($ci, $_REQUEST['selected_reserves']);
+				}
+				else {	//need to perform the action (save edits / delete / copy)
+					//need the CI
+					$ci = new courseInstance($_REQUEST['ci']);
+					
+					//get array of selected reserve IDs
+					$reserve_ids = !empty($_REQUEST['selected_reserves']) ? $_REQUEST['selected_reserves'] : array();
+									
+					//copy reserves
+					if(isset($_REQUEST['copy_multiple'])) {
+						classManager::classManager('copyItems', $u, $adminUser, array('originalClass'=>$_REQUEST['ci'], 'reservesArray'=>$reserve_ids));
+						break;	//do not go further
+					}
+					
+					//determine if need to pull in descendants for selected headings
+					//only need descendants if deleting OR editing status/dates
+					if(isset($_REQUEST['delete_multiple']) || (isset($_REQUEST['submit_edit_multiple']) && (isset($_REQUEST['edit_status']) || isset($_REQUEST['edit_dates'])))) {
+						//get reserve tree
+						$tree = $ci->getReservesAsTree('getReserves');
+						
+						//build a new reserve IDs array that includes all descendants
+						$reserve_ids_with_desc = array();
+						foreach($reserve_ids as $r_id) {
+							//add the reserve
+							if(!isset($reserve_ids_with_desc[$r_id])) {
+								$reserve_ids_with_desc[$r_id] = $r_id;	//index by id to prevent duplicate values
+								$walker = new treeWalker($tree->findDescendant($r_id));	//get the node with that ID
+								foreach($walker as $leaf) {
+									$reserve_ids_with_desc[$leaf->getID()] = $leaf->getID();	//add child to array
+								}
+							}
+						}
+						
+						//go through all reserves and their descendants and delete or set status/dates
+						foreach($reserve_ids_with_desc as $reserve_id) {
+							//init the reserve object
+							$reserve = new reserve($reserve_id);
+							
+							//delete reserve
+							if(isset($_REQUEST['delete_multiple'])) {
+								$reserve->getItem();
+								//delete request for physical items
+								if($reserve->item->isPhysicalItem()) {
+									$request = new request();
+									$request->getRequestByReserveID($reserve_id);
+									$request->destroy();
+								}
+								//delete reserve
+								$reserve->destroy();
+							}
+							else {	//edit
+								//edit status
+								if(isset($_REQUEST['edit_status']) && isset($_REQUEST['reserve_status'])) {
+									//do not allow instructors to change status for a physical item
+									//do not allow anyone to change status of a heading
+									$reserve->getItem();
+									if(!$reserve->isHeading() && (!$reserve->item->isPhysicalItem() || ($u->getRole() >= $g_permission['staff']))) {
+										$reserve->setStatus($_REQUEST['reserve_status']);
+									}
+								}
+								
+								//edit dates
+								if(isset($_REQUEST['edit_dates'])) {
+									//do not change dates of a heading
+									if(!$reserve->isHeading()) {
+										if(!empty($_REQUEST['reserve_activation_date'])) {
+											$reserve->setActivationDate($_REQUEST['reserve_activation_date']);
+										}
+										if(!empty($_REQUEST['reserve_expiration_date'])) {
+											$reserve->setExpirationDate($_REQUEST['reserve_expiration_date']);
+										}
+									}	
+								}
+							}
+						}		
+					}
+					
+					//changes to parent headings and notes do not apply to descendants of a heading					
+					if(isset($_REQUEST['submit_edit_multiple']) && (isset($_REQUEST['edit_heading']) || isset($_REQUEST['edit_note']))) {
+						//go only through the selected reserves
+						foreach($reserve_ids as $reserve_id) {
+							//init reserve object
+							$reserve = new reserve($reserve_id);
+							
+							//edit heading
+							if(isset($_REQUEST['edit_heading']) && !empty($_REQUEST['heading_select'])) {
+								$reserve->setParent($_REQUEST['heading_select']);							
+								//try to insert into sort order
+								$reserve->getItem();
+								$reserve->insertIntoSortOrder($ci->getCourseInstanceID(), $reserve->item->getTitle(), $reserve->item->getAuthor(), $_REQUEST['heading_select']);
+							}
+							
+							//add note
+							if(isset($_REQUEST['edit_note']) && !empty($_REQUEST['note_text'])) {
+								noteManager::saveNote('reserve', $reserve->getReserveID(), $_REQUEST['note_text'], $_REQUEST['note_type']);
+							}							
+						}
+					}
+					
+					//go back to editClass
+					$_REQUEST = array();
+					$_REQUEST['ci'] = $ci->getCourseInstanceID();	//pass CI to editClass
+					classManager::classManager('editClass', $u, null, null);
+				}			
+			break;
 		}
 	}
 }

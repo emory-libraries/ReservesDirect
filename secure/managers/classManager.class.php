@@ -229,93 +229,7 @@ class classManager
 					break;
 				}
 
-				$ci = new courseInstance($_REQUEST['ci']);
-				$reserves = (isset($_REQUEST['selected_reserves'])) ? $_REQUEST['selected_reserves'] : null;
-				
-				
-				//move items to folder
-				if(!empty($_REQUEST['heading_select']) && !empty($reserves)) {
-					foreach($reserves as $r_id) {
-						$reserve = new reserve($r_id);
-											
-						$reserve->setParent($_REQUEST['heading_select']);
-						
-						//try to insert into sort order
-						$reserve->getItem();
-						$reserve->insertIntoSortOrder($ci->getCourseInstanceID(), $reserve->item->getTitle(), $reserve->item->getAuthor(), $_REQUEST['heading_select']);
-					}
-				}
-
-				//perform reserve list action
-				if(isset($_REQUEST['reserveListAction']) && !empty($reserves)) {
-					//make sure the action is performed on all the children too
-					
-					//get reserves data	as tree
-					$tree = $ci->getReservesAsTree('getReserves');
-					
-					$tmp_res = array();
-					foreach($reserves as $r_id) {
-						//add the reserve
-						if(!isset($tmp_res[$r_id])) {
-							$tmp_res[$r_id] = $r_id;	//index by id to prevent duplicate values
-							$walker = new treeWalker($tree->findDescendant($r_id));	//get the node with that ID
-							foreach($walker as $leaf) {
-								$tmp_res[$leaf->getID()] = $leaf->getID();	//add child to array
-							}
-						}
-					}
-					$reserves = $tmp_res;
-
-					//atcion switch
-					switch($_REQUEST['reserveListAction']) {
-						case 'copyAll':
-							classManager::classManager('copyItems', $user, $adminUser, array('originalClass'=>$_REQUEST['ci'], 'reservesArray'=>$reserves));
-							break 2;	//break out of this switch AND the big switch
-						break;
-						
-						case 'deleteAll':
-							foreach($reserves as $r) {
-								$reserve = new reserve($r);
-								$reserve->getItem();
-								if ($reserve->item->isPhysicalItem()) {
-									$reqst = new request();
-									$reqst->getRequestByReserveID($r);
-									$reqst->destroy();
-								}
-								$reserve->destroy();
-							}
-						break;
-						
-						case 'activateAll':
-							foreach($reserves as $r) {
-								$reserve = new reserve($r);
-								
-								//do not allow instructors to change status for a physical item
-								$reserve->getItem();
-								if(!$reserve->item->isPhysicalItem() || ($u->getRole() >= $g_permission['staff'])) {
-									$reserve->setStatus('ACTIVE');
-								}
-							}
-						break;
-
-						case 'deactivateAll':
-							foreach($reserves as $r) {
-								$reserve = new reserve($r);
-								
-								//do not allow instructors to change status for a physical item
-								$reserve->getItem();
-								if(!$reserve->item->isPhysicalItem() || ($u->getRole() >= $g_permission['staff'])) {
-									//Headings always have a status of active
-									if (!$reserve->isHeading()) {
-										$reserve->setStatus('INACTIVE');
-									}
-								}									
-							}
-						break;
-					}
-				}
-					
-				//perform other actions
+				$ci = new courseInstance($_REQUEST['ci']);				
 				
 				//update class dates
 				if(isset($_REQUEST['updateClassDates'])) {
@@ -598,8 +512,7 @@ class classManager
 			break;
 			
 			case 'copyItems':
-				$loc = "copy reserve items to another class";
-				
+				$loc = "copy reserve items to another class";			
 				$class_list = $user->getCourseInstancesToEdit();
 				$this->displayFunction = 'displaySelectClass';
 				$this->argList = array('processCopyItems', $class_list, 'Select class to copy TO:', $request);
