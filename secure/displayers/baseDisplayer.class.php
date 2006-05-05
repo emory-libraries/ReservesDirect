@@ -326,7 +326,7 @@ abstract class baseDisplayer {
 			$heading = new reserve($leaf->getID());
 			$heading->getItem();
 			$label = str_repeat('&nbsp;&nbsp;', ($walker->getDepth()+1)).$heading->item->getTitle();
-			if($truncate_heading) {
+			if($truncate_heading && (sizeof($label) > 33)) {
 				$label = substr($label, 0, 30).'...';
 			}
 			//pre-select a heading
