@@ -597,7 +597,7 @@ class courseInstance
 	{
 		global $g_dbConn;
 
-		$this->Year = $year;
+		$this->year = $year;
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
