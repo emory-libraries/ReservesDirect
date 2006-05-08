@@ -116,7 +116,10 @@ function setAuthSession($authenticated, $user=null) {
 /**********************
 	NOT IMPLEMENTED
 **********************/
-function authByNTDom($username, $password) { return false; }
+function authByNTDom($username, $password) { 
+	setAuthSession(false);
+	return false;
+}
 
 
 /**
@@ -138,9 +141,9 @@ function authByLDAP($username, $password) {
 			//get directory info
 			$user_info = $ldap->getUserInfo();
 			//create a new record with directory info
-			$user->createUser($user_info[$g_ldap['cannonicalName']], $user_info[$g_ldap['firstname']], $user_info[$g_ldap['lastname']], $user_info[$g_ldap['email']], 0);
+			$user->createUser($user_info[$g_ldap['canonicalName']][0], $user_info[$g_ldap['firstname']][0], $user_info[$g_ldap['lastname']][0], $user_info[$g_ldap['email']][0], 0);
 		}
-		
+				
 		//user is now authenticated, set the session vars
 		setAuthSession(true, $user);
 		return true;
