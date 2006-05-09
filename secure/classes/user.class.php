@@ -527,7 +527,7 @@ class user
 				if(!empty($enrollment_status)) {
 					$sql .= " AND a.enrollment_status = '$enrollment_status'";
 				}
-				if(!empty($status)) {
+				if(!empty($ci_status)) {
 					$sql .= " AND ci.status = '$ci_status'";
 				}
 				if(!empty($act_date)) {
@@ -547,7 +547,7 @@ class user
 		//query
 		$rs = $g_dbConn->query($sql);
 		if(DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-				
+					
 		$course_instances = array();
 		while($row = $rs->fetchRow()) {
 			$course_instances[] = new courseInstance($row[0]);
