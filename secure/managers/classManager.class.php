@@ -84,20 +84,33 @@ class classManager
 				
 				//get editable CIs for proxy or better
 				//use getDefaultRole (instead of getRole) to account for not-trained instructors
-				if($user->getDefaultRole() >= $g_permission['proxy']) {
+				if($u->getDefaultRole() >= $g_permission['proxy']) {
 					//get current courses, or those that will start within a year
 					//do not get expired courses
 					$activation_date = date('Y-m-d', strtotime('+1 year'));
 					$expiration_date = date('Y-m-d');
 								
-					//get CIs where user is an instructor
-					$ciList_instructor = $user->fetchCourseInstances('instructor', $activation_date, $expiration_date);
+					//get CIs where user is an instructor - separate by CI status
+					$ciList_instructor = array();
+					$tmp = $u->fetchCourseInstances('instructor', $activation_date, $expiration_date, 'ACTIVE');
+					if(!empty($tmp)) {
+						$ciList_instructor['ACTIVE'] = $tmp;
+					}
+					$tmp = $u->fetchCourseInstances('instructor', $activation_date, $expiration_date, 'AUTOFEED');
+					if(!empty($tmp)) {
+						$ciList_instructor['AUTOFEED'] = $tmp;
+					}
+					$tmp = $u->fetchCourseInstances('instructor', $activation_date, $expiration_date, 'CANCELED');
+					if(!empty($tmp)) {
+						$ciList_instructor['CANCELED'] = $tmp;
+					}
+									
 					//get CIs where user is a proxy
-					$ciList_proxy = $user->fetchCourseInstances('proxy', $activation_date, $expiration_date);					
+					$ciList_proxy = $u->fetchCourseInstances('proxy', $activation_date, $expiration_date, 'ACTIVE');					
 				}
 								
 				//get viewable CIs for everyone
-				$ciList_student = $user->getCourseInstances();
+				$ciList_student = $u->getCourseInstances();
 
 				$this->displayFunction = "displayCourseList";
 				$this->argList = array($ciList_student, $ciList_instructor, $ciList_proxy);
@@ -159,27 +172,25 @@ class classManager
 				}
 			break;
 			
-			case 'removeClass':
+			case 'removeClass':	//remove classes from a user's list (deletes access entry)
 				if(!empty($_REQUEST['ci'])) {	//user selected class
 					$ci = new courseInstance($_REQUEST['ci']);
 					$ci->getCourseForUser();
-					$user->leaveClass($ci->course->getCourseAliasID());
+					$u->leaveClass($ci->course->getCourseAliasID());
 					
 					//go to course listing
-					classManager::classManager('viewCourseList', $user, $adminUser, null);
+					classManager::classManager('viewCourseList', $u, $adminUser, null);
 				}
-				else {	//show class list
-					$course_instances = array();
-					
-					//get all CIs in subarrays indexed by enrollment status
-					$course_instance_arrays = $user->getCourseInstances();
-					//cannot remove self from autofeed courses, so do not display those
-					unset($course_instance_arrays['AUTOFEED']);
-					//now merge all the remaining CIs					
-					foreach($course_instance_arrays as $courses) {
-						$course_instances = array_merge($course_instances, $courses);
+				else {	//show class list					
+					if($_REQUEST['type'] == 'instructor') {
+						//for instructors this will be a list of cancelled/inactive courses they are teaching
+						$course_instances = $u->getCourseInstancesToRemove();
 					}
-					
+					else {
+						//for students this will be a list of all courses in which they are enrolled (except autofed)
+						$course_instances = $u->getCourseInstancesToLeave();
+					}
+
 					$msg = 'Select a class to remove:';
 						
 					$this->displayFunction = 'displaySelectClass';

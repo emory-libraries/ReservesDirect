@@ -890,7 +890,7 @@ class classDisplayer extends baseDisplayer {
 				<p />
 				<ul>
 					<li><a href="index.php?cmd=importClass&new_ci=<?=$ci_id?>">Import materials into this class from another class (Reactivate)</a></li>
-					<li><a href="index.php?cmd=addReserve&ci=<?=$ci_id?>">Add materials to this class</a></li>
+					<li><a href="index.php?cmd=addReserve&ci=<?=$ci_id?>">Add new materials to this class</a></li>
 					<li><a href="index.php?cmd=editClass&ci=<?=$ci_id?>">Go to this class.</a></li>
 					<li><a href="index.php?cmd=createClass">Create a New Class.</a></li>
 				</ul>
@@ -908,9 +908,10 @@ class classDisplayer extends baseDisplayer {
 				<p />
 				<ul>
 					<li><a href="index.php?cmd=importClass&dst_ci=<?=$ci_id?>">Import materials into this class from another class (Reactivate)</a></li>
-					<li><a href="index.php?cmd=addReserve&ci=<?=$ci_id?>">Add materials to this class</a></li>
+					<li><a href="index.php?cmd=addReserve&ci=<?=$ci_id?>">Add new materials to this class</a></li>
 					<li><a href="index.php?cmd=editClass&ci=<?=$ci_id?>">Go to this class.</a></li>
 					<li><a href="index.php?cmd=deactivateClass&ci=<?=$ci_id?>"><strong>Cancel</strong> - I do not wish students to see this class.</a></li>
+					<li><a href="index.php?cmd=removeClass&ci=<?=$ci_id?>"><strong>Remove</strong> - I do not plan on teaching this class.</a></li>
 				</ul>
 			</div>
 		</div>
@@ -1307,8 +1308,10 @@ class classDisplayer extends baseDisplayer {
 			$proxy_ci_array[$term->getTermID()] = array();
 		}	
 		//put CIs in sub-arrays indexed by term_id
-		foreach($instructor_CIs as $ci) {	//instructor courses
-			$instructor_ci_array[$terms[$ci->year][$ci->term]][] = $ci;
+		foreach($instructor_CIs as $ci_status=>$CIs) {	//instructor courses
+			foreach($CIs as $ci) {
+				$instructor_ci_array[$terms[$ci->year][$ci->term]][$ci_status][] = $ci;
+			}
 		}		
 		foreach($proxy_CIs as $ci) {	//proxy courses
 			$proxy_ci_array[$terms[$ci->year][$ci->term]][] = $ci;
@@ -1446,49 +1449,62 @@ class classDisplayer extends baseDisplayer {
 <?php
 			//loop through all the available terms/courses
 			if(!empty($instructor_ci_array)):
-				foreach($instructor_ci_array as $term_id=>$term_ci_list):	//split up the subarrays by term
+				foreach($instructor_ci_array as $term_id=>$status_ci_array):	//split the courses by term
 ?>
 			<table id="instructor_block_<?=$term_id?>" class="displayList" style="display:none;" width="100%">
 <?php
-					if(!empty($term_ci_list)):
-						//begin looping through courses	for this term
-						$rowClass = 'evenRow';
-						foreach($term_ci_list as $ci):
-							$ci->getCourseForUser();	//get course object
-							$ci->getInstructors();	//get a list of instructors	
-							
-							//sort out the edit/activate/view links and icons, based on effective role		
-							if($u->getRole() < $g_permission['instructor']) {	//if the users's effective role is less than instructor (not-trained)
-								$edit_icon = '<img src="images/activate.gif" alt="edit" width="24" height="20">';	//they get no icon
-								$course_link = 'index.php?cmd=viewReservesList&ci='.$ci->getCourseInstanceID();	//only allowed to view course
-							}
-							else {	//full-fledged instructor
-								if($ci->getStatus() == 'AUTOFEED') {	//if the course has been fed through registrar, but not activated							
-									$edit_icon = 'A';	//show the 'activate-me' icon
-									$course_link = 'index.php?cmd=activateClass&ci='.$ci->getCourseInstanceID();	//link to activate course
+					$rowClass = 'evenRow';
+					foreach($status_ci_array as $status=>$ci_list):	//split courses by status
+						if(!empty($ci_list)):
+							//begin looping through courses	for this term
+							foreach($ci_list as $ci):
+								$ci->getCourseForUser();	//get course object
+								$ci->getInstructors();	//get a list of instructors	
+								
+								//sort out the edit/activate/view links and icons, based on effective role		
+								if($u->getRole() < $g_permission['instructor']) {	//if the users's effective role is less than instructor (not-trained)
+									$edit_icon = '';	//they get no icon
+									$course_num = '<a href="index.php?cmd=viewReservesList&ci='.$ci->getCourseInstanceID().'">'.$ci->course->displayCourseNo().'</a>';									$course_name = '<a href="index.php?cmd=viewReservesList&ci='.$ci->getCourseInstanceID().'">'.$ci->course->getName().'</a>';
+									$enrollment = '<span class="'.common_getEnrollmentStyleTag($ci->getEnrollment()).'">'.$ci->getEnrollment().'</span>';
 								}
-								else {
-									$edit_icon = '<img src="images/pencil.gif" alt="edit" width="24" height="20">';	//show the edit icon
-									$course_link = 'index.php?cmd=editClass&ci='.$ci->getCourseInstanceID();	//link to edit course
-								}								
-							}
-							
-							$rowClass = ($rowClass=='oddRow') ? 'evenRow' : 'oddRow';	//set the row class
+								else {	//full-fledged instructor
+									if($ci->getStatus() == 'AUTOFEED') {	//if the course has been fed through registrar, but not activated						
+										$edit_icon = '<img src="images/activate.gif" width="24" height="20" />';	//show the 'activate-me' icon
+										$course_num = '<a href="index.php?cmd=activateClass&ci='.$ci->getCourseInstanceID().'">'.$ci->course->displayCourseNo().'</a>';									
+										$course_name = '<a href="index.php?cmd=activateClass&ci='.$ci->getCourseInstanceID().'">'.$ci->course->getName().'</a>';
+										$enrollment = '<span class="'.common_getEnrollmentStyleTag($ci->getEnrollment()).'">'.$ci->getEnrollment().'</span>';
+									}
+									elseif($ci->getStatus() == 'CANCELED') {	//if the course has been cance led by the registrar
+										$edit_icon = '<img src="images/cancel.gif" alt="edit" width="24" height="20">';	//show the 'activate-me' icon
+										$course_num = $ci->course->displayCourseNo();
+										$course_name = $ci->course->getName();
+										$enrollment = '<strong>[<a href="index.php?cmd=removeClass&ci='.$ci->getCourseInstanceID().'">remove</a>]</strong>';
+									}
+									else {
+										$edit_icon = '<img src="images/pencil.gif" alt="edit" width="24" height="20">';	//show the edit icon
+										$course_num = '<a href="index.php?cmd=editClass&ci='.$ci->getCourseInstanceID().'">'.$ci->course->displayCourseNo().'</a>';
+										$course_name = '<a href="index.php?cmd=editClass&ci='.$ci->getCourseInstanceID().'">'.$ci->course->getName().'</a>';
+										$enrollment = '<span class="'.common_getEnrollmentStyleTag($ci->getEnrollment()).'">'.$ci->getEnrollment().'</span>';
+									}								
+								}
+								
+								$rowClass = ($rowClass=='oddRow') ? 'evenRow' : 'oddRow';	//set the row class
 ?>
 				<tr align="left" valign="middle" class="<?=$rowClass?>">
 					<td width="5%"><?=$edit_icon?></td>
-					<td width="15%"><a href="<?=$course_link?>"><?=$ci->course->displayCourseNo()?></a></td>
-					<td><a href="<?=$course_link?>"><?=$ci->course->getName()?></a></td>
+					<td width="15%"><?=$course_num?></td>
+					<td><?=$course_name?></td>
 					<td width="30%"><?=$ci->displayInstructors()?></td>	
-					<td width="10%"><span class="<?=common_getEnrollmentStyleTag($ci->getEnrollment())?>"><?=$ci->getEnrollment()?></span></td>		
+					<td width="10%"><?=$enrollment?></td>		
 				</tr>
 <?php					
-						endforeach;
-					endif;
+							endforeach;	//end loop through CIs
+						endif;	//end if not empty CIs
+					endforeach;	//end for each status
 ?>
 			</table>
 <?php
-				endforeach;
+				endforeach;	//end for each term
 			else:	//not teaching any courses
 ?>
 			<div class="borders" style="padding:5px;">
@@ -1496,9 +1512,11 @@ class classDisplayer extends baseDisplayer {
 			</div>
 <?php		endif; ?>
 			<p />
-			<img src="images/pencil.gif" width="24" height="20"> <span style="font-size:small;">= active courses you may edit</span>
+			<img src="images/pencil.gif" width="24" height="20" /> <span style="font-size:small;">= active courses you may edit</span>
 			<br />
-			<img src="images/activate.gif" width="24" height="20" > <span style="font-size:small;">= new courses not yet in use</span>
+			<img src="images/activate.gif" width="24" height="20" /> <span style="font-size:small;">= new courses not yet in use</span>
+			<br />
+			<img src="images/cancel.gif" width="24" height="20" /> <span style="font-size:small;">= courses canceled by the registrar</span>
 			<p />
 		</div>
 <?php	endif; ?>
