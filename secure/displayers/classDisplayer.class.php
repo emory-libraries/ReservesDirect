@@ -1290,7 +1290,7 @@ class classDisplayer extends baseDisplayer {
 	 */
 	public function displayCourseList(&$student_CIs, &$instructor_CIs, &$proxy_CIs) {
 		global $u, $g_permission;	
-		
+
 		//need term info
 		$termsObj = new terms();
 		$terms = array();
@@ -1316,6 +1316,27 @@ class classDisplayer extends baseDisplayer {
 		foreach($proxy_CIs as $ci) {	//proxy courses
 			$proxy_ci_array[$terms[$ci->year][$ci->term]][] = $ci;
 		}
+		
+		//the process used above to put all the terms in the correct order may have created a bunch of empty arrays
+		//go through instructor/proxy arrays again, removing empty term/status arrays
+		//instructor first
+		$tmp = array();
+		foreach($instructor_ci_array as $term_id=>$status_ci_arrays) {
+			foreach($status_ci_arrays as $status=>$ci_array) {
+				if(!empty($ci_array)) {
+					$tmp[$term_id][$status] = $ci_array;
+				}
+			}
+		}
+		$instructor_ci_array = $tmp;
+		//repeat for proxy
+		$tmp = array();
+		foreach($proxy_ci_array as $term_id=>$ci_array) {
+			if(!empty($ci_array)) {
+				$tmp[$term_id] = $ci_array;
+			}
+		}
+		$proxy_ci_array = $tmp;
 		
 		//this will hold the jscript calls to select the initial tab view
 		//it will be run after everything is rendered
@@ -1427,9 +1448,6 @@ class classDisplayer extends baseDisplayer {
 			//pre-select first option
 			$select_option = true;
 			foreach(array_keys($instructor_ci_array) as $term_id):
-				if(empty($instructor_ci_array[$term_id])) {
-					continue;	//skip empty term arrays
-				}
 				$term = new term($term_id);
 				$select = ($select_option) ? 'checked="true"' : '';
 ?>
@@ -1455,40 +1473,39 @@ class classDisplayer extends baseDisplayer {
 <?php
 					$rowClass = 'evenRow';
 					foreach($status_ci_array as $status=>$ci_list):	//split courses by status
-						if(!empty($ci_list)):
-							//begin looping through courses	for this term
-							foreach($ci_list as $ci):
-								$ci->getCourseForUser();	//get course object
-								$ci->getInstructors();	//get a list of instructors	
-								
-								//sort out the edit/activate/view links and icons, based on effective role		
-								if($u->getRole() < $g_permission['instructor']) {	//if the users's effective role is less than instructor (not-trained)
-									$edit_icon = '';	//they get no icon
-									$course_num = '<a href="index.php?cmd=viewReservesList&ci='.$ci->getCourseInstanceID().'">'.$ci->course->displayCourseNo().'</a>';									$course_name = '<a href="index.php?cmd=viewReservesList&ci='.$ci->getCourseInstanceID().'">'.$ci->course->getName().'</a>';
+						//begin looping through courses	for this term
+						foreach($ci_list as $ci):
+							$ci->getCourseForUser();	//get course object
+							$ci->getInstructors();	//get a list of instructors	
+							
+							//sort out the edit/activate/view links and icons, based on effective role		
+							if($u->getRole() < $g_permission['instructor']) {	//if the users's effective role is less than instructor (not-trained)
+								$edit_icon = '';	//they get no icon
+								$course_num = '<a href="index.php?cmd=viewReservesList&ci='.$ci->getCourseInstanceID().'">'.$ci->course->displayCourseNo().'</a>';									$course_name = '<a href="index.php?cmd=viewReservesList&ci='.$ci->getCourseInstanceID().'">'.$ci->course->getName().'</a>';
+								$enrollment = '<span class="'.common_getEnrollmentStyleTag($ci->getEnrollment()).'">'.$ci->getEnrollment().'</span>';
+							}
+							else {	//full-fledged instructor
+								if($ci->getStatus() == 'AUTOFEED') {	//if the course has been fed through registrar, but not activated						
+									$edit_icon = '<img src="images/activate.gif" width="24" height="20" />';	//show the 'activate-me' icon
+									$course_num = '<a href="index.php?cmd=activateClass&ci='.$ci->getCourseInstanceID().'">'.$ci->course->displayCourseNo().'</a>';									
+									$course_name = '<a href="index.php?cmd=activateClass&ci='.$ci->getCourseInstanceID().'">'.$ci->course->getName().'</a>';
 									$enrollment = '<span class="'.common_getEnrollmentStyleTag($ci->getEnrollment()).'">'.$ci->getEnrollment().'</span>';
 								}
-								else {	//full-fledged instructor
-									if($ci->getStatus() == 'AUTOFEED') {	//if the course has been fed through registrar, but not activated						
-										$edit_icon = '<img src="images/activate.gif" width="24" height="20" />';	//show the 'activate-me' icon
-										$course_num = '<a href="index.php?cmd=activateClass&ci='.$ci->getCourseInstanceID().'">'.$ci->course->displayCourseNo().'</a>';									
-										$course_name = '<a href="index.php?cmd=activateClass&ci='.$ci->getCourseInstanceID().'">'.$ci->course->getName().'</a>';
-										$enrollment = '<span class="'.common_getEnrollmentStyleTag($ci->getEnrollment()).'">'.$ci->getEnrollment().'</span>';
-									}
-									elseif($ci->getStatus() == 'CANCELED') {	//if the course has been cance led by the registrar
-										$edit_icon = '<img src="images/cancel.gif" alt="edit" width="24" height="20">';	//show the 'activate-me' icon
-										$course_num = $ci->course->displayCourseNo();
-										$course_name = $ci->course->getName();
-										$enrollment = '<strong>[<a href="index.php?cmd=removeClass&ci='.$ci->getCourseInstanceID().'">remove</a>]</strong>';
-									}
-									else {
-										$edit_icon = '<img src="images/pencil.gif" alt="edit" width="24" height="20">';	//show the edit icon
-										$course_num = '<a href="index.php?cmd=editClass&ci='.$ci->getCourseInstanceID().'">'.$ci->course->displayCourseNo().'</a>';
-										$course_name = '<a href="index.php?cmd=editClass&ci='.$ci->getCourseInstanceID().'">'.$ci->course->getName().'</a>';
-										$enrollment = '<span class="'.common_getEnrollmentStyleTag($ci->getEnrollment()).'">'.$ci->getEnrollment().'</span>';
-									}								
+								elseif($ci->getStatus() == 'CANCELED') {	//if the course has been cance led by the registrar
+									$edit_icon = '<img src="images/cancel.gif" alt="edit" width="24" height="20">';	//show the 'activate-me' icon
+									$course_num = $ci->course->displayCourseNo();
+									$course_name = $ci->course->getName();
+									$enrollment = '<strong>[<a href="index.php?cmd=removeClass&ci='.$ci->getCourseInstanceID().'">remove</a>]</strong>';
 								}
-								
-								$rowClass = ($rowClass=='oddRow') ? 'evenRow' : 'oddRow';	//set the row class
+								else {
+									$edit_icon = '<img src="images/pencil.gif" alt="edit" width="24" height="20">';	//show the edit icon
+									$course_num = '<a href="index.php?cmd=editClass&ci='.$ci->getCourseInstanceID().'">'.$ci->course->displayCourseNo().'</a>';
+									$course_name = '<a href="index.php?cmd=editClass&ci='.$ci->getCourseInstanceID().'">'.$ci->course->getName().'</a>';
+									$enrollment = '<span class="'.common_getEnrollmentStyleTag($ci->getEnrollment()).'">'.$ci->getEnrollment().'</span>';
+								}								
+							}
+							
+							$rowClass = ($rowClass=='oddRow') ? 'evenRow' : 'oddRow';	//set the row class
 ?>
 				<tr align="left" valign="middle" class="<?=$rowClass?>">
 					<td width="5%"><?=$edit_icon?></td>
@@ -1498,8 +1515,7 @@ class classDisplayer extends baseDisplayer {
 					<td width="10%"><?=$enrollment?></td>		
 				</tr>
 <?php					
-							endforeach;	//end loop through CIs
-						endif;	//end if not empty CIs
+						endforeach;	//end loop through CIs
 					endforeach;	//end for each status
 ?>
 			</table>
