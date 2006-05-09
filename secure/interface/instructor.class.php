@@ -281,12 +281,12 @@ class instructor extends proxy
 		$expiration_date = date('Y-m-d');
 	
 		//get CIs where user is an instructor
-		$intructor_CIs = $this->fetchCourseInstances('instructor', $activation_date, $expiration_date);
+		$intructor_CIs = $this->fetchCourseInstances('instructor', $activation_date, $expiration_date, 'ACTIVE');
 		//get CIs where user is a proxy
-		$proxy_CIs = $this->fetchCourseInstances('proxy', $activation_date, $expiration_date);
+		$proxy_CIs = $this->fetchCourseInstances('proxy', $activation_date, $expiration_date, 'ACTIVE');
 		
 		//return the combined list
-		return array_merge($intructor_CIs, $proxy_CIs);
+		return ($intructor_CIs + $proxy_CIs);
 	}
 	
 	
@@ -297,9 +297,45 @@ class instructor extends proxy
 	public function getCourseInstancesToImport() {
 		//show current courses, or those that have already expired
 		$activation_date = date('Y-m-d');
+		
+		//get list of CIs
+		$active = $this->fetchCourseInstances('instructor', $activation_date, null, 'ACTIVE');
+		$inactive = $this->fetchCourseInstances('instructor', $activation_date, null, 'INACTIVE');
 			
-		//return list of CIs
-		return $this->fetchCourseInstances('instructor', $activation_date);
+		//return combined list
+		return ($active + $inactive);
+	}
+	
+	
+	/**
+	 * @return array
+	 * @desc Returns an array of cancelled/inactive CIs an instructor may remove from their list (NOT same as 'delete')
+	 */
+	public function getCourseInstancesToRemove() {
+		//get list of CIs
+		$cancelled = $this->fetchCourseInstances('instructor', null, null, 'CANCELED');
+		$not_activated = $this->fetchCourseInstances('instructor', null, null, 'AUTOFEED');
+			
+		//return combined list
+		return ($cancelled + $not_activated);
+	}
+	
+	
+	/**
+	 * @return void
+	 * @param int $courseAliasID
+	 * @desc Remove the access record for this user and course alias
+	 */
+	function leaveClass($courseAliasID) {
+		global $g_dbConn;
+
+		switch($g_dbConn->phptype)	{
+			default:	//mysql
+				$sql = "DELETE FROM access WHERE user_id = {$this->getUserID()} AND alias_id = $courseAliasID AND permission_level = 3 LIMIT 1";
+		}
+
+		$rs = $g_dbConn->query($sql);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 
 

@@ -143,6 +143,20 @@ class student extends user
 	
 	
 	/**
+	 * @return array
+	 * @desc Returns an array of CIs a student is allowed to "leave" (everything but autofed classes)
+	 */
+	public function getCourseInstancesToLeave() {
+		$today = date('Y-m-d');
+		$approved = $this->fetchCourseInstances('student', $today, $today, 'ACTIVE', 'APPROVED');	//enrolled manually
+		$pending = $this->fetchCourseInstances('student', $today, $today, 'ACTIVE', 'PENDING');	//requested enrollment
+		$denied = $this->fetchCourseInstances('student', $today, $today, 'ACTIVE', 'DENIED');	//denied enrollment
+		
+		return ($approved + $pending + $denied);
+	}
+	
+	
+	/**
 	* @return void
 	* @desc surpresses a reserve from display --Not Yet Implemented
 	*/
