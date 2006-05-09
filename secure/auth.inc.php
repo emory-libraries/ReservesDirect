@@ -141,7 +141,8 @@ function authByLDAP($username, $password) {
 			//get directory info
 			$user_info = $ldap->getUserInfo();
 			//create a new record with directory info
-			$user->createUser($user_info[$g_ldap['canonicalName']][0], $user_info[$g_ldap['firstname']][0], $user_info[$g_ldap['lastname']][0], $user_info[$g_ldap['email']][0], 0);
+			//(LDAP returns username in caps, so strtolower() it)
+			$user->createUser(strtolower($user_info[$g_ldap['canonicalName']][0]), $user_info[$g_ldap['firstname']][0], $user_info[$g_ldap['lastname']][0], $user_info[$g_ldap['email']][0], 0);
 		}
 				
 		//user is now authenticated, set the session vars
