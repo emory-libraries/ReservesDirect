@@ -11,7 +11,7 @@
 		
 <table width="600" border="0" align="center" cellpadding="10" cellspacing="0" bgcolor="#FFFFFF" class="borders2">
   <tr align="left" valign="top"> 
-    <td width="50%">&nbsp;</td>
+    <td width="50%" align="left"><img src="images/logo-el-blue.jpg"></td>
     <td width="50%" align="right" valign="middle"><img src="images/logo-rd-gold-book.jpg" width="145" height="100"></td>
   </tr>
   <tr align="center" valign="top"> 
@@ -57,16 +57,28 @@
                 
               </tr>
               <tr bgcolor="#003366"> 
-                <td height="10" align="left" valign="bottom"><img src="images/corner-blue-bottom-lt.gif" width="15" height="15"></td>
-                <td width="100%" height="10">&nbsp;</td>
-                <td height="10" align="right" valign="bottom"><img src="images/corner-blue-bottom-rt.gif" width="15" height="15"></td>
+                <td align="left" valign="bottom"><img src="images/corner-blue-bottom-lt.gif" width="15" height="15"></td>
+                <td width="100%">&nbsp;</td>
+                <td align="right" valign="bottom"><img src="images/corner-blue-bottom-rt.gif" width="15" height="15"></td>
               </tr>
-            </table>       	  </td>
+            </table>       	  
+            </td>
           </tr>
       </table></td>
   </tr>
   <tr> 
-    <td colspan="2"><p align="center" class="small">For documentation and support, visit <a href="https://www.reservesdirect.org"><strong>ReservesDirect.org</strong></a></p></td>
+    <td colspan="2">
+    	<p align="center" class="small">Use your Emory Network ID (netid) to login. This is the same username/password used for OPUS, PeopleSoft and Blackboard</p>
+    	<p align="center" class="small">If you are having difficulty logging in, you may need to sync your passwords
+	  at<br>
+
+	  <a href="https://password.service.emory.edu/">https://password.service.emory.edu/</a><br>
+	  Further help with passwords is available
+          from ITD (404-727-7777) during normal business hours Monday through
+        Friday and limited hours on the weekend
+    or check their web site: <a href="http://it.emory.edu/showdoc.cfm?docid=1079">http://it.emory.edu/showdoc.cfm?docid=1079</a></p>
+        <p align="center" class="small">Problems using the system? <a href="http://ereserves.library.emory.edu/emailReservesDesk.php">Email the Reserves Desk</a>  </p>
+    </td>
   </tr>
 </table>
 
