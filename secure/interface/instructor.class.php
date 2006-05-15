@@ -326,7 +326,7 @@ class instructor extends proxy
 	 * @param int $courseAliasID
 	 * @desc Remove the access record for this user and course alias
 	 */
-	function leaveClass($courseAliasID) {
+	function removeClass($courseAliasID) {
 		global $g_dbConn;
 
 		switch($g_dbConn->phptype)	{

@@ -176,7 +176,12 @@ class classManager
 				if(!empty($_REQUEST['ci'])) {	//user selected class
 					$ci = new courseInstance($_REQUEST['ci']);
 					$ci->getCourseForUser();
-					$u->leaveClass($ci->course->getCourseAliasID());
+					if($_REQUEST['type']=='instructor') {	//trying to remove a class the user is teachin
+						$u->removeClass($ci->course->getCourseAliasID());
+					}
+					else {	//trying to leave a class the user is enrolled in
+						$u->leaveClass($ci->course->getCourseAliasID());
+					}
 					
 					//go to course listing
 					classManager::classManager('viewCourseList', $u, $adminUser, null);
@@ -185,16 +190,18 @@ class classManager
 					if($_REQUEST['type'] == 'instructor') {
 						//for instructors this will be a list of cancelled/inactive courses they are teaching
 						$course_instances = $u->getCourseInstancesToRemove();
+						$type = 'instructor';
 					}
 					else {
 						//for students this will be a list of all courses in which they are enrolled (except autofed)
 						$course_instances = $u->getCourseInstancesToLeave();
+						$type = '';
 					}
 
 					$msg = 'Select a class to remove:';
 						
 					$this->displayFunction = 'displaySelectClass';
-					$this->argList = array('removeClass', $course_instances, $msg);
+					$this->argList = array('removeClass', $course_instances, $msg, array('type'=>$type), true);
 				}				
 			break;
 	

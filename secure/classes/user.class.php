@@ -550,7 +550,7 @@ class user
 					
 		$course_instances = array();
 		while($row = $rs->fetchRow()) {
-			$course_instances[] = new courseInstance($row[0]);
+			$course_instances[$row[0]] = new courseInstance($row[0]);
 		}
 		
 		return $course_instances;

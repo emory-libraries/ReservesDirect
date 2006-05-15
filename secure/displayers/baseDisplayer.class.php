@@ -505,16 +505,17 @@ abstract class baseDisplayer {
 	 * @param array $course_instances (optional) Array of courseInstance objects to show for proxy/instructor select; ignored for staff
 	 * @param string $msg (optional) Text to display above the class select
 	 * @param array $hidden_fields (optional) Array of info to pass on as hidden fields
+	 * @param boolean $override_staff If true, will override the staff default of showing AJAX class looking and will show a list of courses instead.
 	 * @desc Displays class selector -- ajax for staff, list of classes for proxy/instructor
 	 */
-	public function displaySelectClass($next_cmd, $course_instances=null, $msg=null, $hidden_fields=null) {
+	public function displaySelectClass($next_cmd, $course_instances=null, $msg=null, $hidden_fields=null, $override_staff=false) {
 		global $u, $g_permission;
 		
 		if(!empty($msg)) {
 			echo '<span class="helperText">'.$msg.'</span><p />';
 		}				
 		
-		if($u->getRole() >= $g_permission['staff']) {	//staff - use ajax class lookup
+		if(($u->getRole() >= $g_permission['staff']) && !$override_staff) {	//staff - use ajax class lookup
 			//display selectClass
 			$mgr = new ajaxManager('lookupClass', $next_cmd, 'manageClasses', 'Continue', $hidden_fields);
 			$mgr->display();
