@@ -382,6 +382,11 @@ class classDisplayer extends baseDisplayer {
 <?php	if(!empty($pending_roll)): ?>
 					<strong>Students requesting to join this class:</strong>
 					<table align="center" class="simpleList">
+						<tr>
+							<td colspan="2" style="text-align:center;">
+								<a href="index.php?cmd=<?=$next_cmd?>&amp;ci=<?=$ci->getCourseInstanceID()?>&amp;tab=enrollment&amp;rollAction=add&amp;student_id=all">approve all</a> | <a href="index.php?cmd=<?=$next_cmd?>&amp;ci=<?=$ci->getCourseInstanceID()?>&amp;tab=enrollment&amp;rollAction=deny&amp;student_id=all">deny all</a>
+							</td>
+						</tr>
 <?php		foreach($pending_roll as $student): ?>
 						<tr bgcolor="#FFFFFF">
 							<td width="60%">

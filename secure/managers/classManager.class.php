@@ -266,7 +266,19 @@ class classManager
 				}
 				//add/remove/approve/deny enrollment for student
 				if(isset($_REQUEST['rollAction'])) {
-					$user->editClassRoll($ci->getCourseInstanceID(), $_REQUEST['student_id'], $_REQUEST['rollAction']);
+					//get student list for approve/deny-all
+					if($_REQUEST['student_id']=='all') {
+						$roll = $ci->getRoll();
+						$students = array();
+						foreach($roll['PENDING'] as $student) {	//just need the pending students
+							$students[] = $student->getUserID();	//just need IDs
+						}
+					}
+					else {	//single-student action
+						$students = array($_REQUEST['student_id']);
+					}
+					
+					$user->editClassRoll($ci->getCourseInstanceID(), $students, $_REQUEST['rollAction']);
 				}
 				
 				//get the tab to show

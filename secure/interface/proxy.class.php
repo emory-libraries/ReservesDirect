@@ -183,16 +183,20 @@ class proxy extends student
 	/**
 	 * @return boolean
 	 * @param int $ci_id CourseInstance ID
-	 * @param int $student_id Student's user ID
+	 * @param array $student_IDs Array of student userIDs
 	 * @param string $roll_action Roll action to perform (add/remove/deny)
-	 * @desc Adds, removes, etc a student to/from class
+	 * @desc Adds, removes, etc students to/from class
 	 */
-	function editClassRoll($ci_id, $student_id, $roll_action) {
+	function editClassRoll($ci_id, $student_IDs, $roll_action) {
 		global $u, $g_permission;
 		
 		//make sure we have all the info
-		if(empty($ci_id) || empty($student_id)) {
+		if(empty($ci_id) || empty($student_IDs)) {
 			return false;
+		}
+		//for compatibility, make sure $student_IDs is an array
+		if(!is_array($student_IDs)) {
+			$student_IDs = array($student_IDs);	//make it an array
 		}
 		
 		$ci = new courseInstance($ci_id);	//init CI
@@ -200,25 +204,31 @@ class proxy extends student
 		$ci->getInstructors();
 		$ci->getProxies();					
 		if(in_array($u->getUserID(), $ci->instructorIDs) || in_array($u->getUserID(), $ci->proxyIDs) || ($u->getRole() >= $g_permission['staff'])) {
-			//get the student
-			//some limitations -- cannot create a new student object by user ID
-			$student = new user($student_id);	//init a generic user object
-			$student = new student($student->getUsername());	//now init a student object by username
-			
-			//get the primary course for this user
-			$ci->getCourseForUser($student->getUserID());
-			
-			//perform action
-			switch($roll_action) {
-				case 'add':
-					$student->joinClass($ci->course->getCourseAliasID(), 'APPROVED');
-				break;				
-				case 'remove':
-					$student->leaveClass($ci->course->getCourseAliasID());
-				break;				
-				case 'deny':
-					$student->joinClass($ci->course->getCourseAliasID(), 'DENIED');
-				break;
+			foreach($student_IDs as $student_id) {	
+				if(empty($student_id)) {
+					continue;	//skip blank IDs
+				}
+				
+				//get the student
+				//some limitations -- cannot create a new student object by user ID
+				$student = new user($student_id);	//init a generic user object
+				$student = new student($student->getUsername());	//now init a student object by username
+				
+				//get the primary course for this user
+				$ci->getCourseForUser($student->getUserID());
+				
+				//perform action
+				switch($roll_action) {
+					case 'add':
+						$student->joinClass($ci->course->getCourseAliasID(), 'APPROVED');
+					break;				
+					case 'remove':
+						$student->leaveClass($ci->course->getCourseAliasID());
+					break;				
+					case 'deny':
+						$student->joinClass($ci->course->getCourseAliasID(), 'DENIED');
+					break;
+				}
 			}
 		}
 	}
