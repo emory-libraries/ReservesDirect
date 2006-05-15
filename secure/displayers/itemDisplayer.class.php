@@ -631,7 +631,7 @@ class itemDisplayer extends noteDisplayer {
 		if($item->isPhysicalItem()) {	//physical
 			$home_lib_id = $item->getHomeLibraryID();
 			if(!empty($home_lib_id)) {
-				$home_lib = new library();
+				$home_lib = new library($home_lib_id);
 				$owner = $home_lib->getLibrary();
 			}
 			else {
@@ -721,7 +721,10 @@ class itemDisplayer extends noteDisplayer {
 				$rowClass = ($rowClass=='evenRow') ? 'oddRow' : 'evenRow';
 				
 				//determine if this is a currently-active class
-				if(($ci->getStatus()=='ACTIVE') && (strtotime($ci->getActivationDate()) <= time()) && (strtotime($ci->getExpirationDate()) >= time())) {
+				$now = time();  //get current time
+				//if given only the date, strtotime() assumes we mean start of day, ie YYYY-MM-DD 00:00:00
+				//to make sure we include the whole expiration day, we'll make it YYYY-MM-DD 23:59:59
+				if(($ci->getStatus()=='ACTIVE') && (strtotime($ci->getActivationDate()) <= $now) && (strtotime($ci->getExpirationDate().' 23:59:59') >= $now)) {
 					$icon = '<img src="images/astx-green.gif" alt="**" width="15" height="15" />';
 				}
 				else {
