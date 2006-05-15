@@ -912,7 +912,7 @@ class classDisplayer extends baseDisplayer {
 				<strong>You are opening this class for the first time this semester.  What would you like to do?</strong>
 				<p />
 				<ul>
-					<li><a href="index.php?cmd=importClass&dst_ci=<?=$ci_id?>">Import materials into this class from another class (Reactivate)</a></li>
+					<li><a href="index.php?cmd=importClass&new_ci=<?=$ci_id?>">Import materials into this class from another class (Reactivate)</a></li>
 					<li><a href="index.php?cmd=addReserve&ci=<?=$ci_id?>">Add new materials to this class</a></li>
 					<li><a href="index.php?cmd=editClass&ci=<?=$ci_id?>">Go to this class.</a></li>
 					<li><a href="index.php?cmd=deactivateClass&ci=<?=$ci_id?>"><strong>Cancel</strong> - I do not wish students to see this class.</a></li>
