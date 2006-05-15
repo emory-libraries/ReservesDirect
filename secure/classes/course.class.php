@@ -336,8 +336,10 @@ class course
 		$this->department = new department($this->deptID);
 	}
 
-	function getName()
-	{ return htmlentities(stripslashes(($this->name))); }
+	function getName() { 
+		//return name if it is not blank; otherwise return uniform title
+		return htmlentities(stripslashes(!empty($this->name) ? $this->name : $this->uniformTitle));
+	}
 
 	function getCourseNo()
 	{ return $this->courseNo; }

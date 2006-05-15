@@ -460,19 +460,19 @@ class classManager
 			case 'createNewClass':
 				$loc = "create class";
 			
-				$t = new term($request['term']);
+				$t = new term($_REQUEST['term']);
 				
 				//need a CI object
 				$ci = new courseInstance(null);
 								
 				//attempt to create the course instance
-				if($ci->createCourseInstance($request['department'], $request['course_number'], $request['course_name'], $request['section'], $t->getTermYear(), $t->getTermName())) {	//course created successfully, insert data
-					$ci->addInstructor($ci->getPrimaryCourseAliasID(), $request['selected_instr']);
+				if($ci->createCourseInstance($_REQUEST['department'], $_REQUEST['course_number'], $_REQUEST['course_name'], $_REQUEST['section'], $t->getTermYear(), $t->getTermName())) {	//course created successfully, insert data
+					$ci->addInstructor($ci->getPrimaryCourseAliasID(), $_REQUEST['selected_instr']);
 					$ci->setTerm($t->getTermName());
 					$ci->setYear($t->getTermYear());
-					$ci->setActivationDate($request['activation_date']);
-					$ci->setExpirationDate($request['expiration_date']);
-					$ci->setEnrollment($request['enrollment']);
+					$ci->setActivationDate($_REQUEST['activation_date']);
+					$ci->setExpirationDate($_REQUEST['expiration_date']);
+					$ci->setEnrollment($_REQUEST['enrollment']);
 					$ci->setStatus('ACTIVE');
 					
 					$new_ci = $ci->getCourseInstanceID();
