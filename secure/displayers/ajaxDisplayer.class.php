@@ -235,6 +235,9 @@ class ajaxDisplayer extends baseDisplayer {
 	 * @param string $field_id (optional) ID and name to use for the <input> field
 	 */	
 	function userLookup($nextCmd, $button_label='Submit', $hidden_fields=null, $standalone=true, $min_user_role=0, $field_id='user_id') {
+		//prefill if possible
+		$dflt_user_id = !empty($_REQUEST[$field_id]) ? $_REQUEST[$field_id] : '';
+		$dflt_user_label = !empty($_REQUEST['search_'.$field_id]) ? $_REQUEST['search_'.$field_id] : '';
 ?>
 		<script language="JavaScript1.2" src="secure/javascript/liveSearch.js"></script>
 		<script language="JavaScript1.2">
@@ -257,7 +260,7 @@ class ajaxDisplayer extends baseDisplayer {
 				<strong>User:</strong>&nbsp;
 <?php	endif; ?>
 
-				<input type="text" size="40" id="search_<?=$field_id?>" name="search_<?=$field_id?>" onKeyPress="liveSearchStart(event, this, 'AJAX_functions.php?f=userList&amp;role=<?=$min_user_role?>', document.getElementById('search_<?=$field_id?>_result'), 'userSearchReturnAction');">&nbsp;
+				<input type="text" size="40" id="search_<?=$field_id?>" name="search_<?=$field_id?>" value="<?=$dflt_user_label?>" onKeyPress="liveSearchStart(event, this, 'AJAX_functions.php?f=userList&amp;role=<?=$min_user_role?>', document.getElementById('search_<?=$field_id?>_result'), 'userSearchReturnAction');">&nbsp;
 				<span style="font-size: x-small; font-style: italic;">Name OR username</span>
 				<div class="LSResult" id="search_<?=$field_id?>_result" style="display:none;"><ul></ul></div>
 				<script language="JavaScript">liveSearchInit(document.getElementById("search_<?=$field_id?>"));</script>
@@ -270,7 +273,7 @@ class ajaxDisplayer extends baseDisplayer {
 <?php	endif; ?>
 
 			<?php self::displayHiddenFields($hidden_fields); ?>			
-			<input id="<?=$field_id?>" name="<?=$field_id?>" value="" type="hidden">
+			<input id="<?=$field_id?>" name="<?=$field_id?>" value="<?=$dflt_user_id?>" type="hidden">
 				
 <?php	if($standalone): ?>	
 			<input type="hidden" name="cmd" value="<?=$nextCmd?>" />		

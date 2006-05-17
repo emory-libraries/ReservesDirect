@@ -81,6 +81,7 @@ class copyClassManager extends baseManager {
 					$ci = new courseInstance($_REQUEST['ci']);
 					$ci->getCourseForUser();	//get course info
 					$ci->course->getDepartment();	//get the department
+					$ci->getInstructors();	//get instructors
 
 					//attempt to pre-fill create-class form by faking the $_REQUEST array	
 					$_REQUEST = array(
@@ -88,7 +89,9 @@ class copyClassManager extends baseManager {
 						'section' => $ci->course->getSection(),
 						'course_number' => $ci->course->getCourseNo(),
 						'course_name' => $ci->course->getName(),
-						'enrollment' => $ci->getEnrollment()
+						'enrollment' => $ci->getEnrollment(),
+						'selected_instr' => $ci->instructorIDs[0],
+						'search_selected_instr' => $ci->instructorList[0]->getName().' -- '.$ci->instructorList[0]->getUsername()
 					);
 					//pass on the source CI id
 					$needed_info = array('ci' => $src_ci);
