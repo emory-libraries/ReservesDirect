@@ -541,7 +541,7 @@ class user
 				}
 				
 				//finish off with sorting
-				$sql .= " ORDER BY d.abbreviation ASC, c.course_number ASC, ca.section ASC, ci.activation_date ASC";				
+				$sql .= " ORDER BY d.abbreviation ASC, c.course_number ASC, ca.section ASC, ci.year DESC, ci.activation_date DESC";				
 		}
 
 		//query

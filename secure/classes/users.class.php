@@ -385,12 +385,12 @@ class users
 				if(!is_null($term_id) && $term_id != "")
 					$sql .= "AND t.term_id = $term_id ";
 					
-				$sql .= "ORDER BY t.term_id DESC, d.abbreviation ASC, c.course_number ASC, ca.section ASC LIMIT 50";
+				$sql .= "ORDER BY t.term_id DESC, ci.year DESC, d.abbreviation ASC, c.course_number ASC, ca.section ASC LIMIT 50";
 		}
 
 		$rs = $g_dbConn->query($sql);	
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		
+				
 		$tmpArray = null;
 		while ($row = $rs->fetchRow())
 		{
