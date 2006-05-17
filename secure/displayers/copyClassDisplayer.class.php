@@ -128,7 +128,7 @@ class copyClassDisplayer extends baseDisplayer {
 		foreach($tree_walker as $leaf) {
 			//close list tags if backing out of a sublist
 			if($prev_depth > $tree_walker->getDepth()) {
-				echo str_repeat('</ol></li>', ($prev_depth-$tree_walker->getDepth()));
+				echo str_repeat('</ul></li>', ($prev_depth-$tree_walker->getDepth()));
 			}
 			
 		
