@@ -216,7 +216,7 @@ class classDisplayer extends baseDisplayer {
 		
 		<div>
 			[ <a href="index.php?cmd=customSort&ci=<?=$ci->getCourseInstanceID()?>&parentID=" class="editlinks">sort main list</a> ]
-			[ <a href="index.php?cmd=addReserve&ci=<?=$ci->getCourseInstanceID()?>&selected_instr=<?=$ci->instructorList[0]->getUserID()?>" class="editlinks">add new materials</a> ]
+			[ <a href="index.php?cmd=addReserve&ci=<?=$ci->getCourseInstanceID()?>" class="editlinks">add new materials</a> ]
 			[ <a href="index.php?cmd=editHeading&ci=<?=$ci->getCourseInstanceID()?>" class="editlinks">add new heading</a> ]
 			[ <a href="#" class="editlinks" onclick="highlightAll(); return false;">highlight reserve links</a> ]
 		

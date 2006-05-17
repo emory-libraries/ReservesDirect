@@ -176,15 +176,15 @@ class reservesDisplayer extends noteDisplayer {
 		if(!empty($_REQUEST['ci'])) {
 			echo '						<li><a href="index.php?cmd=importClass&amp;new_ci='.$_REQUEST['ci'].'" align="center">Import Class</a></li>';
 		}
-		if (!isset($request['ci']) || (!isset($request['selected_instr'])))
+		if (!isset($request['ci']))
 			echo "							<li><a href=\"index.php?cmd=addDigitalItem\" align=\"center\">Add an Electronic Item</a></li>\n";
-		else if ($request['ci'] && $request['selected_instr'])
-			echo "							<li><a href=\"index.php?cmd=addDigitalItem&ci=".$request['ci']."&selected_instr=".$request['selected_instr']."\" align=\"center\">Add an Electronic Item</a></li>\n";
-		if (!isset($request['ci']) || !isset($request['selected_instr']))
+		else if ($request['ci'])
+			echo "							<li><a href=\"index.php?cmd=addDigitalItem&ci=".$request['ci']."\" align=\"center\">Add an Electronic Item</a></li>\n";
+		if (!isset($request['ci']))
 			echo "							<li><a href=\"index.php?cmd=addPhysicalItem\">Add a Physical Item</a></li>\n";
-		else if ($request['ci'] && $request['selected_instr']) {
-			echo "							<li><a href=\"index.php?cmd=addPhysicalItem&ci=".$request['ci']."&selected_instr=".$request['selected_instr']."\">Add a Physical Item</a></li>\n";
-			echo "							<li><a href=\"index.php?cmd=faxReserve&ci=".$request['ci']."&selected_instr=".$request['selected_instr']."\">Fax a Document</a></li>\n";
+		else if ($request['ci']) {
+			echo "							<li><a href=\"index.php?cmd=addPhysicalItem&ci=".$request['ci']."\">Add a Physical Item</a></li>\n";
+			echo "							<li><a href=\"index.php?cmd=faxReserve&ci=".$request['ci']."\">Fax a Document</a></li>\n";
 			echo "							<li><a href=\"index.php?cmd=searchScreen&ci=".$request['ci']."\">Search for the Item</a></li>\n";
 		}
 		echo "							<!--<li><a href=\"index.php?cmd=physicalItemXListing\">Physical Item Cross-listings </a>--><!--Goes to staff-mngClass-phys-XList1.html --></li>\n";
