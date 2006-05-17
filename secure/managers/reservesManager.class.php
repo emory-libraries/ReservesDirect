@@ -587,10 +587,11 @@ class reservesManager
 							else {	//edit
 								//edit status
 								if(isset($_REQUEST['edit_status']) && isset($_REQUEST['reserve_status'])) {
-									//do not allow instructors to change status for a physical item
-									//do not allow anyone to change status of a heading
+									//do NOT allow anyone to change status of a heading
+									//do NOT allow anyone to change status of a physical item that is 'IN PROCESS'
+									//DO allow staff (or above) to change status of a physical item that is NOT 'IN PROCESS'
 									$reserve->getItem();
-									if(!$reserve->isHeading() && (!$reserve->item->isPhysicalItem() || ($u->getRole() >= $g_permission['staff']))) {
+									if(!$reserve->isHeading() && (!$reserve->item->isPhysicalItem() || (($reserve->getStatus() != 'IN PROCESS') && ($u->getRole() >= $g_permission['staff'])))) {
 										$reserve->setStatus($_REQUEST['reserve_status']);
 									}
 								}
