@@ -136,10 +136,28 @@ class classDisplayer extends baseDisplayer {
 				<div class="courseHeaders"><span class="label">Proxies&nbsp;</span><small>[ <a href="index.php?cmd=editProxies&ci=<?=$ci->getCourseInstanceID()?>" class="editlinks">edit</a> ]</small>: <?=$proxies_string?>
 				</div>
 				
-				<div class="courseHeaders"><span class="label">Enrollment: </span><span class="<?=common_getEnrollmentStyleTag($ci->getEnrollment())?>"><?=strtoupper($ci->getEnrollment())?></span></div>
+				<div class="courseHeaders"><span class="label">Enrollment&nbsp;</span><small>[ <a href="index.php?cmd=<?=$next_cmd?>&amp;ci=<?=$ci->getCourseInstanceID()?>&amp;tab=enrollment" class="editlinks">view</a> ]</small>: <span class="<?=common_getEnrollmentStyleTag($ci->getEnrollment())?>"><?=strtoupper($ci->getEnrollment())?></span></div>
 
 <?php	if($u->getRole() >= $g_permission['staff']): 	//hide activate/deactivate dates from non-staff ?>
 				<div class="courseHeaders">
+					<form name="change_status_form" action="index.php" method="post">
+						<input type="hidden" name="cmd" value="<?=$next_cmd?>" />
+						<input type="hidden" name="ci" value="<?=$ci->getCourseInstanceID()?>" />
+						
+						<span class="label">Class Status: </span>
+						<input type="radio" name="status" value="ACTIVE" <?php echo ($ci->getStatus()=='ACTIVE') ? 'checked="true"' : 'moo'; ?> /> <span class="<?=common_getStatusStyleTag('ACTIVE')?>">ACTIVE</span>
+						<input type="radio" name="status" value="INACTIVE" <?php echo (($ci->getStatus()=='INACTIVE') || ($ci->getStatus()=='AUTOFEED')) ? 'checked="true"' : ''; ?> /> <span class="<?=common_getStatusStyleTag('INACTIVE')?>">INACTIVE</span>
+<?php 		if($ci->getStatus()=='AUTOFEED'): ?>
+						(Added by Registrar)
+<?php 		endif; ?>
+
+<?php		if($ci->getStatus()=='CANCELED'): ?>
+						<input type="radio" name="status" disabled="true" checked="true" /> <span class="inprocess">CANCELED BY REGISTRAR</span>
+<?php		endif; ?>
+
+						<input type="submit" name="updateClassStatus" value="Change Status">
+					</form>				
+					<p />
 					<form name="change_dates_form" action="index.php" method="post">
 						<input type="hidden" name="cmd" value="<?=$next_cmd?>" />
 						<input type="hidden" name="ci" value="<?=$ci->getCourseInstanceID()?>" />

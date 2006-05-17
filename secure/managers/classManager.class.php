@@ -247,8 +247,14 @@ class classManager
 					break;
 				}
 
-				$ci = new courseInstance($_REQUEST['ci']);				
+				$ci = new courseInstance($_REQUEST['ci']);	
 				
+				//update class status
+				if(isset($_REQUEST['updateClassStatus'])) {
+					if(!empty($_REQUEST['status'])) {
+						$ci->setStatus($_REQUEST['status']);
+					}
+				}
 				//update class dates
 				if(isset($_REQUEST['updateClassDates'])) {
 					//if not empty, set activation and expiration dates
