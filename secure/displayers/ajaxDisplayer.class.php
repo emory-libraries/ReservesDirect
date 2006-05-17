@@ -217,7 +217,12 @@ class ajaxDisplayer extends baseDisplayer {
 				<?php self::displayHiddenFields($hidden_fields); ?>
 				<input type="hidden" name="cmd" value="<?=$nextCmd?>" />
 			
-				<div id="course_area" style="border-bottom:1px solid #666666;"></div>		
+				<div id="course_area" style="border-bottom:1px solid #666666;"></div>
+				<p>
+					<img src="images/pencil.gif" width="24" height="20" /> <span style="font-size:small;">= active courses</span> &nbsp;
+					<img src="images/activate.gif" width="24" height="20" /> <span style="font-size:small;">= new courses not yet in use</span> &nbsp;
+					<img src="images/cancel.gif" width="24" height="20" /> <span style="font-size:small;">= courses canceled by the registrar</span> &nbsp;
+				</p>		
 			</div>
 			<div align="center" style="padding:10px;"><input id="editButton" type="submit" value="<?= $button_label ?>" DISABLED></div>
 		</form>

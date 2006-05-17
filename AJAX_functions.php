@@ -141,21 +141,35 @@ http://www.reservesdirect.org/
 			{
 				
 					$returnValue .= "<div align=\"left\" class=\"headingCell1\">\n";
-					$returnValue .= "	<div align=\"left\" style=\"width: 30px; float:left;\">&nbsp;</div>\n";
+					$returnValue .= "	<div align=\"left\" style=\"width:60px; float:left;\">&nbsp;</div>\n";
 					$returnValue .= "	<div align=\"left\" style=\"width:15%; float:left;\">Course Number</div>\n";
 					$returnValue .= "	<div align=\"left\" style=\"width:30%; float:left;\">Course Name</div>\n";
 					$returnValue .= "	<div align=\"left\" style=\"width:25%; float:left;\">Instructor</div>\n";
 					$returnValue .= "	<div align=\"left\" style=\"width:14%; float:left;\">Last Active</div>\n";
-					$returnValue .= "	<div align=\"left\" style=\"width:55px; float:right;\">Preview</div>\n";
+					$returnValue .= "	<div align=\"left\" style=\"width:55px; float:right; padding-right:5px;\">Preview</div>\n";
 					$returnValue .= "	<div style=\"clear:both;\" class=\"headingCell1\"></div>\n";
 					$returnValue .= "</div>\n";					
 				
 				
 				for($i=0; $i<count($ci_list); $i++)
 				{
+					//show status icon
+					switch($ci_list[$i]->getStatus()) {
+						case 'AUTOFEED':
+							$edit_icon = '<img src="images/activate.gif" width="24" height="20" />';	//show the 'activate-me' icon
+						break;
+						case 'CANCELED':
+							$edit_icon = '<img src="images/cancel.gif" alt="edit" width="24" height="20">';	//show the 'activate-me' icon
+						break;
+						default:
+							$edit_icon = '<img src="images/pencil.gif" alt="edit" width="24" height="20">';	//show the edit icon
+						break;						
+					}
+						
 					$rowStyle = ($rowStyle=='oddRow') ? 'evenRow' : 'oddRow';	//set the style
 					$returnValue .= "<div align=\"left\" class=\"$rowStyle\" style=\"padding:5px;\">\n";					
 					$returnValue .= "	<div align=\"left\" style=\"width: 30px; float:left; text-align:left;\"><input name=\"ci\" type=\"radio\" value=\"". $ci_list[$i]->getCourseInstanceID() ."\" onClick=\"document.getElementById('editButton').disabled=false\"></div>\n";
+					$returnValue .= '	<div style="width: 30px; float:left; text-align:left">'.$edit_icon.'</div>';
 					$returnValue .= "	<div align=\"left\" style=\"width:15%; float:left;\">".$ci_list[$i]->course->displayCourseNo()."&nbsp;</div>\n";
 					$returnValue .= "	<div align=\"left\" style=\"width:30%; float:left;\">".$ci_list[$i]->course->getName()."&nbsp;</div>\n";
 					$returnValue .= "	<div align=\"left\" style=\"width:25%; float:left;\">".$ci_list[$i]->displayInstructors()."&nbsp;</div>\n";
