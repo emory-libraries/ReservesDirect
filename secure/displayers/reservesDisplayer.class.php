@@ -173,6 +173,9 @@ class reservesDisplayer extends noteDisplayer {
 		echo "					<td width=\"40%\">\n";
 		echo "						<ul>\n";
 		echo "							<li><a href=\"index.php?cmd=displayRequest\" align=\"center\">Process Requests</a></li>\n";
+		if(!empty($_REQUEST['ci'])) {
+			echo '						<li><a href="index.php?cmd=importClass&amp;new_ci='.$_REQUEST['ci'].'" align="center">Import Class</a></li>';
+		}
 		if (!isset($request['ci']) || (!isset($request['selected_instr'])))
 			echo "							<li><a href=\"index.php?cmd=addDigitalItem\" align=\"center\">Add an Electronic Item</a></li>\n";
 		else if ($request['ci'] && $request['selected_instr'])
