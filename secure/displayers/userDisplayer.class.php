@@ -281,16 +281,21 @@ class userDisplayer
 			}
 
 			$role = (isset($request['user']['defaultRole'])) ? $request['user']['defaultRole'] : $userToEdit->getDefaultRole();
+			
+			//pull out ILS id and name if the user is instructor or better
+			$ilsUserID = ($userToEdit->getDefaultRole() >= $g_permission['instructor']) ? $userToEdit->getILSUserID() : '';
+			$ilsUserName = ($userToEdit->getDefaultRole() >= $g_permission['instructor']) ? $userToEdit->getILSName() : '';
+			
 			if ($role >= $g_permission['instructor'])
 			{
 				echo "				<tr>\n";
 				echo "					<td class=\"strong\" align=\"right\">ILS User ID:</td>\n";
-				echo "					<td><input type=\"text\" name=\"user[ils_user_id]\" size=\"20\" value=\"" . $userToEdit->getILSUserID() ."\"></td>\n";
+				echo "					<td><input type=\"text\" name=\"user[ils_user_id]\" size=\"20\" value=\"" . $ilsUserID ."\"></td>\n";
 				echo "				</tr>\n";
 
 				echo "				<tr>\n";
 				echo "					<td class=\"strong\" align=\"right\">ILS User Name:</td>\n";
-				echo "					<td><input type=\"text\" name=\"user[ils_user_name]\" size=\"20\" value=\"" . $userToEdit->getILSName() ."\"></td>\n";
+				echo "					<td><input type=\"text\" name=\"user[ils_user_name]\" size=\"20\" value=\"" . $ilsUserName ."\"></td>\n";
 				echo "				</tr>\n";
 			}
 
