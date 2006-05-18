@@ -70,8 +70,8 @@ class Copyright extends Notes {
 	 */
 	public function getByItemID($item_id) {
 		global $g_dbConn, $g_notetype;
-/*removed to prevent error jbwhite 5/17/06
-//filter empty ID
+		
+		//filter empty ID
 		if(empty($item_id)) {
 			return false;
 		}
@@ -95,8 +95,6 @@ class Copyright extends Notes {
 		else {
 			return false;
 		}
-*/
-return true; 
 	}
 	
 	

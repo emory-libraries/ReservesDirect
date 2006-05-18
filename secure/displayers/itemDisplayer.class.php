@@ -955,12 +955,16 @@ class itemDisplayer extends noteDisplayer {
 			break;
 		}
 		
-		//check for a pending copyright-review
-		$copyright = new Copyright($item->getItemID());
-		$copyright_alert = '';
-		if(($copyright->getStatus() != 'APPROVED') && ($copyright->getStatus() != 'DENIED')) {
-			$copyright_alert = '<span class="alert">! pending review !</span>';
-		}
+#########################################
+#	HIDE COPYRIGHT UNTIL FURTHER NOTICE #			
+#########################################			
+#		//check for a pending copyright-review
+#		$copyright = new Copyright($item->getItemID());
+#		$copyright_alert = '';
+#		if(($copyright->getStatus() != 'APPROVED') && ($copyright->getStatus() != 'DENIED')) {
+#			$copyright_alert = '<span class="alert">! pending review !</span>';
+#		}
+#########################################
 ?>
 		<div id="alertMsg" align="center" class="failedText"></div>
         <p />  
