@@ -39,7 +39,9 @@ class custodian extends student
 	{
 		$this->getUserByUserName($userName);
 
-		if ($this->getUserClass() != "custodian") trigger_error($userName . " has not been authorized as custodian", E_ERROR);
+		if ($this->getUserClass() != "custodian") trigger_error($userName . " has not been authorized as custodian", E_ERROR);		
+
+		$this->role = 1;
 	}
 
 	function createSpecialUser($userName, $email, $date=null)

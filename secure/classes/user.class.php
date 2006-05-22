@@ -37,7 +37,7 @@ class user
 	public $email;
 	public $dfltRole;
 	private $dfltClass;
-	private $role;
+	protected $role;
 	public $lastLogin;
 	private $userClass;
 	private $not_trained;

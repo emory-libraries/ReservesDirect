@@ -41,7 +41,10 @@ class instructor extends proxy
 
 	function instructor($userName=null)
 	{
-		if (!is_null($userName)) $this->getUserByUserName($userName);
+		if (!is_null($userName)) {
+			$this->getUserByUserName($userName);
+			$this->role = 3;
+		}
 	}
 
 

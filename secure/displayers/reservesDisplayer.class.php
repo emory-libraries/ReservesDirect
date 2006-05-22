@@ -35,9 +35,18 @@ require_once('secure/classes/tree.class.php');
 class reservesDisplayer extends noteDisplayer {
 
 	function displayReserves($cmd, &$ci, &$tree_walker, $reserve_count, &$hidden_reserves=null, $preview_only=false) {
+		global $u;
         
 		if(!($ci->course instanceof course)) {
 			$ci->getPrimaryCourse();
+		}
+		
+		//if previewing, temporarily give the current user a role of student
+		//Note: this process is reversed at the end of this method.
+		if($preview_only) {
+			$curr_user = $u;	//save current user
+			$users = new users();
+			$u = $users->initUser('student', $curr_user->getUserName());	//init current user as student
 		}
         
         // announce rss feed to capable browsers
@@ -156,8 +165,12 @@ class reservesDisplayer extends noteDisplayer {
 		
 		<p />
 		<div style="margin-left:5%; margin-right:5%; text-align:right;"><strong><?=$exit_class_link?></strong></div>
-
 <?php
+
+		//if previewing, return user to original state
+		if($preview_only) {
+			$u = $curr_user;
+		}
 	}
 	
 	function displayStaffAddReserve($request=null)

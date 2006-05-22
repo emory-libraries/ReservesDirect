@@ -36,7 +36,10 @@ class proxy extends student
 {
 	function proxy($userName=null)
 	{
-		if (!is_null($userName)) $this->getUserByUserName($userName);
+		if (!is_null($userName)) {
+			$this->getUserByUserName($userName);
+			$this->role = 2;
+		}
 	}
 
 	
