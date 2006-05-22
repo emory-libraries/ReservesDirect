@@ -27,6 +27,11 @@ ReservesDirect is located at:
 http://www.reservesdirect.org/
 
 *******************************************************************************/
+
+	// workaround for workaround for ie's idiotic caching policy handling
+	header("Cache-Control: no-cache");
+	header("Pragma: no-cache");
+
 	require_once("secure/config.inc.php");
 	require_once("secure/classes/copyright.class.php");
 	require_once("secure/classes/department.class.php");
