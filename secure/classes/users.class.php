@@ -359,7 +359,7 @@ class users
 	}
 	
 	
-	function searchForCI($instructor_id, $dept_id, $course_id, $term_id)
+	function searchForCI($instructor_id, $dept_id, $course_num, $course_name, $term_id)
 	{
 		global $g_dbConn, $g_permission;
 
@@ -367,7 +367,7 @@ class users
 		{
 			default: //'mysql'
 				$sql = "
-					SELECT DISTINCT ci.course_instance_id, t.term_id, ca.course_name
+					SELECT DISTINCT ci.course_instance_id
 					FROM course_aliases as ca 
 						LEFT JOIN access as a on a.alias_id = ca.course_alias_id
 						JOIN course_instances as ci on ci.course_instance_id = ca.course_instance_id
@@ -376,22 +376,24 @@ class users
 						LEFT JOIN terms as t on t.term_year = ci.year AND t.term_name = ci.term 
 					WHERE 1 ";
 				
-				if (!is_null($instructor_id) && $instructor_id != "")
+				if(!empty($instructor_id))
 					$sql .= "AND (a.permission_level = " . $g_permission['instructor'] . ") AND a.user_id = '$instructor_id' ";
-				if (!is_null($dept_id) && $dept_id != "")
+				if (!empty($dept_id))
 					$sql .= "AND c.department_id = $dept_id ";
-				if (!is_null($course_id) && $course_id != "")
-					$sql .= "AND c.course_id = $course_id ";
-				if(!is_null($term_id) && $term_id != "")
+				if (!empty($course_num))
+					$sql .= "AND c.course_number = '$course_num' ";
+				if (!empty($course_name))
+					$sql .= "AND (c.uniform_title = '$course_name' OR ca.course_name = '$course_name') ";
+				if(!empty($term_id))
 					$sql .= "AND t.term_id = $term_id ";
 					
 				$sql .= "ORDER BY t.term_id DESC, ci.year DESC, d.abbreviation ASC, c.course_number ASC, ca.section ASC LIMIT 50";
 		}
-
+		
 		$rs = $g_dbConn->query($sql);	
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-				
-		$tmpArray = null;
+							
+		$tmpArray = array();
 		while ($row = $rs->fetchRow())
 		{
 			$tmpCI = new courseInstance($row[0]);
@@ -401,6 +403,87 @@ class users
 		}
 			
 		return $tmpArray;
+	}
+	
+	
+	/**
+	 * @return Array of arrays
+	 * @param string $qry
+	 * @desc Searches for a $qry in either course_number, uniform_title, or course_name; returns array of subarrays, which are indexed by 'num' and 'name' (['num'] may not exist if query is not searching for a number)
+	 */
+	function searchForCourses($qry) {
+		global $g_dbConn;
+
+		//parse the query
+		$pieces = explode(' ', $qry);	//separate query by space
+		if((int) $pieces[0] != 0) {	//if the first "word" is a number ([(int) "string"] always equals 0)
+			//then we are going to try matching on course number
+			$number = (int) $pieces[0];	//convert the first element to a number
+		}
+		else {
+			$number = null;	//no number
+		}
+		$query = implode(' ', $pieces);	//put the string back together
+		
+		switch($g_dbConn->phptype) {
+			default:	//mysql
+				if(!empty($number)) {	//non-empty number, build pieces of query that deal w/ course number
+					$num_select = " c.course_number, ";
+					$num_where = " OR c.course_number LIKE '$number%'";
+					$num_order = " c.course_number, ";
+				}
+				else {	//ignore course number
+					$num_select = $num_where = $num_order = '';					
+				}
+				
+				$sql = "SELECT DISTINCT $num_select c.uniform_title, ca.course_name
+						FROM course_aliases AS ca
+							JOIN courses AS c ON c.course_id = ca.course_id
+						WHERE c.uniform_title LIKE '%$query%' OR ca.course_name LIKE '%$query%' $num_where
+						ORDER BY $num_order c.uniform_title, ca.course_name";
+		}
+			
+		$rs = $g_dbConn->query($sql);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		$results = array();
+		while($row = $rs->fetchRow()) {
+			$tmp = array();
+			
+			if(sizeof($row) == 3) {	//fetching number as well as title/name
+				$tmp['num'] = $row[0];	//store the number
+				$u_title = $row[1];
+				$name = $row[2];
+			}
+			else {	//only fetching the title/name
+				$title = $row[0];
+				$name = $row[1];
+			}
+			
+			//figure out the title/name
+			if(strcasecmp($name, $u_title) == 0) {	//instructor-give name and uniform title match
+				$tmp['name'] = $u_title;	//store the name
+				$results[] = $tmp;	//add tupple to results			
+			}
+			else {	//title and name do not match
+				//if the instructor-given name is not blank and matches the query
+				if(!empty($name) && (stripos($name, $query) !== false)) {
+					//then add the name to the tuple and results
+					$tmp['name'] = $name;
+					$results[] = $tmp;					
+				}
+				
+				//repeat the same for the uniform title and create/add another tupple
+				//this may result in 2 "results" per database hit, but only when titles do not match
+				if(!empty($u_title) && (stripos($u_title, $query) !== false)) {
+					//create and add another tupple
+					$tmp['name'] = $u_title;
+					$results[] = $tmp;			
+				}
+			}
+		}
+		
+		return $results;
 	}
 
 

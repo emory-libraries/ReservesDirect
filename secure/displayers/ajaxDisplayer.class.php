@@ -53,10 +53,15 @@ class ajaxDisplayer extends baseDisplayer {
 				document.getElementById('dept_id').value = dept['department_id'];
 				getClasses();
 			}
-			function courseSearchReturnAction(course)
+			function courseSearchReturnAction(course_info)
 			{
-				eval ("var course = " + decode64(course));
-				document.getElementById('course_id').value = course['courseID'];
+				eval ("var course_info = " + decode64(course_info));
+
+				if(course_info['num']) {
+					document.getElementById('course_num').value = course_info['num'];
+				}
+				document.getElementById('course_name').value = course_info['name'];
+				
 				getClasses();
 			}			
 			function getClasses()
@@ -68,15 +73,18 @@ class ajaxDisplayer extends baseDisplayer {
 				if(document.getElementById('search_dept').value == "")
 					document.getElementById('dept_id').value = '';
 					
-				if(document.getElementById('search_course').value == "")
-					document.getElementById('course_id').value = '';
+				if(document.getElementById('search_course').value == "") {
+					document.getElementById('course_num').value = '';
+					document.getElementById('course_name').value = '';
+				}
 				
 				var value = document.getElementById('inst_id').value + "::" 
 						  + document.getElementById('dept_id').value + "::" 
-						  + document.getElementById('course_id').value + "::"
+						  + document.getElementById('course_num').value + "::"
+						  + document.getElementById('course_name').value + "::"
 						  + document.getElementById('search_term').options[document.getElementById('search_term').selectedIndex].value;
 
-				if (value != "::::::")
+				if (value != "::::::::")
 				{
 					//document.getElementById('test').value = "AJAX_functions.php?f=classList&qu=" + encode64(value);
 					
@@ -159,7 +167,8 @@ class ajaxDisplayer extends baseDisplayer {
 
 			<input id="inst_id" value="" type="hidden">
 			<input id="dept_id" value="" type="hidden">
-			<input id="course_id" value="" type="hidden">
+			<input id="course_num" value="" type="hidden">
+			<input id="course_name" value="" type="hidden">
 			
 			<!--<br><input id=test><br>-->
 			
@@ -192,7 +201,7 @@ class ajaxDisplayer extends baseDisplayer {
 						<div class="LSResult" id="LSResult2" style="display:none;"><ul></ul></div>
 						<script language="JavaScript">liveSearchInit(document.getElementById("search_course"));</script>
 					</td>					
-					<td align="left" style="font-size: x-small; font-style: italic;">Course Name OR Number</span></td>
+					<td align="left" style="font-size: x-small; font-style: italic;">Course Number and/or Name</span></td>
 				</tr>
 				<tr bgcolor="#CCCCCC">
 					<td width="5%">&nbsp;</td>

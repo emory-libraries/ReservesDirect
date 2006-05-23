@@ -39,6 +39,7 @@ http://www.reservesdirect.org/
 	require_once("secure/classes/terms.class.php");
 	require_once("secure/managers/noteManager.class.php");
 	require_once("secure/managers/copyrightManager.class.php");
+	require_once("secure/managers/helpManager.class.php");
 	require_once("secure/displayers/noteDisplayer.class.php");
 	require_once("PEAR/JSON.php");
 	require_once("secure/common.inc.php");
@@ -117,49 +118,49 @@ http://www.reservesdirect.org/
 			$returnValue .= xmlFoot();
 		break;
 		
-		case 'courseList':			
-			$c = new course();
-			$cList = $c->searchForCourses($qry);
+		case 'courseList':	
+			$usersObj = new users();
+			$courses = $usersObj->searchForCourses($qry);
 						
 			$returnValue = xmlHead();
 			
-			if (count($cList) > 0)
-				for($i=0;$i<count($cList);$i++)
-					$returnValue .=	wrapResults($json->encode($cList[$i]), $cList[$i]->displayCourseNo() . ' - ' . $cList[$i]->getName());
- 			
+			foreach($courses as $info) {
+				//show num and name or just name?
+				$label = !empty($info['num']) ? $info['num'].' - '.$info['name'] : $info['name'];
+				
+				$returnValue .= wrapResults($json->encode($info), $label);
+			}
+	
 			$returnValue .= xmlFoot();		
 		break;			
 
 		case 'classList':
 			/*
 				Expects $_REQUEST['qry'] to be base64 encode '::' delimited string
-				instructor_id :: department_id :: course_id :: term_id
+				instructor_id :: department_id :: course_num :: course_name :: term_id
 				ANY values can be empty			
 			*/
 		
-			list($user_id, $dept_id, $course_id, $term_id) = split("::", $qry);			
+			list($user_id, $dept_id, $course_num, $course_name, $term_id) = split("::", $qry);			
 			
 			$userObj = new users();
-			$ci_list = $userObj->searchForCI($user_id, $dept_id, $course_id, $term_id);
+			$ci_list = $userObj->searchForCI($user_id, $dept_id, $course_num, $course_name, $term_id);
 			
-			if (count($ci_list) > 0)
-			{
+			if(sizeof($ci_list) > 0) {
+				//display table header
+				$returnValue .= "<div align=\"left\" class=\"headingCell1\">\n";
+				$returnValue .= "	<div align=\"left\" style=\"width:60px; float:left;\">&nbsp;</div>\n";
+				$returnValue .= "	<div align=\"left\" style=\"width:15%; float:left;\">Course Number</div>\n";
+				$returnValue .= "	<div align=\"left\" style=\"width:30%; float:left;\">Course Name</div>\n";
+				$returnValue .= "	<div align=\"left\" style=\"width:25%; float:left;\">Instructor</div>\n";
+				$returnValue .= "	<div align=\"left\" style=\"width:14%; float:left;\">Last Active</div>\n";
+				$returnValue .= "	<div align=\"left\" style=\"width:55px; float:right; padding-right:5px;\">Preview</div>\n";
+				$returnValue .= "	<div style=\"clear:both;\" class=\"headingCell1\"></div>\n";
+				$returnValue .= "</div>\n";		
 				
-					$returnValue .= "<div align=\"left\" class=\"headingCell1\">\n";
-					$returnValue .= "	<div align=\"left\" style=\"width:60px; float:left;\">&nbsp;</div>\n";
-					$returnValue .= "	<div align=\"left\" style=\"width:15%; float:left;\">Course Number</div>\n";
-					$returnValue .= "	<div align=\"left\" style=\"width:30%; float:left;\">Course Name</div>\n";
-					$returnValue .= "	<div align=\"left\" style=\"width:25%; float:left;\">Instructor</div>\n";
-					$returnValue .= "	<div align=\"left\" style=\"width:14%; float:left;\">Last Active</div>\n";
-					$returnValue .= "	<div align=\"left\" style=\"width:55px; float:right; padding-right:5px;\">Preview</div>\n";
-					$returnValue .= "	<div style=\"clear:both;\" class=\"headingCell1\"></div>\n";
-					$returnValue .= "</div>\n";					
-				
-				
-				for($i=0; $i<count($ci_list); $i++)
-				{
+				foreach($ci_list as $ci) {
 					//show status icon
-					switch($ci_list[$i]->getStatus()) {
+					switch($ci->getStatus()) {
 						case 'AUTOFEED':
 							$edit_icon = '<img src="images/activate.gif" width="24" height="20" />';	//show the 'activate-me' icon
 						break;
@@ -170,18 +171,34 @@ http://www.reservesdirect.org/
 							$edit_icon = '<img src="images/pencil.gif" alt="edit" width="24" height="20">';	//show the edit icon
 						break;						
 					}
-						
-					$rowStyle = ($rowStyle=='oddRow') ? 'evenRow' : 'oddRow';	//set the style
+									
+					//get crosslistings
+					$crosslistings = $ci->getCrossListings();
+					$crosslistings_string = '';
+					foreach($crosslistings as $crosslisting) {
+						$crosslistings_string .= ', '.$crosslisting->displayCourseNo().' '.$crosslisting->getName();
+					}
+					$crosslistings_string = ltrim($crosslistings_string, ', ');	//trim off the first comma
+					
+					//being "output"					
+					$rowStyle = (empty($rowStyle) || ($rowStyle=='evenRow')) ? 'oddRow' : 'evenRow';	//set the style
+									
 					$returnValue .= "<div align=\"left\" class=\"$rowStyle\" style=\"padding:5px;\">\n";					
-					$returnValue .= "	<div align=\"left\" style=\"width: 30px; float:left; text-align:left;\"><input name=\"ci\" type=\"radio\" value=\"". $ci_list[$i]->getCourseInstanceID() ."\" onClick=\"document.getElementById('editButton').disabled=false\"></div>\n";
+					$returnValue .= "	<div align=\"left\" style=\"width: 30px; float:left; text-align:left;\"><input name=\"ci\" type=\"radio\" value=\"".$ci->getCourseInstanceID()."\" onClick=\"document.getElementById('editButton').disabled=false\"></div>\n";
 					$returnValue .= '	<div style="width: 30px; float:left; text-align:left">'.$edit_icon.'</div>';
-					$returnValue .= "	<div align=\"left\" style=\"width:15%; float:left;\">".$ci_list[$i]->course->displayCourseNo()."&nbsp;</div>\n";
-					$returnValue .= "	<div align=\"left\" style=\"width:30%; float:left;\">".$ci_list[$i]->course->getName()."&nbsp;</div>\n";
-					$returnValue .= "	<div align=\"left\" style=\"width:25%; float:left;\">".$ci_list[$i]->displayInstructors()."&nbsp;</div>\n";
-					$returnValue .= "	<div align=\"left\" style=\"width:14%; float:left;\">".$ci_list[$i]->displayTerm()."&nbsp;</div>\n";
-					$returnValue .= "	<div align=\"left\" style=\"width:55px; float:right;\"><a href=\"javascript:openWindow('no_control=1&cmd=previewReservesList&ci=".$ci_list[$i]->courseInstanceID . "','width=800,height=600');\">preview</a></div>\n";
-					$returnValue .= "	<div style=\"clear:both;\"></div>\n";
-					$returnValue .= "</div>\n";					
+					$returnValue .= "	<div align=\"left\" style=\"width:15%; float:left;\">".$ci->course->displayCourseNo()."&nbsp;</div>\n";
+					$returnValue .= "	<div align=\"left\" style=\"width:30%; float:left;\">".$ci->course->getName()."&nbsp;</div>\n";
+					$returnValue .= "	<div align=\"left\" style=\"width:25%; float:left;\">".$ci->displayInstructors()."&nbsp;</div>\n";
+					$returnValue .= "	<div align=\"left\" style=\"width:14%; float:left;\">".$ci->displayTerm()."&nbsp;</div>\n";
+					$returnValue .= "	<div align=\"left\" style=\"width:55px; float:right;\"><a href=\"javascript:openWindow('no_control=1&cmd=previewReservesList&ci=".$ci->getCourseInstanceID(). "','width=800,height=600');\">preview</a></div>\n";
+					$returnValue .= "	<div style=\"clear:both; margin-left:30px; padding-top:5px;\">";
+					
+					if(!empty($crosslistings_string)) {
+						$returnValue .= "<em>Crosslisted As:</em> <small>$crosslistings_string</small>";
+					}
+					
+					$returnValue .= "	</div>\n";
+					$returnValue .= "</div>\n";
 				}
 			}
 			else

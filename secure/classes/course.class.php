@@ -198,35 +198,6 @@ class course
 		}
 	}
 	
-	/**
-	 * @return Array of course object or null
-	 * @param string $qry
-	 * @desc Searches for a $qry in either course_number or course_name; loads object on success
-	 */
-	function searchForCourses($qry) {
-		global $g_dbConn;
-		
-		switch($g_dbConn->phptype) {
-			default:	//mysql
-				$sql = "SELECT course_id
-						FROM courses
-						WHERE course_number LIKE '$qry%' OR uniform_title LIKE '%$qry%'";
-		}
-		
-		$rs = $g_dbConn->query($sql, array());
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		
-		$tmpArray = null;
-		while ($row = $rs->fetchRow())
-		{
-			$tmpC = new course();
-			$tmpC->getCourseByID($row[0]);
-			$tmpC->getDepartment();
-			$tmpArray[] = $tmpC;
-		}
-			
-		return $tmpArray;
-	}
 	
 	function setName($name)
 	{
