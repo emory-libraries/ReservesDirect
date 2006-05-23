@@ -142,8 +142,8 @@ function liveSearchKeyPress(event) {
 			next++
 		}
 			
-		return false;		
-	}	
+		return false;
+	}
 }
 
 function doClickEvent(el){
@@ -161,7 +161,20 @@ function doClickEvent(el){
 		eval (clickEvent);
 }
 
-function liveSearchStart(event, element, s_url, result_div, rf) {		
+function liveSearchStart(event, element, s_url, result_div, rf) {
+	//ESC closes div
+	if(event.keyCode == 27) {
+		liveSearchHide();
+		return;
+	}
+	//BACKSPACE/DEL - closes dif if query is empty
+	else if ((event.keyCode == 8) || (event.keyCode == 46)) {
+		if(element.value.length == 0) {
+			liveSearchHide();
+			return;
+		}
+	}
+	
 	if(event.keyCode != 9 && event.keyCode != 40 && event.keyCode != 38 && event.keyCode != 13) { //TAB, DOWN ARROW and UP ARROW and RETURN
 		if (t) {
 			window.clearTimeout(t);
