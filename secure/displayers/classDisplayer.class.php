@@ -92,7 +92,7 @@ class classDisplayer extends baseDisplayer {
 		}
 		else {
 			foreach($crosslistings as $crosslisting) {
-				$crosslistings_string .= ', '.$crosslisting->displayCourseNo();
+				$crosslistings_string .= ', '.$crosslisting->displayCourseNo().' '.$crosslisting->getName();
 			}
 			$crosslistings_string = ltrim($crosslistings_string, ', ');	//trim off the first comma
 		}
