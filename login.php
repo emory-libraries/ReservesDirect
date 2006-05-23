@@ -5,9 +5,10 @@
 		<title>ReservesDirect Login</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 		<link rel="stylesheet" href="css/standalone_login.css" type="text/css">
+		<script language="JavaScript1.2" src="secure/javascript/jsFunctions.js"></script>
 	</head>
 
-	<body>
+	<body onload="focusOnForm();">
 		
 <table width="600" border="0" align="center" cellpadding="10" cellspacing="0" bgcolor="#FFFFFF" class="borders2">
   <tr align="left" valign="top"> 
@@ -29,7 +30,7 @@
               <tr> 
                 <td height="103" colspan="3" align="left" valign="top"> 
                 
-                <form name="RDlogin" method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>">
+                <form name="RDlogin" method="post" action="<?php echo $_SERVER['REQUEST_URI']; ?>" style="margin:0px;">
                 <table width="100%" border="0" align="center" cellpadding="5" cellspacing="0" class="loginBox" height="44">
                   <tr valign="top">
                     <td width="11%" height="10">&nbsp; </td>
