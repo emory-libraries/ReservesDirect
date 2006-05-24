@@ -210,9 +210,6 @@ class requestManager
 							$physCopy->createPhysicalCopy();
 							//create new reserve
 							$reserve->createNewReserve($ci->getCourseInstanceID(), $item->getItemID());
-							//store some stats
-							$itemAudit = new itemAudit();
-							$itemAudit->createNewItemAudit($item->getItemID(),$user->getUserID());
 						}					
 					}
 
