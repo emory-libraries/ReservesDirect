@@ -39,7 +39,6 @@ http://www.reservesdirect.org/
 	require_once("secure/classes/terms.class.php");
 	require_once("secure/managers/noteManager.class.php");
 	require_once("secure/managers/copyrightManager.class.php");
-	require_once("secure/managers/helpManager.class.php");
 	require_once("secure/displayers/noteDisplayer.class.php");
 	require_once("PEAR/JSON.php");
 	require_once("secure/common.inc.php");
@@ -289,7 +288,7 @@ http://www.reservesdirect.org/
 			
 			copyrightManager::setContact();
 		break;
-		
+
 		default:
 			return null;
 	}
