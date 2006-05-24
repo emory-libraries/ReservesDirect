@@ -190,10 +190,10 @@ http://www.reservesdirect.org/
 					$returnValue .= "	<div align=\"left\" style=\"width:25%; float:left;\">".$ci->displayInstructors()."&nbsp;</div>\n";
 					$returnValue .= "	<div align=\"left\" style=\"width:14%; float:left;\">".$ci->displayTerm()."&nbsp;</div>\n";
 					$returnValue .= "	<div align=\"left\" style=\"width:55px; float:right;\"><a href=\"javascript:openWindow('no_control=1&cmd=previewReservesList&ci=".$ci->getCourseInstanceID(). "','width=800,height=600');\">preview</a></div>\n";
-					$returnValue .= "	<div style=\"clear:both; margin-left:30px; padding-top:5px;\">";
+					$returnValue .= "	<div style=\"clear:both;\">";
 					
 					if(!empty($crosslistings_string)) {
-						$returnValue .= "<em>Crosslisted As:</em> <small>$crosslistings_string</small>";
+						$returnValue .= "<div style=\" margin-left:30px; padding-top:5px;\"><em>Crosslisted As:</em> <small>$crosslistings_string</small></div>";
 					}
 					
 					$returnValue .= "	</div>\n";
@@ -288,7 +288,7 @@ http://www.reservesdirect.org/
 			
 			copyrightManager::setContact();
 		break;
-
+		
 		default:
 			return null;
 	}
