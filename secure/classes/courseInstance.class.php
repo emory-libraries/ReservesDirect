@@ -1107,6 +1107,19 @@ class courseInstance
 		}
 		return ($retValue == "" ? "No Crosslistings" : $retValue);
 	}
+	
+	/**
+	 * @return boolean
+	 * @desc True if ci is enrollable
+	 */	
+	function EnrollmentAllowed()
+	{
+		if ($this->getEnrollment() == 'INACTIVE' || $this->getEnrollment() != 'CLOSED')
+			return false;
+		else 
+			return true;
+
+	}
 
 
 	function getCourseInstanceID() { return $this->courseInstanceID; }
