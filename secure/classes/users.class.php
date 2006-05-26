@@ -399,7 +399,7 @@ class users
 			$tmpCI = new courseInstance($row[0]);
 			$tmpCI->getPrimaryCourse();
 			$tmpCI->getInstructors();
-			$tmpArray[] = $tmpCI;
+			$tmpArray[$row[0]] = $tmpCI;
 		}
 			
 		return $tmpArray;
