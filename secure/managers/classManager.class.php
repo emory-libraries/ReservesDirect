@@ -155,12 +155,16 @@ class classManager
 						}
 							
 						//do not display courses with closed enrollment
-						for($x=0; $x<sizeof($course_instances); $x++) {
-							if($course_instances[$x]->getEnrollment() == 'CLOSED') {
-								unset($course_instances[$x]);
+						
+						if (!empty($course_instances))
+						{
+							foreach($course_instances as $ci_x) {
+								if(!$ci_x->EnrollmentAllowed()) {								
+									unset($course_instances[$ci_x->getCourseInstanceID()]);
+								}
 							}
 						}
-						
+										
 						$msg = 'Select a class to add:';							
 						$this->displayFunction = 'displaySelectClass';
 						$this->argList = array('addClass', $course_instances, $msg);
