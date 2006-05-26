@@ -1114,7 +1114,7 @@ class courseInstance
 	 */	
 	function EnrollmentAllowed()
 	{
-		if ($this->getEnrollment() == 'INACTIVE' || $this->getEnrollment() == 'CLOSED')
+		if ($this->getEnrollment() == 'INACTIVE' || $this->getEnrollment() == 'CLOSED' || $this->getStatus() == 'AUTOFEED')
 			return false;
 		else 
 			return true;
