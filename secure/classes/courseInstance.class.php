@@ -1112,13 +1112,14 @@ class courseInstance
 	 * @return boolean
 	 * @desc True if ci is enrollable
 	 */	
-	function EnrollmentAllowed()
-	{
-		if ($this->getEnrollment() == 'INACTIVE' || $this->getEnrollment() == 'CLOSED' || $this->getStatus() == 'AUTOFEED')
-			return false;
-		else 
+	function EnrollmentAllowed() {
+		//only allow active courses with open or moderated enrollment
+		if(($this->getEnrollment() != 'CLOSED') && ($this->getStatus() == 'ACTIVE')) {
 			return true;
-
+		}
+		else {
+			return false;
+		}
 	}
 
 

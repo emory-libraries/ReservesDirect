@@ -151,16 +151,15 @@ class classManager
 							$current_term = $termsObj->getCurrentTerm();
 							$usersObj = new users();
 												
-							$course_instances = $usersObj->searchForCI(null, $department_id, null, $current_term->getTermID());
+							$course_instances = $usersObj->searchForCI(null, $department_id, null, null, $current_term->getTermID());
 						}
 							
-						//do not display courses with closed enrollment
-						
+						//do not display courses with closed enrollment or inactive status						
 						if (!empty($course_instances))
 						{
-							foreach($course_instances as $ci_x) {
+							foreach($course_instances as $ci_x_index=>$ci_x) {
 								if(!$ci_x->EnrollmentAllowed()) {								
-									unset($course_instances[$ci_x->getCourseInstanceID()]);
+									unset($course_instances[$ci_x_index]);
 								}
 							}
 						}
