@@ -33,6 +33,8 @@ require_once("secure/classes/courseInstance.class.php");
 //require the admin interface
 //this will require all the other interfaces (cascade)
 require_once('secure/interface/admin.class.php');
+//except custodian which must be included separately
+require_once('secure/interface/custodian.class.php');
 
 class users
 {
