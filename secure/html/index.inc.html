@@ -16,7 +16,11 @@
 </head>
 
 <body onload="focusOnForm();">
-<div id="container">
+
+<!--help sidebar-->
+<?php include('secure/html/help_sidebar.inc.html'); ?>
+
+<div id="container" class="helpOff">
   	<!--banner.inc-->
 	<?php include("secure/html/banner.inc.html"); ?>
 	<div id="Navigation">
@@ -50,14 +54,14 @@
     		echo "</div>";
     	}        	
     ?>
-    </div>	 	 
+	 	 
     <div id="alertMsg" class="failedText">
         <? if (isset($alertMsg)) echo $alertMsg; ?>
     </div>
-	<div id="Content">
+   	<div id="Content">
 		<? $mgr->display() ?>
 	</div>
-    <div id="Footer">
+	<div id="Footer">
  		<?php include("secure/html/footer.inc.html"); ?>
  	</div>
 </div>

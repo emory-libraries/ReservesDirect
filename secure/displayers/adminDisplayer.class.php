@@ -29,6 +29,7 @@ http://www.reservesdirect.org/
 *******************************************************************************/
 require_once("secure/common.inc.php");
 require_once("secure/classes/terms.class.php");
+require_once('secure/displayers/helpDisplayer.class.php');
 
 class adminDisplayer
 {
@@ -39,20 +40,25 @@ class adminDisplayer
 	 */
 	function displayAdminFunctions()
 	{
-		
-		echo "<table width=\"60%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "	<tr><td width=\"100%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
-
-		echo "<tr>\n";
-		echo "	<td NOWRAP><a href=\"index.php?cmd=admin&function=editDept\">Add/Edit Departments</a></td>\n";			
-		echo "<tr>\n";
-
-		echo "<tr>\n";
-		echo "	<td NOWRAP><a href=\"index.php?cmd=admin&function=editLib\">Add/Edit Libraries</a></td>\n";			
-		echo "<tr>\n";		
-		
-		
-		echo "</table>\n";
+?>
+	<a href="index.php?cmd=admin&function=editDept">Add/Edit Departments</a>
+	<p />
+	<a href="index.php?cmd=admin&function=editLib">Add/Edit Libraries</a>
+	<p />
+	
+	<strong>Help</strong>
+	<br />
+	<a href="index.php?cmd=helpEditArticle">Add Article</a>
+	<br />
+	<a href="index.php?cmd=helpEditCategory">Add Category</a>
+	<br />
+	<form method="post" action="index.php?cmd=helpEditCategory">
+		Edit 
+		<?php helpDisplayer::displayCategorySelect(); ?>
+		Category
+		<input type="submit" name="submit" value="Edit" />
+	</form>
+<?php
 	}
 	
 	function displayEditDept($function, $libraries)

@@ -582,12 +582,109 @@ CREATE TABLE `users` (
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `help_art_tags`
+-- 
+
+DROP TABLE IF EXISTS `help_art_tags`;
+CREATE TABLE `help_art_tags` (
+  `article_id` int(8) unsigned default NULL,
+  `tag` varchar(50) default NULL,
+  `user_id` int(11) unsigned default NULL,
+  UNIQUE KEY `ndx_uniq_combo` (`article_id`,`tag`,`user_id`),
+  KEY `user_id` (`user_id`),
+  FULLTEXT KEY `tag` (`tag`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `help_art_to_art`
+-- 
+
+DROP TABLE IF EXISTS `help_art_to_art`;
+CREATE TABLE `help_art_to_art` (
+  `article1_id` int(8) unsigned default NULL,
+  `article2_id` int(8) unsigned default NULL,
+  `relation_2to1` enum('child','sibling') default NULL,
+  UNIQUE KEY `ndx_uniq_combo` (`article1_id`,`article2_id`),
+  KEY `article2_id` (`article2_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='In child relationship, article1 is always parent';
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `help_art_to_role`
+-- 
+
+DROP TABLE IF EXISTS `help_art_to_role`;
+CREATE TABLE `help_art_to_role` (
+  `article_id` int(8) unsigned default NULL,
+  `permission_level` tinyint(2) unsigned default NULL,
+  `can_view` tinyint(1) NOT NULL default '1',
+  `can_edit` tinyint(1) NOT NULL default '0',
+  UNIQUE KEY `ndx_uniq_combo` (`article_id`,`permission_level`),
+  KEY `permission_level` (`permission_level`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='Specifies if specific permission-level may view/edit the art';
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `help_articles`
+-- 
+
+DROP TABLE IF EXISTS `help_articles`;
+CREATE TABLE `help_articles` (
+  `id` int(8) unsigned NOT NULL auto_increment,
+  `category_id` int(8) unsigned default NULL,
+  `title` varchar(100) default NULL,
+  `body` text,
+  `date_created` date default NULL,
+  `date_modified` date default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `category_id` (`category_id`),
+  FULLTEXT KEY `body` (`body`),
+  FULLTEXT KEY `ft_title_body` (`title`,`body`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `help_cat_to_role`
+-- 
+
+DROP TABLE IF EXISTS `help_cat_to_role`;
+CREATE TABLE `help_cat_to_role` (
+  `category_id` int(8) unsigned default NULL,
+  `permission_level` tinyint(2) unsigned default NULL,
+  `can_view` tinyint(1) NOT NULL default '0',
+  `can_edit` tinyint(1) NOT NULL default '0',
+  UNIQUE KEY `ndx_uniq_combo` (`category_id`,`permission_level`),
+  KEY `category_id` (`permission_level`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='Specifies if specific permission-level may view/edit the cat';
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `help_categories`
+-- 
+
+DROP TABLE IF EXISTS `help_categories`;
+CREATE TABLE `help_categories` (
+  `id` smallint(4) unsigned NOT NULL auto_increment,
+  `title` varchar(100) default NULL,
+  `description` tinytext,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+
+
 
 -- -----------------------------------------------------
 -- ADD INITIAL DATA
 -- -----------------------------------------------------
-
--- --------------------------------------------------------
 
 --
 -- Seed data for table `users`: admin

@@ -102,100 +102,6 @@ a.editlinks:hover {
 	font-weight: normal;
 }
 
-/* 'helptab' defines the appearance of top navigation links in the help file. */
-a.helptab:link {
-	
-	color: #333333;
-	text-decoration: none;
-	font-size: medium;
-	font-weight: bold;
-}
-a.helptab:visited {
-	
-	color: #333333;
-	text-decoration: none;
-	font-size: medium;
-	font-weight: bold;
-}
-a.helptab:hover {
-	
-	color: #FFFFFF;
-	text-decoration: underline;
-	font-size: medium;
-	font-weight: bold;
-}
-a.helptab:active {
-	
-	color: #FFFFFF;
-	text-decoration: none;
-	font-size: medium;
-	font-weight: bold;
-}
-
-/* 'helptopic' defines the appearance of topical headers in the helpfile navigation menu. */
-a.helptopic:link {
-	
-	color: #333399;
-	text-decoration: none;
-	font-size: small;
-	font-weight: bold;
-}
-a.helptopic:visited {
-	
-	color: #333399;
-	text-decoration: none;
-	font-size: small;
-	font-weight: bold;
-}
-a.helptopic:hover {
-	
-	color: #999999;
-	text-decoration: none;
-	font-size: small;
-	font-weight: bold;
-}
-a.helptopic:active {
-	
-	color: #993333;
-	text-decoration: none;
-	font-size: small;
-	font-weight: bold;
-}
-
-/* 'helpsubtopic' defines the appearance of subtopic headers in the helpfile navigation menu. */
-a.helpsubtopic:link {
-	
-	color: #996633;
-	text-decoration: none;
-	font-size: x-small;
-	font-weight: bolder;
-	left: 8px;
-}
-a.helpsubtopic:visited {
-	
-	color: #996633;
-	text-decoration: none;
-	font-size: x-small;
-	font-weight: bold;
-	text-indent: 8px;
-}
-a.helpsubtopic:hover {
-	
-	color: #999999;
-	text-decoration: none;
-	font-size: x-small;
-	font-weight: bold;
-	text-indent: 8px;
-}
-a.helpsubtopic:active {
-	
-	color: #993333;
-	text-decoration: none;
-	font-size: x-small;
-	font-weight: bold;
-	text-indent: 8px;
-}
-
 /* 'itemTitle' defines how reserve item title links are listed. */
 
 a.itemTitle:link {
@@ -284,9 +190,9 @@ appearance of the ReservesDirect interface.
 */
 
 #container { /* a wrapper for the entire page layout */
-	margin: 0px;
-	width: 100%;
+	height: 100%;
 }
+
 #Header { /* a wrapper containing the branding image divs */
 	margin: 0px;
 	padding: 0px;
@@ -327,14 +233,11 @@ program logo (default is 'ReservesDirect' logo). */
 
 .functionLinks { /* 'functionlinks' describe the links to site-wide functions like help, sign off, and edit profile
 that appear on every screen.   */
-	margin: 8px 10px 0px 0px;
+	margin: 5px 10px 3px 0px;
 	text-align: right;
-	padding-bottom: 8px;
 	font-size: x-small;
 	font-weight: normal;
 	color: #993333;
-	height: 10px;
-	float: right;
 }
 .functionLinks a:link {
 	color: #993333;
@@ -359,8 +262,8 @@ by Douglas Bowman at http://www.alistapart.com/articles/slidingdoors/
 This technique can be used to create many different types of tabs;
 the commented guidelines below are for creating standard tabs. */
 #mainNav {
-    float:left;
     width:100%;
+    height: 36px;
     background:#7C89CA url('../images/navtab-default-bg.gif') 
       repeat-x bottom; /* creates the background behind the tabs--should be only 2-3 pixels wide.
 	  						background color should be same as top color of bg image. */
@@ -1040,7 +943,6 @@ of materials on reserve. */
 	font-weight:bold;
 }
 
-
 /*Auto complete Definitions for AJAX class search/lookup screens*/
 
 #keyword {
@@ -1118,232 +1020,6 @@ border:1px solid #99b58d;
 	font-size:12px;
 	font-weight:normal;
 }
-/*
-****************************************
-Help Screen Definitions
-****************************************
-*/
-
-.helpTip {
-	position:absolute;
-	left:200px;
-	top:200px;
-	border:1px solid #333333;
-	background-color:#CCFFCC;
-	width:400px;
-	text-align:left;
-	padding:5px;
-	visibility:hidden;
-}
-.helpTip .actionLinks {
-	float:right;
-}
-.helpTip .helpIcon {
-	background-image: url(../../images/questionMark.gif);
-	width:30px;
-	float:left;
-	padding-bottom:15px;
-	margin:3px;
-}
-.helpTip .actionIcons {
-	float:right;
-	width:50px;
-	margin:5px 0px 5px 5px;
-}
-.helpTip .title {
-	float:left;
-	color:#333333;
-	font-size:medium;
-	font-weight:bold;
-	margin-left:8px;
-	margin-top:8px;
-}
-.helpTip .text {
-	display:block;
-	padding:10px;
-	margin: 28px 15px 15px 35px;
-}
-.helpTip .turnOffHelp {
-	color:#666666;
-	font-size:10px;
-	float:left;
-	width:200px;
-}
-.helpTip .turnOffHelp a {
-	color:#333333;
-	text-decoration:underline;
-}
-.helpTip .turnOffHelp a:hover {
-	color:#0000FF;
-}
-.headingCell-helpfileActive {
-	
-	font-size: small;
-	font-weight: bold;
-	color: #FFFFFF;
-	background-color: #000066;
-	text-align: center;
-}
-.headingCell-helpfileInactive {
-	
-	font-size: small;
-	font-weight: bold;
-	text-transform: capitalize;
-	color: #333333;
-	background-color: #CCCCCC;
-	text-align: center;
-}
-
-
-
-#helpTabs {
-    float:left;
-    width:100%;
-    background-color:#FFFFFF;
-	font-family: Arial, Helvetica, sans-serif;
-	font-size:small;
-    } 
-	
-#helpTabs ul {
-    margin:0;
-    padding:0;
-	padding:0; /* padding to top|right and left|bottom of ul, creates space around whole nav bar */
-    list-style:none;
-    }
-#helpTabs li {
-    float:left;
-    margin:3px 3px 0 3px;
-    padding:0; 
-    border-right: 1px solid #666666;
-	border-left: 1px solid #666666;
-	border-top: 1px solid #666666;
-	}
-#helpTabs a {
-	float:left;
-	display:block;
-	background-color: #CCCCCC;
-	padding:4px 20px 4px 20px; /* left padding=right padding - pixel width of left image
-								bottom padding=desired overall bottom padding-pixel 
-								width of bottom border, if any */
-	color: #333333;
-	text-decoration: none;
-	font-weight: bold;
-    }
-	/* Commented Backslash Hack
-     hides rule from IE5-Mac \*/
-  #helpTabs a {float:none;}
-  /* End IE5-Mac hack */ 
-#helpTabs a:hover {
-     color: #000066;
-	text-decoration: underline;
-	  }	
-#helpTabs #current {
-	border-right: 1px solid #666666;
-	border-left: 1px solid #666666;
-	border-top: 1px solid #666666;
-    }
-#helpTabs #current a {
-	background-color: #000066;
-	color: #FFFFFF;
-	text-decoration: none;
-	padding-bottom:4px; /* bottom padding=top padding of mainNav a */
-    }
-
-/* 'helptopic' defines the appearance of topical headers in the helpfile navigation menu. */
-a.helptopic:link {
-	
-	color: #333399;
-	text-decoration: none;
-	font-size: small;
-	font-weight: bold;
-}
-a.helptopic:visited {
-	
-	color: #333399;
-	text-decoration: none;
-	font-size: small;
-	font-weight: bold;
-}
-a.helptopic:hover {
-	
-	color: #999999;
-	text-decoration: none;
-	font-size: small;
-	font-weight: bold;
-}
-a.helptopic:active {
-	
-	color: #993333;
-	text-decoration: none;
-	font-size: small;
-	font-weight: bold;
-}
-
-/* 'helpsubtopic' defines the appearance of subtopic headers in the helpfile navigation menu. */
-a.helpsubtopic:link {
-	
-	color: #996633;
-	text-decoration: none;
-	font-size: x-small;
-	font-weight: bolder;
-	left: 8px;
-}
-a.helpsubtopic:visited {
-	
-	color: #996633;
-	text-decoration: none;
-	font-size: x-small;
-	font-weight: bold;
-	text-indent: 8px;
-}
-a.helpsubtopic:hover {
-	
-	color: #999999;
-	text-decoration: none;
-	font-size: x-small;
-	font-weight: bold;
-	text-indent: 8px;
-}
-a.helpsubtopic:active {
-	
-	color: #993333;
-	text-decoration: none;
-	font-size: x-small;
-	font-weight: bold;
-	text-indent: 8px;
-}
-.border-helpfile {
-	border: 1px solid #000066;
-}
-
-#index {
-	font-size: small;
-	font-family: Arial, Helvetica, sans-serif;
-	list-style: none;
-}
-#index #broadTopic a {
-	color: #000066;
-	font-weight: bold;
-	text-decoration: none;
-}
-#index #broadTopic a:hover {
-	color: #003399;
-	font-weight: bold;
-	text-decoration: underline;
-}
-#index #narrowTopic a {
-	font-weight: bold;
-	color: #333333;
-	text-decoration: none;
-	text-indent: 8px;
-}
-#index #narrowTopic a:hover {
-	font-weight: bold;
-	color: #999999;
-	text-decoration: underline;
-	text-indent: 8px;
-}
-
 
 /*
 ****************************************
@@ -1464,3 +1140,84 @@ legend {
 fieldset.highlight {
 	background: #DDDDDD;
 }
+
+
+/*
+******************************************
+Help
+******************************************
+*/
+
+/* definitions for the sidebar positioning, etc */
+#help-container {
+	position: fixed;
+	top: 10px;
+	bottom: 10px;
+	right: 10px;
+	width: 230px;
+}
+* html #help-container { /* IE hacks */
+	position: absolute;
+	top: 2%;
+	height: 95%;	
+}
+#help-container iframe {
+	border: 0px;
+	width: 100%;
+	height: 100%;
+	padding: 5px;
+}
+
+/* classes for the #container div */
+.helpOff {
+	margin: 0px;
+	width: 100%;
+}
+.helpOn {
+	border-right: 1px solid black;
+	margin: 0px 250px 0px 0px;
+}
+
+/* end container/positional css */
+
+#help-container #nav {
+	text-align: right;
+	padding-bottom: 2px;
+	border-bottom: 1px solid black;
+	margin-bottom: 5px;
+}
+
+#help_article_perms {
+	margin-left: 20px;
+}
+
+#help label, #help-sidebar label {
+	width: 50px;
+	font-style: italic;
+}
+
+#help textarea {
+	width: 400px;
+	height: 150px;
+}
+#help-sidebar textarea {
+	width: 200px;
+	height: 100px;
+}
+
+
+#help {} /* div that wraps all of content of help viewed in the main page */
+#help-sidebar {} /* div that wraps all of content of help viewed in the sidebar */
+
+.help_article_title {}
+.help_article_body {}
+
+.help_article_list {}
+
+.help_related_tags {} /* contains .help_tag_list */
+.help_tag_list {}
+.help_tag {}
+.help_user_tag {}
+
+.help_keyword_highlight {}
+.help_error {}

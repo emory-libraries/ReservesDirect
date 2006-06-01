@@ -39,6 +39,7 @@ http://www.reservesdirect.org/
 	require_once("secure/classes/terms.class.php");
 	require_once("secure/managers/noteManager.class.php");
 	require_once("secure/managers/copyrightManager.class.php");
+	require_once("secure/managers/helpManager.class.php");
 	require_once("secure/displayers/noteDisplayer.class.php");
 	require_once("PEAR/JSON.php");
 	require_once("secure/common.inc.php");
@@ -287,6 +288,20 @@ http://www.reservesdirect.org/
 			$_REQUEST['contact_id'] = $request['contact_id'];
 			
 			copyrightManager::setContact();
+		break;
+		
+		case 'fetchHelpTags':
+			//parse the request
+			parse_str(base64_decode($_REQUEST['query']), $request);
+			
+			$returnValue = helpManager::getTags($request['article_id']);
+		break;
+		
+		case 'saveHelpTags';
+			//parse the request
+			parse_str(base64_decode($_REQUEST['query']), $request);
+			
+			helpManager::setTags($request['article_id'], $request['tags_string']);
 		break;
 		
 		default:

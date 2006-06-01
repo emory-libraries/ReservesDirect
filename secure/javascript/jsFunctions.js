@@ -23,6 +23,37 @@ function focusOnForm() {
 	}
 }
 
+
+
+function help(query) {
+	if(document.getElementById('container') && document.getElementById('help-container') && document.getElementById('help-content')) {
+		if(!query) {	//make sure there is a non-blank query
+			query = 'cmd=help';
+		}
+		//point the iframe to the appropriate page
+		document.getElementById('help-content').src = "help.php?" + query;
+		toggleHelp(1);
+	}
+}
+
+function toggleHelp(on) {
+	if(document.getElementById('container') && document.getElementById('help-container')) {
+		if(on) {
+			//show the help block
+			document.getElementById('container').className = 'helpOn';
+			document.getElementById('help-container').style.display = 'block';
+		}
+		else {
+			//hide the help block
+			document.getElementById('container').className = 'helpOff';
+			document.getElementById('help-container').style.display = 'none';
+		}
+	}
+	
+	return false;
+}
+
+
 /*
 *@desc - This Function is called via the onChange event, when a user updates the sortOrder for a reserve item
 *@desc - The function updates the Sort Order for all of the reserve records

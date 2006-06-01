@@ -132,7 +132,7 @@ switch ($cmd)
 		require_once("secure/managers/reservesManager.class.php");
 		$mgr = new reservesManager($cmd, $u);
 	break;
-	
+
 
 	case 'myReserves':
 	case 'viewCourseList':
@@ -152,7 +152,7 @@ switch ($cmd)
 	case 'confirmDeleteClass':
 	case 'deleteClassSuccess':
 	case 'copyItems':
-		require_once("secure/managers/classManager.class.php");		
+	case 'processCopyItems':
 		require_once("secure/managers/classManager.class.php");
 		$request = $_REQUEST;
 		$mgr = new classManager($cmd, $u, $adminUser, $_REQUEST);
@@ -182,7 +182,7 @@ switch ($cmd)
 	case 'duplicateReserve';
 		require_once("secure/managers/itemManager.class.php");
 		$mgr = new itemManager($cmd, $u);
-	
+	break;
 
 	case 'displayRequest':
 	case 'processRequest':
@@ -221,7 +221,7 @@ switch ($cmd)
 	case 'saveNote':
 		require_once("secure/managers/noteManager.class.php");
 		$mgr = new noteManager($cmd, $u);
-	
+	break;
 
 	case 'exportClass':
 		require_once("secure/managers/exportManager.class.php");
@@ -233,20 +233,33 @@ switch ($cmd)
 	case 'addResultsToClass':
 		require_once("secure/managers/searchManager.class.php");
 		$mgr = new searchManager($cmd, $u, $_REQUEST);
-	
+	break;
 
 	case 'reportsTab':
 	case 'viewReport':
 		$page = "reports";
 		require_once("secure/managers/reportManager.class.php");
 		$mgr = new reportManager($cmd, $u, $_REQUEST);
-	
+	break;
 
 	case 'admin':
 		$page = 'admin';
 		require_once("secure/managers/adminManager.class.php");
 		$mgr = new adminManager($cmd, $u, $_REQUEST);
-		
+	break;
+
+	case 'help':
+	case 'helpViewArticle':
+	case 'helpEditArticle':
+	case 'helpViewCategory':
+	case 'helpEditCategory':
+	case 'helpViewTag':
+	case 'helpSearch':	
+	case 'helpSetRelated':
+		$page = 'help';
+		require_once('secure/managers/helpManager.class.php');
+		$mgr = new helpManager($cmd);
+	break;
 
 	default:
 		trigger_error("index.php cmd=$cmd case not defined", E_USER_ERROR);
