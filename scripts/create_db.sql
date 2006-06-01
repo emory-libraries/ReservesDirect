@@ -581,3 +581,76 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
+
+
+-- -----------------------------------------------------
+-- ADD INITIAL DATA
+-- -----------------------------------------------------
+
+-- --------------------------------------------------------
+
+--
+-- Seed data for table `users`: admin
+--
+
+INSERT INTO users (username, first_name, last_name, dflt_permission_level) VALUES ('admin', 'ReservesDirect', 'Administrator', 5);
+
+--
+-- Seed data for table `special_users`: admin
+--
+
+INSERT INTO special_users VALUES (1, '21232f297a57a5a743894a0e4a801fc3', NULL);
+
+--
+-- Seed data for table `skins`
+--
+
+INSERT INTO `skins` VALUES (1, 'general', 'css/ReservesStyles.css', 'yes');
+
+-- 
+-- Dumping data for table `mimetypes`
+-- 
+
+INSERT INTO `mimetypes` (`mimetype`, `helper_app_url`, `helper_app_name`, `helper_app_icon`, `file_extentions`) VALUES ('application/pdf', 'http://www.adobe.com/products/acrobat/readstep2.html', 'Adobe Acrobat Reader', 'images/doc_type_icons/doctype-pdf.gif', 'pdf');
+INSERT INTO `mimetypes` (`mimetype`, `helper_app_url`, `helper_app_name`, `helper_app_icon`, `file_extentions`) VALUES ('audio/x-pn-realaudio', 'http://www.real.com/', 'RealPlayer', 'images/doc_type_icons/doctype-sound.gif', 'ram');
+INSERT INTO `mimetypes` (`mimetype`, `helper_app_url`, `helper_app_name`, `helper_app_icon`, `file_extentions`) VALUES ('video/quicktime', 'http://www.apple.com/quicktime/', 'Quicktime Player', 'images/doc_type_icons/doctype-movie.gif', 'mov');
+INSERT INTO `mimetypes` (`mimetype`, `helper_app_url`, `helper_app_name`, `helper_app_icon`, `file_extentions`) VALUES ('application/msword', 'http://office.microsoft.com/Assistance/9798/viewerscvt.aspx', 'Microsoft Word', 'images/doc_type_icons/doctype-text.gif', 'doc');
+INSERT INTO `mimetypes` (`mimetype`, `helper_app_url`, `helper_app_name`, `helper_app_icon`, `file_extentions`) VALUES ('application/vnd.ms-excel', 'http://office.microsoft.com/Assistance/9798/viewerscvt.aspx', 'Microsoft Excel', 'images/doc_type_icons/doctype-text.gif', 'xcl');
+INSERT INTO `mimetypes` (`mimetype`, `helper_app_url`, `helper_app_name`, `helper_app_icon`, `file_extentions`) VALUES ('application/vnd.ms-powerpoint', 'http://office.microsoft.com/Assistance/9798/viewerscvt.aspx', 'Microsoft Powerpoint', 'images/doc_type_icons/doctype-text.gif', 'ppt');
+INSERT INTO `mimetypes` (`mimetype`, `helper_app_url`, `helper_app_name`, `helper_app_icon`, `file_extentions`) VALUES ('text/html', NULL, NULL, 'images/doc_type_icons/doctype-clear.gif', '');
+
+-- 
+-- Dumping data for table `permissions_levels`
+-- 
+
+INSERT INTO `permissions_levels` (`permission_id`, `label`) VALUES (0, 'student');
+INSERT INTO `permissions_levels` (`permission_id`, `label`) VALUES (1, 'custodian');
+INSERT INTO `permissions_levels` (`permission_id`, `label`) VALUES (2, 'proxy');
+INSERT INTO `permissions_levels` (`permission_id`, `label`) VALUES (3, 'instructor');
+INSERT INTO `permissions_levels` (`permission_id`, `label`) VALUES (4, 'staff');
+INSERT INTO `permissions_levels` (`permission_id`, `label`) VALUES (5, 'admin');
+
+-- 
+-- Dumping data for table `terms`
+-- 
+
+INSERT INTO `terms` (`sort_order`, `term_name`, `term_year`, `begin_date`, `end_date`) VALUES (1, 'FALL', '2004', '2004-08-26', '2004-12-18');
+INSERT INTO `terms` (`sort_order`, `term_name`, `term_year`, `begin_date`, `end_date`) VALUES (2, 'SPRING', '2005', '2005-01-01', '2005-05-31');
+INSERT INTO `terms` (`sort_order`, `term_name`, `term_year`, `begin_date`, `end_date`) VALUES (3, 'SUMMER', '2005', '2005-05-15', '2005-08-16');
+
+-- 
+-- Dumping data for table `reports`
+-- 
+
+INSERT INTO `reports` (`title`, `param_group`, `sql`, `parameters`, `min_permissions`, `sort_order`, `cached`, `cache_refresh_delay`) VALUES ('Items Added by Role', 'term', 'SELECT concat( t.term_name, '' '', t.term_year ) AS ''Term'', pl.label AS ''Role'', count( distinct eia.item_id ) AS ''Items Added''\r\nFROM electronic_item_audit AS eia\r\nJOIN reserves AS r ON r.item_id = eia.item_id\r\nJOIN course_instances AS ci ON ci.course_instance_id = r.course_instance_id\r\nJOIN terms AS t ON ci.term = t.term_name\r\nAND ci.year = t.term_year\r\nJOIN users AS u ON eia.added_by = u.user_id\r\nJOIN permissions_levels AS pl ON u.dflt_permission_level = pl.permission_id\r\nWHERE t.term_id IN (!)\r\nGROUP BY Term, Role', 'term_id', 4, 2, 0, 0);
+INSERT INTO `reports` (`title`, `param_group`, `sql`, `parameters`, `min_permissions`, `sort_order`, `cached`, `cache_refresh_delay`) VALUES ('Totals: Items And Reserves', NULL, 'SELECT \r\n	i.item_group AS ''Item Type'',\r\n	COUNT(DISTINCT i.item_id) AS ''Total Items'',\r\n	COUNT(DISTINCT r.reserve_id) AS ''Total Reserves''\r\nFROM reserves AS r\r\n	JOIN items AS i ON i.item_id = r.item_id\r\nGROUP BY i.item_group', NULL, 4, 0, 1, 6);
+INSERT INTO `reports` (`title`, `param_group`, `sql`, `parameters`, `min_permissions`, `sort_order`, `cached`, `cache_refresh_delay`) VALUES ('Totals: Courses', NULL, 'SELECT\r\n	COUNT(DISTINCT primary_course_alias_id) AS ''Total Number of Courses''\r\nFROM course_instances', NULL, 4, 0, 1, 6);
+INSERT INTO `reports` (`title`, `param_group`, `sql`, `parameters`, `min_permissions`, `sort_order`, `cached`, `cache_refresh_delay`) VALUES ('Totals: Users', NULL, 'SELECT\r\n	pl.label AS ''User Role'',\r\n	COUNT(DISTINCT u.user_id) AS ''User Count''\r\nFROM users AS u \r\n	JOIN permissions_levels AS pl ON pl.permission_id = u.dflt_permission_level\r\nGROUP BY pl.label', NULL, 4, 0, 1, 6);
+INSERT INTO `reports` (`title`, `param_group`, `sql`, `parameters`, `min_permissions`, `sort_order`, `cached`, `cache_refresh_delay`) VALUES ('Item View Log for a class', 'class', 'SELECT\r\n	i.title as ''Title'',\r\n	COUNT(uvl.user_id) as ''Total Hits'',\r\n	COUNT(DISTINCT uvl.user_id) as ''Unique Hits''\r\nFROM course_instances AS ci\r\n	JOIN reserves AS r ON r.course_instance_id = ci.course_instance_id\r\n	JOIN items AS i ON i.item_id = r.item_id\r\n	LEFT JOIN user_view_log AS uvl ON uvl.reserve_id = r.reserve_id\r\nWHERE ci.course_instance_id = !\r\nGROUP BY r.reserve_id\r\nORDER BY Title', 'ci', 3, 2, 0, 0);
+INSERT INTO `reports` (`title`, `param_group`, `sql`, `parameters`, `min_permissions`, `sort_order`, `cached`, `cache_refresh_delay`) VALUES ('Global: Courses And Users', 'term_lib', 'SELECT\r\n	CONCAT(t.term_name, '' '', t.term_year) as Term,\r\n	l.name AS Library,\r\n	d.name AS Department,\r\n	COUNT(DISTINCT ci.course_instance_id) AS Courses,\r\n	COUNT(DISTINCT a_i.user_id) AS Instructors,\r\n	COUNT(DISTINCT a_p.user_id) AS Proxies,\r\n	COUNT(DISTINCT a_s.user_id) AS Students\r\nFROM terms AS t\r\n	JOIN course_instances AS ci ON (ci.term = t.term_name AND ci.year = t.term_year)\r\n	JOIN course_aliases AS ca ON ca.course_alias_id = ci.primary_course_alias_id\r\n	LEFT JOIN access AS a_i ON a_i.alias_id = ca.course_alias_id AND a_i.permission_level = 3\r\n	LEFT JOIN access AS a_p ON a_p.alias_id = ca.course_alias_id AND a_p.permission_level = 2\r\n	LEFT JOIN access AS a_s ON a_s.alias_id = ca.course_alias_id AND a_s.permission_level = 0\r\n	JOIN courses AS c ON ca.course_id = c.course_id\r\n	JOIN departments AS d ON d.department_id = c.department_id\r\n	JOIN libraries AS l ON l.library_id = d.library_id\r\nWHERE t.term_id IN (!)\r\n	AND l.library_id IN (!)\r\n	AND d.status IS NULL	\r\nGROUP BY\r\n	t.term_year,\r\n	t.term_name,\r\n	l.library_id,\r\n	d.department_id\r\nORDER BY\r\n	t.term_year,\r\n	t.term_name,\r\n	l.name,\r\n	d.name	', 'term_id,library_id', 4, 1, 1, 6);
+INSERT INTO `reports` (`title`, `param_group`, `sql`, `parameters`, `min_permissions`, `sort_order`, `cached`, `cache_refresh_delay`) VALUES ('Global: Items And Reserves', 'term_lib', 'SELECT\r\n	CONCAT(t.term_name, '' '', t.term_year) as Term,\r\n	l.name AS Library,\r\n	d.name AS Department,\r\n	i.item_group AS ''Item Type'',\r\n	COUNT(DISTINCT r.item_id) AS ''Utilized Items'',\r\n	COUNT(DISTINCT r.reserve_id) AS ''Available Reserves'',\r\n	COUNT(DISTINCT uvl.reserve_id) AS ''Opened Reserves''\r\nFROM terms AS t\r\n	JOIN course_instances AS ci ON (ci.term = t.term_name AND ci.year = t.term_year)\r\n	JOIN reserves AS r ON r.course_instance_id = ci.course_instance_id\r\n	JOIN items AS i ON i.item_id = r.item_id\r\n	LEFT JOIN user_view_log AS uvl ON uvl.reserve_id = r.reserve_id\r\n	\r\n	JOIN course_aliases AS ca ON ca.course_alias_id = ci.primary_course_alias_id\r\n	JOIN courses AS c ON c.course_id = ca.course_id\r\n	JOIN departments AS d ON d.department_id = c.department_id\r\n	JOIN libraries AS l ON l.library_id = d.library_id\r\nWHERE t.term_id IN (!)\r\n	AND l.library_id IN (!)\r\n	AND d.status IS NULL\r\nGROUP BY\r\n	t.term_year,\r\n	t.term_name,\r\n	l.library_id,\r\n	d.department_id,\r\n	i.item_group\r\nORDER BY\r\n	t.term_year,\r\n	t.term_name,\r\n	l.name,\r\n	d.name,\r\n	i.item_group', 'term_id,library_id', 4, 1, 1, 6);
+INSERT INTO `reports` (`title`, `param_group`, `sql`, `parameters`, `min_permissions`, `sort_order`, `cached`, `cache_refresh_delay`) VALUES ('Global: Upload Activity', 'term', 'SELECT\r\n	CONCAT(t.term_name, '' '', t.term_year) as Term,\r\n	CONCAT(u.last_name, '', '', u.first_name) AS User,\r\n	pl.label AS Role,		\r\n	COUNT(DISTINCT aud.item_id) AS ''Items Added''\r\nFROM terms AS t\r\n	JOIN electronic_item_audit AS aud ON (aud.date_added BETWEEN t.begin_date AND t.end_date)\r\n	JOIN users AS u ON u.user_id = aud.added_by\r\n	JOIN permissions_levels AS pl ON pl.permission_id = u.dflt_permission_level\r\nWHERE t.term_id IN (!)\r\nGROUP BY\r\n	t.term_year,\r\n	t.term_name,\r\n	u.user_id\r\nORDER BY\r\n	t.term_year,\r\n	t.term_name,\r\n	''Items Added'' DESC', 'term_id', 4, 1, 0, 0);
+INSERT INTO `reports` (`title`, `param_group`, `sql`, `parameters`, `min_permissions`, `sort_order`, `cached`, `cache_refresh_delay`) VALUES ('Item View Log for a class by date', 'class', 'SELECT\r\n	i.title as ''Title'',\r\n	DATE(uvl.timestamp_viewed) AS ''Date'',\r\n	COUNT(uvl.user_id) as ''Total Hits'',\r\n	COUNT(DISTINCT uvl.user_id) as ''Unique Hits''\r\nFROM course_instances AS ci\r\n	JOIN reserves AS r ON r.course_instance_id = ci.course_instance_id\r\n	JOIN items AS i ON i.item_id = r.item_id\r\n	JOIN user_view_log AS uvl ON uvl.reserve_id = r.reserve_id\r\nWHERE ci.course_instance_id = !\r\nGROUP BY r.reserve_id, ''Date''\r\nORDER BY Title, ''Date''', 'ci', 5, 2, 0, 0);
+
+
+
