@@ -311,31 +311,44 @@ class reserve extends Notes {
 	/**
 	 * @return boolean
 	 * @param int $parent_id New parent reserve's ID
+	 * @param boolean $autosort If true, will attempt to insert the reserve into proper sort order in new folder
 	 * @desc sets $parent_id as this reserve's parent; return true on success, false on failure
 	 */
-	function setParent($parent_id) {
+	function setParent($parent_id, $autosort=false) {
 		global $g_dbConn;
-		
-		//setting parent_id to self breaks things
-		if($parent_id == $this->reserveID) {
-			return false;
-		}
-
-		switch ($g_dbConn->phptype) {
-			default:	//mysql
-				$sql = "UPDATE reserves	SET parent_id = !, last_modified = ? WHERE reserve_id = !";
-				$d = date("Y-m-d"); //get current date
-		}
 		
 		//handle 'null' or 'root' parent
 		//PEAR DB chokes on literal null values, so make them 'NULL'
 		$parent_id = (empty($parent_id) || ($parent_id=='root')) ? 'NULL' : intval($parent_id);
 		
+		//setting parent_id to self breaks things
+		if($parent_id == $this->reserveID) {
+			return false;
+		}
+		
+		//do nothing if trying to set the same parent
+		$current_parent_id = !empty($this->parentID) ? $this->parentID : 'NULL';
+		if($parent_id == $current_parent_id) {
+			return true;
+		}
+		
+		switch ($g_dbConn->phptype) {
+			default:	//mysql
+				$sql = "UPDATE reserves	SET parent_id = !, last_modified = ? WHERE reserve_id = !";
+				$d = date("Y-m-d"); //get current date
+		}
+				
 		$rs = $g_dbConn->query($sql, array($parent_id, $d, $this->reserveID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$this->parentID = $parent_id;
 		$this->lastModDate = $d;	
+		
+		//try to insert into sort order
+		if($autosort) {
+			$this->getItem();
+			$this->insertIntoSortOrder($this->getCourseInstanceID(), $this->item->getTitle(), $this->item->getAuthor(), $parent_id);
+		}
 		
 		return true;	
 	}

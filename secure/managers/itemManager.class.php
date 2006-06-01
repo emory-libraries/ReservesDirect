@@ -119,11 +119,7 @@ class itemManager
 						
 						//set parent heading
 						if(!empty($_REQUEST['heading_select'])) {
-							$reserve->setParent($_REQUEST['heading_select']);
-							
-							//try to insert into sort order
-							$reserve->getItem();
-							$reserve->insertIntoSortOrder($ci->getCourseInstanceID(), $reserve->item->getTitle(), $reserve->item->getAuthor(), $_REQUEST['heading_select']);
+							$reserve->setParent($_REQUEST['heading_select'], true);
 						}	
 					}
 					
