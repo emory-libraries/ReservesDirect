@@ -743,6 +743,34 @@ class Help_Article {
 
 		return true;
 	}
+	
+	
+	/**
+	 * @return boolean
+	 * @desc Deletes article, its tags, and its permissions from the DB
+	 */
+	public function destroyArticle() {
+		global $g_dbConn;
+		
+		if(empty($this->id)) {
+			return false;
+		}
+		
+		switch($g_dbConn->phptype) {
+			default:	//mysql
+				$sql[0] = "DELETE FROM help_articles WHERE id = {$this->id}";
+				$sql[1] = "DELETE FROM help_art_tags WHERE article_id = {$this->id}";
+				$sql[2] = "DELETE FROM help_art_to_role WHERE article_id = {$this->id}";
+		}
+		
+		foreach($sql as $sql_x) {
+			$rs = $g_dbConn->query($sql_x);
+			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		}
+
+		$this->__construct();
+		return true;		
+	}
 
 
 	/**

@@ -419,9 +419,20 @@ class helpDisplayer extends baseDisplayer {
 			</div>
 		</fieldset>
 
+<?php	if($u->getRole() >= $g_permission['staff']): ?>
+		<fieldset>
+			<legend>Delete</legend>
+			Check this box if you want to delete the article. <strong>This can not be undone!</strong>
+			<input type="checkbox" name="help_article_delete" />
+		</fieldset>
+<?php	endif; ?>
+
 		<p />
-		<input type="submit" id="help_article_submit" name="help_article_submit" value="Submit" />
+		<input type="submit" id="help_article_submit" name="help_article_submit" value="Save" />
 	</form>
+	
+
+
 <?php
 	}
 

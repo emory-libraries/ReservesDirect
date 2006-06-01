@@ -254,6 +254,17 @@ class helpManager extends baseManager {
 			$article = new Help_Article();
 
 			if($article->getByID($_REQUEST['help_article_id'])) {	//found article - edit record
+				//check to see if trying to delete article
+				if(isset($_REQUEST['help_article_delete']) && ($u->getRole() >= $g_permission['staff'])) {
+					$article->destroyArticle();	
+					
+					$loc = 'help';
+					$this->displayFunction = 'displayHome';				
+				
+					return;	//do nothing else
+				}
+				
+				
 				//check if user can edit article
 				if(!$article->canUserEdit($u->getRole())) {	//cannot edit
 					$err_msg = 'You may not edit this article.';
