@@ -315,7 +315,7 @@ class user
 	}
 	
 	/**
-	* @return int
+	* @return string
 	* @desc Returns User's Class as specified in the users table
 	*/
 	function getDefaultClass() {
@@ -323,7 +323,7 @@ class user
 	}
 	
 	/**
-	* @return int
+	* @return string
 	* @desc Returns User's  Class as specified in the users table may be overwritten by not_trained
 	*/
 	function getUserClass()
