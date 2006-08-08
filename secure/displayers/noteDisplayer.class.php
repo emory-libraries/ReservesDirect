@@ -84,7 +84,7 @@ class noteDisplayer extends baseDisplayer {
 				<td align="right">
 					<strong><?=$note->getType()?> Note:</strong>
 					<br />
-					<a href="#" onclick="javascript: notes_show_form(<?=$note->getID()?>, '<?=$note->getText()?>', '<?=$note->getType()?>'); return false;">edit</a> | <a href="#" onclick="javascript: notes_delete_note('<?=$obj_type?>', <?=$obj_id?>, <?=$note->getID()?>); return false;">delete</a>&nbsp;
+					<a href="#" onclick="javascript: notes_show_form(<?=$note->getID()?>, '<?= preg_replace('"',"'", $note->getText())?>', '<?=$note->getType()?>'); return false;">edit</a> | <a href="#" onclick="javascript: notes_delete_note('<?=$obj_type?>', <?=$obj_id?>, <?=$note->getID()?>); return false;">delete</a>&nbsp;
 				</td>
 				<td>
 					<?=stripslashes($note->getText())?>
