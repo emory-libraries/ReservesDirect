@@ -262,6 +262,7 @@ by Douglas Bowman at http://www.alistapart.com/articles/slidingdoors/
 This technique can be used to create many different types of tabs;
 the commented guidelines below are for creating standard tabs. */
 #mainNav {
+	float:left;
     width:100%;
     height: 36px;
     background:#7C89CA url('../images/navtab-default-bg.gif') 
@@ -1209,15 +1210,54 @@ Help
 #help {} /* div that wraps all of content of help viewed in the main page */
 #help-sidebar {} /* div that wraps all of content of help viewed in the sidebar */
 
-.help_article_title {}
-.help_article_body {}
+.help_article_title {
+	color:#663333;
+	font-size:16px;
+	font-weight:bold;
+	font-variant: caps;
+}
+a.help_edit_link {
+	color: #993333;
+	text-decoration: underline;
+	font-weight: normal;
+}
+a.help_edit_link:hover {
+	color: #660000;
+	text-decoration: underline;
+}
+.help_article_body {
+	color:#333333;
+}
+.help_article_list {
+	margin-top:0px;
+	list-style:circle;
+}
 
-.help_article_list {}
+.help_related_tags {
+	border:1px solid #333333;
+	padding:5px;
+	background-color:#CCCCCC;
+} /* contains .help_tag_list */
+.help_tag_list {
+	background-color:FFFFCC;
+	padding:2px;
+}
+a.help_tag {
+	color:#6065A1;
+}
+a.help_tag:hover {
+	color:#374597;
+	text-decoration:underline;
+}
+a.help_user_tag {
+	color:
+}
+a.help_user_tag:hover {
+	color:#374597;
+	text-decoration:underline;
+}
 
-.help_related_tags {} /* contains .help_tag_list */
-.help_tag_list {}
-.help_tag {}
-.help_user_tag {}
-
-.help_keyword_highlight {}
+.help_keyword_highlight {
+	background-color:#FFFF00;
+}
 .help_error {}
