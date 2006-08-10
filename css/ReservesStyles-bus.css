@@ -241,7 +241,7 @@ program logo (default is 'ReservesDirect' logo). */
 that appear on every screen.   */
 	margin: 5px 10px 3px 0px;
 	text-align: right;
-	font-size: x-small;
+	font-size: small;
 	font-weight: normal;
 	color: #993333;
 }
@@ -251,6 +251,7 @@ that appear on every screen.   */
 .functionlinks a:hover {
 	color: #993333;
 	text-decoration: underline;
+	font-size: small;
 }
 .functionLinks a:visited {
 	color: #993333;
@@ -268,11 +269,11 @@ by Douglas Bowman at http://www.alistapart.com/articles/slidingdoors/
 This technique can be used to create many different types of tabs;
 the commented guidelines below are for creating standard tabs. */
 #mainNav {
-    width:100%;
+    float:left;
+	width:100%;
     height: 36px;
-    background:#7C89CA url('../images/navtab-default-bg.gif') 
-      repeat-x bottom; /* creates the background behind the tabs--should be only 2-3 pixels wide.
-	  						background color should be same as top color of bg image. */
+    background:#79A77D; 
+    background-image: url('../images/skins/bus/navtab-default-bg.gif');
 	font:x-small/1.5em Arial, Helvetica, sans-serif;
 	font-size:x-small;
     } 
