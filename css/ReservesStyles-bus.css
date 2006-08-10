@@ -1,10 +1,8 @@
 /* 
 ReservesDirect Style Sheet  
-ReserveStyles.css
+ReserveStyles-bus.css
 
-Default implementation for General Libraries
-Emory University
-Atlanta, GA 30322
+Goizqueta Business School Style Sheet.
 
 Last Modified 11/26/2005
 */
@@ -14,6 +12,7 @@ Last Modified 11/26/2005
  DEFAULT HTML TAG DEFINITIONS 
  ************************************************* 
 */
+
 
 body {
 	font-family: Arial, Helvetica, sans-serif;
@@ -52,19 +51,17 @@ h3 {
 	font-weight:bold;
 } 
 a:link {
-	font-size:small;
 	color: #006600;
 	text-decoration: underline;
 }
 a:visited {
-	font-size:small;
 	color: #006600;
 	text-decoration: underline;
 }
 a:hover {
 	font-size:small;
-	color: #006600;
-	text-decoration: underline;
+	color: #999900;
+	text-decoration:underline;
 }
 
 
@@ -104,103 +101,9 @@ a.editlinks:visited {
 a.editlinks:hover {
 	
 	color: #339933;
-	text-decoration: none;
-	font-size: small;
-	font-weight: bold;
-}
-
-/* 'helptab' defines the appearance of top navigation links in the help file. */
-a.helptab:link {
-	
-	color: #333333;
-	text-decoration: none;
-	font-size: medium;
-	font-weight: bold;
-}
-a.helptab:visited {
-	
-	color: #333333;
-	text-decoration: none;
-	font-size: medium;
-	font-weight: bold;
-}
-a.helptab:hover {
-	
-	color: #FFFFFF;
 	text-decoration: underline;
-	font-size: medium;
+	font-size:small;
 	font-weight: bold;
-}
-a.helptab:active {
-	
-	color: #FFFFFF;
-	text-decoration: none;
-	font-size: medium;
-	font-weight: bold;
-}
-
-/* 'helptopic' defines the appearance of topical headers in the helpfile navigation menu. */
-a.helptopic:link {
-	
-	color: #333399;
-	text-decoration: none;
-	font-size: small;
-	font-weight: bold;
-}
-a.helptopic:visited {
-	
-	color: #333399;
-	text-decoration: none;
-	font-size: small;
-	font-weight: bold;
-}
-a.helptopic:hover {
-	
-	color: #999999;
-	text-decoration: none;
-	font-size: small;
-	font-weight: bold;
-}
-a.helptopic:active {
-	
-	color: #993333;
-	text-decoration: none;
-	font-size: small;
-	font-weight: bold;
-}
-
-/* 'helpsubtopic' defines the appearance of subtopic headers in the helpfile navigation menu. */
-a.helpsubtopic:link {
-	
-	color: #996633;
-	text-decoration: none;
-	font-size: x-small;
-	font-weight: bolder;
-	left: 8px;
-}
-a.helpsubtopic:visited {
-	
-	color: #996633;
-	text-decoration: none;
-	font-size: x-small;
-	font-weight: bold;
-	text-indent: 8px;
-}
-a.helpsubtopic:hover {
-	
-	color: #999999;
-	text-decoration: none;
-	font-size: x-small;
-	font-weight: bold;
-	text-indent: 8px;
-}
-a.helpsubtopic:active {
-	
-	color: #993333;
-	text-decoration: none;
-	font-size: x-small;
-	font-weight: bold;
-	text-indent: 8px;
 }
 
 /* 'itemTitle' defines how reserve item title links are listed. */
@@ -222,14 +125,14 @@ a.itemTitle:visited {
 a.itemTitle:hover {
 	
 	color: #006600;
-	text-decoration: none;
+	text-decoration: underline;
 	font-size: small;
 	font-weight: bold;
 }
 
 /* 'subnav' defines the appearance and links that appear
 in the subnavigation bar just below the main navigation tabs. */
-a.subnav:link {
+.navItems a:link {
 	
 	color: #333333;
 	text-decoration: none;
@@ -274,10 +177,11 @@ a.titlelink:visited {
 	text-decoration: underline;
 }
 a.titlelink:hover {
+	
 	text-decoration: none;
 	font-weight: bold;
-	color: #006600;
-	font-size: 16px;
+	color: #999900;
+	font-size:16px;
 	}
 
 /*
@@ -291,9 +195,10 @@ appearance of the ReservesDirect interface.
 */
 
 #container { /* a wrapper for the entire page layout */
-	margin: 0px;
-	width: 100%;
+	margin:0px;
+	height: 100%;
 }
+
 #Header { /* a wrapper containing the branding image divs */
 	margin: 0px;
 	padding: 0px;
@@ -334,14 +239,11 @@ program logo (default is 'ReservesDirect' logo). */
 
 .functionLinks { /* 'functionlinks' describe the links to site-wide functions like help, sign off, and edit profile
 that appear on every screen.   */
-	margin: 8px 10px 0px 0px;
+	margin: 5px 10px 3px 0px;
 	text-align: right;
-	padding-bottom: 8px;
 	font-size: x-small;
 	font-weight: normal;
 	color: #993333;
-	height: 10px;
-	float: right;
 }
 .functionLinks a:link {
 	color: #993333;
@@ -366,14 +268,13 @@ by Douglas Bowman at http://www.alistapart.com/articles/slidingdoors/
 This technique can be used to create many different types of tabs;
 the commented guidelines below are for creating standard tabs. */
 #mainNav {
-    float:left;
-	width:100%;
-	font:x-small/1.5em Verdana, Arial, Helvetica, sans-serif;
+    width:100%;
+    height: 36px;
+    background:#7C89CA url('../images/navtab-default-bg.gif') 
+      repeat-x bottom; /* creates the background behind the tabs--should be only 2-3 pixels wide.
+	  						background color should be same as top color of bg image. */
+	font:x-small/1.5em Arial, Helvetica, sans-serif;
 	font-size:x-small;
-	background-color: #79A77D;
-	background-image:  url('../images/skins/bus/navtab-default-bg.gif');
-	background-repeat: repeat-x;
-	background-position: bottom;
     } 
 	
 #mainNav ul {
@@ -383,8 +284,8 @@ the commented guidelines below are for creating standard tabs. */
     list-style:none;
     }
 #mainNav li {
-   float:left;
-	background: url('../images/skins/bus/navtab-default-left-up.gif') 
+    float:left;
+	background:url('../images/skins/bus/navtab-default-left-up.gif')
       no-repeat left top; /* left-hand tab image for inactive tabs */
     margin:0;
     padding:0 0 0 10px; /* top|right|bottom|left padding. left padding=px width of left image */
@@ -424,9 +325,34 @@ the commented guidelines below are for creating standard tabs. */
 	display: block;
 }
 .navItems { /* empty in default implementation of RD 2.x */
-	margin: 0;
-	padding: 0;
+	font-size: small;
+	font-weight: bold;
+	margin-top: 3px;
+	margin-bottom: 3px;
+	margin-left: 10px;
 	float: left;
+}
+.navItems ul {
+    margin: 0;
+    padding: 0;
+    list-style-position: inside;
+    list-style:none;
+}
+.navItems li {
+    float: left;
+    padding-left:10px;
+    padding-right: 10px;
+    border-right:1px solid #CCCCCC;
+}
+
+.navItems a {
+	color: #373643;
+	text-decoration: none;
+	font-size: 12px;
+	font-weight: normal;
+}
+.navItems a:hover {
+	text-decoration:underline;
 }
 .user {
 	font-size: small;
@@ -444,8 +370,7 @@ the commented guidelines below are for creating standard tabs. */
 	border-bottom-style: solid;
 	border-top-color: #CCCCCC;
 	border-bottom-color: #CCCCCC;
-	height: 0px;
-	background-color: #CCCCCC;
+	background-color:#CCCCCC;
 	height: 10px;
 	margin: 0px;
 	padding: 0px;
@@ -459,7 +384,7 @@ the commented guidelines below are for creating standard tabs. */
 .locationIndicatorText {
 	font-size: 14px;
 	font-weight: bold;
-	text-transform: none;
+	text-transform: lowercase;
 	color: #333333;
 	text-decoration: none;
 	float: left;
@@ -490,13 +415,152 @@ the commented guidelines below are for creating standard tabs. */
 #Content { /* wraps the content display area */
 	margin: 0px 50px;
 	min-height:200px;
-	clear: both;
+	clear: both;	
 }
 /* IE hack to get the width right \*/
 * html #Content {
 	width: 100%; 
 }
 /* end IE hack */
+
+/* courseInfo describes the block where course title, instructors, etc. (all courseHeaders elements) appears
+in the class view. courseActions is a block containing links that provide actions for the course in the edit
+class screen, and is next to the courseInfo block. */
+#courseInfo {
+	float:left;
+	width:65%;
+}
+#courseActions {
+	float:right;
+	width:30%;
+	border-right:2px solid #333333;
+	border-bottom:2px solid #333333;
+	background-color:#7A879F;
+	color:#FFFFFF;
+	padding:4px 4px 4px 6px;
+	margin-top:7px;
+}
+#courseActions a {
+	color:#FFFFFF;
+	text-decoration:none;
+	padding-bottom:5px;
+}
+#courseActions a:hover {
+	text-decoration:underline;
+}
+#courseActions ul {
+	margin-left:0px;
+}
+#courseActions li {
+	list-style-image:url(../../images/list-arrow-white.gif);
+	margin-left:0px;
+}
+
+/*contentTabs and displayList together control how most tables and lists display in the main content area */
+.contentTabs {
+    margin-left:0px;
+    background-color:#FFFFFF;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size:small;
+    } 
+	
+.contentTabs ul {
+	margin-left:0px;
+	padding:0px; 
+    list-style:none;
+    }
+.contentTabs li {
+    float:left;
+    margin:3px 3px 0 3px;
+    padding:0; 
+    border-right: 1px solid #666666;
+	border-left: 1px solid #666666;
+	border-top: 1px solid #666666;
+	}
+.contentTabs .alert {
+	font-size:12px;
+	color:#009900;
+}
+.contentTabs a {
+	float:left;
+	display:block;
+	background-color: #CCCCCC;
+	padding:4px 20px 4px 20px; /* left padding=right padding - pixel width of left image
+								bottom padding=desired overall bottom padding-pixel 
+								width of bottom border, if any */
+	color: #333333;
+	text-decoration: none;
+	font-weight: bold;
+    }
+	/* Commented Backslash Hack
+     hides rule from IE5-Mac \*/
+  .contentTabs a {float:none;}
+  /* End IE5-Mac hack */ 
+.contentTabs a:hover {
+     color: #000066;
+	text-decoration: underline;
+	background-color: #CCCC99;
+	  }	
+.contentTabs .current a, .contentTabs .current a:hover {
+	border-bottom: 1px solid #CCCCCC;
+	background-color: #333333;
+	color: #FFFFFF;
+	font-weight:bold;
+	text-decoration: none;
+	padding-bottom:4px; /* bottom padding=top padding of mainNav a */
+    }
+table.simpleList {
+	border:1px solid #CCCCCC;
+	background-color:#CCCCCC;
+}
+table.simpleList td {
+	padding:4px;
+	margin:1px;
+	background-color:#FFFFFF;
+}
+.simpleList .labelCell1 {
+	background-color:#8195B8;
+	text-align:right;
+}
+.simpleList .contentCell1 {
+	background-color:#CCCCFF;
+}
+.simpleList .emptyCell {      /* The background color of simpleList.emptyCell should be the same as .displayArea */
+	background-color:#CCCCCC;
+}
+table.displayList {	
+	border:1px solid #333333;
+	border-collapse:collapse;
+}
+table.displaylist td{
+	padding:4px;
+}
+.displayArea {	
+	border:1px solid #333333;
+	background-color:#CCCCCC;
+}
+.displayList .actions, .displayList .actions a {
+	color:#CCCCCC;
+	text-decoration:none;
+}
+.displayList .actions a:hover {
+	color:#CCCCCC;
+	text-decoration:underline;
+}
+.displayList .head, .displayList .foot{
+	background-color:#333333;
+	color:#FFFFFF;
+}
+
+.displayList .divider {
+
+	background-color: #CCCCFF;
+	color:#333333;
+	text-align: left;
+	border-top: 1px solid #333333;
+	border-bottom: 1px solid #333333;
+	
+}
 
 /* oddRow/evenRow define how alternating row colors appear in tables */
 .oddRow {
@@ -526,6 +590,7 @@ the commented guidelines below are for creating standard tabs. */
 	padding: 0;
 	border: 1px solid #333333;
 	
+	
 }
 .headingCell2 .headingText{
 	font-size: large;
@@ -535,6 +600,24 @@ the commented guidelines below are for creating standard tabs. */
 
 	
 }
+.classEnrollmentOptions {
+	background-color:#FFFFCC;
+	padding:10px;
+	border-bottom:1px solid #333333;
+}
+.classRoll {
+	background-color:#CCCCCC;
+	padding:10px;
+}
+.classRollPending {
+	float:left;
+	width:45%;
+}
+.classRollActive {
+	float:right;
+	width:45%;
+}
+
 .reserveItem {
 	margin:0px; 
 	padding:0px; 
@@ -643,12 +726,6 @@ the commented guidelines below are for creating standard tabs. */
 	float: right;
 	right: 0px;
 }
-.displayList {	
-	font-size: small;
-	font-style: normal;
-	color: #333333;
-	text-decoration: none;
-}
 
 
 /*
@@ -657,8 +734,8 @@ FORMATTING DEFINITIONS
 ************************************************* 
 */
 .indent {
-	text-indent: 25px;
-	left: 8px;
+	margin-left:10px;
+	padding: 3px;
 }
 .nobullet {
 	list-style-type: none;
@@ -681,7 +758,6 @@ whether there should be page breaks or no page breaks. */
  TEXT DISPLAY DEFINITIONS 
  ************************************************* 
 */
-
 
 /* The following provide definitions for they system message display area.
 The style for individual system messages is set in the "news" table of the db,
@@ -716,40 +792,47 @@ itemMetaPre defines how some prefixes to metadata information appear, for exampl
 	color: #000000;
 
 }
-
 .itemAuthor {
 	font-size: x-small;
 	font-style: normal;
-}
 
+}
 .itemMeta {
 	font-size: x-small;
 	font-style: normal;
 	color: #000000;
 
 }
-
 .itemMetaPre {
 	font-size: x-small;
 	font-style: italic;
 
 } 
-
 .noteType {
-	font-size: x-small;
+	font-size: small;
 	font-weight: bold;
 	color: #339933;
 
 }
-
 .noteText {
-	font-size: x-small;
+	font-size: small;
 	font-weight: bold;
 	color: #000000;
-
 }
 
 /* Other text definition tags below.... */
+.button, .button:focus {
+    color: #fff;
+    background-color: #339;
+    border-bottom: 1px solid #333;
+    border-right: 1px solid #000;
+    border-left: 1px solid #C4C4B8;
+    border-top: 1px solid #C4C4B8;
+    -moz-border-radius: 5px;
+}
+.button:hover {
+    background-color: #66a;
+}
 
 .small {
 	font-family: Arial, Helvetica, sans-serif;
@@ -763,37 +846,31 @@ itemMetaPre defines how some prefixes to metadata information appear, for exampl
 		 
 		font-size: small; 
 		font-weight: bold; 
-		color: #006600
+		color: #006600;
 }
 .courseTitle {
-	
 	font-size: medium;
 	font-weight: bold;
 	/*font-variant: small-caps;*/
-	color: #000000;
+	color: #000066;
 }
 .courseHeaders {
+
 	padding: 3px 0 3px 0;
 }
 .courseHeaders .label {
 	font-weight: bold;
 	color: #333333;
 }
-.currentClass {
-	
-	font-weight: bold;
-	color: #003300;
-	padding-right:10px;
-}
 .strong {
 	font-weight: bold;
 	color: #000000;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-family:Verdana, Arial, Helvetica, sans-serif;
 }
 .successText {
 	font-weight: bold;
 	color: #003300;
-	font-size: small;
+	font-size:small;
 }
 .failedText {
 	font-weight: bold;
@@ -837,7 +914,18 @@ of materials on reserve. */
 	font-weight: bold;
 
 }
-
+.copyrightReview_hidden {
+	color: #666666;
+	font-weight: bold;
+}
+.copyrightReview_active {
+	color: #009900;
+	font-weight: bold;
+}
+.copyrightReview_denied {
+	color: #CC0000;
+	font-weight: bold;
+}
 .active {
 	color: #009900;
 	font-weight: bold;
@@ -849,8 +937,40 @@ of materials on reserve. */
 	font-weight: bold;
 
 }
+.openEnrollment {
+	color:#009900;
+	font-weight:bold;
+}
+.moderatedEnrollment {
+	color:#663300;
+	font-weight:bold;
+}
+.closedEnrollment {
+	color:#CC0000;
+	font-weight:bold;
+}
+#copyright .new {
+	background-color:#CADBEC;
+	color:##0B105D;
+	font-weight:bold;
+}
+#copyright .pending {
+	background-color:#FFFFCC;
+	color:#663300;
+	font-weight:bold;
+}
+#copyright .approved {
+	background-color:#CCECDE;
+	color:#003300;
+	font-weight:bold;
+}
+#copyright .denied {
+	background-color:#D2AAA0;
+	color:660000;
+	font-weight:bold;
+}
 
-/*Auto complete Definitions for search lookup screens*/
+/*Auto complete Definitions for AJAX class search/lookup screens*/
 
 #keyword {
 margin: 0 25px 0 0;
@@ -872,7 +992,7 @@ border:1px solid #99b58d;
       border:1px solid #666666;
       color: #783E3F;
       background-color: #EDD2C9;
-               
+      
       height:150px;
       overflow:auto;
 }
@@ -927,176 +1047,6 @@ border:1px solid #99b58d;
 	font-size:12px;
 	font-weight:normal;
 }
-/*
-****************************************
-Help Screen Definitions
-****************************************
-*/
-.headingCell-helpfileActive {
-	
-	font-size: small;
-	font-weight: bold;
-	color: #FFFFFF;
-	background-color: #000066;
-	text-align: center;
-}
-.headingCell-helpfileInactive {
-	
-	font-size: small;
-	font-weight: bold;
-	text-transform: capitalize;
-	color: #333333;
-	background-color: #CCCCCC;
-	text-align: center;
-}
-#helpTabs {
-    float:left;
-    width:100%;
-    background-color:#FFFFFF;
-	font-family: Arial, Helvetica, sans-serif;
-	font-size:small;
-    } 
-	
-#helpTabs ul {
-    margin:0;
-    padding:0;
-	padding:0; /* padding to top|right and left|bottom of ul, creates space around whole nav bar */
-    list-style:none;
-    }
-#helpTabs li {
-    float:left;
-    margin:3px 3px 0 3px;
-    padding:0; 
-    border-right: 1px solid #666666;
-	border-left: 1px solid #666666;
-	border-top: 1px solid #666666;
-	}
-#helpTabs a {
-	float:left;
-	display:block;
-	background-color: #CCCCCC;
-	padding:4px 20px 4px 20px; /* left padding=right padding - pixel width of left image
-								bottom padding=desired overall bottom padding-pixel 
-								width of bottom border, if any */
-	color: #333333;
-	text-decoration: none;
-	font-weight: bold;
-    }
-	/* Commented Backslash Hack
-     hides rule from IE5-Mac \*/
-  #helpTabs a {float:none;}
-  /* End IE5-Mac hack */ 
-#helpTabs a:hover {
-     color: #000066;
-	text-decoration: underline;
-	  }	
-#helpTabs #current {
-	border-right: 1px solid #666666;
-	border-left: 1px solid #666666;
-	border-top: 1px solid #666666;
-    }
-#helpTabs #current a {
-	background-color: #000066;
-	color: #FFFFFF;
-	text-decoration: none;
-	padding-bottom:4px; /* bottom padding=top padding of mainNav a */
-    }
-
-/* 'helptopic' defines the appearance of topical headers in the helpfile navigation menu. */
-a.helptopic:link {
-	
-	color: #333399;
-	text-decoration: none;
-	font-size: small;
-	font-weight: bold;
-}
-a.helptopic:visited {
-	
-	color: #333399;
-	text-decoration: none;
-	font-size: small;
-	font-weight: bold;
-}
-a.helptopic:hover {
-	
-	color: #999999;
-	text-decoration: none;
-	font-size: small;
-	font-weight: bold;
-}
-a.helptopic:active {
-	
-	color: #993333;
-	text-decoration: none;
-	font-size: small;
-	font-weight: bold;
-}
-
-/* 'helpsubtopic' defines the appearance of subtopic headers in the helpfile navigation menu. */
-a.helpsubtopic:link {
-	
-	color: #996633;
-	text-decoration: none;
-	font-size: x-small;
-	font-weight: bolder;
-	left: 8px;
-}
-a.helpsubtopic:visited {
-	
-	color: #996633;
-	text-decoration: none;
-	font-size: x-small;
-	font-weight: bold;
-	text-indent: 8px;
-}
-a.helpsubtopic:hover {
-	
-	color: #999999;
-	text-decoration: none;
-	font-size: x-small;
-	font-weight: bold;
-	text-indent: 8px;
-}
-a.helpsubtopic:active {
-	
-	color: #993333;
-	text-decoration: none;
-	font-size: x-small;
-	font-weight: bold;
-	text-indent: 8px;
-}
-.border-helpfile {
-	border: 1px solid #000066;
-}
-
-#index {
-	font-size: small;
-	font-family: Arial, Helvetica, sans-serif;
-	list-style: none;
-}
-#index #broadTopic a {
-	color: #000066;
-	font-weight: bold;
-	text-decoration: none;
-}
-#index #broadTopic a:hover {
-	color: #003399;
-	font-weight: bold;
-	text-decoration: underline;
-}
-#index #narrowTopic a {
-	font-weight: bold;
-	color: #333333;
-	text-decoration: none;
-	text-indent: 8px;
-}
-#index #narrowTopic a:hover {
-	font-weight: bold;
-	color: #999999;
-	text-decoration: underline;
-	text-indent: 8px;
-}
-
 
 /*
 ****************************************
@@ -1118,7 +1068,7 @@ Note Form Definitions
 	z-index: 3;
 	top: -220px; /* negative (height + any padding) */
 	
-	background: lightgreen;
+	background: lightblue;
 	border: 1px solid black;
 	
 	/* transparency */
@@ -1165,7 +1115,7 @@ Copyright Contact Form Definitions
 	z-index: 3;
 	top: -245px; /* negative (height + any padding) */
 		
-	background: lightgreen;
+	background: lightblue;
 	border: 1px solid black;
 	
 	/* transparency */
@@ -1190,3 +1140,111 @@ Copyright Contact Form Definitions
 	border: 1px solid black;
 	text-align: center;
 }
+
+
+/*
+**************************************
+Fieldsets
+
+NOTE: IE6 (maybe others) is dumb and ignores fieldset/legend css in this file.
+	Just as well, since it does not apply fieldset background css correctly
+**************************************
+*/
+
+fieldset {
+	border: 1px solid #666666;
+	background: #BBBBBB;
+	margin: 5px;
+}
+
+legend {
+	border: 1px solid #666666;
+	background: #DDDDDD;
+	font-weight: bold;
+	padding: 2px;
+}
+
+fieldset.highlight {
+	background: #DDDDDD;
+}
+
+
+/*
+******************************************
+Help
+******************************************
+*/
+
+/* definitions for the sidebar positioning, etc */
+#help-container {
+	position: fixed;
+	top: 10px;
+	bottom: 10px;
+	right: 10px;
+	width: 230px;
+}
+* html #help-container { /* IE hacks */
+	position: absolute;
+	top: 2%;
+	height: 95%;	
+}
+#help-container iframe {
+	border: 0px;
+	width: 100%;
+	height: 100%;
+	padding: 5px;
+}
+
+/* classes for the #container div */
+.helpOff {
+	margin: 0px;
+	width: 100%;
+}
+.helpOn {
+	border-right: 1px solid black;
+	margin: 0px 250px 0px 0px;
+}
+
+/* end container/positional css */
+
+#help-container #nav {
+	text-align: right;
+	padding-bottom: 2px;
+	border-bottom: 1px solid black;
+	margin-bottom: 5px;
+}
+
+#help_article_perms {
+	margin-left: 20px;
+}
+
+#help label, #help-sidebar label {
+	width: 50px;
+	font-style: italic;
+}
+
+#help textarea {
+	width: 400px;
+	height: 150px;
+}
+#help-sidebar textarea {
+	width: 200px;
+	height: 100px;
+}
+
+
+#help {} /* div that wraps all of content of help viewed in the main page */
+#help-sidebar {} /* div that wraps all of content of help viewed in the sidebar */
+
+.help_article_title {}
+.help_article_body {}
+
+.help_article_list {}
+
+.help_related_tags {} /* contains .help_tag_list */
+.help_tag_list {}
+.help_tag {}
+.help_user_tag {}
+
+.help_keyword_highlight {}
+.help_error {}
