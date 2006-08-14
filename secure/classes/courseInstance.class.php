@@ -58,11 +58,12 @@ class courseInstance
 	public $proxyIDs = array();
 	public $students = array();
 	public $containsHeading = false;
-	//public $aliasID;
+	public $duplicates = array();
+	
 
 
 	function courseInstance($courseInstanceID = NULL)
-	{
+	{	
 		if (!is_null($courseInstanceID))
 			$this->getCourseInstance($courseInstanceID);
 
@@ -79,14 +80,7 @@ class courseInstance
 	 * @desc True on success, false if there was a duplicate. MUST check return value, because this method _always_ initializes self to a valid CI (either dupe or new CI)
 	 */
 	function createCourseInstance($dept_id, $course_number, $course_name, $section, $year, $term) {
-		global $g_dbConn;
-		
-		//first check for a duplicate
-		if($this->getCourseInstanceByMatch($dept_id, $course_number, $section, $year, $term)) {	//there is a dupe
-			return false;
-		}
-	
-		//else, there is no dupe, create the course and course instance
+		global $g_dbConn;		
 		
 		//create course instance		
 		switch ($g_dbConn->phptype) {
@@ -189,8 +183,11 @@ class courseInstance
 			return false;
 		}
 		else {
-			$row = $rs->fetchRow();
-			$this->getCourseInstance($row[0]);	//init self to matching CI
+			$this->duplicates = null;  // clear array
+			while($row = $rs->fetchRow())
+			{
+				$this->duplicates[] = new courseInstance($row[0]);	//init self to matching CI
+			}
 			return true;
 		}
 	}
@@ -1019,7 +1016,7 @@ class courseInstance
 				;
 		}
 
-		$rs = $g_dbConn->query($sql, array($this->courseInstanceID));
+		$rs = $g_dbConn->query($sql, array($this->getCourseInstanceID()));		
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
 		$this->instructorIDs = $this->instructorList = array();
