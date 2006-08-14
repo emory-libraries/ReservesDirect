@@ -265,6 +265,8 @@ class copyClassManager extends baseManager {
 					$sourceClass->destroy();
 					$copyStatus[]="Source Class successfully deleted";
 				}
+				
+				$targetClass->setStatus('ACTIVE');
 
 				$this->displayFunction = 'displayCopySuccess';
 				$this->argList = array($sourceClass, $targetClass, $copyStatus, $importing);
