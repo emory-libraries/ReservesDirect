@@ -1687,68 +1687,84 @@ class classDisplayer extends baseDisplayer {
 	
 	function displayDuplicateCourse(&$ci, $prev_state=null) {
 		global $u, $g_permission;
-			
-		$ci->getPrimaryCourse();	//pull in course object
-		$ci->getInstructors();	//pull in instructor info
 		
-		//link course name/num to editClass, if viewed by instructor
-		if($u->getRole() >= $g_permission['staff']) {
-			$course_num = '<a href="index.php?cmd=editClass&ci='.$ci->getCourseInstanceID().'">'.$ci->course->displayCourseNo().'</a>';
-			$course_name = '<a href="index.php?cmd=editClass&ci='.$ci->getCourseInstanceID().'">'.$ci->course->getName().'</a>';
-		}
-		else {
-			$course_num = $ci->course->displayCourseNo();
-			$course_name = $ci->course->getName();
-		}
+		$dup_msg = "The course you are attempting to create is already active for this term.  Please double-check the department, course number, section, and term of your course.";  
+		if (is_array($ci->duplicates))
+			$dup_msg .=	"You may copy reserves by selecting one of the course(s) below.";
 		
-		//begin display
 		
-		//make a form with hidden items and a button to return to previous screen
-		if(!empty($prev_state)):
-?>
-		<div style="width:100%; margin:auto;">
-			<form action="index.php" method="post" name="return_to_previous">			
-				<?php self::displayHiddenFields(unserialize(urldecode($prev_state))); ?>
-				<input type="submit" name="return" value="Go Back to the Previous Screen" />
-			</form>
-		</div>
-<?php
-		endif;
 ?>	
 		<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
 			<tr><td width="100%"><img src="images/spacer.gif" width="1" height="5"></td></tr>
 			<tr>
-				<td class="failedText">
-					The course you are attempting to create is already active for this term!  Please double-check the department, course number, section, and term of your course.  If you believe this to be an error, or need further assistance, please contact your Reserves staff. 
-
-<?php	if($u->getRole() >= $g_permission['staff']):	//display additional message to staff ?>
-					<p />
-					Staff: If you are trying to copy a class to a "new class", please copy "to existing" instead.
-<?php	endif; ?>
-					
-				</td>
+				<td class="failedText"><?=$dup_msg?></td>
 			</tr>
 			<tr><td>&nbsp;</td></tr>
-			<tr>
-				<td align="left" valign="top">
-					<table width="100%" border="0" align="center" cellpadding="5" cellspacing="0" class="displayList">
-						<tr align="left" valign="middle" bgcolor="#CCCCCC" class="headingCell1">
-							<td>Course Number</td><td align="left">Course Name</td><td>Instructor</td><td>Active Term</td><td>Reserve List</td>
-						</tr>
-						<tr align="left" valign="middle" class="oddRow">
-							<td width="15%" align="center"><?=$course_num?></td>
-							<td><?=$course_name?></td>
-							<td width="20%" align="center"><?=$ci->displayInstructors()?></td>
-							<td width="15%" align="center"><?=$ci->displayTerm()?></td>
-							<td width="10%" align="center"><a href="javascript:openWindow('no_control&cmd=previewReservesList&ci=<?=$ci->getCourseInstanceID()?>','width=800,height=600');">preview</a></td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-			<tr><td align="left" valign="top">&nbsp;</td></tr>
+			<? if (is_array($ci->duplicates)) { ?>
+				<form action="index.php" method="post" id="frmCopyClass">
+					<input type="hidden" name="cmd" value="processCopyClass">
+					<input type="hidden" name="importClass">				
+					<input type="hidden" name="ci" value="<?= $ci->getCourseInstanceID(); ?>">
+					<tr>
+						<td align="left" valign="top">
+							<table width="100%" border="0" align="center" cellpadding="5" cellspacing="0" class="displayList">
+									<tr align="left" valign="middle" bgcolor="#CCCCCC" class="headingCell1">
+										<td>&nbsp;</td><td>Course Number</td><td align="left">Course Name</td><td>Instructor</td><td>Active Term</td><td>Reserve List</td>
+									</tr>
+											
+									<? 
+									foreach ($ci->duplicates as $dup)
+									{ 							
+										$dup->getPrimaryCourse();	//pull in course object
+										$dup->getInstructors();	//pull in instructor info
+										
+										//link course name/num to editClass, if viewed by instructor
+										if($u->getRole() >= $g_permission['staff']) {
+											$course_num = '<a href="index.php?cmd=editClass&ci='.$dup->getCourseInstanceID().'">'.$dup->course->displayCourseNo().'</a>';
+											$course_name = '<a href="index.php?cmd=editClass&ci='.$dup->getCourseInstanceID().'">'.$dup->course->getName().'</a>';
+										}
+										else {
+											$course_num = $dup->course->displayCourseNo();
+											$course_name = $dup->course->getName();
+										}							
+										echo "<tr align=\"left\" valign=\"middle\" class=\"oddRow\">\n";
+										echo "	<td align=\"center\"><input type='radio' name='new_ci' value='".$dup->getCourseInstanceID()."' onClick=\"this.form.submit.disabled=false;\"></td>\n";
+										echo "	<td width=\"15%\" align=\"center\">$course_num</td>\n";
+										echo "	<td>$course_name</td>\n";
+										echo "	<td width=\"20%\" align=\"center\">".$dup->displayInstructors()."</td>\n";
+										echo "	<td width=\"15%\" align=\"center\">".$dup->displayTerm()."</td>\n";
+										echo "	<td width=\"10%\" align=\"center\"><a href=\"javascript:openWindow('no_control&cmd=previewReservesList&ci=".$dup->getCourseInstanceID()."','width=800,height=600');\">preview</a></td>\n";
+										echo "</tr>\n";
+									}
+									?>	
+									
+								</table>
+						</td>
+					</tr>
+					
+					<tr><td align="left" valign="top">&nbsp;</td></tr>
+					
+					<tr><td align="center" valign="top"><input type="submit" value="Copy Into Selected Course" name="submit" disabled> 
+					</form>
+				<? } //isarray($ci->duplicates 
+				   else 
+				   { echo '<tr><td align="center" valign="top">'; }
+
+							//make a form with hidden items and a button to return to previous screen
+							if(!empty($prev_state))
+							{	
+								//echo "<div style=\"width:100%; margin:auto;\">\n";
+								echo "	<form action=\"index.php\" method=\"post\" name=\"return_to_previous\">\n";
+										self::displayHiddenFields(unserialize(urldecode($prev_state))); 
+								echo "		<input type=\"submit\" name=\"return\" value=\"Go Back to the Previous Screen\" />\n";
+								echo "	</form>\n";
+								//echo "</div>\n";
+							}
+						?>
+					</td>
+				</tr>						
 		</table>
 		<p />
 <?php
 	}
-}
-?>
+}?>

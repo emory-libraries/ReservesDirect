@@ -180,16 +180,13 @@ class classManager
 					$ci = new courseInstance($_REQUEST['ci']);
 					$ci->getCourseForUser();
 					if($u->getDefaultRole() >= $g_permission['instructor']) {	//trying to remove a class the user is teaching
-echo "removing class<br>";
 						$u->removeClass($ci->course->getCourseAliasID());						
 					}
-					else {	//trying to leave a class the user is enrolled in
-echo "leaving class<br>";						
+					else {	//trying to leave a class the user is enrolled in	
 						$u->leaveClass($ci->course->getCourseAliasID());
 					}
 					
 					//go to course listing
-echo "calling classManager<br>";					
 					classManager::classManager('viewCourseList', $u, $adminUser, null);
 				}
 				else {	//show class list					
@@ -470,42 +467,48 @@ echo "calling classManager<br>";
 			break;
 
 			case 'createNewClass':
+				global $ci;
 				$loc = "create class";
 			
 				$t = new term($_REQUEST['term']);
 				
-				//need a CI object
-				$ci = new courseInstance(null);
-								
-				//attempt to create the course instance
-				if($ci->createCourseInstance($_REQUEST['department'], $_REQUEST['course_number'], $_REQUEST['course_name'], $_REQUEST['section'], $t->getTermYear(), $t->getTermName())) {	//course created successfully, insert data
-					$ci->addInstructor($ci->getPrimaryCourseAliasID(), $_REQUEST['selected_instr']);
-					$ci->setTerm($t->getTermName());
-					$ci->setYear($t->getTermYear());
-					$ci->setActivationDate($_REQUEST['activation_date']);
-					$ci->setExpirationDate($_REQUEST['expiration_date']);
-					$ci->setEnrollment($_REQUEST['enrollment']);
-					$ci->setStatus('ACTIVE');
-					
-					$new_ci = $ci->getCourseInstanceID();
-					
-					//course is now complete, decide what to do next
-					$postproc_cmd = !empty($_REQUEST['postproc_cmd']) ? $_REQUEST['postproc_cmd'] : '';					
-					switch($postproc_cmd) {
-						case 'importClass':	//turn control over to a different manager
-						case 'processCopyClass':
-							require_once("secure/managers/copyClassManager.class.php");
-							$_REQUEST['new_ci'] = $new_ci;
-							copyClassManager::copyClassManager($postproc_cmd, $u, $_REQUEST);
-						break;
+				if (!($ci instanceof courseInstance))
+					$ci = ($_REQUEST['src_ci']) ? new courseInstance($_REQUEST['src_ci']) : new courseInstance($_REQUEST['ci']);			
 
-						default:	//do not need to do any post-processing
-							//show success screen
-							$this->displayFunction = 'displayCreateSuccess';
-							$this->argList = array($new_ci);
+				if (!$ci->getDuplicatesByMatch($_REQUEST['department'], 
+												   $_REQUEST['course_number'], 
+												   $_REQUEST['section'], $t->getTermYear(), $t->getTermName()))
+				{		
+					//attempt to create the course instance
+					if($ci->createCourseInstance($_REQUEST['department'], $_REQUEST['course_number'], $_REQUEST['course_name'], $_REQUEST['section'], $t->getTermYear(), $t->getTermName())) 
+					{	//course created successfully, insert data
+						$ci->addInstructor($ci->getPrimaryCourseAliasID(), $_REQUEST['selected_instr']);
+						$ci->setTerm($t->getTermName());
+						$ci->setYear($t->getTermYear());
+						$ci->setActivationDate($_REQUEST['activation_date']);
+						$ci->setExpirationDate($_REQUEST['expiration_date']);
+						$ci->setEnrollment($_REQUEST['enrollment']);
+						$ci->setStatus('ACTIVE');
+						
+						$new_ci = $ci->getCourseInstanceID();
+						
+						//course is now complete, decide what to do next
+						$postproc_cmd = !empty($_REQUEST['postproc_cmd']) ? $_REQUEST['postproc_cmd'] : '';					
+						switch($postproc_cmd) {
+							case 'importClass':	//turn control over to a different manager
+							case 'processCopyClass':
+								require_once("secure/managers/copyClassManager.class.php");
+								$_REQUEST['new_ci'] = $new_ci;
+								copyClassManager::copyClassManager($postproc_cmd, $u, $_REQUEST);
+							break;
+	
+							default:	//do not need to do any post-processing
+								//show success screen
+								$this->displayFunction = 'displayCreateSuccess';
+								$this->argList = array($new_ci);
+						}
 					}
-				}
-				else {	//could not create course -- the CI must be a duplicate
+				} else {	//duplicates found					
 					//display duplicate info
 					$this->displayFunction = 'displayDuplicateCourse';
 					//make sure we go back to the previous screen

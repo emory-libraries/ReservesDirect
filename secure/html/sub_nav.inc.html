@@ -7,7 +7,7 @@
 		
 			if($u->getRole() >= $g_permission['instructor']) {
 				$subMenu[] = '<a href="index.php?cmd=createClass">Create New Class</a>';
-				//$subMenu[] = '<a href="index.php?cmd=importClass">Reactivate Class</a>';
+				$subMenu[] = '<a href="index.php?cmd=importClass">Reactivate Class</a>';
 			}
 			if($u->getRole() >= $g_permission['proxy']) {
 				$subMenu[] = '<a href="index.php?cmd=exportClass">Export Class</a>';

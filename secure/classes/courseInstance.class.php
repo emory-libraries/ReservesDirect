@@ -158,7 +158,7 @@ class courseInstance
 	 * @param string $term Course term
 	 * @desc Initializes $this to the matching CI and returns TRUE if match found, else returns FALSE
 	 */
-	function getCourseInstanceByMatch($dept_id, $courseNumber, $section, $year, $term) {
+	function getDuplicatesByMatch($dept_id, $courseNumber, $section, $year, $term) {
 		global $g_dbConn;
 		
 		//select matching course instance ID
@@ -183,10 +183,11 @@ class courseInstance
 			return false;
 		}
 		else {
-			$this->duplicates = null;  // clear array
+			$this->duplicates = null;  // clear array			
 			while($row = $rs->fetchRow())
 			{
-				$this->duplicates[] = new courseInstance($row[0]);	//init self to matching CI
+				if ($this->courseInstanceID != $row[0])
+					$this->duplicates[] = new courseInstance($row[0]);	//add duplicate to array
 			}
 			return true;
 		}

@@ -226,33 +226,6 @@ class instructor extends proxy
 		$rs = $g_dbConn->query($sql, array($proxyID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR);}
 
-		/* commented out by kawashi on 11.12.2004 - No longer adding proxies to crosslistings, just to primary course
-		//Get all course aliases for the given course instance id
-		$rs = $g_dbConn->query($sql1, array($courseInstanceID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR);}
-
-		//Loop through all course aliases
-		while($row = $rs->fetchRow())
-		{
-			$aliasID = $row[0];
-
-			//Check to see if proxy already has access to this alias in the access table
-			$rs2 = $g_dbConn->query($sql2, array($proxyID, $aliasID, $g_permission['proxy']));
-			if (DB::isError($rs2)) { trigger_error($rs2->getMessage(), E_USER_ERROR);}
-
-			//If proxy doesn't have access...
-			if ($rs2->numRows() == 0) {
-
-				//Execute query to grant access for the proxy, to the couse alias, in the access table
-				$rs3 = $g_dbConn->query($sql3, array($proxyID, $aliasID, $g_permission['proxy']));
-				if (DB::isError($rs3)) { trigger_error($rs3->getMessage(), E_USER_ERROR);}
-
-			}
-		}
-		*/
-
-		//Code below was added by kawashi on 11.12.2004 - Now only adding proxies to primary course
-
 		//Get primary course alias for the given course instance id
 		$rs = $g_dbConn->query($sql1, array($courseInstanceID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR);}
@@ -292,6 +265,26 @@ class instructor extends proxy
 		return ($intructor_CIs + $proxy_CIs);
 	}
 	
+	/**
+	 * @return array
+	 * @desc Returns an array of all current and future CIs for this instructor
+	 */
+	public function getAllFutureCourseInstances() {		
+		//show current courses, or those that will start within a year
+		//do not show expired courses
+		$activation_date = date('Y-m-d');
+		$expiration_date = null;
+		$status = null;
+	
+		//get CIs where user is an instructor
+		$intructor_CIs = $this->fetchCourseInstances('instructor', $activation_date, $expiration_date, $status);
+		//$intructor_auto_CIs = $this->fetchCourseInstances('instructor', $activation_date, $expiration_date, 'AUTOFEED');
+		//get CIs where user is a proxy
+		//$proxy_active_CIs = $this->fetchCourseInstances('proxy', $activation_date, $expiration_date, 'ACTIVE');
+		
+		//return the combined list
+		return ($intructor_CIs);
+	}	
 	
 	/**
 	 * @return array

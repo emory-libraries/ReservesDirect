@@ -46,18 +46,19 @@ abstract class baseDisplayer {
 	 * @param array $hidden_fields A reference to an array (may be two-dimensional) of keys/values
 	 * @desc outputs hidden <input> fields for the array
 	 */
-	public function displayHiddenFields(&$hidden_fields) {
+	public function displayHiddenFields(&$hidden_fields) {				
 		if(empty($hidden_fields))
 			return;
-			
-		foreach($hidden_fields as $key=>$val) {
-			if(is_array($val)) {
-				foreach($val as $subkey=>$val) {
-					echo '<input type="hidden" name="'.$key.'['.$subkey.']" value="'.$val.'" />'."\n";
+		else {			
+			foreach($hidden_fields as $key=>$val) {
+				if(is_array($val)) {
+					foreach($val as $subkey=>$val) {
+						echo '<input type="hidden" name="'.$key.'['.$subkey.']" value="'.$val.'" />'."\n";
+					}
 				}
-			}
-			else {		
-				echo '<input type="hidden" name="'.$key.'" value="'.$val.'" />'."\n";
+				else {		
+					echo '<input type="hidden" name="'.$key.'" value="'.$val.'" />'."\n";
+				}
 			}
 		}
 	}
@@ -506,9 +507,11 @@ abstract class baseDisplayer {
 	 * @param string $msg (optional) Text to display above the class select
 	 * @param array $hidden_fields (optional) Array of info to pass on as hidden fields
 	 * @param boolean $override_staff If true, will override the staff default of showing AJAX class looking and will show a list of courses instead.
+	 * @param string $ci_variable name of html variable for selected ci
+	 * @param string $createClassLink link to create new class
 	 * @desc Displays class selector -- ajax for staff, list of classes for proxy/instructor
 	 */
-	public function displaySelectClass($next_cmd, $course_instances=null, $msg=null, $hidden_fields=null, $override_staff=false) {
+	public function displaySelectClass($next_cmd, $course_instances=null, $msg=null, $hidden_fields=null, $override_staff=false, $ci_variable='ci', $createClassLink=null) {
 		global $u, $g_permission;
 		
 		if(!empty($msg)) {
@@ -555,7 +558,7 @@ abstract class baseDisplayer {
 				$rowClass = ($rowClass=='evenRow') ? 'oddRow' : 'evenRow';
 ?>
 						<tr class="<?=$rowClass?>">
-							<td style="text-align:center;"><input type="radio" id="ci" name="ci" value="<?=$ci->getCourseInstanceID()?>" onClick="this.form.submit.disabled=false;" /></td>
+							<td style="text-align:center;"><input type="radio" id="ci" name="<?= $ci_variable?>" value="<?=$ci->getCourseInstanceID()?>" onClick="this.form.submit.disabled=false;" /></td>
 			    			<td><?=$ci->course->displayCourseNo()?></td>
 							<td><?=$ci->course->getName()?></td>
 							<td><?=$ci->displayTerm()?></td>
@@ -573,8 +576,14 @@ abstract class baseDisplayer {
 		<p />		
 		<input type="submit" name="submit" value="Continue" disabled="disabled">
 		
-		</form>
+		</form>	
+		
 <?php
+			if(!is_null($createClassLink))
+			{
+				echo "<p/><<<< Class not found?  <a href='$createClassLink'>Create New";
+			}
+		
 		}
 	}
 }
