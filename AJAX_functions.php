@@ -137,11 +137,11 @@ http://www.reservesdirect.org/
 		case 'classList':
 			/*
 				Expects $_REQUEST['qry'] to be base64 encode '::' delimited string
-				instructor_id :: department_id :: course_num :: course_name :: term_id
+				instructor_id :: department_id :: course_num :: course_name :: term_id :: ci_variable
 				ANY values can be empty			
 			*/
 		
-			list($user_id, $dept_id, $course_num, $course_name, $term_id) = split("::", $qry);			
+			list($user_id, $dept_id, $course_num, $course_name, $term_id, $ci_variable) = split("::", $qry);			
 			
 			$userObj = new users();
 			$ci_list = $userObj->searchForCI($user_id, $dept_id, $course_num, $course_name, $term_id);
@@ -184,7 +184,7 @@ http://www.reservesdirect.org/
 					$rowStyle = (empty($rowStyle) || ($rowStyle=='evenRow')) ? 'oddRow' : 'evenRow';	//set the style
 									
 					$returnValue .= "<div align=\"left\" class=\"$rowStyle\" style=\"padding:5px;\">\n";					
-					$returnValue .= "	<div align=\"left\" style=\"width: 30px; float:left; text-align:left;\"><input name=\"ci\" type=\"radio\" value=\"".$ci->getCourseInstanceID()."\" onClick=\"document.getElementById('editButton').disabled=false\"></div>\n";
+					$returnValue .= "	<div align=\"left\" style=\"width: 30px; float:left; text-align:left;\"><input name=\"".$ci_variable."\" type=\"radio\" value=\"".$ci->getCourseInstanceID()."\" onClick=\"document.getElementById('editButton').disabled=false\"></div>\n";
 					$returnValue .= '	<div style="width: 30px; float:left; text-align:left">'.$edit_icon.'</div>';
 					$returnValue .= "	<div align=\"left\" style=\"width:15%; float:left;\">".$ci->course->displayCourseNo()."&nbsp;</div>\n";
 					$returnValue .= "	<div align=\"left\" style=\"width:30%; float:left;\">".$ci->course->getName()."&nbsp;</div>\n";

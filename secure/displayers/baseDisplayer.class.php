@@ -53,11 +53,11 @@ abstract class baseDisplayer {
 			foreach($hidden_fields as $key=>$val) {
 				if(is_array($val)) {
 					foreach($val as $subkey=>$val) {
-						echo '<input type="hidden" name="'.$key.'['.$subkey.']" value="'.$val.'" />'."\n";
+						echo '<input type="hidden" id="'.$key.'['.$subkey.']" name="'.$key.'['.$subkey.']" value="'.$val.'" />'."\n";
 					}
 				}
 				else {		
-					echo '<input type="hidden" name="'.$key.'" value="'.$val.'" />'."\n";
+					echo '<input type="hidden" id="'.$key.'" name="'.$key.'" value="'.$val.'" />'."\n";
 				}
 			}
 		}
@@ -520,6 +520,8 @@ abstract class baseDisplayer {
 		
 		if(($u->getRole() >= $g_permission['staff']) && !$override_staff) {	//staff - use ajax class lookup
 			//display selectClass
+			$hidden_fields['ci_variable'] = $ci_variable;
+			
 			$mgr = new ajaxManager('lookupClass', $next_cmd, 'manageClasses', 'Continue', $hidden_fields);
 			$mgr->display();
 		}

@@ -82,15 +82,17 @@ class ajaxDisplayer extends baseDisplayer {
 						  + document.getElementById('dept_id').value + "::" 
 						  + document.getElementById('course_num').value + "::"
 						  + document.getElementById('course_name').value + "::"
-						  + document.getElementById('search_term').options[document.getElementById('search_term').selectedIndex].value;
+						  + document.getElementById('search_term').options[document.getElementById('search_term').selectedIndex].value + "::"
+						  + document.getElementById('ci_variable').value
+						  ;
 
-				if (value != "::::::::")
+				if (value != "::::::::::")
 				{
 					//document.getElementById('test').value = "AJAX_functions.php?f=classList&qu=" + encode64(value);
 					
 					liveSearchInitXMLHttpRequest();
 					liveSearchReq.onreadystatechange = displayClasses;
-					liveSearchReq.open("GET", "AJAX_functions.php?f=classList&qu=" + encode64(value));
+					liveSearchReq.open("GET", "AJAX_functions.php?f=classList&qu=" + encode64(value));				
 					liveSearchReq.send(null);
 				} else
 					resetFields();
