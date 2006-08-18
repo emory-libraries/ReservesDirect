@@ -272,8 +272,8 @@ class instructor extends proxy
 	public function getAllFutureCourseInstances() {		
 		//show current courses, or those that will start within a year
 		//do not show expired courses
-		$activation_date = date('Y-m-d');
-		$expiration_date = null;
+		$activation_date = null;
+		$expiration_date = date('Y-m-d');
 		$status = null;
 	
 		//get CIs where user is an instructor

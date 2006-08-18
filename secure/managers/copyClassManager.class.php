@@ -56,7 +56,14 @@ class copyClassManager extends baseManager {
 		{
 			case 'importClass':	
 				$src_ci = !empty($_REQUEST['src_ci']) ? $_REQUEST['src_ci'] : null;
-				$dst_ci = !empty($_REQUEST['dst_ci']) ? $_REQUEST['dst_ci'] : null;				
+				$dst_ci = !empty($_REQUEST['dst_ci']) ? $_REQUEST['dst_ci'] : null;
+
+				if (!empty($_REQUEST['dst_ci']))
+					$dst_ci = $_REQUEST['dst_ci'];  //user selected destination
+				elseif (!empty($_REQUEST['new_ci']))
+					$dst_ci = $_REQUEST['new_ci'];  //user created new destination course
+				else
+					$dst_ci = null;
 				
 				if(!empty($dst_ci) && !empty($src_ci)) {	//have both source and destination, display options
 					//get the source ci
@@ -96,7 +103,7 @@ class copyClassManager extends baseManager {
                                 'search_selected_instr' => $ci->instructorList[0]->getName().' -- '.$ci->instructorList[0]->getUsername()
                         );
                         //pass on the source CI id
-                        $needed_info = array('src_ci' => $src_ci, 'createNew' => 'true');
+                        $needed_info = array('src_ci' => $src_ci, 'submit' => 'Continue');
 
                         $loc = 'import class >> create destination class';
                         $this->displayClass = 'classDisplayer';
