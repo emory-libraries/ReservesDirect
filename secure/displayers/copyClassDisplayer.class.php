@@ -119,7 +119,15 @@ class copyClassDisplayer extends baseDisplayer {
 
 				<div style="float:right; text-align:right;"><a href="javascript:checkAll2(document.forms.reservesListForm, 1)">check all</a> | <a href="javascript:checkAll2(document.forms.reservesListForm, 0)">uncheck all</a></div>
 				<div class="headingCell1" style="width:33%;">Reserves List</div>
+				<div style="clear:both;"></div>
 					<ul style="list-style:none; padding-left:0px; margin:0px;">
+				<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+					<tr>
+						<td class="headingCell1">&nbsp;
+						</td>
+					</tr>
+					<tr>
+						<td>
 <?php
 		//begin displaying individual reserves
 		//loop
@@ -174,7 +182,7 @@ class copyClassDisplayer extends baseDisplayer {
 						<input type="checkbox" checked="true" name="selected_reserves[]" value="<?=$reserve->getReserveID()?>" />
 					</div>
 					<?php self::displayReserveInfo($reserve, 'class="metaBlock-wide"'); ?>
-					<!-- hack to clear floats -->
+					<!-- hack to clear floats-->		
 					<div style="clear:both;"></div>
 					<!-- end hack -->
 				</div>			
@@ -191,6 +199,13 @@ class copyClassDisplayer extends baseDisplayer {
 					</ul>
 				</div>
 			</div>
+			</td>
+			</tr>
+			<tr>
+				<td class="headingCell1">&nbsp;
+				</td>
+			</tr>
+		</table>
 			<p />
 			<div style="text-align:center;">
 				<input type="submit" name="Submit" value="Import Class">
