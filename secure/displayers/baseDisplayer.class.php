@@ -520,9 +520,8 @@ abstract class baseDisplayer {
 		
 		if(($u->getRole() >= $g_permission['staff']) && !$override_staff) {	//staff - use ajax class lookup
 			//display selectClass
-			$hidden_fields['ci_variable'] = $ci_variable;
 			
-			$mgr = new ajaxManager('lookupClass', $next_cmd, 'manageClasses', 'Continue', $hidden_fields);
+			$mgr = new ajaxManager('lookupClass', $next_cmd, 'manageClasses', 'Continue', $hidden_fields, null, null, $ci_variable);
 			$mgr->display();
 		}
 		else {	//all others class select

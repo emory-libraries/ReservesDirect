@@ -36,8 +36,9 @@ class ajaxDisplayer extends baseDisplayer {
 	 * @param string $nextCmd Action to take when the form is submitted
 	 * @param string $button_label (optional) What to label the submit button
 	 * @param array $hidden_fields (optional) Additional information that will be included in the form as hidden fields
+	 * @param string $ci_variable name of html variable for selected ci
 	 */	
-	function classLookup($nextCmd, $button_label='Submit', $hidden_fields=null) {
+	function classLookup($nextCmd, $button_label='Submit', $hidden_fields=null, $ci_variable = 'ci') {
 ?>
 		<script language="JavaScript1.2" src="secure/javascript/liveSearch.js"></script>
 		<script language="JavaScript1.2">
@@ -167,10 +168,11 @@ class ajaxDisplayer extends baseDisplayer {
 				</tr>
 			</table>
 
-			<input id="inst_id" value="" type="hidden">
-			<input id="dept_id" value="" type="hidden">
-			<input id="course_num" value="" type="hidden">
-			<input id="course_name" value="" type="hidden">
+			<input id="inst_id" value="" type="hidden"/>
+			<input id="dept_id" value="" type="hidden"/>
+			<input id="course_num" value="" type="hidden"/>
+			<input id="course_name" value="" type="hidden"/>
+			<input id="ci_variable" value="<?=$ci_variable?>" type="hidden"/>
 			
 			<!--<br><input id=test><br>-->
 			

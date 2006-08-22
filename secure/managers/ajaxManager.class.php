@@ -58,15 +58,14 @@ class ajaxManager extends baseManager {
 	 * @param array $additional_args an array of any other arguments that may need to be passed
 	 * @desc Displays textfield that is AJAX-enabled to search for a user
 	 */
-	public function lookup($cmd, $nextCmd, $tab, $button_label, $propagated_info=null, $standalone=true, $additional_args=null) {
-		
+	public function lookup($cmd, $nextCmd, $tab, $button_label, $propagated_info=null, $standalone=true, $additional_args=null, $ci_variable='ci') {		
 		switch($cmd) {
 			case 'lookupClass':
 				$page = $tab;
 				$loc  = "class lookup";
 
 				$this->displayFunction = 'classLookup';
-				$this->argList = array($nextCmd, $button_label, $propagated_info, $standalone);
+				$this->argList = array($nextCmd, $button_label, $propagated_info, $standalone, $ci_variable);
 			break;
 			
 			case 'lookupUser':
