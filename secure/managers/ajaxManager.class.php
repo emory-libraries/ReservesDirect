@@ -65,7 +65,7 @@ class ajaxManager extends baseManager {
 				$loc  = "class lookup";
 
 				$this->displayFunction = 'classLookup';
-				$this->argList = array($nextCmd, $button_label, $propagated_info, $standalone, $ci_variable);
+				$this->argList = array($nextCmd, $button_label, $propagated_info, $ci_variable);
 			break;
 			
 			case 'lookupUser':
