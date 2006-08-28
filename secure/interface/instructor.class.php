@@ -220,6 +220,7 @@ class instructor extends proxy
 				$sql2 =	"SELECT access_id FROM access WHERE user_id = ! AND alias_id = ! AND permission_level = !";
 
 				$sql3 =	"INSERT INTO access (user_id, alias_id, permission_level) VALUES (!, !, !)";
+				$sql4 = "UPDATE access SET permission_level = ! WHERE user_id = ! AND alias_id = !";
 		}
 
 		//Update default permission to proxy if current permssion level < proxy
@@ -240,8 +241,17 @@ class instructor extends proxy
 		//If proxy doesn't have access...
 		if ($rs2->numRows() == 0) {
 			//Execute query to grant access for the proxy, to the couse alias, in the access table
-			$rs3 = $g_dbConn->query($sql3, array($proxyID, $aliasID, $g_permission['proxy']));
-			if (DB::isError($rs3)) { trigger_error($rs3->getMessage(), E_USER_ERROR);}
+			$rs3 = $g_dbConn->query($sql3, array($proxyID, $aliasID, $g_permission['proxy']));							
+			
+			if (DB::isError($rs3)) { 
+				if ($rs3->level == 1024)
+				{
+					$rs4 = $g_dbConn->query($sql4, array($g_permission['proxy'], $proxyID, $aliasID));
+					if (DB::isError($rs4)) { trigger_error($rs4->getMessage(), E_USER_ERROR);}
+				} else {
+					trigger_error($rs3->getMessage(), E_USER_ERROR);
+				}
+			}
 		}
 	}
 	
