@@ -248,7 +248,8 @@ class courseInstance
 	* Remove Crosslistings from Class
 	* @return boolean
 	* @param array $course_alias_ids Array of course_alias_id
-	* @desc delete crosslisting
+	* @desc delete crosslisting return false on failure; if primary_course_alias_id appears in 
+	* 	    $course_alias_ids no changes will be made
 	*/	
 	function removeCrossListing($course_alias_ids)
 	{	
@@ -256,20 +257,19 @@ class courseInstance
 		
 		$rv = false;	
 		$sql = "DELETE FROM course_aliases WHERE course_alias_id = !";
-		
+				
 		if (is_array($course_alias_ids) && !empty($course_alias_ids))
 		{
+			//before removing crosslist confirm it is not primary
+			if (in_array($this->getPrimaryCourseAliasID(), $course_alias_ids))
+				return false;
+				
 			foreach($course_alias_ids as $ca_id)
-			{
-				//before removing crosslist confirm it is not primary
-				if ($this->getPrimaryCourseAliasID() == $ca_id)
-					return false;
-				
+			{				
 				$rs = $g_dbConn->query($sql, $ca_id);
-				if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-				
-				$rv = true;
+				if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }				
 			}
+			$rv = true;
 		}
 		
 		return $rv;
