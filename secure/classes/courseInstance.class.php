@@ -243,6 +243,38 @@ class courseInstance
 
 		$this->getCrossListings();
 	}
+	
+	/**
+	* Remove Crosslistings from Class
+	* @return boolean
+	* @param array $course_alias_ids Array of course_alias_id
+	* @desc delete crosslisting
+	*/	
+	function removeCrossListing($course_alias_ids)
+	{	
+		global $g_dbConn;
+		
+		$rv = false;	
+		$sql = "DELETE FROM course_aliases WHERE course_alias_id = !";
+		
+		if (is_array($course_alias_ids) && !empty($course_alias_ids))
+		{
+			foreach($course_alias_ids as $ca_id)
+			{
+				//before removing crosslist confirm it is not primary
+				if ($this->getPrimaryCourseAliasID() == $ca_id)
+					return false;
+				
+				$rs = $g_dbConn->query($sql, $ca_id);
+				if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+				
+				$rv = true;
+			}
+		}
+		
+		return $rv;
+	}
+	
 
 	function getProxies()
 	{

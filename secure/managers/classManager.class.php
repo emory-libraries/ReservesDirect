@@ -303,15 +303,11 @@ class classManager
 				$loc ="edit title and crosslistings";
 				$ci = new courseInstance($_REQUEST['ci']);
 
-				if (isset($_REQUEST['deleteCrossListings']))
+				if (isset($_REQUEST['deleteCrossListings']) 
+					&& is_array($_REQUEST['deleteCrossListing']) 
+					&& !empty($_REQUEST['deleteCrossListing']))
 				{
-					$courses = $_REQUEST['deleteCrossListing'];
-					if (is_array($courses) && !empty($courses)){
-						foreach($courses as $c)
-						{
-							$user->leaveClass($c);
-						}
-					}
+					$ci->removeCrossListing($_REQUEST['deleteCrossListing']);
 				}
 
 
