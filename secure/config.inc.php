@@ -124,4 +124,7 @@ http://www.reservesdirect.org/
 	$g_no_javascript_msg = (string)$configure->no_javascript_msg;
 
 	$g_request_notifier_lastrun = (string)$configure->request_notifier->last_run;
+	
+    $g_activation_padding_days = (integer)$configure->registar_feed->activation_padding_days;
+    $g_expiration_padding_days = (integer)$configure->registar_feed->expiration_padding_days;
 ?>
