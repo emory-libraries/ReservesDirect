@@ -36,7 +36,7 @@ http://www.reservesdirect.org/
 -->
 <configuration>
     <authentication>
-        <type>LDAP</type>
+        <type>LDAP</type><!-- OPTIONS: LDAP, StandAlone, ANY -->
     </authentication>
 
     <database>
