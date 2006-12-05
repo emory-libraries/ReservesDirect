@@ -65,7 +65,7 @@ http://www.reservesdirect.org/
     <ldap>
         <ldapHost>CHANGEME</ldapHost>                <!-- host name or IP address of ldap server; "localhost" if using stunnel -->
         <ldapDomain>CHANGEME.example.edu</ldapDomain>     <!-- domain that holds ldap user accounts -->
-        <ldapPort>CHANGEME</ldapPort>                <!-- "686" if connecting securely (ldaps), otherwise "389" -->
+        <ldapPort>CHANGEME</ldapPort>                <!-- "636" if connecting securely (ldaps), otherwise "389" -->
         <ldapVersion>3</ldapVersion>                    <!-- ldap version, usually "3" -->
         <baseDistinguishedName>CHANGEME</baseDistinguishedName>
         <userAttributes>                    <!-- attributes, if available, used to seed new user profile in RD -->

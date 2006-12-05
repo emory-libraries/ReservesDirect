@@ -6,21 +6,19 @@ Created by Jason White (jbwhite@emory.edu)
 
 This file is part of ReservesDirect
 
-Copyright (c) 2004-2005 Emory University, Atlanta, Georgia.
+Copyright (c) 2004-2006 Emory University, Atlanta, Georgia.
 
-ReservesDirect is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
+Licensed under the ReservesDirect License, Version 1.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the full License at
+http://www.reservesdirect.org/licenses/LICENSE-1.0
 
 ReservesDirect is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with ReservesDirect; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+but is distributed "AS IS" and WITHOUT ANY WARRANTY, without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE, and without any warranty as to non-infringement of any third
+party's rights.  See the License for the specific language governing
+permissions and limitations under the License.
 
 ReservesDirect is located at:
 http://www.reservesdirect.org/
