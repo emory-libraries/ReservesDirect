@@ -1,4 +1,13 @@
 		<div class="resourceLinks">&nbsp;</div>
 		<div class="functionLinks">
-			<a href="index.php?cmd=editProfile">Edit Profile</a> | <a href="help/topics/overview/index.html" target="help">Help</a> | <a href="secure/logout.php">Sign Off</a>
+			<a href="index.php?cmd=editProfile">Edit Profile</a> | 
+				<?php  	if (isset($help_article)): ?>
+						<a href="#" onclick="javascript:help('cmd=helpViewArticle&h_a_id=<?=$help_article?>'); return false;">Help</a> |
+				<?php 	else: ?>
+					<a href="#" onclick="javascript:help('cmd=help'); return false;">Help</a> |
+				<?php	endif; ?>
+						
+
+			<a href="#" onclick="javascript:help('cmd=helpViewArticle&h_a_id=40'); return false;">Contact Us</a> | 
+			<a href="secure/logout.php">Sign Off</a>
 		</div>
