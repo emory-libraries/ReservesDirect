@@ -45,7 +45,7 @@ class userManager
 
 	function userManager($cmd, $user, $adminUser, $msg="")
 	{
-		global $page, $loc, $g_permission, $ci, $alertMsg;
+		global $page, $loc, $g_permission, $ci, $alertMsg, $help_article;
 
 		$this->displayClass = "userDisplayer";
 
@@ -65,6 +65,7 @@ class userManager
 				} elseif ($user->getRole() == $g_permission['instructor']) {
 
 					$loc  = "manage your proxies";
+					$help_article = "14";
 
 					$this->displayFunction = 'displayInstructorHome';
 					$this->argList = "";

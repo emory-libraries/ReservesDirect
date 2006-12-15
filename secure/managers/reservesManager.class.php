@@ -54,7 +54,7 @@ class reservesManager
 
 	function reservesManager($cmd, $user)
 	{
-		global $g_permission, $page, $loc, $g_faxDirectory, $g_documentDirectory, $g_documentURL, $ci, $g_notetype, $u;
+		global $g_permission, $page, $loc, $g_faxDirectory, $g_documentDirectory, $g_documentURL, $ci, $g_notetype, $u, $help_article;
 
 		$this->displayClass = "reservesDisplayer";
 		//$this->user = $user;
@@ -198,6 +198,7 @@ class reservesManager
 			case 'customSort':
 				$page = ($u->getRole() >= $g_permission['staff']) ? 'manageClasses' : 'myReserves';
 				$loc  = "sort reserves list";
+				$help_article = "34";
 				
 				$ci = new courseInstance($_REQUEST['ci']);
 				
@@ -229,6 +230,8 @@ class reservesManager
 			case 'addReserve':
 				$page = "addReserve";
 				$progress = array ('total' => 4, 'full' => 0);
+				$loc = "add a reserve";
+				$help_article = "15";
 
 				if ($user->getRole() >= $g_permission['staff']) {
 					//$courseInstances = $user->getCourseInstances($_REQUEST['u']);
@@ -252,12 +255,18 @@ class reservesManager
 			
 			case 'searchScreen':
 				$page = "addReserve";
+				$loc = "search for an item";
+				$help_article = "19";
+				
 
 				$this->displayFunction = "displaySearchScreen";
 				$this->argList = array($page, 'searchResults', $_REQUEST['ci']);
 			break;
 			case 'searchResults':
 				$page = "addReserve";
+				$loc = "search for an item";
+				$help_article = "19";
+				
 				$search = new searchItems();
 
 				if (isset($_REQUEST['f'])) {
@@ -349,11 +358,15 @@ class reservesManager
 			break;
 			case 'uploadDocument':
 				$page="addReserve";
+				$loc = "upload a document";
+				$help_article = "18";
 				$this->displayFunction = "displayUploadForm";
 				$this->argList = array($user, $_REQUEST['ci'], "DOCUMENT", $user->getAllDocTypeIcons());
 			break;
 			case 'addURL':
 				$page="addReserve";
+				$loc = "add a URL / link";
+				$help_article = "16";
 				$this->displayFunction = "displayUploadForm";
 				$this->argList = array($user, $_REQUEST['ci'], "URL", $user->getAllDocTypeIcons());
 			break;
@@ -430,11 +443,15 @@ class reservesManager
 			break;
 			case 'faxReserve':
 				$page="addReserve";
+				$loc = "fax a document";
+				$help_article = "17";
 				$this->displayFunction = "displayFaxInfo";
 				$this->argList = array($_REQUEST['ci']);
 			break;
 			case 'getFax':
 				$page="addReserve";
+				$loc = "claim your fax";
+				$help_article = "17";
 				$faxReader = new faxReader();
 				$faxReader->getFaxesFromFile($g_faxDirectory);
 
@@ -443,6 +460,8 @@ class reservesManager
 			break;
 			case 'addFaxMetadata':
 				$page="addReserve";
+				$loc = "add fax document information";
+				$help_article = "17";
 				$faxReader = new faxReader();
 
 				$claims =& $_REQUEST['claimFax'];
@@ -529,7 +548,8 @@ class reservesManager
 					//show form
 					$ci = new courseInstance($_REQUEST['ci']);					
 					$page = 'addReserve';
-					$loc = 'edit multiple reserves';				
+					$loc = 'edit multiple reserves';	
+					$help_article = "41";
 					$this->displayFunction = 'displayEditMultipleReserves';
 					$this->argList = array($ci, $_REQUEST['selected_reserves']);
 				}

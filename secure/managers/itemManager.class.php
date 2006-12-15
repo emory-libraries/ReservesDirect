@@ -47,7 +47,7 @@ class itemManager
 
 	function itemManager($cmd, $user)
 	{
-		global $g_permission, $g_documentURL, $page, $loc, $ci, $u;
+		global $g_permission, $g_documentURL, $page, $loc, $ci, $u, $help_article;
 
 		$this->displayClass = "itemDisplayer";
 		
@@ -219,13 +219,16 @@ class itemManager
 					
 					//go back to edit item copyright screen
 					$page = "addReserve";
-					$loc  = "edit item";					
+					$loc  = "edit item";		
+					$help_article = "33";
+					
 					$this->displayFunction = 'displayEditItem';
 					$this->argList = array($item, $reserve);
 				}
 				else {	//display edit page
 					$page = "addReserve";
 					$loc  = "edit item";
+					$help_article = "33";
 					
 					$this->displayFunction = 'displayEditItem';
 					$this->argList = array($item, $reserve, array('dubReserve'=>$_REQUEST['dubReserve'], 'selected_instr'=>$_REQUEST['selected_instr']));
@@ -235,6 +238,7 @@ class itemManager
 			case 'editHeading':
 				$page = ($u->getRole() >= $g_permission['staff']) ? 'manageClasses' : 'addReserve';
 				$loc = "edit heading";
+				$help_article = "35";
 				
 				$headingID = !empty($_REQUEST['headingID']) ? $_REQUEST['headingID'] : null;
 				$heading = new reserve($headingID);
@@ -246,6 +250,7 @@ class itemManager
 			case 'processHeading':
 				$page = "myReserves";
 				$loc = "edit heading";
+				$help_article = "35";
 
 				$ci = new courseInstance($_REQUEST['ci']);
 				$headingText = $_REQUEST['heading'];

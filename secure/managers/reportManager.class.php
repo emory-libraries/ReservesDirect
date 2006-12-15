@@ -34,7 +34,7 @@ class reportManager extends baseManager {
 
 	function reportManager($cmd, $user, $request)
 	{
-		global $ci, $loc;
+		global $ci, $loc, $help_article;
 		
 		$this->displayClass = "reportDisplayer";
 		$this->user = $user;
@@ -57,6 +57,7 @@ class reportManager extends baseManager {
 			
 			case 'reportsTab':
 				$loc = "View System Statistics";
+				$help_article = "11";
 			
 				$this->displayFunction = "displayReportList";
 				$this->argList = array($user->getReportList());

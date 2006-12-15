@@ -49,7 +49,7 @@ class classManager
 
 	function classManager($cmd, $user, $adminUser, $request)
 	{
-		global $g_permission, $page, $loc, $ci, $alertMsg, $u;
+		global $g_permission, $page, $loc, $ci, $alertMsg, $u, $help_article;
 		
 //echo "classManager($cmd, $user, $adminUser)<P>"; //classManager
 
@@ -116,6 +116,9 @@ class classManager
 			
 	
 			case 'addClass':
+				$loc = "join a class";
+				$help_article = "27";
+				
 				$ci_id = !empty($_REQUEST['ci']) ? $_REQUEST['ci'] : null;
 				$instructor_id = !empty($_REQUEST['selected_instr']) ? $_REQUEST['selected_instr'] : null;
 				$department_id = !empty($_REQUEST['department']) ? $_REQUEST['department'] : null;
@@ -174,6 +177,9 @@ class classManager
 			break;
 			
 			case 'removeClass':	//remove classes from a user's list (deletes access entry)
+				$loc = "leave a class";
+				$help_article = "27";
+				
 				if(!empty($_REQUEST['ci'])) {	//user selected class
 					$ci = new courseInstance($_REQUEST['ci']);
 					$ci->getCourseForUser();
@@ -238,6 +244,7 @@ class classManager
 			
 			case 'editClass':
 				$loc  = "edit class";
+				$help_article = "23";
 				
 				if(empty($_REQUEST['ci'])) {	//get ci
 					//get array of CIs (ignored for staff)
@@ -299,6 +306,8 @@ class classManager
 			case 'editTitle':
 			case 'editCrossListings':
 				$loc ="edit title and crosslistings";
+				$help_article = "29";
+				
 				$ci = new courseInstance($_REQUEST['ci']);
 
 				if (isset($_REQUEST['deleteCrossListings']) 
@@ -370,6 +379,8 @@ class classManager
 
 			case 'editInstructors':
 				$loc = "edit instructors";
+				$help_article = "12";
+				
 				$ci = new courseInstance($_REQUEST['ci']);
 				$ci->getCrossListings();  //load cross listings 
 
@@ -406,6 +417,8 @@ class classManager
 
 			case 'editProxies':
 				$loc = "edit proxies";
+				$help_article = "13";
+				
 				$ci = new courseInstance($_REQUEST['ci']);
 				$ci->getCrossListings();  //load cross listings
 
@@ -454,6 +467,7 @@ class classManager
 
 			case 'createClass':
 				$loc = "create new class";
+				$help_article = "25";
 
 //				$msg = 'Create your class below.  You will have a chance to reactivate readings from previous courses on the next screen.';
 				$this->displayFunction = 'displayCreateClass';
@@ -551,7 +565,9 @@ class classManager
 			break;
 			
 			case 'copyItems':
-				$loc = "copy reserve items to another class";			
+				$loc = "copy reserve items to another class";
+				$help_article = "20";
+				
 				$class_list = $user->getCourseInstancesToEdit();
 				$this->displayFunction = 'displaySelectClass';
 				$this->argList = array('processCopyItems', $class_list, 'Select class to copy TO:', $request);
