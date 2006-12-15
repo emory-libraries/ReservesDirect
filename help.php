@@ -7,14 +7,6 @@ Created by Dmitriy Panteleyev (dpantel@emory.edu)
 
 This file is part of ReservesDirect
 
-/*******************************************************************************
-AJAX_functions.php
-returns data for ajax data fields
-
-Created by Jason White (jbwhite@emory.edu)
-
-This file is part of ReservesDirect
-
 Copyright (c) 2004-2006 Emory University, Atlanta, Georgia.
 
 Licensed under the ReservesDirect License, Version 1.0 (the "License");      
@@ -32,10 +24,7 @@ permissions and limitations under the License.
 ReservesDirect is located at:
 http://www.reservesdirect.org/
 
-*******************************************************************************/
 
-ReservesDirect is located at:
-http://www.reservesdirect.org/
 *******************************************************************************/
 
 //show only content (no logos, menus, etc)
