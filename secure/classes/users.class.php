@@ -387,7 +387,7 @@ class users
 				if(!empty($term_id))
 					$sql .= "AND t.term_id = $term_id ";
 					
-				$sql .= "ORDER BY t.term_id DESC, ci.year DESC, d.abbreviation ASC, c.course_number ASC, ca.section ASC LIMIT 50";
+				$sql .= "ORDER BY t.term_id DESC, ci.year DESC, d.abbreviation ASC, c.course_number ASC, ca.section ASC";
 		}
 		
 		$rs = $g_dbConn->query($sql);	
