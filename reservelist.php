@@ -34,8 +34,6 @@ require_once("secure/classes/course.class.php");
 require_once("secure/classes/courseInstance.class.php");
 require_once("secure/classes/reserveItem.class.php");
 require_once('secure/classes/tree.class.php');
-require_once("secure/interface/instructor.class.php");
-require_once("secure/interface/student.class.php");
 
 
 //$i = new instructor();
