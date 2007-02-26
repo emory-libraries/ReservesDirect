@@ -1,0 +1,2 @@
+ALTER TABLE `libraries` CHANGE `monograph_library_id` `monograph_library_id` INT( 11 ) NULL DEFAULT NULL ;
+ALTER TABLE `libraries` CHANGE `multimedia_library_id` `multimedia_library_id` INT( 11 ) NULL DEFAULT NULL ;

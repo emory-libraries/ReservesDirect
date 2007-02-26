@@ -307,74 +307,92 @@ class classManager
 			case 'editCrossListings':
 				$loc ="edit title and crosslistings";
 				$help_article = "29";
+
+				$msg = null;			
 				
-				$ci = new courseInstance($_REQUEST['ci']);
-
-				if (isset($_REQUEST['deleteCrossListings']) 
-					&& is_array($_REQUEST['deleteCrossListing']) 
-					&& !empty($_REQUEST['deleteCrossListing']))
+				if (!isset($_REQUEST['ci']))
 				{
-					$ci->removeCrossListing($_REQUEST['deleteCrossListing']);
-				}
-
-
-				if (isset($_REQUEST['addCrossListing']))
-				{
-
-					$dept = $_REQUEST['newDept'];
-					$courseNo = $_REQUEST['newCourseNo'];
-					$section = $_REQUEST['newSection'];
-					$courseName = $_REQUEST['newCourseName'];
-
-					if ($dept==NULL || $courseNo==NULL || $courseName==NULL)	
-						$alertMsg =	'Please supply a Department, Course#, Section, and Title before adding the Cross Listing.';
-					else 
-						$user->addCrossListing($ci, $dept, $courseNo, $section, $courseName);
-					
-
-				}
-
-				if (isset($_REQUEST['updateCrossListing'])) {
-					/* commented out by kawashi on 11.12.04 - No longer able to change primary course
-					$oldPrimaryCourse = new course($_REQUEST['oldPrimaryCourse']);
-					$oldPrimaryCourse->setDepartmentID($_REQUEST['primaryDept']);
-					$oldPrimaryCourse->setCourseNo($_REQUEST['primaryCourseNo']);
-					$oldPrimaryCourse->setSection($_REQUEST['primarySection']);
-					$oldPrimaryCourse->setName($_REQUEST['primaryCourseName']);
-
-					//Set New Primary Course
-					$ci->setPrimaryCourseAliasID($_REQUEST['primaryCourse']);
-					*/
-
-					$primaryCourse = new course($_REQUEST['primaryCourse']);
-					$primaryCourse->setDepartmentID($_REQUEST['primaryDept']);
-					$primaryCourse->setCourseNo($_REQUEST['primaryCourseNo']);
-					$primaryCourse->setSection($_REQUEST['primarySection']);
-					$primaryCourse->setName($_REQUEST['primaryCourseName']);
-
-					if ($_REQUEST['cross_listings'])
+					$this->displayFunction = 'displaySelectClass';
+					$this->argList = array($cmd, null, 'Select class to add Crosslisting:', null);
+				} else {
+					$ci = new courseInstance($_REQUEST['ci']);							
+	
+					if (isset($_REQUEST['deleteCrossListings']) 
+						&& is_array($_REQUEST['deleteCrossListing']) 
+						&& !empty($_REQUEST['deleteCrossListing']))
 					{
-						$cross_listings = array_keys($_REQUEST['cross_listings']);
-						foreach ($cross_listings as $cross_listing)
+						$ci->removeCrossListing($_REQUEST['deleteCrossListing']);
+						$msg = " Crosslistings Successfully Removed.";
+					}
+	
+	
+					if (isset($_REQUEST['addCrossListing']))
+					{
+						if (isset($_REQUEST['ca_variable']))
 						{
-							$updateCourse = new course($cross_listing);
-							$updateCourse->setDepartmentID($_REQUEST['cross_listings'][$cross_listing]['dept']);
-							$updateCourse->setCourseNo($_REQUEST['cross_listings'][$cross_listing]['courseNo']);
-							$updateCourse->setSection($_REQUEST['cross_listings'][$cross_listing]['section']);
-							$updateCourse->setName($_REQUEST['cross_listings'][$cross_listing]['courseName']);
+							$c = new course($_REQUEST['selected_ca']);
+							$dept = $c->deptID;
+							$courseNo = $c->courseNo;
+							$section = $c->section;
+							$courseName = $c->name;							
+						} else {
+							$dept = $_REQUEST['newDept'];
+							$courseNo = $_REQUEST['newCourseNo'];
+							$section = $_REQUEST['newSection'];
+							$courseName = $_REQUEST['newCourseName'];
+						}
+						
+						if (is_null($dept) || is_null($courseNo) || is_null($courseName))	
+							$alertMsg =	'Please supply a Department, Course#, Section, and Title before adding the Cross Listing.';
+						else 
+							$user->addCrossListing($ci, $dept, $courseNo, $section, $courseName);
+							$msg = " Crosslistings Successfully Added.";						
+	
+					}
+	
+					if (isset($_REQUEST['updateCrossListing'])) {
+						/* commented out by kawashi on 11.12.04 - No longer able to change primary course
+						$oldPrimaryCourse = new course($_REQUEST['oldPrimaryCourse']);
+						$oldPrimaryCourse->setDepartmentID($_REQUEST['primaryDept']);
+						$oldPrimaryCourse->setCourseNo($_REQUEST['primaryCourseNo']);
+						$oldPrimaryCourse->setSection($_REQUEST['primarySection']);
+						$oldPrimaryCourse->setName($_REQUEST['primaryCourseName']);
+	
+						//Set New Primary Course
+						$ci->setPrimaryCourseAliasID($_REQUEST['primaryCourse']);
+						*/
+	
+						$primaryCourse = new course($_REQUEST['primaryCourse']);
+						$primaryCourse->setDepartmentID($_REQUEST['primaryDept']);
+						$primaryCourse->setCourseNo($_REQUEST['primaryCourseNo']);
+						$primaryCourse->setSection($_REQUEST['primarySection']);
+						$primaryCourse->setName($_REQUEST['primaryCourseName']);
+	
+						if ($_REQUEST['cross_listings'])
+						{
+							$cross_listings = array_keys($_REQUEST['cross_listings']);
+							foreach ($cross_listings as $cross_listing)
+							{
+								$updateCourse = new course($cross_listing);
+								$updateCourse->setDepartmentID($_REQUEST['cross_listings'][$cross_listing]['dept']);
+								$updateCourse->setCourseNo($_REQUEST['cross_listings'][$cross_listing]['courseNo']);
+								$updateCourse->setSection($_REQUEST['cross_listings'][$cross_listing]['section']);
+								$updateCourse->setName($_REQUEST['cross_listings'][$cross_listing]['courseName']);
+							}
+							$msg = " Crosslistings Successfully Updated.";
 						}
 					}
+	
+					//$ci->getCourseForInstructor($user->getUserID());
+					$ci->getPrimaryCourse();
+					$ci->course->getDepartment();   //$this->department = new department($this->deptID);
+					$ci->getCrossListings();
+	
+					$deptID = $ci->course->department->getDepartmentID();
+	
+					$this->displayFunction = 'displayEditTitle';
+					$this->argList = array($cmd, $ci, $deptID, $msg);
 				}
-
-				//$ci->getCourseForInstructor($user->getUserID());
-				$ci->getPrimaryCourse();
-				$ci->course->getDepartment();   //$this->department = new department($this->deptID);
-				$ci->getCrossListings();
-
-				$deptID = $ci->course->department->getDepartmentID();
-
-				$this->displayFunction = 'displayEditTitle';
-				$this->argList = array($ci, $deptID);
 			break;
 
 			case 'editInstructors':

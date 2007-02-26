@@ -58,6 +58,10 @@ require_once("secure/session.inc.php");
 //if user is valid, then initializes global user object as $u
 //else shows login page
 
+####################################
+
+####################################
+
 require_once('secure/auth.inc.php');
 
 //read cmd
@@ -106,6 +110,9 @@ $calendar = new Calendar();
 if(!empty($_REQUEST['deleteNote'])) {
 	noteManager::deleteNote($_REQUEST['deleteNote']);
 }
+
+if ($_SESSION['debug'])
+	echo "cmd=$cmd<hr>";
 
 switch ($cmd)
 {

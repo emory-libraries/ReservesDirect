@@ -303,7 +303,7 @@ class searchDisplayer extends baseDisplayer {
 				echo "					</td>\n";
 				echo "					<td width=\"7%\" align=\"center\" valign=\"middle\" class=\"$rowClass\" class=\"borders\">\n";
 				echo "						<a href=\"index.php?cmd=editItem&itemID=" . $item->getItemID() . "&search=". urlencode($hidden_fields['search']) ."\">edit</a>\n";
-				//<!--Clicking \"edit\" link should open up edit item screen with a link on it to \"Return to Search Results\" at bottom instead of the usual \"Return to Class\" link. -->
+				
 				echo "					</td>\n";
 				echo "					<td width=\"9%\" align=\"center\" valign=\"middle\" class=\"$rowClass\" class=\"borders\">\n";
 				echo "						<input type=\"checkbox\" name=\"itemSelect[]\" value=\"". $item->getItemID() ."\">\n";

@@ -94,6 +94,11 @@ class userDisplayer
 
 	function displayEditProxy($courseInstances,$nextCmd)
 	{
+echo "displayEditProxy<Br><pre>"; print_r ($courseInstances); echo "</pre><hr>";
+echo get_class($courseInstances[0]) . "<br>";
+
+		
+		
 		echo "<form action=\"index.php\" method=\"post\" name=\"editUser\">\n";
 	    echo "<input type=\"hidden\" name=\"cmd\" value=\"$nextCmd\">\n";
 		echo '<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">';
@@ -130,21 +135,23 @@ class userDisplayer
         echo 					'<td width="10%">Select</td>';
         echo				'</tr>';
 
-        $rowNumber = 0;
-        for ($i=0; $i<count($courseInstances); $i++)
+        if(!empty($courseInstances))
         {
-        	$rowClass = ($rowNumber++ % 2) ? $rowClass = "evenRow" : "oddRow";
-        	$courseInstances[$i]->getPrimaryCourse();
-
-        echo				'<tr align="left" valign="middle" bgcolor="#CCCCCC" class="'.$rowClass.'">';
-        echo 					'<td width="15%">'.$courseInstances[$i]->course->displayCourseNo().'</td>';
-        echo 					'<td width="65%">'.$courseInstances[$i]->course->getName().'</td>';
-        echo 					'<td width="20%">'.$courseInstances[$i]->displayTerm().'</td>';
-        echo 					'<td width="10%" align="center"><input type="radio" name="ci" value="'.$courseInstances[$i]->getCourseInstanceID().'"></td>';
-        echo 				'</tr>';
-
+        	$rowNumber = 0;
+	        foreach ($courseInstances as $ci)
+	        {
+	        	$rowClass = ($rowNumber++ % 2) ? $rowClass = "evenRow" : "oddRow";
+	        	$ci->getPrimaryCourse();
+	
+	        echo				'<tr align="left" valign="middle" bgcolor="#CCCCCC" class="'.$rowClass.'">';
+	        echo 					'<td width="15%">'.$ci->course->displayCourseNo().'</td>';
+	        echo 					'<td width="65%">'.$ci->course->getName().'</td>';
+	        echo 					'<td width="20%">'.$ci->displayTerm().'</td>';
+	        echo 					'<td width="10%" align="center"><input type="radio" name="ci" value="'.$ci->getCourseInstanceID().'"></td>';
+	        echo 				'</tr>';
+	
+	        }
         }
-
         echo 				'<tr align="left" valign="middle" bgcolor="#CCCCCC" class="headingCell1">';
         echo 					'<td width="15%">&nbsp;</td>';
         echo 					'<td width="65%">&nbsp;</td>';

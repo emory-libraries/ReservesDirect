@@ -131,7 +131,7 @@ class copyClassManager extends baseManager {
 				
 				$loc  = "copy course reserves list >> select source class";				
 				$this->displayFunction = 'displaySelectClass';
-				$this->argList = array('copyClassOptions', $class_list, 'Select class to copy FROM:');
+				$this->argList = array('copyClassOptions', $class_list, 'Select Source Class:'); //Select class to copy FROM:
 			break;
 				
 			case 'copyClassOptions':
@@ -147,13 +147,14 @@ class copyClassManager extends baseManager {
 			case 'copyExisting':				
 				//propagate the info
 				$needed_info = array();
-				if(!empty($_REQUEST['sourceClass']))	$needed_info['sourceClass'] = $_REQUEST['sourceClass'];
-				if(!empty($_REQUEST['copyReserves']))	$needed_info['copyReserves'] = $_REQUEST['copyReserves'];
+				if(!empty($_REQUEST['sourceClass']))		$needed_info['sourceClass'] = $_REQUEST['sourceClass'];
+				if(!empty($_REQUEST['copyReserves']))		$needed_info['copyReserves'] = $_REQUEST['copyReserves'];
 				if(!empty($_REQUEST['copyCrossListings']))	$needed_info['copyCrossListings'] = $_REQUEST['copyCrossListings'];
-				if(!empty($_REQUEST['copyEnrollment']))	$needed_info['copyEnrollment'] = $_REQUEST['copyEnrollment'];
+				if(!empty($_REQUEST['copyEnrollment']))		$needed_info['copyEnrollment'] = $_REQUEST['copyEnrollment'];
 				if(!empty($_REQUEST['copyInstructors']))	$needed_info['copyInstructors'] = $_REQUEST['copyInstructors'];
-				if(!empty($_REQUEST['copyProxies']))	$needed_info['copyProxies'] = $_REQUEST['copyProxies'];
-				if(!empty($_REQUEST['deleteSource']))	$needed_info['deleteSource'] = $_REQUEST['deleteSource'];	
+				if(!empty($_REQUEST['copyProxies']))		$needed_info['copyProxies'] = $_REQUEST['copyProxies'];
+				if(!empty($_REQUEST['deleteSource']))		$needed_info['deleteSource'] = $_REQUEST['deleteSource'];	
+				if(!empty($_REQUEST['crosslistSource']))	$needed_info['crosslistSource'] = $_REQUEST['crosslistSource'];	
 				
 				$class_list = $u->getCourseInstancesToEdit();
 
@@ -165,14 +166,15 @@ class copyClassManager extends baseManager {
 			case 'copyNew':				
 				//propagate the info
 				$needed_info = array();
-				if(!empty($_REQUEST['sourceClass']))	$needed_info['sourceClass'] = $_REQUEST['sourceClass'];
-				if(!empty($_REQUEST['copyReserves']))	$needed_info['copyReserves'] = $_REQUEST['copyReserves'];
+				if(!empty($_REQUEST['sourceClass']))		$needed_info['sourceClass'] = $_REQUEST['sourceClass'];
+				if(!empty($_REQUEST['copyReserves']))		$needed_info['copyReserves'] = $_REQUEST['copyReserves'];
 				if(!empty($_REQUEST['copyCrossListings']))	$needed_info['copyCrossListings'] = $_REQUEST['copyCrossListings'];
-				if(!empty($_REQUEST['copyEnrollment']))	$needed_info['copyEnrollment'] = $_REQUEST['copyEnrollment'];
+				if(!empty($_REQUEST['copyEnrollment']))		$needed_info['copyEnrollment'] = $_REQUEST['copyEnrollment'];
 				if(!empty($_REQUEST['copyInstructors']))	$needed_info['copyInstructors'] = $_REQUEST['copyInstructors'];
-				if(!empty($_REQUEST['copyProxies']))	$needed_info['copyProxies'] = $_REQUEST['copyProxies'];
-				if(!empty($_REQUEST['deleteSource']))	$needed_info['deleteSource'] = $_REQUEST['deleteSource'];
-
+				if(!empty($_REQUEST['copyProxies']))		$needed_info['copyProxies'] = $_REQUEST['copyProxies'];
+				if(!empty($_REQUEST['deleteSource']))		$needed_info['deleteSource'] = $_REQUEST['deleteSource'];
+				if(!empty($_REQUEST['crosslistSource']))	$needed_info['crosslistSource'] = $_REQUEST['crosslistSource'];	
+				
 				$loc = 'copy course reserves list >> create destination class';
 				$this->displayClass = 'classDisplayer';
 				$this->displayFunction = 'displayCreateClass';
@@ -261,7 +263,7 @@ class copyClassManager extends baseManager {
 					}
 
 					$copyStatus[]="Crosslistings successfully copied";
-				}
+				}				
 
 				if (isset($request['copyInstructors']))
 				{
@@ -286,6 +288,20 @@ class copyClassManager extends baseManager {
 				if(!$importing && isset($request['deleteSource'])) {
 					$sourceClass->destroy();
 					$copyStatus[]="Source Class successfully deleted";
+				}
+				
+				//if crosslist source
+				if (isset($request['crosslistSource']))
+				{
+					$sourceClass->getCourses();					
+
+					foreach ($sourceClass->courseList as $course)
+					{						
+						$course->bindToCourseInstance($targetClass->getCourseInstanceID());					
+						$copyStatus[]= $course->displayCourseNo() . " successfully crosslisted";
+					}
+					$sourceClass->destroy();
+					$copyStatus[]="Source Class successfully deleted";					
 				}
 				
 				$targetClass->setStatus('ACTIVE');

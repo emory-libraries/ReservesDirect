@@ -976,9 +976,9 @@ class itemDisplayer extends noteDisplayer {
 
 		<div class="contentTabs">
 			<ul>
-				<li <?=$tab_styles['meta']?>><a href="index.php?cmd=editItem&amp;<?=$edit_item_href?>">Item Info</a></li>
+				<li <?=$tab_styles['meta']?>><a href="index.php?cmd=editItem&<?=$edit_item_href?>&search=<?=urlencode($_REQUEST['search'])?>">Item Info</a></li>
 <?php		if($u->getRole() >= $g_permission['staff']): ?>
-				<li <?=$tab_styles['history']?>><a href="index.php?cmd=editItem&amp;<?=$edit_item_href?>&amp;tab=history">History</a></li>
+				<li <?=$tab_styles['history']?>><a href="index.php?cmd=editItem&<?=$edit_item_href?>&tab=history&search=<?=urlencode($_REQUEST['search'])?>">History</a></li>
 <?php
 #########################################
 #	HIDE COPYRIGHT UNTIL FURTHER NOTICE #

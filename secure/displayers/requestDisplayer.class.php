@@ -981,7 +981,7 @@ class requestDisplayer extends noteDisplayer {
 				self::displayNotes($itemNotes);
 				
 				echo '	</td>';
-				echo '	<td width="17%" valign="top" align="right" nowrap="nowrap">[ <a href="index.php?cmd=editReserve&reserveID='.$reserve->getReserveID().'" class="editlinks">edit item</a> ]';
+				echo '	<td width="17%" valign="top" align="right" nowrap="nowrap">[ <a href="index.php?cmd=editItem&reserveID='.$reserve->getReserveID().'" class="editlinks">edit item</a> ]';
 				if($duplicate_link)
 					echo '&nbsp;[ <a href="index.php?cmd=duplicateReserve&amp;reserveID='.$reserve->getReserveID().'&amp;selected_instr='.$selected_instr.'" class="editlinks">duplicate item</a> ]';
 				echo '</td>';

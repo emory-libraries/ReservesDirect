@@ -382,9 +382,8 @@ class userManager
 					$this->displayFunction = 'displayStaffHome';
 					$this->argList = array($msg);
 				} else {
-					require_once("secure/managers/reservesManager.class.php");
-					reservesManager::reservesManager('viewCourseList', $user);
-					break;
+					require_once("secure/managers/classManager.class.php");
+					classManager::classManager('viewCourseList', $editUser, $user, $_REQUEST);
 				}
 			break;
 

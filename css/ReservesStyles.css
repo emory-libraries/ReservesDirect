@@ -610,8 +610,8 @@ table.displaylist td{
 	width:45%;
 }
 .classRollActive {
-	float:right;
-	width:45%;
+	float:left;
+	width:25%;
 }
 
 .reserveItem {

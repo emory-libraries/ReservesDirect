@@ -125,6 +125,46 @@ class adminManager
 				
 			break;
 			
+			case 'editClassFeed':
+				//Admin will be prompted to select a CI 
+				//then if Cross-listings exist for this CI a course_alias (CA) must be selected
+				
+				$src_ci = null;				
+				if (!is_null($_REQUEST['src_ci']))
+				{
+					$src_ci =  new courseInstance($_REQUEST['src_ci']);
+					$src_ci->getPrimaryCourse();
+					$src_ci->getCrossListings();	
+					
+					$courseList =  array_merge(array($src_ci->course), $src_ci->crossListings);
+				}
+				
+				$registrar_keys = ($_REQUEST['registrar_keys']) ? $_REQUEST['registrar_keys'] : null;
+								
+				if (is_null($src_ci))
+				{
+					$this->displayFunction = "displaySelectClass";
+					$this->argList = array("admin", null, "", array("function" => "editClassFeed"), false, "src_ci", null);					
+				} elseif (is_null($registrar_keys)) {				
+					//IF no crosslisting then use getPrimaryCourseAliasID else prompt for crosslisting selection					
+					
+					$this->displayFunction = "displayEditRegistrarKey";
+					$this->argList = array ("admin", $courseList, "To detach from Registrar Feed clear registrar key.", array("function" => "editClassFeed", "src_ci" => $src_ci->getCourseInstanceID()), "registrar_keys");
+					
+				} else {
+					//store Registrar keys if blank store null
+					foreach ($registrar_keys as $key => $value)
+					{
+						$ca = new course($key);
+						$rk = ($value == '') ? null : $value;
+						$ca->setRegistrarKey($rk);
+					}
+					
+					$alertMsg = "Course(s) Successfully Updated";
+					$this->adminManager($cmd, $user, null);
+				}
+			break;
+			
 			default:
 				$loc = "System Administration";
 			

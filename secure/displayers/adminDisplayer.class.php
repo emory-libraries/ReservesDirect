@@ -29,8 +29,9 @@ http://www.reservesdirect.org/
 require_once("secure/common.inc.php");
 require_once("secure/classes/terms.class.php");
 require_once('secure/displayers/helpDisplayer.class.php');
+require_once('secure/displayers/baseDisplayer.class.php');
 
-class adminDisplayer
+class adminDisplayer extends baseDisplayer 
 {
 	/**
 	 * Display List all admins available to user
@@ -43,6 +44,8 @@ class adminDisplayer
 	<a href="index.php?cmd=admin&function=editDept">Add/Edit Departments</a>
 	<p />
 	<a href="index.php?cmd=admin&function=editLib">Add/Edit Libraries</a>
+	<p />
+	<a href="index.php?cmd=admin&function=editClassFeed">Manage Course Feed for a Class</a>
 	<p />
 	
 	<strong>Help</strong>
@@ -363,7 +366,8 @@ class adminDisplayer
 					<td>Monograph Processing Library:</td>
 					<td>
 						<select name="monograph_library_id" id="monograph_library_id">
-						<?
+							<option value="null">No Monograph Processing Library</option>
+						<?							
 							foreach ($libraries as $l)
 							{
 								echo "<option value=\"" . $l->getLibraryID() ."\">". $l->getLibraryNickname() . "</option>";
@@ -378,6 +382,7 @@ class adminDisplayer
 					<td>Multimedia Processing Library:</td>
 					<td>
 						<select name="multimedia_library_id" id="multimedia_library_id">
+							<option value="null">No Multimedia Processing Library</option>
 						<?
 							foreach ($libraries as $l)
 							{
@@ -397,6 +402,52 @@ class adminDisplayer
 		</form>
 		<script language="JavaScript">getLibraryData(document.getElementById('lib_search'));</script>
 		<?
+	}
+		
+	/**
+	 * @return void
+	 * @param string $next_cmd The next command to execute
+	 * @param array $courses (optional) Array of crosslistings
+	 * @param string $msg (optional) Text to display above the class select
+	 * @param array $hidden_fields (optional) Array of info to pass on as hidden fields
+	 * @param string $return_variable name of html variable for selected
+	 * @desc Displays list of courses (course_alias) for selection
+	 */
+	public function displayEditRegistrarKey($next_cmd, $courses=null, $msg=null, $hidden_fields=null, $return_variable='ca') 	
+	{
+		if(!empty($msg)) {
+			echo "<span class=\"helperText\">$msg</span><p />\n";
+		}
+		
+		print("<form action=\"index.php\" method=\"post\" name=\"select_course\" id=\"select_class\">\n");
+		print("	<input type=\"hidden\" id=\"cmd\" name=\"cmd\" value=\"$next_cmd\" />\n");
+		
+		self::displayHiddenFields($hidden_fields);
+		
+		$c = new course();
+		
+		print "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\" align=\"center\">\n";
+		
+		$rowNumber = 0;
+		foreach($courses as $c)
+		{
+			$c->getDepartment();	
+		
+			$rowClass = ($rowNumber % 2) ? "evenRow" : "oddRow\n";
+			print("<tr class=\"$rowClass\">\n");
+			print("<td style=\"text-align:center;\">".$c->displayCourseNo().$c->getSection() . "</td>");
+			print("<td style=\"text-align:center;\">" . $c->getName() . "</td>");
+			print("<td style=\"text-align:center;\"><input type=\"text\" id=\"$return_variable_$rowNumber\" name=\"".$return_variable."[" . $c->getCourseAliasID() ."]\" value=\"". $c->getRegistrarKey() ."\" size=\"30\" maxlength=\"255\"/></td>\n");
+			print("</tr>\n");
+			$rowNumber++;
+		}
+		
+		print "<tr><td>&nbsp;</td></tr>";
+		print "<tr><td colspan=\"3\" align=\"center\"><input type=\"submit\" value=\"Update\"> <input type=\"button\" value=\"Cancel\" onClick=\"window.location.href='index.php?cmd=admin';\"></td></tr>\n";
+		
+		print "</table>\n";
+		
+		print("</form>\n");
 	}	
 }
 ?>

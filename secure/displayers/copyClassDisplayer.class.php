@@ -218,6 +218,7 @@ class copyClassDisplayer extends baseDisplayer {
 	
 	function displayCopyClassOptions(&$sourceClass) {
 ?>
+		<script src="secure/javascript/copyClassOptions.js"></script>
 		<form action="index.php" method="post">
 			<input type="hidden" name="sourceClass" value="<?=$sourceClass->getCourseInstanceID()?>" />
 			
@@ -229,20 +230,22 @@ class copyClassDisplayer extends baseDisplayer {
 					</div>
 					<div style="background-color:#CCCCCC;" style="padding:10px;">
 						<div style="width:45%; float:left;">
-							<input name="copyReserves" type="checkbox" value="checkbox">&nbsp;Copy Reserve Materials
+							<input id="copyReserves" name="copyReserves" type="checkbox" value="checkbox">&nbsp;Copy Reserve Materials
 							<br />
-							<input type="checkbox" name="copyCrossListings" value="checkbox">&nbsp;Copy Crosslistings
+							<input type="checkbox" id="copyCrossListings" name="copyCrossListings" value="checkbox">&nbsp;Copy Crosslistings
 							<br />
-							<input type="checkbox" name="copyEnrollment" value="checkbox">&nbsp;Copy Enrollment List
-						</div>
-						<div style="width:45%; float:left;">
-							<input type="checkbox" name="copyInstructors" value="checkbox">&nbsp;Copy Instructors
+							<input type="checkbox" id="copyEnrollment" name="copyEnrollment" value="checkbox">&nbsp;Copy Enrollment List
+						</div>						
+						<div style="width:45%; float:left;">							
+							<input type="checkbox" id="copyInstructors" name="copyInstructors" value="checkbox">&nbsp;Copy Instructors
 							<br />
-							<input type="checkbox" name="copyProxies" value="checkbox">&nbsp;Copy Proxies
+							<input type="checkbox" id="copyProxies" name="copyProxies" value="checkbox">&nbsp;Copy Proxies
 						</div>
 						<div style="clear:left;">
 							<br />
-							<input type="checkbox" name="deleteSource" value="checkbox">&nbsp;DELETE Source Class (Merge Classes) <span style="color:#CC0000;"><strong>CAUTION! Deleting the Source Class cannot be undone!</strong></span>
+							<input type="checkbox" id="crosslistSource" name="crosslistSource" value="checkbox" onClick="setCopyOptions('crossList')";>&nbsp;CROSSLIST Source Class <span style="color:#000000;"><strong>Enrollment will be retained by course</strong></span>
+							<br />
+							<input type="checkbox" id="deleteSource" name="deleteSource" value="checkbox">&nbsp;DELETE Source Class (Merge Classes) <span style="color:#CC0000;"><strong>CAUTION! Deleting the Source Class cannot be undone!</strong></span>
 						</div>
 					</div>
 					<div style="padding:5px;">

@@ -52,11 +52,11 @@ abstract class baseDisplayer {
 			foreach($hidden_fields as $key=>$val) {
 				if(is_array($val)) {
 					foreach($val as $subkey=>$val) {
-						echo '<input type="hidden" id="'.$key.'['.$subkey.']" name="'.$key.'['.$subkey.']" value="'.$val.'" />'."\n";
+						echo "<input type=\"hidden\" id=\"$key\"[$subkey]\" name=\"$key[$subkey]\" value=\"$val\" />\n";
 					}
 				}
 				else {		
-					echo '<input type="hidden" id="'.$key.'" name="'.$key.'" value="'.$val.'" />'."\n";
+					echo "<input type=\"hidden\" id=\"$key\" name=\"$key\" value=\"$val\" />\n";
 				}
 			}
 		}
@@ -502,6 +502,76 @@ abstract class baseDisplayer {
 	/**
 	 * @return void
 	 * @param string $next_cmd The next command to execute
+	 * @param array $courses (optional) Array of course objects to show for select
+	 * @param string $msg (optional) Text to display above the class select
+	 * @param array $hidden_fields (optional) Array of info to pass on as hidden fields
+	 * @param string $ca_variable name of html variable for selected ca
+	 * @desc Displays course selector -- ajax for staff
+	 */
+	public function displaySelectCourse($next_cmd, $courses=null, $msg=null, $hidden_fields=null, $ca_variable='ci') 
+	{
+//echo "function displaySelectCourse(next_cmd=$next_cmd, courses=$courses, msg=$msg, hf=$hidden_fields, ca_var=$ca_variable)<p> ";		
+		
+		global $u, $g_permission;
+		
+		if(!empty($msg)) {
+			echo '<span class="helperText">'.$msg.'</span><p />';
+		}				
+		
+			
+	//begin display
+
+		echo "<form action=\"index.php\" method=\"post\" name=\"select_course\">\n";
+		echo "	<input type=\"hidden\" id=\"cmd\" name=\"cmd\" value=\"$next_cmd\" />\n";	
+			
+		self::displayHiddenFields($hidden_fields); 
+			
+		echo "	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
+		echo "		<tr>\n";
+		echo "			<td class=\"headingCell1\" width=\"25%\" align=\"center\">SELECT COURSE</td>\n";
+		echo "			<td width=\"75%\" align=\"center\">&nbsp;</td>\n";
+		echo "		</tr>\n";
+		echo "		<tr>\n";
+		echo "	    	<td colspan=\"2\">\n";
+		echo "		    	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"5\" class=\"displayList\">\n";
+		echo "		    		<tr class=\"headingCell1\" style=\"text-align:left;\">\n";
+		echo "		    			<td width=\"5%\" style=\"text-align:center;\">Select</td>\n";
+		echo "		    			<td width=\"20%\">Department</td>\n";
+		echo "		    			<td width=\"15%\">Course Number</td>\n";
+		echo "		    			<td width=\"10%\">Section</td>\n";
+		echo "						<td>Course Title</td>\n";			
+		echo "		    		</tr>\n";
+			
+		$rowClass = 'evenRow';
+		//loop through the courses
+		foreach($courses as $ca)
+		{
+			$rowClass = ($rowClass == 'evenRow') ? 'oddRow' : 'evenRow';
+
+			echo "		<tr class=\"$rowClass\">\n";
+			echo "			<td style=\"text-align:center;\">\n";
+			echo "				<input type=\"radio\" id=\"ci\" name=$ca_variable\" value=\"" . $ca->getCourseAliasID() . "\" onClick=\"this.form.submit.disabled=false;\" />\n";
+			echo "			</td>\n";
+			echo "			<td>" . $ca->displayCourseNo() . "</td>\n";
+			echo "			<td>" . $ca->department->getName() . "</td>\n";
+			echo "			<td>" . $ca->getSection() . "</td>\n";
+			echo "			<td>" . $ca->getName() . "</td>\n";
+			echo "		</tr>\n";
+
+		}
+
+		echo "		</table>\n";
+		echo "	</td>\n";
+		echo "</tr>\n";
+		echo "</table>\n";
+		echo "<p />\n";
+		echo "<input type=\"submit\" name=\"submit\" value=\"Continue\" disabled=\"disabled\">\n";		
+		echo "</form>\n";
+	}
+	
+	/**
+	 * @return void
+	 * @param string $next_cmd The next command to execute
 	 * @param array $course_instances (optional) Array of courseInstance objects to show for proxy/instructor select; ignored for staff
 	 * @param string $msg (optional) Text to display above the class select
 	 * @param array $hidden_fields (optional) Array of info to pass on as hidden fields
@@ -510,7 +580,8 @@ abstract class baseDisplayer {
 	 * @param string $createClassLink link to create new class
 	 * @desc Displays class selector -- ajax for staff, list of classes for proxy/instructor
 	 */
-	public function displaySelectClass($next_cmd, $course_instances=null, $msg=null, $hidden_fields=null, $override_staff=false, $ci_variable='ci', $createClassLink=null) {
+	public function displaySelectClass($next_cmd, $course_instances=null, $msg=null, $hidden_fields=null, $override_staff=false, $ci_variable='ci', $createClassLink=null) 
+	{
 		global $u, $g_permission;
 		
 		if(!empty($msg)) {
@@ -522,8 +593,7 @@ abstract class baseDisplayer {
 			
 			$mgr = new ajaxManager('lookupClass', $next_cmd, 'manageClasses', 'Continue', $hidden_fields, null, null, $ci_variable);
 			$mgr->display();
-		}
-		else {	//all others class select
+		} else {	//all others class select
 			//begin display
 ?>
 		<form action="index.php" method="post" name="select_class" id="select_class">
@@ -579,11 +649,13 @@ abstract class baseDisplayer {
 		</form>	
 		
 <?php
-			if(!is_null($createClassLink))
-			{
-				echo "<p/><<<< Class not found?  <a href='$createClassLink'>Create New";
-			}
-		
 		}
-	}
+		
+		if(!is_null($createClassLink))
+		{
+			echo "<p/><<<< Class not found?  <a href='$createClassLink'>Create New";
+		}
+		
+	}	
+	
 }

@@ -305,14 +305,14 @@ class courseInstance
 	
 	/**
 	 * @return array
-	 * @desc Resturns array of arrays indexed by enrollment status; each subarray holds student objects
+	 * @desc Resturns array of arrays indexed by course and status; each subarray holds student objects
 	 */
 	function getRoll() {
 		global $g_dbConn;
 		
 		switch($g_dbConn->phptype) {
 			default:	//mysql
-				$sql = "SELECT DISTINCT u.username, a.enrollment_status
+				$sql = "SELECT DISTINCT u.username, a.enrollment_status, a.alias_id
 						FROM users AS u
 							JOIN access AS a ON a.user_id = u.user_id
 							JOIN course_aliases AS ca ON ca.course_alias_id = a.alias_id
@@ -326,11 +326,12 @@ class courseInstance
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
 		$roll = array();
-		while($row = $rs->fetchRow()) {
-			$status = !empty($row[1]) ? $row[1] : 'unk';
+		while($row = $rs->fetchRow(DB_FETCHMODE_ASSOC)) {
+			$status = !empty($row['enrollment_status']) ? $row['enrollment_status'] : 'PENDING';
+			$ca = $row['alias_id'];
 			
 			//add students into subarrays indexed by enrollment status
-			$roll[$status][] = new student($row[0]);
+			$roll[$ca][$status][] = new student($row['username']);
 		}
 		
 		return $roll;
@@ -1064,19 +1065,27 @@ class courseInstance
 	function addInstructor($courseAliasID, $instructorID)
 	{
 		global $g_dbConn;
-
+		$this->getInstructors();	
+		
+		if(in_array($instructorID, $this->instructorIDs)) { return null; }
+		
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT access_id from access WHERE user_id = ! AND alias_id = ! and permission_level = 3";
+				$sql  = "SELECT access_id from access WHERE user_id = ! AND alias_id = !";
 				$sql2 = "INSERT INTO access (user_id, alias_id, permission_level) VALUES (!, !, !)";
+				$sql3 = "UPDATE access set permission_level = ".$g_permission['instructor']." WHERE access_id = !"; 
 		}
 
 		$rs = $g_dbConn->query($sql, array($instructorID, $courseAliasID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		if (DB::isError($rs)) {trigger_error($rs->getMessage(), E_USER_ERROR);}
 
 		if ($rs->numRows() == 0) {
 			$rs = $g_dbConn->query($sql2, array($instructorID, $courseAliasID, '3'));
+			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		} else {
+			$data = $rs->fetchRow(DB_FETCHMODE_ASSOC); 
+			$rs = $g_dbConn->query($sql3, array($data['access_id']));
 			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		}
 	}
@@ -1084,21 +1093,30 @@ class courseInstance
 
 	function addProxy($courseAliasID, $proxyID)
 	{
-		global $g_dbConn;
+		global $g_dbConn, $g_permission;
 
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT access_id from access WHERE user_id = ! AND alias_id = ! and permission_level = 2";
+				$sql = "SELECT access_id, permission_level from access WHERE user_id = ! AND alias_id = !";
 				$sql2 = "INSERT INTO access (user_id, alias_id, permission_level) VALUES (!, !, !)";
+				$sql3 = "UPDATE access set permission_level = ".$g_permission['proxy']." WHERE access_id = !"; 
 		}
 
 		$rs = $g_dbConn->query($sql, array($proxyID, $courseAliasID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		if ($rs->numRows() == 0) {
-			$rs = $g_dbConn->query($sql2, array($proxyID, $courseAliasID, '2'));
+			$rs = $g_dbConn->query($sql2, array($proxyID, $courseAliasID, $g_permission['proxy']));
 			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		} else {
+			$data = $rs->fetchRow(DB_FETCHMODE_ASSOC); 
+			
+			if ($data['permission_level'] < $g_permission['proxy'])
+			{
+				$rs = $g_dbConn->query($sql3, array($data['access_id']));
+				if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+			}
 		}
 	}
 

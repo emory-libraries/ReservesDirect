@@ -56,8 +56,9 @@ class classDisplayer extends baseDisplayer {
 		
 		echo "					<td width=\"33%\" class=\"borders\">\n";
 		echo "						<ul>\n";
-		echo "							<li><a href=\"index.php?cmd=copyClass\">Copy Reserve List or Merge Classes</a><!--Links to staff-mngClass-CopyList1.html --></li>\n";
-		echo "							<li><a href=\"index.php?cmd=exportClass\">Export a Class to Blackboard, etc.</a><!--Same screens as faculty use for exporting a class--></li>\n";
+		echo "							<li><a href=\"index.php?cmd=copyClass\">Copy Reserve List or Merge Classes</a></li>\n";
+		echo "							<li><a href=\"index.php?cmd=editCrossListings\">Edit Crosslistings</a></li>\n";
+		echo "							<li><a href=\"index.php?cmd=exportClass\">Export a Class to Blackboard, etc.</a></li>\n";
 		echo "						</ul>\n";
 		echo "					</td>\n";
 		
@@ -351,17 +352,15 @@ class classDisplayer extends baseDisplayer {
 	
 	
 	function displayEditClassEnrollment(&$ci, &$roll, $next_cmd) {		
-		//split the roll by status
-				
-		//this status is for registrar-fed roll; the students are considered approved and non-removable
-		$autofed_roll = !empty($roll['AUTOFEED']) ? $roll['AUTOFEED'] : array();
-		//these are manually-added approved students
-		$approved_roll = !empty($roll['APPROVED']) ? $roll['APPROVED'] : array();
-		//these are students who have requested to join a moderated class
-		$pending_roll = !empty($roll['PENDING']) ? $roll['PENDING'] : array();
-		if(!empty($roll['unk'])) {
-			$pending_roll = array_merge($pending_roll, $roll['unk']);	//students with 'unk' status are treated as pending
-		}
+		
+	$pending_roll = array();
+	foreach ($roll as $courseRoll)
+	{
+		if (key_exists('PENDING', $courseRoll))
+			array_push($pending_roll, $courseRoll['PENDING']);
+	}
+	//echo "<pre>";print_r($pending_roll);echo"</pre>";
+
 ?>
 	<form method="post" name="editReserves" action="index.php">		
 		<input type="hidden" name="cmd" value="<?=$next_cmd?>" />
@@ -397,7 +396,9 @@ class classDisplayer extends baseDisplayer {
 					<input type="hidden" name="rollAction" id="rollActionAdd" value="" />
 					<input type="submit" name="submit" value="Add Student to Roll" onclick="javascript: document.getElementById('rollActionAdd').value='add';" style="margin-top:5px;" />
 					<p />
-<?php	if(!empty($pending_roll)): ?>
+
+	
+<?php	if(!empty($pending_roll[0])): ?>
 					<strong>Students requesting to join this class:</strong>
 					<table align="center" class="simpleList">
 						<tr>
@@ -405,7 +406,7 @@ class classDisplayer extends baseDisplayer {
 								<a href="index.php?cmd=<?=$next_cmd?>&amp;ci=<?=$ci->getCourseInstanceID()?>&amp;tab=enrollment&amp;rollAction=add&amp;student_id=all">approve all</a> | <a href="index.php?cmd=<?=$next_cmd?>&amp;ci=<?=$ci->getCourseInstanceID()?>&amp;tab=enrollment&amp;rollAction=deny&amp;student_id=all">deny all</a>
 							</td>
 						</tr>
-<?php		foreach($pending_roll as $student): ?>
+<?php		foreach($pending_roll[0] as $student): ?>
 						<tr bgcolor="#FFFFFF">
 							<td width="60%">
 								<?=$student->getName()?>
@@ -419,61 +420,81 @@ class classDisplayer extends baseDisplayer {
 <?php 	else: ?>
 					<strong>There are no enrollment requests.</strong>
 <?php	endif; ?>			
-				</div>
-				<div class="classRollActive">
-<?php	if(!empty($autofed_roll) || !empty($approved_roll)): ?>
-					<strong>Currently enrolled in this class:</strong>
-					<table align="center" class="simpleList">
-<?php		if(!empty($autofed_roll)): ?>
-						<tr>
-							<td colspan="2">
-								<strong>Students added by the Registrar:</strong>
-							</td>
-						</tr>
-<?php			foreach($autofed_roll as $student): ?>
-						<tr>
-							<td colspan="2">
-								<?=$student->getName()?>
-							</td>
-						</tr>
-<?php
-				endforeach;
-			endif;
+				</div><!-- classRollPending -->
+				<div style="clear:both;" ></div><!-- hack to clear floats -->				
+<?php 
+  if (!empty($roll)):	
+  	 $i = 0;		
+  	 $ca_ids = array_keys($roll);
+	 foreach ($roll as $courseRoll): 
 		
-			if(!empty($approved_roll)):
-				if(!empty($autofed_roll)):	//only show the label if there are both kinds of students (autofed + manual)
-?>
-						<tr><td colspan="2" align="center"><strong>* * *</strong></td></tr>
-						<tr>
-							<td colspan="2">
-								<strong>Manually-added students:</strong>
-							</td>
-						</tr>
-<?php		
+		$course = new course($ca_ids[$i]);
+		$autofed_roll  = $courseRoll['AUTOFEED'];
+		$approved_roll = $courseRoll['APPROVED'];
+		
+		if ($i % 4 == 0) //carriage return div after 4 
+			echo "<div style=\"clear:both;\" ></div><!-- hack to clear floats -->";
+		$i++;			
+	?>
+				
+				<div class="classRollActive">
+	<?php	if(!empty($autofed_roll) || !empty($approved_roll)): ?>
+						<strong>Currently enrolled in <?php echo $course->displayCourseNo() ?>:</strong>
+						<table align="center" class="simpleList">
+	<?php		if(!empty($autofed_roll)): ?>
+							<tr>
+								<td colspan="2">
+									<strong>Students added by the Registrar:</strong>
+								</td>
+							</tr>
+	<?php			foreach($autofed_roll as $student): ?>
+							<tr>
+								<td colspan="2">
+									<?=$student->getName()?>
+								</td>
+							</tr>
+	<?php
+					endforeach;
 				endif;
-				foreach($approved_roll as $student):
-?>
-						<tr>
-							<td width="80%">
-								<?=$student->getName()?>
-							</td>
-							<td width="20%" align="center">
-								<a href="index.php?cmd=<?=$next_cmd?>&amp;ci=<?=$ci->getCourseInstanceID()?>&amp;tab=enrollment&amp;rollAction=remove&amp;student_id=<?=$student->getUserID()?>">remove</a>
-							</td>
-						</tr>
-<?php		
-				endforeach;
-			endif;
-?>
-					</table>
-<?php	else: ?>
-					<strong>There are no enrolled students.</strong>
-<?php	endif; ?>	
-				</div>
-				<div class="clear"></div>
-			</div>
-		</div>		
+			
+				if(!empty($approved_roll)):
+					if(!empty($autofed_roll)):	//only show the label if there are both kinds of students (autofed + manual)
+	?>
+							<tr><td colspan="2" align="center"><strong>* * *</strong></td></tr>
+							<tr>
+								<td colspan="2">
+									<strong>Manually-added students:</strong>
+								</td>
+							</tr>
+	<?php		
+					endif;
+					foreach($approved_roll as $student):
+	?>
+							<tr>
+								<td width="80%">
+									<?=$student->getName()?>
+								</td>
+								<td width="20%" align="center">
+									<a href="index.php?cmd=<?=$next_cmd?>&amp;ci=<?=$ci->getCourseInstanceID()?>&amp;tab=enrollment&amp;rollAction=remove&amp;student_id=<?=$student->getUserID()?>">remove</a>
+								</td>
+							</tr>
+	<?php		
+					endforeach;
+				endif;
+	?>
+						</table>
+	<?php	else: ?>
+						<strong>There are no enrolled students.</strong>
+	<?php	endif; ?>	
+					</div>
+	<?php 
+		endforeach; 				
+				echo "<div class=\"clear\"></div></div>";
+			echo "</div>";
+	endif;
+	?>
 	</form>
+
 					
 <?php
 	} //displayEditClassEnrollment()
@@ -484,7 +505,7 @@ class classDisplayer extends baseDisplayer {
 		$roll = $ci->getRoll();
 		//show a warning if there are students pending enrollment approval
 		//check pending array
-		$show_students_pending_warning = (!empty($roll['PENDING']) || !empty($roll['unk'])) ? true : false;		
+		$show_students_pending_warning = (!empty($roll['PENDING'])) ? true : false;		
 		
 		if($tab=='enrollment') {	//display enrollment screen
 			self::displayEditClassHeader($ci, $next_cmd, false);	//display header without the quicklinks box
@@ -502,14 +523,26 @@ class classDisplayer extends baseDisplayer {
 <?php
 	}
 	
+	/**
+	 * @return void
+	 * @param string $cmd currently executing cmd
+	 * @param CourseInstance $ci course_instance object being edited
+	 * @param string $msg Helper message to display above the form
+	 * @desc Displays form for editting title and crosslistings
+	 */	
 
-	function displayEditTitle($ci, $deptID)
+	function displayEditTitle($cmd, $ci, $deptID, $msg=null)
 	{
+		if(!is_null($msg)) {
+			echo "<span class=\"helperText\">$msg</span><p />\n";
+		}
+		
+		
 		echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		echo "<tr>\n";
 		echo "<td width =\"100%\" align=\"right\" valign=\"middle\"><!--<div align=\"right\" class=\"currentClass\">".$ci->course->displayCourseNo()."&nbsp;".$ci->course->getName()."</div>--></td>\n";
 		echo "</tr>\n";
-		echo " <form action=\"index.php?cmd=editTitle&ci=".$ci->getCourseInstanceID()."\" method=\"post\">\n";
+		echo " <form action=\"index.php?cmd=editTitle&ci=".$ci->getCourseInstanceID()."\" method=\"post\">\n";		
 		echo " <tr>\n";
 		echo " 	<td width=\"100%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td>\n";
 		echo " </tr>\n";
@@ -604,27 +637,18 @@ class classDisplayer extends baseDisplayer {
 		echo " 	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
 		echo " 		<tr align=\"left\" valign=\"top\"> \n";
 		echo " 			<td width=\"35%\" class=\"headingCell1\">ADD NEW CROSSLISTING</td>\n";
-		echo " 			<!--The \"Show All Editable Item\" Links appears by default when this\n";
-		echo " 			page is loaded if some of the metadata fields for the document are blank.\n";
-		echo " 			Blank fields will be hidden upon page load. -->\n";
-		echo " 			<td>&nbsp; </td>\n";
+		echo " 			<td>&nbsp;</td>\n";
 		echo " 		</tr>\n";
 		echo " 	</table>\n";
 		echo " 	</td>\n";
 		echo " </tr>\n";
 
+		//Create New Course
 		echo "<tr> "
 		."    	<td align=\"left\" valign=\"top\" class=\"borders\">\n"
 		."    	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\">\n"
 		."      	<tr class=\"headingCell1\">"
-		."          	<td width=\"10%\" align=\"left\" valign=\"middle\">&nbsp;</td>\n"
-		."              <td width=\"10%\" align=\"left\" valign=\"middle\">&nbsp;</td>\n"
-		."              <td width=\"10%\" align=\"left\" valign=\"middle\">&nbsp;</td>\n"
-		."              <td width=\"5%\" align=\"left\" valign=\"middle\">&nbsp;</td>\n"
-		."              <td width=\"10%\" align=\"left\" valign=\"middle\">&nbsp;</td>\n"
-		."              <td width=\"5%\" align=\"left\" valign=\"middle\">&nbsp;</td>\n"
-		."              <td width=\"5%\" align=\"left\" valign=\"middle\">&nbsp;</td>\n"
-		."              <td width=\"55%\" align=\"left\" valign=\"middle\">&nbsp;</td>\n"
+		."          	<td colspan=\"8\" align=\"left\">CREATE NEW COURSE</td>\n"	
 		."			</tr>\n"
 		."          <tr> "
 		."          	<td align=\"left\" valign=\"middle\" class=\"strong\"><div align=\"center\">Department:</div></td>\n"
@@ -638,24 +662,29 @@ class classDisplayer extends baseDisplayer {
 		."              <td align=\"left\" valign=\"middle\"> <div align=\"left\"><input name=\"newSection\" type=\"text\" size=\"4\" maxlength=\"6\"></div></td>\n"
 		."              <td align=\"left\" valign=\"middle\" class=\"strong\"><div align=\"center\">Title:</div></td>\n"
 		."          	<td align=\"left\" valign=\"middle\"> <div align=\"left\"><input name=\"newCourseName\" type=\"text\" size=\"30\"></div></td>\n"
-		."			</tr>\n"
-		."           <tr class=\"headingCell1\"> "
-		."                <td align=\"left\" valign=\"middle\">&nbsp;</td>\n"
-		."                <td align=\"left\" valign=\"middle\">&nbsp;</td>\n"
-		."                <td align=\"left\" valign=\"middle\">&nbsp;</td>\n"
-		."                <td align=\"left\" valign=\"middle\">&nbsp;</td>\n"
-		."                <td align=\"left\" valign=\"middle\">&nbsp;</td>\n"
-		."                <td align=\"left\" valign=\"middle\">&nbsp;</td>\n"
-		."                <td align=\"left\" valign=\"middle\">&nbsp;</td>\n"
-		."                <td align=\"left\" valign=\"middle\"><div align=\"right\"><input type=\"submit\" name=\"addCrossListing\" value=\"Add Crosslisting\"></div></td>\n"
-		."   		</tr>\n"
-		."   	</table>\n"
-		."		</td>\n"
-		." 	</tr>\n"
-		."        <tr>\n"
+		."			</tr>\n";	
+		
+		echo "      <tr class=\"headingCell1\">\n";
+		echo "          <td align=\"left\" valign=\"middle\" colspan=\"8\"><div align=\"right\"><input type=\"submit\" name=\"addCrossListing\" value=\"Add Crosslisting\"></div></td>\n";
+		echo "   	</tr>\n";		
+		
+		//SELECT EXISTING COURSE
+		echo "		<tr> \n";
+		echo "			<td align=\"left\" valign=\"top\" class=\"borders\" colspan=\"8\">\n";
+		echo "     			<tr class=\"headingCell1\">\n";
+		echo "      			<td colspan=\"8\" align=\"left\">SELECT EXISTING COURSE</td>\n";
+		echo "				</tr>\n";		
+		echo "			</td>\n";
+		echo "	</td>\n";
+		echo "</tr>\n";				
+		
+		echo "   	</table>\n";
+		echo "		</td>\n";
+		echo " 	</tr>\n";		
+		
+		echo "<tr>\n"
 		."          <td>&nbsp;</td>\n"
 		."        </tr>\n"
-		."</form>\n"
 		."        <tr>\n"
 		."          <td><div align=\"center\"><a href=\"index.php?cmd=editClass&ci=".$ci->courseInstanceID."\">Return to Edit Class</a></div></td>\n"
 		."        </tr>\n"
@@ -753,7 +782,7 @@ class classDisplayer extends baseDisplayer {
 						echo "                 	<tr align=\"left\" valign=\"middle\" class=\"".$rowClass."\">";
 						echo "                   		<td>".$instruct[$i]->getName()."</td>";
 						echo "                   		<td width=\"8%\" valign=\"top\" class=\"borders\"><div align=\"center\">";
-						if ($userType=="Instructor" && $i>0)
+						if ($userType=="Instructor")
 							echo "<input type=\"checkbox\" name=\"".$userType."[".$instruct[$i]->userID."]\" value=\"".$instruct[$i]->userID."\">";
 						echo "&nbsp;</div></td>";
 							

@@ -246,7 +246,7 @@ class course
 		$rs = $g_dbConn->query($sql, array($key, $this->courseID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
-	}
+	}	
 	
 	function setCourseNo($courseNo)
 	{
@@ -332,6 +332,21 @@ class course
 	{ return $this->uniformTitle; }
 
 	function getCourseID() { return $this->courseID; }
+	
+	function getRegistrarKey() { return $this->registrarKey; }
 
+	function bindToCourseInstance($course_instance_id)
+	{
+		global $g_dbConn;
+
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "UPDATE course_aliases SET course_instance_id = ! WHERE course_id = !";
+		}
+
+		$rs = $g_dbConn->query($sql, array($course_instance_id, $this->courseID));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }		
+	}
 }
 ?>
