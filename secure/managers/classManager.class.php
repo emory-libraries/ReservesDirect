@@ -268,10 +268,10 @@ class classManager
 					//if not empty, set activation and expiration dates
 					//try to convert dates to proper format
 					if(!empty($_REQUEST['activation'])) {
-						$ci->setActivationDate($_REQUEST['activation']);
+						$ci->setActivationDate($_REQUEST['activation'], $u->getRole());
 					}
 					if(!empty($_REQUEST['expiration'])) {
-						$ci->setExpirationDate($_REQUEST['expiration']);
+						$ci->setExpirationDate($_REQUEST['expiration'], $u->getRole());
 					}
 				}
 				//change enrollment type

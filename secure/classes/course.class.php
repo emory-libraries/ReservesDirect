@@ -240,10 +240,10 @@ class course
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "UPDATE course_aliases SET registrar_key = ? WHERE course_id = !";
+				$sql = "UPDATE course_aliases SET registrar_key = ? WHERE course_alias_id = !";
 		}
 
-		$rs = $g_dbConn->query($sql, array($key, $this->courseID));
+		$rs = $g_dbConn->query($sql, array($key, $this->courseAliasID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 	}	

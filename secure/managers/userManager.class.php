@@ -227,6 +227,7 @@ class userManager
 
 
 			case 'setPwd':
+/*				
 				if (isset($_REQUEST['selectedUser']) && $_REQUEST['selectedUser'] == "")
 				{
 					$userToEdit = new user();
@@ -234,13 +235,25 @@ class userManager
 					$userToEdit->createUser($_REQUEST['user']['username'], $_REQUEST['user']['first_name'], $_REQUEST['user']['last_name'], $_REQUEST['user']['email'], $_REQUEST['user']['defaultRole']);
 				} else
 					$userToEdit = (isset($_REQUEST['selectedUser'])) ? new user($_REQUEST['selectedUser']) : null;
+					
+					$users = new users();
+					$tmpUser = new user($_REQUEST['selectedUser']);
+					$role = (isset($_REQUEST['user']['defaultRole'])) ? $_REQUEST['user']['defaultRole'] : $tmpUser->getDefaultRole();
+					
+					$userToEdit = $users->initUser($role, $tmpUser->getUsername());
+					$userToEdit->getUserByID($_REQUEST['selectedUser']);		
+					unset($tmpUser);
+					
+					if ($role >= $g_permission['instructor'])
+						$userToEdit->getInstructorAttributes();		
+									
 
 				if (!is_null($userToEdit) && !$userToEdit->isSpecialUser())
 				{
 					$sp = new specialUser();
 					$sp->createNewSpecialUser($userToEdit->getUsername(), $userToEdit->getEmail(), null);
 				}
-
+*/
 			case 'editUser':
 				$page = "manageUser";
 				$loc = "edit user profile";

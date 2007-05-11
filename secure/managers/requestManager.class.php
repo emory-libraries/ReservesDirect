@@ -237,6 +237,12 @@ class requestManager
 					if (isset($request['volume_title'])) $item->setVolumeTitle($request['volume_title']);
 					if (isset($request['times_pages'])) $item->setPagesTimes($request['times_pages']);
 					if (isset($request['selectedDocIcon'])) $item->setDocTypeIcon($request['selectedDocIcon']);
+					
+					if (isset($request['ISBN'])) $item->setISBN($request['ISBN']);
+					if (isset($request['ISSN'])) $item->setISSN($request['ISSN']);
+					if (isset($request['OCLC'])) $item->setOCLC($request['OCLC']);
+					
+					
 					//check personal item owner
 					if( ($request['personal_item'] == 'yes') && !empty($request['selected_owner']) ) {
 						$item->setPrivateUserID($request['selected_owner']);
@@ -281,7 +287,7 @@ class requestManager
 							$physCopy->setStatus($phys_item['loc']);
 							$physCopy->setItemType($phys_item['type']);
 							$physCopy->setBarcode($phys_item['bar']);
-
+							
 							if (!is_null($item->getPrivateUserID()))
 								$physCopy->setOwnerUserID($item->getPrivateUserID());
 
@@ -477,6 +483,9 @@ class requestManager
 						$search_results['controlKey'] = $item->getLocalControlKey();
 						$search_results['personal_owner'] = $item->getPrivateUserID();		
 						$search_results['notes'] = $item->getNotes();
+						$search_results['ISBN']	= $item->getISBN();
+						$search_results['ISSN']	= $item->getISSN();
+						$search_results['OCLC']	= $item->getOCLC();
 					} else {
 						$item_id = null;
 					}

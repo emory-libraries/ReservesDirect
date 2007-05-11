@@ -714,6 +714,10 @@ class requestDisplayer extends noteDisplayer {
 		echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">Source / Year:</span></td>\n";
 		echo "					<td align=\"left\"><input name=\"source\" type=\"text\" size=\"50\" value=\"".$search_results['source']."\"> </td>\n";
 		echo "				</tr>\n";
+		
+		echo "				<tr><td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">ISBN:</span></td><td><input type=\"text\" size=\"15\" maxlength=\"13\" value=\"". $search_results['ISBN'] ."\" name=\"ISBN\" /></td></tr>\n";
+        echo "				<tr><td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">OCLC:</span></td><td><input type=\"text\" size=\"11\" maxlength=\"9\"  value=\"". $search_results['ISSN'] ."\" name=\"OCLC\" /></td></tr>\n";
+        echo "				<tr><td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">ISSN:</span></td><td><input type=\"text\" size=\"10\" maxlength=\"8\"  value=\"". $search_results['OCLC'] ."\" name=\"ISSN\" /></td></tr>\n";
 
 		if (!is_null($docTypeIcons))
 		{
@@ -768,13 +772,31 @@ class requestDisplayer extends noteDisplayer {
 		
 		//only show this stuff for physical items
 		if( ($cmd == 'addPhysicalItem') || ($cmd == 'processRequest') ) {
-			$barcode_value = (isset($barcode) && (isset($request['searchTerm']) && $request['searchTerm'] != "")) ? $request['searchTerm'] : $search_results['physicalCopy'][0]['bar'];			
+			$barcode_value = (isset($request['searchTerm']) && $request['searchField'] == "barcode") ? $request['searchTerm'] : $search_results['physicalCopy'][0]['bar'];					
 			
 			echo "				<tr align=\"left\" valign=\"middle\" id=\"nonman_barcode\">\n";
 			echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">Barcode:</td>\n";
 			echo "					<td><input name=\"barcode\" type=\"text\" size=\"15\" value=\"$barcode_value\"></td>\n";
 			echo "				</tr>\n";
+			
+			
 
+			echo "				<tr align=\"left\" valign=\"middle\" id=\"nonman_ISBN\">\n";
+			echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">ISBN:</td>\n";
+			echo "					<td><input name=\"ISBN\" type=\"text\" size=\"15\" maxlength=\"13\" /></td>\n";
+			echo "				</tr>\n";
+
+			echo "				<tr align=\"left\" valign=\"middle\" id=\"nonman_ISSN\">\n";
+			echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">ISSN:</td>\n";
+			echo "					<td><input name=\"ISSN\" type=\"text\" maxlength=\"8\" size=\"15\" /></td>\n";
+			echo "				</tr>\n";
+
+			echo "				<tr align=\"left\" valign=\"middle\" id=\"nonman_OCLC\">\n";
+			echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">OCLC:</td>\n";
+			echo "					<td><input name=\"OCLC\" type=\"text\" maxlength=\"9\" size=\"15\" /></td>\n";
+			echo "				</tr>\n";					
+						
+			
 			echo "				<tr align=\"left\" valign=\"middle\" id=\"nonman_control\">\n";
 			echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">Control Number:</td>\n";
 			echo "					<td>".$search_results['controlKey']."<input name=\"controlKey\" type=\"hidden\" size=\"10\" value=\"".$search_results['controlKey']."\"></td>\n";

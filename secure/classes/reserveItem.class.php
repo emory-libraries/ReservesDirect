@@ -47,6 +47,10 @@ class reserveItem extends item
 	public $physicalCopy;
 	public $itemIcon;
 	
+	private $ISSN;
+	private $ISBN;
+	private $OCLC;	
+	
 	function reserveItem($itemID=NULL)
 	{
 		if (!is_null($itemID)){
@@ -70,7 +74,7 @@ class reserveItem extends item
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT item_id, title, item_group, last_modified, creation_date, item_type, author, source, volume_edition, pages_times, performer, local_control_key, url, mimeType, home_library, private_user_id, volume_title, item_icon
+				$sql = "SELECT item_id, title, item_group, last_modified, creation_date, item_type, author, source, volume_edition, pages_times, performer, local_control_key, url, mimeType, home_library, private_user_id, volume_title, item_icon, ISBN, ISSN, OCLC
 						FROM items
 						WHERE item_id = !";
 		}
@@ -79,7 +83,7 @@ class reserveItem extends item
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
 		//pull the info
-		list($this->itemID, $this->title, $this->itemGroup, $this->lastModDate, $this->creationDate, $this->itemType, $this->author, $this->source, $this->volumeEdition, $this->pagesTimes, $this->performer, $this->localControlKey, $this->URL, $this->mimeTypeID, $this->homeLibraryID, $this->privateUserID, $this->volumeTitle, $this->itemIcon) = $rs;
+		list($this->itemID, $this->title, $this->itemGroup, $this->lastModDate, $this->creationDate, $this->itemType, $this->author, $this->source, $this->volumeEdition, $this->pagesTimes, $this->performer, $this->localControlKey, $this->URL, $this->mimeTypeID, $this->homeLibraryID, $this->privateUserID, $this->volumeTitle, $this->itemIcon, $this->ISBN, $this->ISSN, $this->OCLC) = $rs;
 				
 		//get the notes
 		$this->setupNotes('items', $this->itemID);
@@ -466,6 +470,64 @@ class reserveItem extends item
 		$this->privateUserID = $privateUserID;
 		$this->lastModDate = $d;
 	}
+	
+	/**
+	* @return void
+	* @param string $ISBN
+	* @desc Updates the ISBN value, associated w/the item, in the DB
+	*/
+	function setISBN($ISBN)
+	{
+		global $g_dbConn;
+
+		$this->ISBN = $ISBN;
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "UPDATE items SET ISBN = ? WHERE item_id = !";
+		}
+		$rs = $g_dbConn->query($sql, array($ISBN, $this->itemID));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+	}	
+	
+	/**
+	* @return void
+	* @param string $ISSN
+	* @desc Updates the ISSN value, associated w/the item, in the DB
+	*/
+	function setISSN($ISSN)
+	{
+		global $g_dbConn;
+
+		$this->ISSN = $ISSN;
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "UPDATE items SET ISSN = ? WHERE item_id = !";
+		}
+		$rs = $g_dbConn->query($sql, array($ISSN, $this->itemID));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+	}		
+	
+	/**
+	* @return void
+	* @param string $OCLC
+	* @desc Updates the OCLC value, associated w/the item, in the DB
+	*/
+	function setOCLC($OCLC)
+	{
+		global $g_dbConn;
+
+		$this->OCLC = $OCLC;
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "UPDATE items SET OCLC = ? WHERE item_id = !";
+		}
+		$rs = $g_dbConn->query($sql, array($OCLC, $this->itemID));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+	}		
+	
 
 	function getAuthor() { return htmlentities(stripslashes($this->author)); }
 	function getSource() { return htmlentities(stripslashes($this->source)); }
@@ -475,7 +537,12 @@ class reserveItem extends item
 	function getPerformer() { return htmlentities(stripslashes($this->performer)); }
 	function getLocalControlKey() { return stripslashes($this->localControlKey); }
 	function getURL() { return ($this->URL != '') ? stripslashes($this->URL) : false; }
-
+	
+	function getISBN() { return $this->ISBN; }
+	function getISSN() { return $this->ISSN; }
+	function getOCLC() { return $this->OCLC; }	
+	
+	
 	function getMimeType()
 	{
 		global $g_dbConn;

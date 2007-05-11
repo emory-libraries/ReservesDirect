@@ -144,7 +144,11 @@ class itemManager
 					$item->setVolumeTitle($_REQUEST['volumeTitle']);
 					$item->setVolumeEdition($_REQUEST['volumeEdition']);
 					$item->setPagesTimes($_REQUEST['pagesTimes']);
-					$item->setSource($_REQUEST['source']);					
+					$item->setSource($_REQUEST['source']);										
+					$item->setISBN($_REQUEST['ISBN']);
+					$item->setISSN($_REQUEST['ISSN']);
+					$item->setOCLC($_REQUEST['OCLC']);					
+					
 					//physical item data
 					if($item->isPhysicalItem()) {
 						$item->setHomeLibraryID($_REQUEST['home_library']);
@@ -153,7 +157,7 @@ class itemManager
 						if($item->getPhysicalCopy()) {	//returns false if not a physical copy
 							//only set these if they were part of the form
 							if(isset($_REQUEST['barcode'])) $item->physicalCopy->setBarcode($_REQUEST['barcode']);
-							if(isset($_REQUEST['call_num'])) $item->physicalCopy->setCallNumber($_REQUEST['call_num']);
+							if(isset($_REQUEST['call_num'])) $item->physicalCopy->setCallNumber($_REQUEST['call_num']);							
 						}
 					}
 					

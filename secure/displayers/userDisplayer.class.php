@@ -93,12 +93,7 @@ class userDisplayer
 	}
 
 	function displayEditProxy($courseInstances,$nextCmd)
-	{
-echo "displayEditProxy<Br><pre>"; print_r ($courseInstances); echo "</pre><hr>";
-echo get_class($courseInstances[0]) . "<br>";
-
-		
-		
+	{	
 		echo "<form action=\"index.php\" method=\"post\" name=\"editUser\">\n";
 	    echo "<input type=\"hidden\" name=\"cmd\" value=\"$nextCmd\">\n";
 		echo '<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">';
@@ -272,17 +267,20 @@ echo get_class($courseInstances[0]) . "<br>";
 				if ($user->getRole() == $g_permission['admin']) echo "							<option value=\"5\" $SELECT_5>ADMIN</option>\n";
 				echo "						</select>\n";
 				echo "					</td>\n";
+				
 			}else{
 				echo "					<input type=\"hidden\" name=\"user[defaultRole]\" value=\"". $userToEdit->getDefaultRole() ."\">\n";
-				echo "					<td>". strtoupper($userToEdit->getUserClass()) ."</td>\n";
+				echo "					<td>". strtoupper($userToEdit->getDefaultClass()) ."</td>\n";
 			}
 			echo "				</tr>\n";
 			
 			//users should not be allowed to edit there trained status
-			if ($user->getUserID() != $userToEdit->getUserID())
+			if ($user->getUserID() != $userToEdit->getUserID() && $user->getRole() >= $g_permission['staff'])
 			{
 				$not_trained = ($userToEdit->isNotTrained()) ? " checked " : "";
 				echo "				<tr><td>&nbsp;</td><td valign=\"top\"><input type=\"checkbox\" name=\"user[not_trained]\" value=\"not_trained\" $not_trained> Not Trained &nbsp;&nbsp;&nbsp;<span class=\"helperText\">Allow only student level access.</span></td></tr>\n";
+			} elseif ($userToEdit->isNotTrained()) { 
+				echo "				<tr><td>&nbsp;</td><td valign=\"top\">Not Trained &nbsp;&nbsp;&nbsp;<span class=\"helperText\">Allow only student level access.</span></td></tr>\n";
 			}
 
 			$role = (isset($request['user']['defaultRole'])) ? $request['user']['defaultRole'] : $userToEdit->getDefaultRole();

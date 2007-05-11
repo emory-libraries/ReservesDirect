@@ -138,10 +138,11 @@ class itemDisplayer extends noteDisplayer {
 						<input name="call_num" type="text" id="call_num" size="30" value="<?=$reserveItem->physicalCopy->getCallNumber()?>" />
 					</td>				
 				</tr>
+<?php			endif;	//end physical copy info ?>
+
 			</table>
 		</div>
-<?php
-			endif;	//end physical copy info
+<?php		
 		endif; //end physical item block
 	}	//displayEditItemSource()
 	
@@ -364,6 +365,11 @@ class itemDisplayer extends noteDisplayer {
 	    				<input name="source" type="text" id="source" size="50" value="<?=$item->getSource()?>">
 	    			</td>
 	    		</tr>
+				<tr><td align="right">ISBN:</td><td><input type="text" size="15" maxlength="13" value="<?= $item->getISBN() ?>" name="ISBN" /></td></tr>
+                <tr><td align="right">OCLC:</td><td><input type="text" size="11" maxlength="9"  value="<?= $item->getOCLC() ?>" name="OCLC" /></td></tr>
+                <tr><td align="right">ISSN:</td><td><input type="text" size="10" maxlength="8"  value="<?= $item->getISSN() ?>" name="ISSN" /></td></tr>
+	    		
+
 	    		
 <?php	
 		//only allow choosing personal-item owner to staff or better

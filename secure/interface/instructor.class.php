@@ -193,64 +193,8 @@ class instructor extends proxy
 	*/
 	function makeProxy($proxyID, $courseInstanceID)
 	{
-		global $g_dbConn, $g_permission;
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				//This statement is only updating record if permission level < proxy
-				$sql = 	"UPDATE users SET dflt_permission_level = " . $g_permission['proxy'] . " "
-				.		"WHERE user_id = ! AND dflt_permission_level < " . $g_permission['proxy']
-				;
-
-				/* commented out by kawashi on 11.12.04 - No longer adding proxies to cross listings
-				$sql1 = "SELECT ca.course_alias_id "
-				.		"FROM course_aliases as ca "
-				.		"WHERE ca.course_instance_id = !"
-				;
-				*/
-
-				//This SQL statement added by kawashi on 11.12.04 - We are now just adding proxies to the primary course
-				$sql1 = "SELECT ci.primary_course_alias_id "
-				.		"FROM course_instances as ci "
-				.		"WHERE ci.course_instance_id = !"
-				;
-
-				$sql2 =	"SELECT access_id FROM access WHERE user_id = ! AND alias_id = ! AND permission_level = !";
-
-				$sql3 =	"INSERT INTO access (user_id, alias_id, permission_level) VALUES (!, !, !)";
-				$sql4 = "UPDATE access SET permission_level = ! WHERE user_id = ! AND alias_id = !";
-		}
-
-		//Update default permission to proxy if current permssion level < proxy
-		$rs = $g_dbConn->query($sql, array($proxyID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR);}
-
-		//Get primary course alias for the given course instance id
-		$rs = $g_dbConn->query($sql1, array($courseInstanceID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR);}
-
-		$row = $rs->fetchRow();
-		$aliasID = $row[0];
-
-		//Check to see if proxy already has access to this alias in the access table
-		$rs2 = $g_dbConn->query($sql2, array($proxyID, $aliasID, $g_permission['proxy']));
-		if (DB::isError($rs2)) { trigger_error($rs2->getMessage(), E_USER_ERROR);}
-
-		//If proxy doesn't have access...
-		if ($rs2->numRows() == 0) {
-			//Execute query to grant access for the proxy, to the couse alias, in the access table
-			$rs3 = $g_dbConn->query($sql3, array($proxyID, $aliasID, $g_permission['proxy']));							
-			
-			if (DB::isError($rs3)) { 
-				if ($rs3->level == 1024)
-				{
-					$rs4 = $g_dbConn->query($sql4, array($g_permission['proxy'], $proxyID, $aliasID));
-					if (DB::isError($rs4)) { trigger_error($rs4->getMessage(), E_USER_ERROR);}
-				} else {
-					trigger_error($rs3->getMessage(), E_USER_ERROR);
-				}
-			}
-		}
+		$c = new CourseInstance($courseInstanceID);
+		$c->addProxy($c->getPrimaryCourseAliasID(), $proxyID);
 	}
 	
 	

@@ -38,7 +38,7 @@ if(!isset($_SESSION['debug']) && isset($_REQUEST['debug'])) $_SESSION['debug'] =
 if(isset($_SESSION['debug'])) {
 	error_reporting(E_ALL);	//report all errors
 	//and print them to screen
-	echo "<pre>";
+	echo "<pre>Request:\n";
 	print_r($_REQUEST);
 	echo "</pre><hr />";
 } else {	//no debug-mode set

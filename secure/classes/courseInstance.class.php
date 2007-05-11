@@ -640,25 +640,32 @@ class courseInstance
 	/**
 	 * @return void
 	 * @param string $activationDate New activation date (YYYY-MM-DD)
-	 * @desc Sets the activation date as long as it's within the boundaries defined by the term; otherwise term boundaries are used
+	 * @desc Sets the activation date as long as it's within the boundaries defined by the term; 
+	 * 		 otherwise term boundaries are used; do not restrict staff
 	 */
-	function setActivationDate($activationDate) {
-		global $g_dbConn;
-		
-		//get bounding activation date (based on term)
-		//bound = term begin - 1 month
-		$term = new term();
-		$term->getTermByName($this->term, $this->year);
-		//get unix timestamp of the date 1 month before the beginning of term
-		$activation_limit = strtotime("-1 month", strtotime($term->getBeginDate()));
+	function setActivationDate($activationDate, $userRole) {
+		global $g_dbConn, $g_permission;
 				
 		//attempt to parse input date that may be in non-standard formats and get unix timestamp
-		$activation_unix_tstamp = strtotime($activationDate);
+		$activation_unix_tstamp = strtotime($activationDate);		
 		
-		//use either the input or the boundary, whichever occurs at a later date (greater unix tstamp)
-		$proper_tstamp = ($activation_unix_tstamp > $activation_limit) ? $activation_unix_tstamp : $activation_limit;
+		if ($userRole < $g_permission['staff'])
+		{
+			//get bounding activation date (based on term)
+			//bound = term begin - 1 month
+			$term = new term();
+			$term->getTermByName($this->term, $this->year);
+			//get unix timestamp of the date 1 month before the beginning of term
+			$activation_limit = strtotime("-1 month", strtotime($term->getBeginDate()));					
+			
+			//use either the input or the boundary, whichever occurs at a later date (greater unix tstamp)
+			$proper_tstamp = ($userRole >= $g_permission['staff'] && $activation_unix_tstamp > $activation_limit) ? $activation_unix_tstamp : $activation_limit;
+		} else {
+			$proper_tstamp = $activation_unix_tstamp;	
+		}
+		
 		//now build the actual activation date
-		$activation_date = date('Y-m-d', $proper_tstamp);
+		$activation_date = date('Y-m-d', $proper_tstamp);		
 		
 		switch($g_dbConn->phptype) {
 			default:	//mysql
@@ -674,25 +681,33 @@ class courseInstance
 	/**
 	 * @return void
 	 * @param string $expirationDate New expiration date (YYYY-MM-DD)
-	 * @desc Sets the expiration date as long as it's within the boundaries defined by the term; otherwise term boundaries are used
+	 * @desc Sets the expiration date as long as it's within the boundaries defined by the term; 
+	 * 		 otherwise term boundaries are used; Do not limit staff or greater
 	 */
-	function setExpirationDate($expirationDate) {
-		global $g_dbConn;
-		
-		//get bounding expiration date (based on term)
-		//bound = term end + 1 month
-		$term = new term();
-		$term->getTermByName($this->term, $this->year);
-		//get unix timestamp of the date 1 month after the end of term
-		$expiration_limit = strtotime("+1 month", strtotime($term->getEndDate()));
-				
+	function setExpirationDate($expirationDate, $userRole) {
+		global $g_dbConn, $g_permission;;
+
 		//attempt to parse input date that may be in non-standard formats and get unix timestamp
 		$expiration_unix_tstamp = strtotime($expirationDate);
 		
-		//use either the input or the boundary, whichever occurs at an earlier date (smaller unix tstamp)
-		$proper_tstamp = ($expiration_unix_tstamp < $expiration_limit) ? $expiration_unix_tstamp : $expiration_limit;
+		
+		if ($userRole < $g_permission['staff'])
+		{
+			//get bounding expiration date (based on term)
+			//bound = term end + 1 month
+			$term = new term();
+			$term->getTermByName($this->term, $this->year);
+			//get unix timestamp of the date 1 month after the end of term
+			$expiration_limit = strtotime("+1 month", strtotime($term->getEndDate()));
+								
+			//use either the input or the boundary, whichever occurs at an earlier date (smaller unix tstamp)
+			$proper_tstamp = ($expiration_unix_tstamp < $expiration_limit) ? $expiration_unix_tstamp : $expiration_limit;
+		} else {
+			$proper_tstamp = $expiration_unix_tstamp;			
+		}
+		
 		//now build the actual expiration date
-		$expiration_date = date('Y-m-d', $proper_tstamp);
+		$expiration_date = date('Y-m-d', $proper_tstamp);		
 		
 		switch($g_dbConn->phptype) {
 			default:	//mysql
@@ -1064,7 +1079,7 @@ class courseInstance
 
 	function addInstructor($courseAliasID, $instructorID)
 	{
-		global $g_dbConn;
+		global $g_dbConn, $g_permission;
 		$this->getInstructors();	
 		
 		if(in_array($instructorID, $this->instructorIDs)) { return null; }
@@ -1073,15 +1088,15 @@ class courseInstance
 		{
 			default: //'mysql'
 				$sql  = "SELECT access_id from access WHERE user_id = ! AND alias_id = !";
-				$sql2 = "INSERT INTO access (user_id, alias_id, permission_level) VALUES (!, !, !)";
-				$sql3 = "UPDATE access set permission_level = ".$g_permission['instructor']." WHERE access_id = !"; 
+				$sql2 = "INSERT INTO access (user_id, alias_id, permission_level, enrollment_status) VALUES (!, !, !, ?)";
+				$sql3 = "UPDATE access set enrollment_status='APPROVED', permission_level = ".$g_permission['instructor']." WHERE access_id = !"; 
 		}
 
 		$rs = $g_dbConn->query($sql, array($instructorID, $courseAliasID));
 		if (DB::isError($rs)) {trigger_error($rs->getMessage(), E_USER_ERROR);}
 
 		if ($rs->numRows() == 0) {
-			$rs = $g_dbConn->query($sql2, array($instructorID, $courseAliasID, '3'));
+			$rs = $g_dbConn->query($sql2, array($instructorID, $courseAliasID, $g_permission['instructor'], 'APPROVED'));
 			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		} else {
 			$data = $rs->fetchRow(DB_FETCHMODE_ASSOC); 
@@ -1099,15 +1114,15 @@ class courseInstance
 		{
 			default: //'mysql'
 				$sql = "SELECT access_id, permission_level from access WHERE user_id = ! AND alias_id = !";
-				$sql2 = "INSERT INTO access (user_id, alias_id, permission_level) VALUES (!, !, !)";
-				$sql3 = "UPDATE access set permission_level = ".$g_permission['proxy']." WHERE access_id = !"; 
+				$sql2 = "INSERT INTO access (user_id, alias_id, permission_level, enrollment_status) VALUES (!, !, !, ?)";
+				$sql3 = "UPDATE access set enrollment_status='APPROVED', permission_level = ".$g_permission['proxy']." WHERE access_id = !"; 
 		}
 
 		$rs = $g_dbConn->query($sql, array($proxyID, $courseAliasID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		if ($rs->numRows() == 0) {
-			$rs = $g_dbConn->query($sql2, array($proxyID, $courseAliasID, $g_permission['proxy']));
+			$rs = $g_dbConn->query($sql2, array($proxyID, $courseAliasID, $g_permission['proxy'], 'APPROVED'));
 			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		} else {
 			$data = $rs->fetchRow(DB_FETCHMODE_ASSOC); 

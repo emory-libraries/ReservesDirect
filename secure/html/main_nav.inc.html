@@ -20,7 +20,7 @@
 	$tabs['zReports']		= null;
 	$tabs['zzAdmin']		= null;
 	
-	switch ($u->getUserClass())
+	switch ($_SESSION['userclass'])
 	{
 		case 'admin':
 			$tabs['zzAdmin']	= "<li $tab_admin><a href=\"index.php?cmd=admin\">Admin</a></li>\n";
