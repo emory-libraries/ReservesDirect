@@ -52,7 +52,7 @@ abstract class baseDisplayer {
 			foreach($hidden_fields as $key=>$val) {
 				if(is_array($val)) {
 					foreach($val as $subkey=>$val) {
-						echo "<input type=\"hidden\" id=\"$key\"[$subkey]\" name=\"$key[$subkey]\" value=\"$val\" />\n";
+						echo "<input type='hidden' id='".$key."_".$subkey."' name='".$key."[]' value='$val' />\n";
 					}
 				}
 				else {		
