@@ -94,7 +94,7 @@ class user
 				$sql = "SELECT u.user_id 
 						FROM users as u 
 							JOIN special_users as sp ON u.user_id = sp.user_id 
-						WHERE u.username = ? AND sp.password = ? AND (expiration <= ? OR expiration IS NULL)
+						WHERE u.username = ? AND sp.password = ? AND (expiration >= ? OR expiration IS NULL)
 					   ";
 				$d = date("Y-m-d");
 		}		
