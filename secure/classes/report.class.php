@@ -171,7 +171,7 @@ class report
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql  = "SELECT report_id, title, sql, parameters, min_permissions, sort_order, param_group "
+				$sql  = "SELECT report_id, title, `sql`, parameters, min_permissions, sort_order, param_group "
 					  . "FROM reports "
 					  . "WHERE report_id = !";
 
