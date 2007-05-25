@@ -1,8 +1,8 @@
 /* 
 ReservesDirect Style Sheet  
-ReserveStyles-bus.css
+ReserveStyles.css
 
-Goizqueta Business School Style Sheet.
+Sample style sheet for Open Source distribution.
 
 Last Modified 11/26/2005
 */
@@ -33,35 +33,31 @@ td {
 	font-size: small;
 }
 h1 {
-	color: #000000;
-	font-size: 16px;
+	color: #333399;
+	font-size: 24px;
 	text-align: left;
-	font-variant: bold;
+	font-variant: small-caps;
 }
 h2 {
-	color: #333333;
-	font-size: 14px;
-	text-transform: none;
-	font-weight:bold;
+	color: #000066;
+	font-size: 16px;
+	text-transform: capitalize;
 }
 h3 {
 	text-transform: uppercase;
-	color: #000000;
-	font-size: 12px;
-	font-weight:bold;
+	color: #990033;
+	font-size: 16px;
 } 
 a:link {
-	color: #006600;
-	text-decoration: underline;
+	color: #0000FF;
+	text-decoration: none;
 }
 a:visited {
-	color: #006600;
-	text-decoration: underline;
+	color: #0000FF;
+	text-decoration: none;
 }
 a:hover {
-	font-size:small;
 	color: #999900;
-	text-decoration:underline;
 }
 
 
@@ -79,54 +75,54 @@ LINK DEFINITIONS
  
 a.editlinks:hover {
 	
-	color: #339933;
+	color: #660033;
 	text-decoration: underline;
 	font-size: small;
-	font-weight: bold;
+	font-weight: normal;
 }
 a.editlinks:link {
 	
-	color: #339933;
+	color: #993333;
 	text-decoration: underline;
 	font-size: small;
-	font-weight: bold;
+	font-weight: normal;
 }
 a.editlinks:visited {
 	
-	color: #339933;
+	color: #993333;
 	text-decoration: underline;
 	font-size:small;
-	font-weight: bold;
+	font-weight: normal;
 }
 a.editlinks:hover {
 	
-	color: #339933;
+	color: #660033;
 	text-decoration: underline;
-	font-size:small;
-	font-weight: bold;
+	font-size: small;
+	font-weight: normal;
 }
 
 /* 'itemTitle' defines how reserve item title links are listed. */
 
 a.itemTitle:link {
 	
-	color: #006600;
-	text-decoration: underline;
-	font-size: small;
+	color: #0000FF;
+	text-decoration: none;
+	font-size: medium;
 	font-weight: bold;
 }
 a.itemTitle:visited {
 	
-	color: #003300;
-	text-decoration: underline;
-	font-size: small;
+	color: #0000FF;
+	text-decoration: none;
+	font-size: medium;
 	font-weight: bold;
 }
 a.itemTitle:hover {
 	
-	color: #006600;
+	color: #999900;
 	text-decoration: underline;
-	font-size: small;
+	font-size: medium;
 	font-weight: bold;
 }
 
@@ -163,25 +159,24 @@ a.subnav:active {
 
 /* titlelink defines certain links that are used as titles as headings to paragraphs or section */
 a.titlelink:link {
-	color: #006600;
-	font-weight: bold;
-	font-size: 16px;
-	text-transform: none;
-	text-decoration: underline;
-}
-a.titlelink:visited {
-	color: #006600;
+	color: #0000FF;
 	font-weight: bold;
 	font-size: 16px;
 	text-transform: uppercase;
-	text-decoration: underline;
+	text-decoration: none;
+}
+a.titlelink:visited {
+	color: #0000FF;
+	font-weight: bold;
+	font-size: 16px;
+	text-transform: uppercase;
+	text-decoration: none;
 }
 a.titlelink:hover {
 	
-	text-decoration: none;
+	text-decoration: underline;
 	font-weight: bold;
 	color: #999900;
-	font-size:16px;
 	}
 
 /*
@@ -195,7 +190,6 @@ appearance of the ReservesDirect interface.
 */
 
 #container { /* a wrapper for the entire page layout */
-	margin:0px;
 	height: 100%;
 }
 
@@ -213,11 +207,11 @@ program logo (default is 'ReservesDirect' logo). */
 	margin: 0px;
 	float: left;
 	padding: 0px;
-	height: 100px;
+	height: 70px;
 	width: 40%;
-	background-image: url('../images/skins/bus/header-leftslice.gif');
+	background-image: url(../images/logoEmoryGBS.gif);
 	background-repeat: no-repeat;
-	background-position: 10px 0 left top;
+	background-position: 10px 0;
 }
 #Header .brandUpperRight {
 	margin: 0px;
@@ -227,8 +221,8 @@ program logo (default is 'ReservesDirect' logo). */
 	float: right;
 	clear: none;
 	height: 100px;
-	width: 60%;
-	background-image: url('../images/skins/bus/header-rtslice.gif');
+	width: 50%;
+	background-image: url(../images/logoGBL.gif);
 	background-repeat: no-repeat;
 	background-position: right top;
 }
@@ -241,7 +235,7 @@ program logo (default is 'ReservesDirect' logo). */
 that appear on every screen.   */
 	margin: 5px 10px 3px 0px;
 	text-align: right;
-	font-size: small;
+	font-size: x-small;
 	font-weight: normal;
 	color: #993333;
 }
@@ -251,7 +245,6 @@ that appear on every screen.   */
 .functionlinks a:hover {
 	color: #993333;
 	text-decoration: underline;
-	font-size: small;
 }
 .functionLinks a:visited {
 	color: #993333;
@@ -269,11 +262,12 @@ by Douglas Bowman at http://www.alistapart.com/articles/slidingdoors/
 This technique can be used to create many different types of tabs;
 the commented guidelines below are for creating standard tabs. */
 #mainNav {
-    float:left;
-	width:100%;
+	float:left;
+    width:100%;
     height: 36px;
-    background:#79A77D; 
-    background-image: url('../images/skins/bus/navtab-default-bg.gif');
+    background:#7C89CA url('../images/navtab-default-bg.gif') 
+      repeat-x bottom; /* creates the background behind the tabs--should be only 2-3 pixels wide.
+	  						background color should be same as top color of bg image. */
 	font:x-small/1.5em Arial, Helvetica, sans-serif;
 	font-size:x-small;
     } 
@@ -286,7 +280,7 @@ the commented guidelines below are for creating standard tabs. */
     }
 #mainNav li {
     float:left;
-	background:url('../images/skins/bus/navtab-default-left-up.gif')
+	background:url('../images/navtab-default-left-up.gif')
       no-repeat left top; /* left-hand tab image for inactive tabs */
     margin:0;
     padding:0 0 0 10px; /* top|right|bottom|left padding. left padding=px width of left image */
@@ -294,7 +288,7 @@ the commented guidelines below are for creating standard tabs. */
 #mainNav a {
 	float:left;
 	display:block;
-	background:url('../images/skins/bus/navtab-default-right-up.gif')
+	background:url('../images/navtab-default-right-up.gif')
       no-repeat right top;  /* right-hand tab image for inactive tabs */
 	padding:5px 15px 4px 5px; /* left padding=right padding - pixel width of left image
 								bottom padding=desired overall bottom padding-pixel 
@@ -309,15 +303,15 @@ the commented guidelines below are for creating standard tabs. */
   #mainNav a {float:none;}
   /* End IE5-Mac hack */ 
 #mainNav a:hover {
-      color:#99cc99;
+      color:#FFFF66;
 	  }	
 #mainNav #current {
-	background-image:url('../images/skins/bus/navtab-default-left-down.gif'); /* left-hand tab image for active tabs */
+	background-image:url('../images/navtab-default-left-down.gif'); /* left-hand tab image for active tabs */
     }
 #mainNav #current a {
-	background-image:url('../images/skins/bus/navtab-default-right-down.gif'); /* right-hand tab image for active tabs */
+	background-image:url('../images/navtab-default-right-down.gif'); /* right-hand tab image for active tabs */
 	padding-bottom:5px; /* bottom padding=top padding of mainNav a */
-	color: #006600;
+	color: #333399;
     }
 #subNav { /* a wrapper for 'navItems' and 'user'. */
 	margin: 0px 10px;
@@ -364,14 +358,14 @@ the commented guidelines below are for creating standard tabs. */
 	float: right;
 }
 #divider { /* seperates navigation from content area */
+	background-image: url('../images/div-bg-yellow.gif');
 	background-repeat: repeat;
 	border-top-width: 1px;
 	border-bottom-width: 1px;
 	border-top-style: solid;
 	border-bottom-style: solid;
-	border-top-color: #CCCCCC;
-	border-bottom-color: #CCCCCC;
-	background-color:#CCCCCC;
+	border-top-color: #000066;
+	border-bottom-color: #000066;
 	height: 10px;
 	margin: 0px;
 	padding: 0px;
@@ -393,7 +387,7 @@ the commented guidelines below are for creating standard tabs. */
 }
 .currentClass {
 	font-weight: bold;
-	color: #003300;
+	color: #333399;
 	padding-right:10px;
 	float: right;
 }
@@ -567,30 +561,31 @@ table.displaylist td{
 .oddRow {
     padding-top:1px; /* this fixes a display error in IE for the default implementation. Change at your own risk. */
 	background-color: #CCCCCC;
-	border-left:1px solid #666666; 
-	border-right:1px solid #666666;
+	border-left:1px solid #333333; 
+	border-right:1px solid #333333;
 }
 .evenRow {
     padding-top:1px; /* this fixes a display error in IE for the default implementation. Change at your own risk. */
 	background-color: #FFFFFF;
-	border-left:1px solid #666666; 
-	border-right:1px solid #666666;
+	border-left:1px solid #333333; 
+	border-right:1px solid #333333;
 }
 .headingCell1 {
 	font-weight: bold;
 	color: #FFFFFF;
-	background-color: #003300;
+	background-color: #333333;
 	text-align: center;
 	padding:5px;
 	
 }
 .headingCell2 {
-	font-size:small;
-	background-color: #99cc99;
+
+	background-color: #CCCCFF;
 	text-align: left;
 	padding: 0;
 	border: 1px solid #333333;
-	
+	font-weight:bold;
+	color:#333333;
 	
 }
 .headingCell2 .headingText{
@@ -781,6 +776,7 @@ or from the admin tab. */
 	color:#003300;
 }
 
+
 /* The following group of tags define how reserve items are listed, along with a.itemTitle 
 (see "Link Definitions" above).
 'itemTitle' defines the appearance of item titles for materials that do not have live links 
@@ -788,7 +784,7 @@ or from the admin tab. */
 itemMetaPre defines how some prefixes to metadata information appear, for example 'from' x journal or book.*/
 
 .itemTitleNoLink {
-	font-size: small;
+	font-size: medium;
 	font-weight: bold;
 	color: #000000;
 
@@ -796,6 +792,7 @@ itemMetaPre defines how some prefixes to metadata information appear, for exampl
 .itemAuthor {
 	font-size: x-small;
 	font-style: normal;
+	text-transform: uppercase;
 
 }
 .itemMeta {
@@ -812,7 +809,7 @@ itemMetaPre defines how some prefixes to metadata information appear, for exampl
 .noteType {
 	font-size: small;
 	font-weight: bold;
-	color: #339933;
+	color: #660000;
 
 }
 .noteText {
@@ -847,12 +844,12 @@ itemMetaPre defines how some prefixes to metadata information appear, for exampl
 		 
 		font-size: small; 
 		font-weight: bold; 
-		color: #006600;
+		color: #000099
 }
 .courseTitle {
-	font-size: medium;
+	font-size: large;
 	font-weight: bold;
-	/*font-variant: small-caps;*/
+	font-variant: small-caps;
 	color: #000066;
 }
 .courseHeaders {
@@ -861,17 +858,15 @@ itemMetaPre defines how some prefixes to metadata information appear, for exampl
 }
 .courseHeaders .label {
 	font-weight: bold;
-	color: #333333;
+	color: #660000;
 }
 .strong {
 	font-weight: bold;
 	color: #000000;
-	font-family:Verdana, Arial, Helvetica, sans-serif;
 }
 .successText {
 	font-weight: bold;
-	color: #003300;
-	font-size:small;
+	color: #009900;
 }
 .failedText {
 	font-weight: bold;
@@ -1237,15 +1232,55 @@ Help
 #help {} /* div that wraps all of content of help viewed in the main page */
 #help-sidebar {} /* div that wraps all of content of help viewed in the sidebar */
 
-.help_article_title {}
-.help_article_body {}
+.help_article_title {
+	color:#663333;
+	font-size:16px;
+	font-weight:bold;
+	font-variant: caps;
+}
+a.help_edit_link {
+	color: #993333;
+	text-decoration: underline;
+	font-weight: normal;
+}
+a.help_edit_link:hover {
+	color: #660000;
+	text-decoration: underline;
+}
+.help_article_body {
+	color:#333333;
+}
+.help_article_list {
+	margin-top:0px;
+	list-style:circle;
+}
 
-.help_article_list {}
+.help_related_tags {
+	border:1px solid #333333;
+	padding:5px;
+	background-color:#CCCCCC;
+} /* contains .help_tag_list */
+.help_tag_list {
+	background-color:FFFFCC;
+	padding:2px;
+}
+a.help_tag {
+	color:#6065A1;
+}
+a.help_tag:hover {
+	color:#374597;
+	text-decoration:underline;
+}
+a.help_user_tag {
+	color:
+}
+a.help_user_tag:hover {
+	color:#374597;
+	text-decoration:underline;
+}
 
-.help_related_tags {} /* contains .help_tag_list */
-.help_tag_list {}
-.help_tag {}
-.help_user_tag {}
-
-.help_keyword_highlight {}
+.help_keyword_highlight {
+	background-color:#FFFF00;
+}
 .help_error {}
+
