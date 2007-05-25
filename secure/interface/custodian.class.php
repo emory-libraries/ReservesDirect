@@ -33,10 +33,11 @@ class custodian extends student
 {
 	var $sp;
 
-	function custodian($userName)
-	{
-		$this->getUserByUserName($userName);	
-		$this->role = 1;
+	function custodian($userName=null) {
+		if(!empty($userName)) {
+			$this->getUserByUserName($userName);	
+			$this->role = 1;
+		}
 	}
 
 	function createSpecialUser($userName, $email, $date=null)

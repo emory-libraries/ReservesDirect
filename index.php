@@ -92,7 +92,7 @@ if (!empty($_REQUEST['ci']))
 
 
 //Force user to update email address
-if (($u->getEmail() == "" || $u->getLastName() == "") && $cmd!="storeUser") //direct user to edit profile
+if (($u->getEmail() == "" || $u->getLastName() == "") && !isset($_REQUEST['edit_user_submit'])) //direct user to edit profile
 {
 	 $cmd = 'newProfile';
 }
@@ -162,7 +162,6 @@ switch ($cmd)
 	case 'manageUser':
 	case 'newProfile':
 	case 'editProfile':
-	case 'storeUser':
 	case 'editUser':
 	case 'mergeUsers':
 	case 'addUser':

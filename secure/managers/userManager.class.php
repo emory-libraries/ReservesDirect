@@ -26,34 +26,32 @@ http://www.reservesdirect.org/
 
 
 *******************************************************************************/
-require_once("secure/common.inc.php");
+
 require_once("secure/displayers/userDisplayer.class.php");
 require_once("secure/managers/ajaxManager.class.php");
+require_once('secure/managers/baseManager.class.php');
+require_once('secure/classes/specialUser.class.php');
+require_once('secure/interface/admin.class.php');	//this will also include all children
 
-class userManager
-{
-	public $user;
-	public $displayClass;
-	public $displayFunction;
-	public $argList;
+class userManager extends baseManager {
 
-	function display()
-	{
-		if (is_callable(array($this->displayClass, $this->displayFunction)))
-			call_user_func_array(array($this->displayClass, $this->displayFunction), $this->argList);
-	}
-
-	function userManager($cmd, $user, $adminUser, $msg="")
-	{
-		global $page, $loc, $g_permission, $ci, $alertMsg, $help_article;
+	function userManager($cmd, $user, $adminUser, $msg="") {
+		global $page, $loc, $g_permission, $u, $alertMsg, $help_article;
 
 		$this->displayClass = "userDisplayer";
+		$page = "manageUser";
+		
+		//there are a many CMD cases that require a user lookup
+		//catch them all here and show them the AJAX user lookup box
+		$cmds_requiring_user = array('editUser', 'setPwd', 'resetPwd', 'removePwd');
+		if(in_array($cmd, $cmds_requiring_user) && empty($_REQUEST['selectedUser'])) {
+			$this->getUser($cmd);
+			return;	//don't do anything else
+		}
 
-		switch ($cmd)
-		{
+		switch ($cmd) {
 
 			case 'manageUser':
-
 				$page = "manageUser";
 
 				if ($user->getRole() >= $g_permission['staff'])
@@ -77,28 +75,164 @@ class userManager
 					$this->argList = "";
 				}
 			break;
+			
+			
+			case 'editUser':
+				if(isset($_REQUEST['edit_user_submit'])) {
+					//attempt to set user info
+					//the === is important: method returns TRUE on success, but error msg if it fails
+					//(the error string would evaluate to true if using ==)
+					if(($msg = $this->setUser()) === true) {	
+						break;	//done, if successfull, otherwise will evaluate the rest of the block
+					}
+				}
 
-			case "newProfile":				
-			case "editProfile":
-				$page = "manageUser";
-				$loc = "edit your profile";
-
-				$newUser = ($cmd == "newProfile") ? true : false;
+				$loc = 'edit user profile';					
 				
-				if ($user->getRole() >= $g_permission['instructor'] 
-					|| (isset($request['user']['defaultRole']) && $request['user']['defaultRole'] >= $g_permission['staff']))
-					$user->getInstructorAttributes();
+				//assume that there IS a selectedUser (this should be caught by the if statement at the top of the method.
+				$tmp_user = new user($_REQUEST['selectedUser']);
+				$username = $tmp_user->getUsername();
+				//use the requested/updated role if it exists, stored otherwise
+				//it is important to use DEFAULT role (since not-trained instructors will return a 'role' of student)
+				$role = !empty($_REQUEST['default_role']) ? $_REQUEST['default_role'] : $tmp_user->getDefaultRole();
 				
-				$hidden_fields = array (
-					'cmd' 			=> 'storeUser', 
-					'previous_cmd'	=> $cmd,
-					'newUser'		=> $newUser
-				);
+				//now init the user as an object of the proper class
+				$users = new users();
+				$userToEdit = $users->initUser($role, $username);
 				
-				$this->displayFunction = 'displayEditUser';
-				$this->argList = array($user, $user, null, $_REQUEST, null, $hidden_fields, $user->getLibraries());
+				$this->displayFunction = 'displayEditProfile';
+				$this->argList = array($userToEdit, $cmd, $msg);
 			break;
 			
+			
+			case 'addUser':
+				if(isset($_REQUEST['edit_user_submit'])) {
+					//attempt to set user info
+					//the === is important: method returns TRUE on success, but error msg if it fails
+					//(the error string would evaluate to true if using ==)
+					if(($msg = $this->setUser()) === true) {	
+						break;	//done, if successfull, otherwise will evaluate the rest of the block
+					}
+				}
+
+				$loc = 'create a new user';
+
+				//create base user object
+				$userToEdit = new user();
+				
+				$this->displayFunction = 'displayEditProfile';
+				$this->argList = array($userToEdit, $cmd, $msg);
+			break;
+						
+			
+			case 'newProfile':
+			case 'editProfile':
+				if(isset($_REQUEST['edit_user_submit'])) {
+					//attempt to set user info
+					//the === is important: method returns TRUE on success, but error msg if it fails
+					//(the error string would evaluate to true if using ==)
+					if(($msg = $this->setUser()) === true) {
+						break;	//done, if successfull, otherwise will evaluate the rest of the block
+					}
+				}
+
+				$loc = 'edit your profile';
+				$this->displayFunction = 'displayEditProfile';
+				$this->argList = array($user, $cmd, $msg);
+			break;
+			
+			
+			case 'setPwd':
+				$loc = 'set override password';
+				
+				$userToEdit = new user($_REQUEST['selectedUser']);
+				
+				if(isset($_REQUEST['edit_pass_submit'])) {	//set password
+					//do not allow empty passwords
+					if(!empty($_REQUEST['override_pass'])) {
+						//make sure the password and confirmation password match
+						if($_REQUEST['override_pass']==$_REQUEST['override_pass_confirm']) {
+							//change password
+							$sp_user = new specialUser();
+							if(!$userToEdit->isSpecialUser()) {	//no password record exists, create it first
+								$sp_user->createNewSpecialUser($userToEdit->getUsername(), $userToEdit->getEmail());
+							}
+							//set password
+							$sp_user->resetPassword($userToEdit->getUsername(), $_REQUEST['override_pass']);
+			
+							//take user back to manage-user page
+							$this->argList = array('Password succesfully changed for <u>'.$userToEdit->getName(false).'</u>');
+							if ($u->getRole() == $g_permission['custodian']) {
+								$this->displayFunction = 'displayCustodianHome';
+							} elseif ($u->getRole() >= $g_permission['staff']) {
+								$this->displayFunction = 'displayStaffHome';
+							}						
+						}
+						else {
+							$msg = 'The passwords do not match';
+							$this->displayFunction = 'displayEditPassword';
+							$this->argList = array($userToEdit, $cmd, $msg);
+						}						
+					}
+					else {
+						$msg = 'Cannot leave password blank';
+						$this->displayFunction = 'displayEditPassword';
+						$this->argList = array($userToEdit, $cmd, $msg);
+					}			
+				}
+				else {			
+					$this->displayFunction = 'displayEditPassword';
+					$this->argList = array($userToEdit, $cmd);
+				}
+			break;
+			
+			
+			case 'resetPwd':
+				$loc = 'reset override password';
+				
+				//already made sure to have a user
+				$userToEdit = new user($_REQUEST['selectedUser']);
+
+				//get special user object
+				$sp_user = new specialUser();
+				if(!$userToEdit->isSpecialUser()) {	//no password record exists, create it first
+					$sp_user->createNewSpecialUser($userToEdit->getUsername(), $userToEdit->getEmail());
+				}
+				//reset password
+				$sp_user->resetPassword($userToEdit->getUsername());
+
+				//take user back to manage-user page
+				$this->argList = array('Password succesfully reset for <u>'.$userToEdit->getName(false).'</u>');
+				if ($u->getRole() == $g_permission['custodian']) {
+					$this->displayFunction = 'displayCustodianHome';
+				} elseif ($u->getRole() >= $g_permission['staff']) {
+					$this->displayFunction = 'displayStaffHome';
+				}
+			break;
+			
+			
+			case 'removePwd':
+				$loc = 'remove override password';
+				
+				//already made sure to have a user
+				$userToEdit = new user($_REQUEST['selectedUser']);
+				
+				//destroy password record if it exists
+				if($userToEdit->isSpecialUser()) {
+					$sp_user = new specialUser($userToEdit->getUserID());
+					$sp_user->destroy();
+				}
+
+				//take user back to manage-user page
+				$this->argList = array('Password succesfully removed for <u>'.$userToEdit->getName(false).'</u>');
+				if ($u->getRole() == $g_permission['custodian']) {
+					$this->displayFunction = 'displayCustodianHome';
+				} elseif ($u->getRole() >= $g_permission['staff']) {
+					$this->displayFunction = 'displayStaffHome';
+				}
+			break;
+
+
 			case "mergeUsers":				
 				$page = "manageUser";
 				$loc = "merge user profiles";
@@ -130,165 +264,6 @@ class userManager
 					$this->displayFunction = 'displayMergeUser';
 					$this->argList = array($_REQUEST, $hidden_fields, $userObj, $cmd);			
 				}
-			break;
-
-			case 'addUser':
-				$page = "manageUser";
-				$loc = "create user";
-
-				switch ($_REQUEST['user']['defaultRole'])
-				{
-					case $g_permission['admin']:
-						$userToEdit = new admin();
-						break;
-					case $g_permission['staff']:
-						$userToEdit = new staff();
-						break;	
-					case $g_permission['instructor']: //need to have access to intructor_attributes
-						$userToEdit = new instructor();
-						break;
-					case $g_permission['proxy']:
-						$userToEdit = new proxy();
-						break;
-					case $g_permission['custodian']:
-						$userToEdit = new custodian();
-						break;
-					case $g_permission['custodian']:
-					default:
-						$userToEdit = new student();
-						break;											
-				}
-
-				if (isset($_REQUEST['user']))  // we do not want to store this to the db yet but should populate the object for display to the form
-				{
-					$userToEdit->userName  = $_REQUEST['user']['username'];
-					$userToEdit->firstName = $_REQUEST['user']['first_name'];
-					$userToEdit->lastName  = $_REQUEST['user']['last_name'];
-					$userToEdit->dfltRole  = $_REQUEST['user']['defaultRole'];
-					$userToEdit->email	   = $_REQUEST['user']['email'];
-
-					if ($userToEdit->getRole() >= $g_permission['instructor'] && isset($_REQUEST['user']['ils_user_name']))
-					{
-						$userToEdit->ils_user_id = $_REQUEST['user']['ils_user_id'];
-						$userToEdit->ils_name = $_REQUEST['user']['ils_user_name'];
-					}
-
-				}
-
-				$hidden_fields = array (
-					'cmd' 			=> 'storeUser', 
-					'previous_cmd'	=> $cmd,
-					'newUser'		=> false
-				);
-				
-				$this->displayFunction = 'displayEditUser';				
-				$this->argList = array($userToEdit, $user, null, $_REQUEST, null, $hidden_fields, $user->getLibraries());
-			break;
-
-			case 'resetPwd':
-				$page = "manageUser";
-				$loc = "reset user password";
-
-				$users = new users();
-
-				if (isset($_REQUEST['select_user_by']) && isset($_REQUEST['user_qryTerm']))
-					$users->search($_REQUEST['select_user_by'], $_REQUEST['user_qryTerm']);
-
-				$userToEdit = (isset($_REQUEST['selectedUser'])) ? new user($_REQUEST['selectedUser']) : null;
-
-				$sp = new specialUser();
-
-				if (!is_null($userToEdit))
-				{
-					if (!$userToEdit->isSpecialUser())
-						$sp->createNewSpecialUser($userToEdit->getUsername(), $userToEdit->getEmail(), null);
-					else
-						$sp->resetPassword($userToEdit->getUsername());
-
-					if ($user->getRole() == $g_permission['custodian']) {
-						$this->displayFunction = 'displayCustodianHome';
-						$this->argList = array('Override Password Reset');
-					} else {
-						$this->displayFunction = 'displayStaffHome';
-						$this->argList = array('Override Password Reset');
-					}
-				} else {
-					$hidden_fields = array (
-						'cmd' 			=> 'storeUser', 
-						'previous_cmd'	=> $cmd,
-						'newUser'		=> false
-					);
-				//($userToEdit, $user, $msg=null, $request, $usersObj=null, $hidden_fields=null)
-					$this->displayFunction = 'displayEditUser';
-					$this->argList = array($userToEdit, $user, null, $_REQUEST, $users, $hidden_fields, $user->getLibraries());
-				}
-
-			break;
-
-
-			case 'setPwd':
-/*				
-				if (isset($_REQUEST['selectedUser']) && $_REQUEST['selectedUser'] == "")
-				{
-					$userToEdit = new user();
-
-					$userToEdit->createUser($_REQUEST['user']['username'], $_REQUEST['user']['first_name'], $_REQUEST['user']['last_name'], $_REQUEST['user']['email'], $_REQUEST['user']['defaultRole']);
-				} else
-					$userToEdit = (isset($_REQUEST['selectedUser'])) ? new user($_REQUEST['selectedUser']) : null;
-					
-					$users = new users();
-					$tmpUser = new user($_REQUEST['selectedUser']);
-					$role = (isset($_REQUEST['user']['defaultRole'])) ? $_REQUEST['user']['defaultRole'] : $tmpUser->getDefaultRole();
-					
-					$userToEdit = $users->initUser($role, $tmpUser->getUsername());
-					$userToEdit->getUserByID($_REQUEST['selectedUser']);		
-					unset($tmpUser);
-					
-					if ($role >= $g_permission['instructor'])
-						$userToEdit->getInstructorAttributes();		
-									
-
-				if (!is_null($userToEdit) && !$userToEdit->isSpecialUser())
-				{
-					$sp = new specialUser();
-					$sp->createNewSpecialUser($userToEdit->getUsername(), $userToEdit->getEmail(), null);
-				}
-*/
-			case 'editUser':
-				$page = "manageUser";
-				$loc = "edit user profile";
-
-				$users = new users();
-
-				//if user to be editted has been selected create object and get data
-				if (!isset($userToEdit))
-				{
-					if (isset($_REQUEST['selectedUser']))
-					{			
-						$tmpUser = new user($_REQUEST['selectedUser']);
-						$role = (isset($_REQUEST['user']['defaultRole'])) ? $_REQUEST['user']['defaultRole'] : $tmpUser->getDefaultRole();
-						
-						$userToEdit = $users->initUser($role, $tmpUser->getUsername());
-						$userToEdit->getUserByID($_REQUEST['selectedUser']);		
-						unset($tmpUser);
-						
-						if ($role >= $g_permission['instructor'])
-							$userToEdit->getInstructorAttributes();
-						
-					} else
-						$userToEdit = null;
-				}
-				
-
-				$hidden_fields = array (
-					'cmd' 			=> 'storeUser', 
-					'previous_cmd'	=> $cmd,
-					'newUser'		=> false
-				);
-			
-				$this->displayFunction = 'displayEditUser';
-				$this->argList = array($userToEdit, $user, null, $_REQUEST, $users, $hidden_fields, $user->getLibraries());
-
 			break;
 
 			case 'assignProxy':
@@ -327,79 +302,6 @@ class userManager
 
 			break;
 
-			case 'storeUser':
-				$editUser = new user();
-				
-
-				
-				
-				if ($_REQUEST['previous_cmd'] == 'addUser')
-				{
-					$tmpUser = new user();
-					if (!$tmpUser->getUserByUserName($_REQUEST['user']['username']))
-					{
-						$editUser->createUser($_REQUEST['user']['username'], '', '', '', $_REQUEST['user']['defaultRole']);
-					} else {
-						$hidden_fields = array (
-							'cmd' 			=> 'addUser', 
-							'previous_cmd'	=> 'storeUser',
-							'newUser'		=> false
-						);
-						
-						$this->displayFunction = 'displayEditUser';
-						$this->argList = array($editUser, $user, "This username is in use.  Please choose another.", $_REQUEST, $users, $hidden_fields, $user->getLibraries());
-						return;
-					}
-				} else
-					$editUser->getUserByID($_REQUEST['user']['userID']);
-
-					
-				$usersObject = new users();
-				//$editUser->getRole()
-				$editUser = $usersObject->initUser($_REQUEST['user']['defaultRole'], $editUser->getUsername());	
-					
-				if ($editUser->setEmail($_REQUEST['user']['email']))
-				{
-					$editUser->setFirstName($_REQUEST['user']['first_name']);
-					$editUser->setLastName($_REQUEST['user']['last_name']);
-					$editUser->setDefaultRole($_REQUEST['user']['defaultRole']);
-
-					if ($editUser->isSpecialUser() && isset($_REQUEST['user']['pwd']) && $_REQUEST['user']['pwd'] != "")
-					{
-						$sp = new specialUser($editUser->getUserID());
-						$sp->resetPassword($editUser->getUsername(), $_REQUEST['user']['pwd']);
-					}
-
-					if (isset($_REQUEST['user']['ils_user_id']))
-					{
-						$editUser->storeInstructorAttributes($_REQUEST['user']['ils_user_id'], $_REQUEST['user']['ils_user_name']);
-					}
-
-					if ($editUser->getRole() >= $g_permission['instructor'] && isset($_REQUEST['user']['staff_library']))
-						$editUser->assignStaffLibrary($_REQUEST['user']['staff_library']);
-						
-					if (isset($_REQUEST['user']['not_trained']) && $_REQUEST['user']['not_trained'] == 'not_trained')
-						$editUser->addNotTrained();
-					else
-						$editUser->removeNotTrained();
-						
-					$msg = "User Record Successfully Saved";
-				} else {
-					$msg = "Invalid Email Format - Changes Not Saved";
-				}
-
-				if ($user->getRole() == $g_permission['custodian']) {
-					$this->displayFunction = 'displayCustodianHome';
-					$this->argList = array("User Password Successfully Changed");
-				} elseif ($user->getRole() >= $g_permission['staff']) {
-					$this->displayFunction = 'displayStaffHome';
-					$this->argList = array($msg);
-				} else {
-					require_once("secure/managers/classManager.class.php");
-					classManager::classManager('viewCourseList', $editUser, $user, $_REQUEST);
-				}
-			break;
-
 			case 'addProxy':
 			case 'removeProxy':
 				$page = "manageUser";
@@ -407,39 +309,119 @@ class userManager
 				$courseInstances = $user->getCourseInstancesToEdit();
 
 				$this->displayFunction = 'displayEditProxy';
-				$this->argList = array($courseInstances,'editProxies');
+				$this->argList = array($courseInstances,'editProxies', $cmd);
 			break;
-
-			case 'removePwd':
-				$page = "manageUser";
-				$loc = "remove user password";
-
-				$users = new users();
-				
-				$userToEdit = (isset($_REQUEST['selectedUser'])) ? new user($_REQUEST['selectedUser']) : null;
-
-				if (!is_null($userToEdit))
-				{
-					if ($userToEdit->isSpecialUser())
-					{
-						$sp = new specialUser($userToEdit->getUserID());
-						$sp->destroy();
-					}
-
-					if ($user->getRole() == $g_permission['custodian']) {
-						$this->displayFunction = 'displayCustodianHome';
-						$this->argList = array('Override Password Removed');
-					} else {
-						$this->displayFunction = 'displayStaffHome';
-						$this->argList = array('Override Password Removed');
-					}
-				} else {
-					$this->displayFunction = 'displayAssignUser';
-					$this->argList = array($cmd, $cmd, $userToEdit, null, $users, 'Remove Override Password', $_REQUEST);
-				}
-			break;
-
 		}
+	}
+	
+	
+	/**
+	 * Set user profile information in the database
+	 *
+	 * @return (string) error message on failure; (boolean) TRUE on success -- will also display the manage-user home on success;
+	 */
+	function setUser() {
+		global $g_permission, $u;
+		
+		$userToEdit = new user();
+		
+		//check to make sure that all required fields have been filled
+		if(empty($_REQUEST['first_name'])) {	//first name
+			return "First name is required";
+		}		
+		if(empty($_REQUEST['last_name'])) {	//last name
+			return "Last name is required";
+		}
+		if(empty($_REQUEST['email'])) {	//email
+			return "The email is required";
+		}
+		//if editing password, make sure confirmation matches
+		if(!empty($_REQUEST['override_pass']) && ($_REQUEST['override_pass'] != $_REQUEST['override_pass_confirm'])) {
+			return "Passwords do not match";
+		}
+		
+		if(empty($_REQUEST['selectedUser'])) {	//creating new user
+			//make sure have username
+			if(empty($_REQUEST['username'])) {
+				return "The username is required";
+			}
+
+			//check for match to existing user
+			if(!$userToEdit->getUserByUserName($_REQUEST['username'])) {
+				//no match, create new basic user
+				$userToEdit->createUser(trim($_REQUEST['username']));
+			}
+			else {
+				//duplicate username
+				return "This username is in use.  Please choose another";
+			}			
+		}
+		else {	//editing existing user
+			//init user object
+			$userToEdit->getUserByID($_REQUEST['selectedUser']);
+		}
+		
+		//set everything else
+		$userToEdit->setEmail(trim($_REQUEST['email']));
+		$userToEdit->setLastName(trim($_REQUEST['last_name']));
+		$userToEdit->setFirstName(trim($_REQUEST['first_name']));
+		$userToEdit->setDefaultRole($_REQUEST['default_role']);
+		//not-trained
+		if(isset($_REQUEST['not_trained'])) {	//if checkbox was checked
+			$userToEdit->addNotTrained();	//add to not-trained table
+		}
+		else {	//if checkbox was not checked
+			$userToEdit->removeNotTrained();	//remove entry from not-trained, if it existed
+		}
+		//if setting instructor and have ILS info		
+		if(($_REQUEST['default_role'] >= $g_permission['instructor']) && (!empty($_REQUEST['ils_user_id']) || !empty($_REQUEST['ils_user_name']))) {
+			//need the object to be an instructor class
+			$userToEdit = new instructor($userToEdit->getUsername());
+			//now set the info
+			$userToEdit->storeInstructorAttributes(trim($_REQUEST['ils_user_id']), trim($_REQUEST['ils_user_name']));
+		}
+		//or if setting staff and have a staff-library
+		elseif(($_REQUEST['default_role'] >= $g_permission['staff']) && !empty($_REQUEST['staff_library'])) {
+			//need staff object
+			$userToEdit = new staff($userToEdit->getUsername());
+			//set info
+			$userToEdit->assignStaffLibrary($_REQUEST['staff_library']);
+		}
+		//override password
+		//do not need to check if pass==pass_confirm, since already did it once
+		if(!empty($_REQUEST['override_pass'])) {
+			$sp_user = new specialUser();
+			if(!$userToEdit->isSpecialUser()) {	//no password record exists, create it first
+				$sp_user->createNewSpecialUser($userToEdit->getUsername(), $userToEdit->getEmail());
+			}
+			//set password
+			$sp_user->resetPassword($userToEdit->getUsername(), $_REQUEST['override_pass']);			
+		}
+
+		//success, redirect everyone to their proper place
+		if($u->getRole() >= $g_permission['staff']) {
+			$this->displayFunction = 'displayStaffHome';
+			$this->argList = array('Profile succesfully updated for <u>'.$userToEdit->getName(false).'</u>');
+		}
+		else {
+			require_once("secure/managers/classManager.class.php");
+			classManager::classManager('viewCourseList', $userToEdit, $u, array());
+		}
+		
+		return true;
+	}
+	
+	
+	/**
+	 * Displays ajax user-lookup screen
+	 */
+	function getUser($cmd) {
+		$page = 'manageUser';
+		$loc = 'select user';
+			
+		//init ajax manager - sets the displayer
+		ajaxManager::ajaxManager();			
+		ajaxManager::lookup('lookupUser', $cmd, 'manageUser', "Select User", null, true, array('min_user_role'=>0, 'field_id'=>'selectedUser'));
 	}
 }
 ?>

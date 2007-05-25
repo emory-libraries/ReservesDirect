@@ -65,7 +65,6 @@ $functional_permissions = array
 	 'manageUser' 					=> $g_permission['custodian'],
 	 'newProfile' 					=> $g_permission['student'],
 	 'editProfile' 					=> $g_permission['student'],
-	 'storeUser' 					=> $g_permission['student'],
 	 'editUser' 					=> $g_permission['staff'],
 	 'mergeUsers' 					=> $g_permission['staff'],
 	 'addUser' 						=> $g_permission['staff'],
