@@ -299,7 +299,7 @@ class instructor extends proxy
             switch ($g_dbConn->phptype)
             {
                     default: //'mysql'
-                            $sql = "SELECT report_id, title, sql, parameters "
+                            $sql = "SELECT report_id, title, `sql`, parameters "
                                     .  "FROM reports "
                                     .  "WHERE min_permissions <= " . $this->getRole() . " "
                                     .  "ORDER BY sort_order";
