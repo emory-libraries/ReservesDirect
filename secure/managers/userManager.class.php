@@ -319,6 +319,8 @@ class userManager extends baseManager {
 	 * Set user profile information in the database
 	 *
 	 * @return (string) error message on failure; (boolean) TRUE on success -- will also display the manage-user home on success;
+	 * 	
+	 * Usage Note: if(($msg = $this->setUser()) === true) { user stored successfully code } else { echo error: $msg }
 	 */
 	function setUser() {
 		global $g_permission, $u;

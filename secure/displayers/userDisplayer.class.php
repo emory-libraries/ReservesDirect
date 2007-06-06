@@ -196,6 +196,9 @@ class userDisplayer extends baseDisplayer {
 	 *
 	 * @param user $userObject user object (or subclass)
 	 * @param boolean $hide_on_load	if TRUE will hide the input fields and display link to show them.
+	 * 
+	 * Assumes that will be inserted into <table></table>; outputs <tr><td></td></tr> blocks
+	 * Assumes that will be inserted into <form></form>; outputs 2 input fields
 	 */
 	function displayPasswordFields($userObject, $hide_on_load=false) {
 		global $g_permission, $u;
