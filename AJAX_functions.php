@@ -35,11 +35,11 @@ http://www.reservesdirect.org/
 	require_once("secure/classes/department.class.php");
 	require_once("secure/classes/users.class.php");
 	require_once("secure/classes/terms.class.php");
+	require_once("secure/classes/json_wrapper.class.php");	
 	require_once("secure/managers/noteManager.class.php");
 	require_once("secure/managers/copyrightManager.class.php");
 	require_once("secure/managers/helpManager.class.php");
 	require_once("secure/displayers/noteDisplayer.class.php");
-	require_once("PEAR/JSON.php");
 	require_once("secure/common.inc.php");
 	
 	//set up error-handling/debugging, skins, etc.
@@ -62,8 +62,7 @@ http://www.reservesdirect.org/
 	echo "<br>f=$f";
 	echo "<br>qry=$qry";
 */
-	$json = new Services_JSON();
-	
+	$json = new JSON_Wrapper();
 	
 	
 	switch ($f)
