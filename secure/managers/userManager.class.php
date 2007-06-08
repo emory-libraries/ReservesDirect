@@ -364,7 +364,9 @@ class userManager extends baseManager {
 		}
 		
 		//set everything else
-		$userToEdit->setEmail(trim($_REQUEST['email']));
+		if(!$userToEdit->setEmail(trim($_REQUEST['email']))) {	//email not valid
+			return "The provided email is not valid";
+		}
 		$userToEdit->setLastName(trim($_REQUEST['last_name']));
 		$userToEdit->setFirstName(trim($_REQUEST['first_name']));
 		$userToEdit->setDefaultRole($_REQUEST['default_role']);
