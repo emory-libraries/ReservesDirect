@@ -138,33 +138,6 @@ CREATE TABLE IF NOT EXISTS `courses` (
 -- --------------------------------------------------------
 
 -- 
--- Table structure for table `courses_no_dept`
--- 
-
-DROP TABLE IF EXISTS `courses_no_dept`;
-CREATE TABLE IF NOT EXISTS `courses_no_dept` (
-  `course_id` int(11) NOT NULL auto_increment,
-  `department_id` int(11) NOT NULL default '0',
-  `course_number` varchar(10) default NULL,
-  `course_name` text,
-  `uniform_title` enum('t','f') NOT NULL default 't',
-  `old_id` int(11) NOT NULL default '0',
-  `dept_abv` varchar(50) NOT NULL default '',
-  `old_course_num` varchar(50) NOT NULL default '',
-  PRIMARY KEY  (`course_id`),
-  KEY `department_id` (`department_id`),
-  KEY `uniform_title` (`uniform_title`),
-  KEY `old_id` (`old_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- 
--- Dumping data for table `courses_no_dept`
--- 
-
-
--- --------------------------------------------------------
-
--- 
 -- Table structure for table `departments`
 -- 
 
@@ -1110,12 +1083,7 @@ CREATE TABLE IF NOT EXISTS `special_users` (
   PRIMARY KEY  (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
--- 
--- Dumping data for table `special_users`
--- 
 
-INSERT INTO `special_users` (`user_id`, `password`, `expiration`) VALUES 
-(1, '21232f297a57a5a743894a0e4a801fc3', NULL);
 
 -- --------------------------------------------------------
 
@@ -1231,10 +1199,3 @@ CREATE TABLE IF NOT EXISTS `users` (
   KEY `old_user_id` (`old_user_id`),
   KEY `last_name` (`last_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
-
--- 
--- Dumping data for table `users`
--- 
-
-INSERT INTO `users` (`user_id`, `username`, `first_name`, `last_name`, `email`, `dflt_permission_level`, `last_login`, `old_id`, `old_user_id`) VALUES 
-(1, 'admin', 'ReservesDirect', 'Administrator', NULL, 5, '0000-00-00', NULL, NULL);
