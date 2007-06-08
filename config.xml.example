@@ -29,12 +29,12 @@ http://www.reservesdirect.org/
 -->
 <configuration>
     <authentication>
-        <type>LDAP</type><!-- OPTIONS: LDAP, StandAlone, ANY -->
+        <type comment="OPTIONS: LDAP/StandAlone/ANY">ANY</type><!-- OPTIONS: LDAP, StandAlone, ANY -->
     </authentication>
 
     <database>
         <dbtype>mysql</dbtype>
-        <username>CHANGEME</username>
+        <username comment="Max length is 16 characters">CHANGEME</username>
         <pwd>CHANGEME</pwd>
         <host>localhost</host>
         <dbname>CHANGEME</dbname>
@@ -44,7 +44,7 @@ http://www.reservesdirect.org/
     
     <catalog>
         <catalogName>CHANGEME</catalogName>
-        <useCatalog>yes</useCatalog> <!-- all others may be blank if no -->
+        <useCatalog comment="OPTIONS: yes/no; all others may be blank if 'no'">yes</useCatalog> <!-- all others may be blank if no -->
         <zhost>CHANGEME.example.edu</zhost>
         <zport>2200</zport>
         <zdb>Unicorn</zdb>
@@ -56,16 +56,16 @@ http://www.reservesdirect.org/
     </catalog>
 
     <ldap>
-        <ldapHost>CHANGEME</ldapHost>                <!-- host name or IP address of ldap server; "localhost" if using stunnel -->
-        <ldapDomain>CHANGEME.example.edu</ldapDomain>     <!-- domain that holds ldap user accounts -->
-        <ldapPort>CHANGEME</ldapPort>                <!-- "636" if connecting securely (ldaps), otherwise "389" -->
-        <ldapVersion>3</ldapVersion>                    <!-- ldap version, usually "3" -->
+        <ldapHost comment="host name or IP address of ldap server; 'localhost' if using stunnel">CHANGEME</ldapHost>                <!-- host name or IP address of ldap server; "localhost" if using stunnel -->
+        <ldapDomain comment="domain that holds ldap user accounts">CHANGEME.example.edu</ldapDomain>     <!-- domain that holds ldap user accounts -->
+        <ldapPort comment="'636' if connecting securely (ldaps), otherwise '389'">CHANGEME</ldapPort>                <!-- "636" if connecting securely (ldaps), otherwise "389" -->
+        <ldapVersion comment="ldap version, usually '3'">3</ldapVersion>                    <!-- ldap version, usually "3" -->
         <baseDistinguishedName>CHANGEME</baseDistinguishedName>
-        <userAttributes>                    <!-- attributes, if available, used to seed new user profile in RD -->
-            <canonicalName>CHANGEME</canonicalName>        <!-- user's id (used to bind/authenticate) -->
-            <email>CHANGEME</email>                <!-- email address (optional) -->
-            <firstName>CHANGEME</firstName>        <!-- user's first name (optional) -->
-            <lastName>CHANGEME</lastName>                <!-- user's last name (optional) -->
+        <userAttributes comment="attributes, if available, used to seed new user profile in RD">                    <!-- attributes, if available, used to seed new user profile in RD -->
+            <canonicalName comment="user's id (used to bind/authenticate)">CHANGEME</canonicalName>        <!-- user's id (used to bind/authenticate) -->
+            <email comment="email address (optional)">CHANGEME</email>                <!-- email address (optional) -->
+            <firstName comment="user's first name (optional)">CHANGEME</firstName>        <!-- user's first name (optional) -->
+            <lastName comment="user's last name (optional)">CHANGEME</lastName>                <!-- user's last name (optional) -->
         </userAttributes>
     </ldap>    
     
@@ -77,8 +77,8 @@ http://www.reservesdirect.org/
     <adminEmail>webmaster@example.edu</adminEmail>
 
     <fax>
-        <directory>/var/www/html/CHANGEME/incoming/</directory>  <!-- include trailing / -->
-        <URL>http://CHANGEME.example.edu/CHANGEME/incoming/</URL>  <!-- include trailing / -->
+        <directory comment="include trailing /">/var/www/html/CHANGEME/incoming/</directory>  <!-- include trailing / -->
+        <URL comment="include trailing /">http://CHANGEME.example.edu/CHANGEME/incoming/</URL>  <!-- include trailing / -->
         <copyright>/var/www/CHANGEME/copyright.pdf</copyright>
         <log>/var/spool/hylafax/log/CHANGEME.log</log>
         <fax2pdf_bin>/CHANGEME/path/to/fax2pdf</fax2pdf_bin>
@@ -86,8 +86,8 @@ http://www.reservesdirect.org/
         <gs_bin>/CHANGEME/path/to/gs</gs_bin>
     </fax>
     
-    <documentDirectory>/var/www/html/CHANGEME/uploaded/</documentDirectory>  <!-- include trailing / -->
-    <documentURL>http://CHANGEME.example.edu/uploaded/</documentURL> <!-- include trailing / -->
+    <documentDirectory comment="include trailing /">/var/www/html/CHANGEME/uploaded/</documentDirectory>  <!-- include trailing / -->
+    <documentURL comment="include trailing /">http://CHANGEME.example.edu/uploaded/</documentURL> <!-- include trailing / -->
     <documentCover>/var/www/CHANGEME/copyright.pdf</documentCover>  
 
     <copyrightNoticeURL>http://CHANGEME.example.edu/copyright.html</copyrightNoticeURL>
@@ -131,7 +131,7 @@ as username ?username , password ?password
     
     <EmailRegExp>^(.+)@(.+)$</EmailRegExp>
     
-    <no_javascript_msg>A scan of your computer shows that javascript is disabled, some features of ReservesDirect require javascript.<br/> Please contact CHANGEME at CHANGEME or CHANGEME@example.edu if you require assistance to enable javascript.</no_javascript_msg>
+    <no_javascript_msg>A scan of your computer shows that javascript is disabled, some features of ReservesDirect require javascript.\n Please contact CHANGEME at CHANGEME or CHANGEME@example.edu if you require assistance to enable javascript.</no_javascript_msg>
     
     <request_notifier>
         <last_run>1970-01-01</last_run>
