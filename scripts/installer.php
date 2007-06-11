@@ -1,5 +1,32 @@
 <?php
 
+/****************************************************************************
+<pre>  
+  
+			No-PHP Warning
+			--------------
+			
+If you can read this in your browser, then you do not have PHP installed.
+
+Please revew the server requirements for ReservesDirect:
+
+	- Apache HTTPd
+	- PHP 5+ with:
+		- MySQL client
+		- SimpleXML functions
+		- DOM functions
+		- JSON functions OR PEAR Services_JSON
+	- MySQL 4.1+
+	- PEAR DB
+	
+	
+Please visit http://reservesdirect.org for more information.
+
+
+</pre>
+*****************************************************************************/
+		
+
 	## EDIT ME ##
 
 	//If the installer script is moved, change this to the path of ReservesDirect directory
@@ -22,7 +49,7 @@
 	$step = !empty($_REQUEST['step']) ? $_REQUEST['step'] : null;
 	
 	//main "steps" switching point
-	if($step=='two') {	//atep 2 -- setting up config file
+	if($step=='two') {	//step 2 -- setting up config file
 		setup_config();
 	}
 	elseif($step=='three') {	//step 3 -- setting up and seeding DB
@@ -41,6 +68,8 @@
 		check_json();
 		//check if simplexml is enabled
 		check_simplexml();
+		//check DOM		
+		check_dom();		
 		
 		//go on to step 2 -- setting up config file	
 		setup_config();
@@ -70,12 +99,17 @@
 		
 		//decide what to do next
 		if(isset($_REQUEST['submit_create_db'])) {	//DB creation form submitted; try to set up the db
+			//check to see if using admin credentials
+			//checkbox must be checked and the field be non-empty
+			$db_admin_username = (isset($_REQUEST['admin_user']) && !empty($_REQUEST['db_admin_username'])) ? $_REQUEST['db_admin_username'] : null;
+			$db_admin_pass = (isset($_REQUEST['admin_user']) && !empty($_REQUEST['db_admin_pass'])) ? $_REQUEST['db_admin_pass'] : null;
+						
 			//attempt to connect to server, but do not pick a DB
 			//will die w/ message on error
-			get_mysql_connection($config, $_REQUEST['db_admin_username'], $_REQUEST['db_admin_pass'], false);
+			get_mysql_connection($config, $db_admin_username, $db_admin_pass, false);
 			
 			//check mysql server version
-			//will die w/ message if < 4.0
+			//will die w/ message if < 4.1
 			$mysql_version = check_mysql_server_version();
 			
 			//make sure that we have the bare minimum info in the config
@@ -106,7 +140,7 @@
 				
 				//build create-user sql
 				//grant select, insert, update, delete on <db>.* to <user>@<host> identified by '<pass>';
-				$sql = "GRANT SELECT, INSERT, UPDATE, DELETE ON {$config->database->dbname}.* TO {$config->database->username}@{$host}";
+				$sql = "GRANT SELECT, INSERT, UPDATE, DELETE ON `{$config->database->dbname}`.* TO '{$config->database->username}'@'{$host}'";
 				
 				//add password if it exists, or print warning
 				if(!empty($config->database->pwd)) {
@@ -157,7 +191,7 @@
 			//now need to reconnect and select the db (ideally would just select DB, but no such method)
 			//will die w/ message on error
 			$g_dbConn->disconnect();
-			get_mysql_connection($config, $_REQUEST['db_admin_username'], $_REQUEST['db_admin_pass'], true);	
+			get_mysql_connection($config, $db_admin_username, $db_admin_pass, true);
 			
 			//attempt to use transactions
 			if($g_dbConn->provides('transactions')) {
@@ -241,7 +275,7 @@
 				echo '<br />password: '.$password;
 			}
 			
-			echo '<p />For security purposes, DELETE THIS SCRIPT after you verify your ReservesDirect installation.';
+			echo '<p />For security purposes, DELETE THIS SCRIPT after you verify your ReservesDirect installation.<p />Also, do not forget to change permissions of <tt>'.RD_ROOT.'config_loc.inc.php<tt> and the directory of the config file to read-only.';
 		}
 		else {	//display initial form
 			//first make sure we have the SQL dump
@@ -338,7 +372,7 @@
 			$config_path = $default_xmlConfig;
 		}
 		else {	//can't find either one, error out
-			print_error('Example config file (<tt>'.RD_ROOT.'config.xml.example</tt>) is missing.');
+			print_error('Example config file (<tt>'.RD_ROOT.'config.xml.example</tt>) is missing or is unreadable.');
 			die(-1);
 		}
 		
@@ -517,10 +551,10 @@
 		//get mysql server version
 		$mysql_version = $g_dbConn->getOne('SELECT VERSION() as version');
 	
-		// Make sure the server has MySQL 4.0
+		// Make sure the server has MySQL 4.1
 		$mysql_version = preg_replace('|[^0-9\.]|', '', $mysql_version);
-		if(version_compare($mysql_version, '4.0.0', '<')) {
-			print_error('MySQL server 4.0 or higher is required.');
+		if(version_compare($mysql_version, '4.1', '<')) {
+			print_error('MySQL server 4.1 or higher is required.');
 			die(-1);
 		}
 		else {
@@ -594,6 +628,22 @@
 		}
 		else {
 			print_error('SimpleXML is required.');
+			die(-1);
+		}
+	}
+	
+	
+	/**
+	 * checks DOM functionality;  Should be built into PHP5
+	 * 
+	 * pretty hacky way to check this
+	 */
+	function check_dom() {
+		if(class_exists('DOMDocument') && class_exists('DOMXPath')) {
+			return true;
+		}
+		else {
+			print_error('DOM functionality (DOMDocument, DOMXPath, etc.) is required.');
 			die(-1);
 		}
 	}
@@ -691,8 +741,8 @@
 			if(!$had_err) {
 				//write contents to file
 				if(file_put_contents($new_config_path, $config_xml_string) !== false) {
-					//try to change permissions to rw-------
-					if(!chmod($new_config_path, 0600)) {
+					//try to change permissions to r--------
+					if(!chmod($new_config_path, 0400)) {
 						$had_err = true;
 						$err_msg = 'Configuration file successfully written to <tt>'.$config_path.'</tt>, but installer could not change file permissions.';
 					}
@@ -956,13 +1006,13 @@
 	 * @param string $msg
 	 */
 	function print_error($msg) {
-		echo '<br /><span style="color:red;">ERROR: '.$msg.'</span><br />';
+		echo '<br /><span class="error" style="color:red;">ERROR: '.$msg.'</span><br />';
 	}
 	function print_warning($msg) {
-		echo '<br /><span style="color:orange;">WARNING: '.$msg.'</span><br />';
+		echo '<br /><span class="warning" style="color:#804000;">WARNING: '.$msg.'</span><br />';
 	}		
 	function print_success($msg) {
-		echo '<br /><span style="color:green;">SUCCESS: '.$msg.'</span><br />';
+		echo '<br /><span class="success" style="color:green;">SUCCESS: '.$msg.'</span><br />';
 	}
 	
 	/**
