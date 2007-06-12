@@ -1,3 +1,29 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+		<title>ReservesDirect Installer</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+		
+		<style type="text/css" media="all">
+			body {
+				background-color: #E9E9E9;
+				color: black;
+				font-family: sans-serif;
+			}
+			
+			input {
+				padding: 2px;
+			}
+			
+			.error { color: red; }
+			.warning { color: #FF9900; }
+			.success { color: green; }
+		</style>
+	</head>
+	
+	<body>
+
 <?php
 
 /****************************************************************************
@@ -232,9 +258,9 @@ Please visit http://reservesdirect.org for more information.
 			<form method="post" name="db_form2">
 				<input type="hidden" name="step" value="three" />
 				
-				ReservesDirect Admin Username: <input type="text" id="rd_admin_username" name="rd_admin_username" value="admin" />
+				ReservesDirect Admin Username: <input type="text" size="40" id="rd_admin_username" name="rd_admin_username" value="admin" />
 				<br />
-				ReservesDirect Admin Password: <input type="password" id="rd_admin_pass" name="rd_admin_pass" />
+				ReservesDirect Admin Password: <input type="password" size="40" id="rd_admin_pass" name="rd_admin_pass" />
 				<p />
 				<input type="submit" name="submit_rd_admin" value="Create Administrator" />
 			</form>
@@ -340,9 +366,9 @@ Please visit http://reservesdirect.org for more information.
 				<p />
 				<input type="checkbox" id="admin_user" name="admin_user" onchange="javascript:check_uncheck3();" /> Use these credentials to perform the operations above (otherwise will attempt to use <tt><?php echo $config->database->username; ?></tt> credentials):
 				<div style="padding-left: 50px;">
-					DB Admin Username: <input type="text" id="db_admin_username" name="db_admin_username" value="root" disabled="disabled" />
+					DB Admin Username: <input type="text" size="40" id="db_admin_username" name="db_admin_username" value="root" disabled="disabled" />
 					<br />
-					DB Admin Password: <input type="password" id="db_admin_pass" name="db_admin_pass" disabled="disabled" />
+					DB Admin Password: <input type="password" size="40" id="db_admin_pass" name="db_admin_pass" disabled="disabled" />
 				</div>
 				<p />
 				<input type="submit" name="submit_create_db" value="Setup Database" />
@@ -413,7 +439,7 @@ Please visit http://reservesdirect.org for more information.
 				<input type="hidden" name="step" value="two" />
 							
 				<h3>Configuration file location:</h3>					
-				<input type="text" name="config_loc" value="/path/to/secure-location/" />
+				<input type="text" size="40" name="config_loc" value="/path/to/secure-location/" />
 				<br />
 				<small>
 					This should be the path of the directory where you want to save the ReservesDirect configuration file.  It is strongly recommended to place the configuration file outside of the document root of the web application.
@@ -674,10 +700,10 @@ Please visit http://reservesdirect.org for more information.
 		else {
 			echo '<br />'.$sxmlObj->getName().': ';
 			if(strlen($sxmlObj) > 100) {
-				echo '<br /><textarea name="xml['.$path.']">'.$sxmlObj.'</textarea>';
+				echo '<br /><textarea rows="6" cols="75" name="xml['.$path.']">'.$sxmlObj.'</textarea>';
 			}
 			else {
-				echo '<input type="text" name="xml['.$path.']" value="'.$sxmlObj.'" />';
+				echo '<input type="text" size="40" name="xml['.$path.']" value="'.$sxmlObj.'" />';
 			}
 			
 			//print the comment
@@ -788,7 +814,7 @@ Please visit http://reservesdirect.org for more information.
 ?>
 		The installer was unable to save the configuration data.  Please save the following data in an XML file.  Do not forget to edit <tt>config_loc.inc.php</tt> file in the ReservesDirect directory to specify the configuration location.
 		<br />
-		<textarea><?php echo $config_xml_string; ?></textarea>
+		<textarea rows="10" cols="100" wrap="off"><?php echo $config_xml_string; ?></textarea>
 <?php				
 		}
 	}
@@ -1006,13 +1032,13 @@ Please visit http://reservesdirect.org for more information.
 	 * @param string $msg
 	 */
 	function print_error($msg) {
-		echo '<br /><span class="error" style="color:red;">ERROR: '.$msg.'</span><br />';
+		echo '<br /><span class="error">ERROR: '.$msg.'</span><br />';
 	}
 	function print_warning($msg) {
-		echo '<br /><span class="warning" style="color:#804000;">WARNING: '.$msg.'</span><br />';
+		echo '<br /><span class="warning">WARNING: '.$msg.'</span><br />';
 	}		
 	function print_success($msg) {
-		echo '<br /><span class="success" style="color:green;">SUCCESS: '.$msg.'</span><br />';
+		echo '<br /><span class="success">SUCCESS: '.$msg.'</span><br />';
 	}
 	
 	/**
@@ -1032,3 +1058,6 @@ Please visit http://reservesdirect.org for more information.
 <?php		
 	}
 ?>
+
+	</body>
+</html>
