@@ -489,7 +489,7 @@ class user
 	 * @param string $ci_status (optional) CIs with this status
 	 * @param string $enrollment_status (optional) Enrollment status of this user [only really matters for students (access_level=0)]	
 	 * @param int $dept_id (optional) CIs in this department
-	 * @desc Returns an array of CI objects for this user with the given qualifications. If a parameter is not specified, no restriction is placed.  This is the catch-all logic to get CIs to be used by public methods with selective criteria. 
+	 * @desc Returns an array of CI objects (indexed by CI ID) for this user with the given qualifications. If a parameter is not specified, no restriction is placed.  This is the catch-all logic to get CIs to be used by public methods with selective criteria. 
 	 */
 	public function fetchCourseInstances($access_level=null, $act_date=null, $exp_date=null, $ci_status=null, $enrollment_status=null, $dept_id=null) {
 		global $g_dbConn, $g_permission;
