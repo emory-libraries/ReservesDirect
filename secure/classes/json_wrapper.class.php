@@ -41,7 +41,18 @@ class JSON_Wrapper {
 			$this->pear_json_obj = null;			
 		}
 		else {	//have to rely on PEAR
-			require_once("PEAR/JSON.php");
+			//JSON could be in 2 different places
+			$haveit = false;
+			if(@include('JSON.php')) {
+				$haveit = true;
+			}
+			elseif(@include('PEAR/JSON.php')) {
+				$haveit = true;
+			}
+			if(!$haveit) {
+				trigger_error('Could not find JSON.php', E_USER_ERROR);
+			}			
+			
 			$this->is_built_in = false;
 			$this->pear_json_obj = new Services_JSON();
 		}
