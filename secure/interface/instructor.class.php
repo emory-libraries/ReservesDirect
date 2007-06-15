@@ -84,8 +84,13 @@ class instructor extends proxy
 		$rs = $g_dbConn->getOne($sql);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
-		//init object
-		return $this->getUserByID($rs);
+		if(empty($rs)) {
+			return false;
+		}
+		else {
+			//init object
+			return $this->getUserByID($rs);
+		}
 	}
 	
 

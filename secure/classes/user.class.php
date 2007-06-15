@@ -338,13 +338,17 @@ class user
 
 
 	/**
-	* @return void
+	* @return boolean
 	* @param int $userID
-	* @desc Gets user record from DB by userID
+	* @desc Gets user record from DB by userID; returns TRUE on success, FALSE otherwise
 	*/
 	function getUserByID($userID)
 	{
 		global $g_dbConn;
+		
+		if(empty($userID)) {
+			return false;
+		}
 
 		switch ($g_dbConn->phptype)
 		{
@@ -366,20 +370,15 @@ class user
 		}
 
 		$rs = $g_dbConn->query($sql, $userID);
-
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		$row = $rs->fetchRow();
-			$this->userID 		= $row[0];
-			$this->userName 	= $row[1];
-			$this->firstName	= $row[2];
-			$this->lastName		= $row[3];
-			$this->email		= $row[4];
-			$this->dfltRole		= $row[5];
-			$this->dfltClass	= $row[6];
-			$this->role			= $row[7];
-			$this->userClass	= $row[8];
-			$this->not_trained	= $row[9];
+		
+		if($rs->numRows() == 0) {
+			return false;
+		}
+		else {
+			list($this->userID, $this->userName, $this->firstName, $this->lastName, $this->email, $this->dfltRole, $this->dfltClass, $this->role, $this->userClass, $this->not_trained) = $rs->fetchRow();			
+			return true;
+		}
 	}
 
 	/**
