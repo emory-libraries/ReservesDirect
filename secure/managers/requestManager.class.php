@@ -487,23 +487,24 @@ class requestManager
 						if($ils_request->getByBarcode($phys_item['bar'])) {
 							//not sure if this is necessary, but ignore duplicate users
 							$ils_user_id = $ils_request->getILSUserID();
-							if(!in_array($ils_user_id, $processed_ids)) {	//have not processed this one before
+							if(!empty($ils_user_id) && !in_array($ils_user_id, $processed_ids)) {	//have not processed this one before
 								//init instructor object
 								$instructor = new instructor();
-								$instructor->getByILSUserID($ils_user_id);
-								//fetch and store CIs taught by this instructor
-								$instructor_CIs = $instructor->getCourseInstancesToEdit();
-								$course_instances = array_merge($course_instances, $instructor_CIs);
-								
-								//attempt to find the CI matching the requesting course
-								foreach($instructor_CIs as $instructor_CI) {
-									if($ils_request->doesCourseMatch($instructor_CI->getCourseInstanceID())) {
-										//store ILS request ID matching this CI
-										//need this to remove request from DB later
-										$requests_matching_CIs[$instructor_CI->getCourseInstanceID()] = $ils_request->getRequestID();
+								if($instructor->getByILSUserID($ils_user_id)) {	//make sure we actually have a user
+									//fetch and store CIs taught by this instructor
+									$instructor_CIs = $instructor->getCourseInstancesToEdit();
+									$course_instances = array_merge($course_instances, $instructor_CIs);
+																		
+									//attempt to find the CI matching the requesting course
+									foreach($instructor_CIs as $instructor_CI) {
+										if($ils_request->doesCourseMatch($instructor_CI->getCourseInstanceID())) {
+											//store ILS request ID matching this CI
+											//need this to remove request from DB later
+											$requests_matching_CIs[$instructor_CI->getCourseInstanceID()] = $ils_request->getRequestID();
+										}
 									}
 								}
-																
+								
 								//remember this ils-user-id
 								$processed_ids[] = $ils_user_id;
 								//free up memory
