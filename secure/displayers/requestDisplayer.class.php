@@ -292,14 +292,18 @@ class requestDisplayer extends noteDisplayer {
 
 		$circRules = new circRules();
 
-		//Added by kawashi on 12.1.04
-		//This is so the reserve activation date will match the course instance activation date
-		if (is_array($hidden_fields)){
+		//pre-fill reserve activation/expiration dates
+		if(!empty($hidden_fields['ci'])) {
 			$ci = new courseInstance($hidden_fields['ci']);
 			$reserve_activation_date = $ci->getActivationDate();
 			$reserve_expiration_date = $ci->getExpirationDate();
 		}
-		//End of added code section
+		else {
+			$terms = new terms();
+			$term = $terms->getCurrentTerm();
+			$reserve_activation_date = $term->getBeginDate();
+			$reserve_expiration_date = $term->getEndDate();
+		}
 
 		echo "<script languge=\"JavaScript\">\n";
 		echo "	function setBarcode(frm) { if (frm.searchField.options[frm.searchField.selectedIndex] == 'barcode') { frm.barcode.value = frm.searchTerm.value; } }\n";
@@ -329,10 +333,23 @@ class requestDisplayer extends noteDisplayer {
 		if (addTypeValue == 'PERSONAL' && frm.selected_owner.selectedIndex == '0') { alertMsg = alertMsg + 'Please select a personal owner.<br>'; }
 		
 		if (alertMsg == '') {
+				
+<?php		if($cmd == 'addPhysicalItem'):	//do not want to go to storeRequest quite yet ?>
+
+			frm.cmd.value = '<?php echo $cmd; ?>'
+			
+<?php		else:	//processing a request, go to store it ?>
+
 			frm.cmd.value = 'storeRequest';
-			frm.submit();
+			
+<?php		endif; ?>
+
+			//submit form
+			return true;
 		} else {
 			document.getElementById('alertMsg').innerHTML = alertMsg;
+			//do not submit form
+			return false;
 		}
 	}
 
@@ -394,9 +411,12 @@ class requestDisplayer extends noteDisplayer {
 			
 		if (alertMsg == '') {
 			frm.cmd.value = 'storeRequest';
-			frm.submit();
+			//submit form
+			return true;
 		} else {
 			document.getElementById('alertMsg').innerHTML = alertMsg;
+			//do not submit form
+			return false;
 		}
 	}
 	
@@ -870,7 +890,7 @@ class requestDisplayer extends noteDisplayer {
 
 //		echo "	<tr><td align=\"center\"><input type=\"checkbox\" name=\"addDuplicate\" value=\"addDuplicate\">&nbsp;<span class=\"small\">Create Item Duplicate</span></td></tr>\n";
 
-		echo "	<tr><td align=\"center\"><input type=\"button\" name=\"store_request\" value=\"$buttonValue\" onClick=\"checkForm(this.form);\"></td></tr>\n";
+		echo "	<tr><td align=\"center\"><input type=\"submit\" name=\"store_request\" value=\"$buttonValue\" onClick=\"return checkForm(this.form);\"></td></tr>\n";
 		echo "</form\n";
 		echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "</table>\n";
@@ -1036,6 +1056,87 @@ class requestDisplayer extends noteDisplayer {
 		echo "	<tr><td align=\"center\"></td></tr>\n";
 		echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "</table>\n";
+	}
+	
+	
+	
+	function displayCoursesForRequest($CIs, $request, $requests_matching_CIs=null) {
+
+		if(!empty($CIs)) {
+			//this is a bit of javascript to add an extra field to the existing select-class form
+			//this javascript (and the snippet defined in a later block) will add an onsubmit event
+			//that will set the hidden ils_request_id field based on selected CI
+?>
+		<script type="text/javascript">
+			//this function will set the value of ils-request-id hidden field to that matching a CI-id
+			function set_ils_request_id() {
+				//define associative array indexed by CI_id, containing ILS_request_id
+				var match_array = {
+<?php
+			//need this so that we can string the rest w/ preceding comma
+			echo '"null":"null"';
+			foreach($requests_matching_CIs as $ci_id=>$ils_request_id) {
+				echo ', "'.$ci_id.'":"'.$ils_request_id.'"';
+			}
+?>				
+				};
+				
+				//set the value based on which CI is chosen
+				if(document.getElementById('ils_request_id')) {
+					var ci_radio = document.getElementById('select_class').elements['ci'];
+					var len = ci_radio.length;
+					
+					//only one radio box
+					if(ci_radio && !len) {
+						if(ci_radio.checked) {
+							//found the selected CI
+							//set the ils_request_id matching that CI
+							document.getElementById('ils_request_id').value = match_array[ci_radio.value];
+							//do not bother with anything else
+							return true;
+						}
+					}
+					else if(ci_radio) {
+						//go through array	
+						for(x=0; x<len; x++) {
+							if(ci_radio[x].checked) {
+								//found the selected CI
+								//set the ils_request_id matching that CI
+								document.getElementById('ils_request_id').value = match_array[ci_radio[x].value];
+								//do not bother with anything else
+								return true;
+							}
+						}
+					}					
+				}
+				
+				return true;
+			}
+		</script>
+<?php
+			//now have to make sure that the hidden input field exists in the form
+			//just add it to the array of hidden info
+			$request['ils_request_id'] = null;
+
+			//display a list of courses - set override_staff to TRUE to show the list
+			//selected CI is the first KEY in an array of matches
+			self::displaySelectClass('storeRequest', $CIs, 'Select class for the requested item.', $request, true, 'ci', null, array_pop(array_keys($requests_matching_CIs)));
+			$msg = '<br /><br /><br />or if the class is not in the list, search for it:';
+?>
+		<script type="text/javascript">
+			//add the function call to the form as onsubmit event
+			if(document.getElementById('select_class')) {
+				document.getElementById('select_class').onsubmit = set_ils_request_id;
+			}
+		</script>
+<?php
+		}
+		else {
+			$msg = 'Select Class for the requested item.';
+		}
+		
+		//also give the lookup box - same method, just do not override staff (will display ajax box)
+		self::displaySelectClass('storeRequest', null, $msg, $request);
 	}
 }
 ?>

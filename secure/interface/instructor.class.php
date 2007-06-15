@@ -70,6 +70,24 @@ class instructor extends proxy
 
 		list($this->ils_user_id, $this->ils_name, $this->organization_status) = $rs->fetchRow();
 	}
+	
+	
+	public function getByILSUserID($ils_user_id) {
+		global $g_dbConn;
+		
+		if(empty($ils_user_id)) {
+			return false;
+		}
+		
+		//get user_id by ils_user_id
+		$sql = "SELECT user_id FROM instructor_attributes WHERE ils_user_id = '{$ils_user_id}'";
+		$rs = $g_dbConn->getOne($sql);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		//init object
+		return $this->getUserByID($rs);
+	}
+	
 
 	/**
 	* @return void

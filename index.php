@@ -189,22 +189,10 @@ switch ($cmd)
 	case 'storeRequest':
 	case 'deleteRequest':
 	case 'printRequest':
-		require_once("secure/managers/requestManager.class.php");
-		$mgr = new requestManager($cmd, $u, $ci, $_REQUEST);
-	break;
-
 	case 'addDigitalItem':
 	case 'addPhysicalItem':
-		if (!isset($_REQUEST['ci']))
-		{
-			//display ajax class select
-			$mgr = new ajaxManager();
-			$mgr->lookup('lookupClass', $cmd, 'addReserve', 'Select Class');
-		} else {
-			//add Physical Item
-			require_once("secure/managers/requestManager.class.php");
-			$mgr = new requestManager($cmd, $u, $ci, $_REQUEST);
-		}
+		require_once("secure/managers/requestManager.class.php");
+		$mgr = new requestManager($cmd, $u, $ci, $_REQUEST);
 	break;
 
 	case 'copyClass':

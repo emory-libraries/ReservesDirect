@@ -578,9 +578,10 @@ abstract class baseDisplayer {
 	 * @param boolean $override_staff If true, will override the staff default of showing AJAX class looking and will show a list of courses instead.
 	 * @param string $ci_variable name of html variable for selected ci
 	 * @param string $createClassLink link to create new class
+	 * @param int $selected_ci (optional) Value of CI to pre-select
 	 * @desc Displays class selector -- ajax for staff, list of classes for proxy/instructor
 	 */
-	public function displaySelectClass($next_cmd, $course_instances=null, $msg=null, $hidden_fields=null, $override_staff=false, $ci_variable='ci', $createClassLink=null) 
+	public function displaySelectClass($next_cmd, $course_instances=null, $msg=null, $hidden_fields=null, $override_staff=false, $ci_variable='ci', $createClassLink=null, $selected_ci=null) 
 	{
 		global $u, $g_permission;
 		
@@ -595,6 +596,10 @@ abstract class baseDisplayer {
 			$mgr->display();
 		} else {	//all others class select
 			//begin display
+			
+			
+		//WARNING
+		//if you add "onsubmit" to this form, requestDisplayer::displayCoursesForRequest() will break
 ?>
 		<form action="index.php" method="post" name="select_class" id="select_class">
 			<input type="hidden" id="cmd" name="cmd" value="<?=$next_cmd?>" />		
@@ -626,9 +631,10 @@ abstract class baseDisplayer {
 				$ci->getCourseForUser();	//fetch the course object
 				$ci->getInstructors();	//get a list of instructors
 				$rowClass = ($rowClass=='evenRow') ? 'oddRow' : 'evenRow';
+				$selected = ($ci->getCourseInstanceID()==$selected_ci) ? 'checked="true"' : '';
 ?>
 						<tr class="<?=$rowClass?>">
-							<td style="text-align:center;"><input type="radio" id="ci" name="<?= $ci_variable?>" value="<?=$ci->getCourseInstanceID()?>" onClick="this.form.submit.disabled=false;" /></td>
+							<td style="text-align:center;"><input type="radio" id="<?=$ci_variable?>" name="<?=$ci_variable?>" value="<?=$ci->getCourseInstanceID()?>" <?php echo $selected; ?> onClick="this.form.submit.disabled=false;" /></td>
 			    			<td><?=$ci->course->displayCourseNo()?></td>
 							<td><?=$ci->course->getName()?></td>
 							<td><?=$ci->displayTerm()?></td>

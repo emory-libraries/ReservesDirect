@@ -27,6 +27,7 @@ http://www.reservesdirect.org/
 *******************************************************************************/
 require_once("secure/common.inc.php");
 require_once("secure/classes/itemAudit.class.php");
+require_once("secure/classes/ils_request.class.php");
 require_once("secure/classes/users.class.php");
 require_once("secure/classes/zQuery.class.php");
 require_once("secure/displayers/requestDisplayer.class.php");
@@ -360,7 +361,16 @@ class requestManager
 					
 					//delete the reserve
 					$originally_requested_reserve->destroy();
-				}					
+				}
+
+				
+				//if a request came through ILS request feed AND we have processed it, delete it
+				if(!empty($_REQUEST['ils_request_id'])) {
+					$ils_request = new ILS_Request();
+					if($ils_request->getByID($_REQUEST['ils_request_id'])) {
+						$ils_request->deleteRow();
+					}
+				}
 
 				//show success screen
 
@@ -390,7 +400,7 @@ class requestManager
 			case 'processRequest':
 				global $ci;
 
-				$page = "manageClasses";
+				$page = "addReserve";
 				$loc  = "process request";
 				$msg = "";
 
@@ -454,8 +464,75 @@ class requestManager
 
 			case 'addDigitalItem':
 			case 'addPhysicalItem':
-				$page = "manageClasses";
+				$page = "addReserve";
 				$loc  = "add item";
+				
+				//if the main form has been submitted, then it's time to look up a class for the item
+				//should only be here if adding physical item 
+				if(isset($_REQUEST['store_request'])) {					
+					//array to store all CI objects that have matching instructors
+					$course_instances = array();
+					//not sure if this is necessary, but ignore duplicate users
+					$processed_ids = array();
+					//store CI_id-ils_request_id pairs for all matching courses
+					$requests_matching_CIs = array();
+										
+					foreach($_REQUEST['physical_copy'] as $phys_copy_raw_data) {
+						//pull physical copy info
+						$phys_item = unserialize(urldecode($phys_copy_raw_data));
+						
+						//init an ILS_Request object
+						//used to look up ils-user-IDs by barcode
+						$ils_request = new ILS_Request();
+						if($ils_request->getByBarcode($phys_item['bar'])) {
+							//not sure if this is necessary, but ignore duplicate users
+							$ils_user_id = $ils_request->getILSUserID();
+							if(!in_array($ils_user_id, $processed_ids)) {	//have not processed this one before
+								//init instructor object
+								$instructor = new instructor();
+								$instructor->getByILSUserID($ils_user_id);
+								//fetch and store CIs taught by this instructor
+								$instructor_CIs = $instructor->getCourseInstancesToEdit();
+								$course_instances = array_merge($course_instances, $instructor_CIs);
+								
+								//attempt to find the CI matching the requesting course
+								foreach($instructor_CIs as $instructor_CI) {
+									if($ils_request->doesCourseMatch($instructor_CI->getCourseInstanceID())) {
+										//store ILS request ID matching this CI
+										//need this to remove request from DB later
+										$requests_matching_CIs[$instructor_CI->getCourseInstanceID()] = $ils_request->getRequestID();
+									}
+								}
+																
+								//remember this ils-user-id
+								$processed_ids[] = $ils_user_id;
+								//free up memory
+								unset($instructor);
+								unset($instructor_CIs);
+							}
+						}
+						unset($ils_request);
+					}
+					
+					//also, if CI-id is already defined (i.e. "add another item to this class")
+					//then add that CI to the list
+					if(!empty($_REQUEST['ci']) && !array_key_exists($_REQUEST['ci'], $course_instances)) {
+						$course_instances[] = new courseInstance($_REQUEST['ci']);
+					}
+
+					//it's very important to pass on the current $_REQUEST
+					//otherwise all the reserve info will be lost
+					//however, we do not want the CMD var in there, because of clashing
+					unset($_REQUEST['cmd']);
+						
+					//display this list of CIs + lookup box
+					$this->displayFunction = 'displayCoursesForRequest';
+					$this->argList = array($course_instances, $_REQUEST, $requests_matching_CIs);
+					
+					//do not do any further processing
+					break;
+				}
+				
 
 				if (isset($_REQUEST['searchField']) && (isset($_REQUEST['searchTerm']) && ltrim(rtrim($_REQUEST['searchTerm'])) != ""))
 				{
@@ -506,10 +583,15 @@ class requestManager
 				} else 
 					$docTypeIcons = null;
 				
-				$this->displayFunction = 'addItem';			
+				$this->displayFunction = 'addItem';
+				
+				$hidden_fields = array('cmd'=>$cmd, 'previous_cmd'=>$cmd, 'selected_instr'=>$_REQUEST['selected_instr'], 'item_id'=>$item_id);
+				if(!empty($_REQUEST['ci'])) {
+					$hidden_fields['ci'] = $_REQUEST['ci'];
+				}
 						
 				//when form is sumbitted for save cmd is set to storeRequest its ugly but it works
-				$this->argList = array($user, $cmd, $search_results, $lib_list, null, $_REQUEST, array('cmd'=>$cmd, 'previous_cmd'=>$cmd, 'ci'=>$_REQUEST['ci'], 'selected_instr'=>$_REQUEST['selected_instr'], 'item_id'=>$item_id), $docTypeIcons);
+				$this->argList = array($user, $cmd, $search_results, $lib_list, null, $_REQUEST, $hidden_fields, $docTypeIcons);
 			break;
 		}
 	}
