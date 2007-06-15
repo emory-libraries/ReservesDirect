@@ -610,6 +610,26 @@ CREATE TABLE IF NOT EXISTS `hidden_readings` (
 -- --------------------------------------------------------
 
 -- 
+-- Table structure for table `ils_requests`
+-- 
+
+DROP TABLE IF EXISTS `ils_requests`;
+CREATE TABLE IF NOT EXISTS `ils_requests` (
+  `request_id` int(8) unsigned NOT NULL auto_increment,
+  `date_added` date default NULL,
+  `barcode` varchar(16) default NULL,
+  `user_net_id` varchar(16) default NULL,
+  `user_ils_id` varchar(16) default NULL,
+  `ils_course` varchar(150) default NULL,
+  PRIMARY KEY  (`request_id`),
+  KEY `barcode` (`barcode`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `inst_loan_periods`
 -- 
 
