@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 /*******************************************************************************
-config.xml.example
-sample XML configuration file
+XML configuration file
 
 Created by Jason White (jbwhite@emory.edu)
 
@@ -29,10 +28,10 @@ http://www.reservesdirect.org/
 -->
 <configuration>
     <authentication>
-        <type comment="OPTIONS: LDAP/StandAlone/ANY">ANY</type><!-- OPTIONS: LDAP, StandAlone, ANY -->
+        <type comment="OPTIONS: LDAP/StandAlone/ANY">ANY</type>
     </authentication>
 
-    <database>
+    <database comment="This information is required">
         <dbtype>mysql</dbtype>
         <username comment="Max length is 16 characters">CHANGEME</username>
         <pwd>CHANGEME</pwd>
@@ -44,7 +43,7 @@ http://www.reservesdirect.org/
     
     <catalog>
         <catalogName>CHANGEME</catalogName>
-        <useCatalog comment="OPTIONS: yes/no; all others may be blank if 'no'">yes</useCatalog> <!-- all others may be blank if no -->
+        <useCatalog comment="OPTIONS: yes/no; all others may be blank if 'no'">yes</useCatalog>
         <zhost>CHANGEME.example.edu</zhost>
         <zport>2200</zport>
         <zdb>Unicorn</zdb>
@@ -56,16 +55,16 @@ http://www.reservesdirect.org/
     </catalog>
 
     <ldap>
-        <ldapHost comment="host name or IP address of ldap server; 'localhost' if using stunnel">CHANGEME</ldapHost>                <!-- host name or IP address of ldap server; "localhost" if using stunnel -->
-        <ldapDomain comment="domain that holds ldap user accounts">CHANGEME.example.edu</ldapDomain>     <!-- domain that holds ldap user accounts -->
-        <ldapPort comment="'636' if connecting securely (ldaps), otherwise '389'">CHANGEME</ldapPort>                <!-- "636" if connecting securely (ldaps), otherwise "389" -->
-        <ldapVersion comment="ldap version, usually '3'">3</ldapVersion>                    <!-- ldap version, usually "3" -->
+        <ldapHost comment="host name or IP address of ldap server; 'localhost' if using stunnel">CHANGEME</ldapHost>
+        <ldapDomain comment="domain that holds ldap user accounts">CHANGEME.example.edu</ldapDomain>
+        <ldapPort comment="'636' if connecting securely (ldaps), otherwise '389'">CHANGEME</ldapPort>
+        <ldapVersion comment="ldap version, usually '3'">3</ldapVersion>
         <baseDistinguishedName>CHANGEME</baseDistinguishedName>
-        <userAttributes comment="attributes, if available, used to seed new user profile in RD">                    <!-- attributes, if available, used to seed new user profile in RD -->
-            <canonicalName comment="user's id (used to bind/authenticate)">CHANGEME</canonicalName>        <!-- user's id (used to bind/authenticate) -->
-            <email comment="email address (optional)">CHANGEME</email>                <!-- email address (optional) -->
-            <firstName comment="user's first name (optional)">CHANGEME</firstName>        <!-- user's first name (optional) -->
-            <lastName comment="user's last name (optional)">CHANGEME</lastName>                <!-- user's last name (optional) -->
+        <userAttributes comment="attributes, if available, used to seed new user profile in RD">
+            <canonicalName comment="user's id (used to bind/authenticate)">CHANGEME</canonicalName>
+            <email comment="email address (optional)">CHANGEME</email>
+            <firstName comment="user's first name (optional)">CHANGEME</firstName>
+            <lastName comment="user's last name (optional)">CHANGEME</lastName>
         </userAttributes>
     </ldap>    
     
@@ -77,8 +76,8 @@ http://www.reservesdirect.org/
     <adminEmail>webmaster@example.edu</adminEmail>
 
     <fax>
-        <directory comment="include trailing /">/var/www/html/CHANGEME/incoming/</directory>  <!-- include trailing / -->
-        <URL comment="include trailing /">http://CHANGEME.example.edu/CHANGEME/incoming/</URL>  <!-- include trailing / -->
+        <directory comment="include trailing /">/var/www/html/CHANGEME/incoming/</directory>
+        <URL comment="include trailing /">http://CHANGEME.example.edu/CHANGEME/incoming/</URL>
         <copyright>/var/www/CHANGEME/copyright.pdf</copyright>
         <log>/var/spool/hylafax/log/CHANGEME.log</log>
         <fax2pdf_bin>/CHANGEME/path/to/fax2pdf</fax2pdf_bin>
@@ -86,44 +85,29 @@ http://www.reservesdirect.org/
         <gs_bin>/CHANGEME/path/to/gs</gs_bin>
     </fax>
     
-    <documentDirectory comment="include trailing /">/var/www/html/CHANGEME/uploaded/</documentDirectory>  <!-- include trailing / -->
-    <documentURL comment="include trailing /">http://CHANGEME.example.edu/uploaded/</documentURL> <!-- include trailing / -->
+    <documentDirectory comment="include trailing /">/var/www/html/CHANGEME/uploaded/</documentDirectory>
+    <documentURL comment="include trailing /">http://CHANGEME.example.edu/uploaded/</documentURL>
     <documentCover>/var/www/CHANGEME/copyright.pdf</documentCover>  
 
     <copyrightNoticeURL>http://CHANGEME.example.edu/copyright.html</copyrightNoticeURL>
     
     <siteURL>https://CHANGEME.example.edu/CHANGEME/</siteURL>
 
-    <newUserEmail>
+    <newUserEmail comment="This is the message automatically sent to the user when a new account is created.">
         <subject>New Account Created</subject>
-        <msg>
-Welcome to ReservesDirect. A new account has been created
-for you, or your email address has been updated. ReservesDirect 
-allows you to access all of your course materials online. 
-For further assistance on how to use the system, click on
-the "Help" link, send an email to ?deskemail, or contact the 
-reserves staff at your home library.
+        <msg comment="Available variables: ?deskemail = ReservesDirect email address (`reservesEmail` above); ?url = ReservesDirect URL (`siteURL` above); ?username = login name of the user being addressed; ?password = password of the user being addressed.">
+Welcome to ReservesDirect. A new account has been created for you, or your email address has been updated. ReservesDirect allows you to access all of your course materials online. For further assistance on how to use the system, click on the "Help" link, send an email to ?deskemail, or contact the reserves staff at your home library.
 
-Your username is ?username . to log in, please visit:
-?url        
+Your username is ?username . to log in, please visit: ?url        
         </msg>
     </newUserEmail>
     
-    <specialUserEmail>
+    <specialUserEmail comment="This is the message automatically sent to the user when an override password is created.">
         <subject>Temporary Password Created</subject>
-        <msg>
-A temporary password has been created for you to log into the
-ReservesDirect system, presumably because your standard CHANGEME
-CHANGEME username and password are not working properly. This
-password will allow you to access the ReservesDirect system until your
-regular campus password is working again. To change your password once
-you log in, click on the "Edit Profile" link just under the
-ReservesDirect logo. If you believe you have received this message in
-error, or if you did not request your password to be changed, please
-send an email to ?deskemail.
+        <msg comment="Available variables: ?deskemail = ReservesDirect email address (`reservesEmail` above); ?url = ReservesDirect URL (`siteURL` above); ?username = login name of the user being addressed; ?password = password of the user being addressed.">
+A temporary password has been created for you to log into the ReservesDirect system. This password will allow you to access the ReservesDirect system until your normal means of loging in are restored. To change your password once you log in, click on the "Edit Profile" link just under the ReservesDirect logo. If you believe you have received this message in error, or if you did not request your password to be changed, please send an email to ?deskemail.
 
-Please log into ?url 
-as username ?username , password ?password
+Please log into ?url as username ?username , password ?password
         </msg>
     </specialUserEmail>
        
@@ -131,7 +115,7 @@ as username ?username , password ?password
     
     <EmailRegExp>^(.+)@(.+)$</EmailRegExp>
     
-    <no_javascript_msg>A scan of your computer shows that javascript is disabled, some features of ReservesDirect require javascript.\n Please contact CHANGEME at CHANGEME or CHANGEME@example.edu if you require assistance to enable javascript.</no_javascript_msg>
+    <no_javascript_msg>A scan of your computer shows that javascript is disabled, some features of ReservesDirect require javascript.</no_javascript_msg>
     
     <request_notifier>
         <last_run>1970-01-01</last_run>

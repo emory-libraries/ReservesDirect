@@ -95,8 +95,9 @@ Please visit http://reservesdirect.org for more information.
 		//check if simplexml is enabled
 		check_simplexml();
 		//check DOM		
-		check_dom();		
+		check_dom();
 		
+		echo '<br /><hr />';		
 		//go on to step 2 -- setting up config file	
 		setup_config();
 	}
@@ -414,7 +415,7 @@ Please visit http://reservesdirect.org for more information.
 			Before continuing to the next step, please make sure that:
 			<ol>
 				<li>the configuration XML file exists in a secure location</li>
-				<li>the HTTPD/PHP user has permissions to read this file</li>
+				<li>the HTTPd/PHP user has permissions to read this file</li>
 				<li>the absolute path to this file is stored in <tt>config_loc.in.php</tt> in your ReservesDirect directory</li>
 			</ol>
 			<form method="post">
@@ -428,6 +429,10 @@ Please visit http://reservesdirect.org for more information.
 			<form method="post" name="config_form">
 				<input type="hidden" name="step" value="two" />
 				<input type="hidden" name="config_loc" value="<?php echo $_REQUEST['config_loc']; ?>" />
+				
+				Please see documentation at <a href="http://reservesdirect.org">ReservesDirect.org</a> for help.
+				<p />
+				
 				<?php print_xml_as_form(simplexml_load_file($config_path)); ?>
 				<input type="submit" name="submit_config" value="Save" />
 			</form>
@@ -439,15 +444,18 @@ Please visit http://reservesdirect.org for more information.
 				<input type="hidden" name="step" value="two" />
 							
 				<h3>Configuration file location:</h3>					
-				<input type="text" size="40" name="config_loc" value="/path/to/secure-location/" />
+				<input type="text" size="40" name="config_loc" value="/path/to/secure-location/" /> <small><i>ex: /etc/reservesdirect/</i></small>
 				<br />
 				<small>
 					This should be the path of the directory where you want to save the ReservesDirect configuration file.  It is strongly recommended to place the configuration file outside of the document root of the web application.
 				</small>
 				<p />
-				* If you want the installer to handle file writing, please make sure the HTTPd user has write permissions to the directory you specified above AND <tt>config_loc.inc.php</tt> file in the ReservesDirect directory.
-				<br />
-				** If you want to save the configuration file by hand, just click the button.
+				** If you want the installer to handle file writing, please check the following:
+				<ul>
+					<li>The HTTPd user must have write permissions to the directory specified above</li>
+					<li>The HTTPd user must have write permissions to <tt>config_loc.inc.php</tt> file in the ReservesDirect directory</li>
+				</ul>
+				** If you wish to edit files manually, just click the button
 				<p />
 				<input type="submit" name="begin_setup" value="Create Configuration File" />
 			</form>
@@ -690,7 +698,7 @@ Please visit http://reservesdirect.org for more information.
 			echo '<legend>'.$sxmlObj->getName().'</legend>';
 			//print the comment
 			if(!empty($sxmlObj['comment'])) {
-				echo '<small>'.$sxmlObj['comment'].'</small><br />';
+				echo '<small><i>'.$sxmlObj['comment'].'</i></small><br />';
 			}
 			foreach($sxmlObj->children() as $child) {
 				print_xml_as_form($child, $path);
@@ -701,6 +709,9 @@ Please visit http://reservesdirect.org for more information.
 			echo '<br />'.$sxmlObj->getName().': ';
 			if(strlen($sxmlObj) > 100) {
 				echo '<br /><textarea rows="6" cols="75" name="xml['.$path.']">'.$sxmlObj.'</textarea>';
+				if(!empty($sxmlObj['comment'])) {
+					echo '<br />';
+				}
 			}
 			else {
 				echo '<input type="text" size="40" name="xml['.$path.']" value="'.$sxmlObj.'" />';
@@ -708,7 +719,7 @@ Please visit http://reservesdirect.org for more information.
 			
 			//print the comment
 			if(!empty($sxmlObj['comment'])) {
-				echo ' <small>'.$sxmlObj['comment'].'</small>';
+				echo ' <small><i>'.$sxmlObj['comment'].'</i></small>';
 			}
 		}
 		
@@ -733,7 +744,8 @@ Please visit http://reservesdirect.org for more information.
 		foreach($_REQUEST['xml'] as $node_xpath=>$node_value) {
 			$node = $xpath->query($node_xpath)->item(0);
 			if(!is_null($node) && ($node_value != $node->nodeValue)) {
-				$node->nodeValue = $node_value;
+				//trim the new value
+				$node->nodeValue = trim($node_value);
 			}
 		}
 		
@@ -812,6 +824,7 @@ Please visit http://reservesdirect.org for more information.
 			//print warning instead of error, because this is not fatal.
 			print_warning($err_msg);
 ?>
+		<br />
 		The installer was unable to save the configuration data.  Please save the following data in an XML file.  Do not forget to edit <tt>config_loc.inc.php</tt> file in the ReservesDirect directory to specify the configuration location.
 		<br />
 		<textarea rows="10" cols="100" wrap="off"><?php echo $config_xml_string; ?></textarea>
