@@ -734,10 +734,6 @@ class requestDisplayer extends noteDisplayer {
 		echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">Source / Year:</span></td>\n";
 		echo "					<td align=\"left\"><input name=\"source\" type=\"text\" size=\"50\" value=\"".$search_results['source']."\"> </td>\n";
 		echo "				</tr>\n";
-		
-		echo "				<tr><td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">ISBN:</span></td><td><input type=\"text\" size=\"15\" maxlength=\"13\" value=\"". $search_results['ISBN'] ."\" name=\"ISBN\" /></td></tr>\n";
-        echo "				<tr><td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">OCLC:</span></td><td><input type=\"text\" size=\"11\" maxlength=\"9\"  value=\"". $search_results['ISSN'] ."\" name=\"OCLC\" /></td></tr>\n";
-        echo "				<tr><td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><span class=\"strong\">ISSN:</span></td><td><input type=\"text\" size=\"10\" maxlength=\"8\"  value=\"". $search_results['OCLC'] ."\" name=\"ISSN\" /></td></tr>\n";
 
 		if (!is_null($docTypeIcons))
 		{
@@ -789,6 +785,21 @@ class requestDisplayer extends noteDisplayer {
 		</tr>
 		
 <?php
+		//show ISSN, ISBN, OCLC
+		echo "				<tr align=\"left\" valign=\"middle\" id=\"nonman_ISBN\">\n";
+		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">ISBN:</td>\n";
+		echo "					<td><input name=\"ISBN\" type=\"text\" size=\"15\" maxlength=\"13\" value=\"". $search_results['ISBN'] ."\" /></td>\n";
+		echo "				</tr>\n";
+
+		echo "				<tr align=\"left\" valign=\"middle\" id=\"nonman_ISSN\">\n";
+		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">ISSN:</td>\n";
+		echo "					<td><input name=\"ISSN\" type=\"text\" maxlength=\"8\" size=\"15\" value=\"". $search_results['ISSN'] ."\" /></td>\n";
+		echo "				</tr>\n";
+
+		echo "				<tr align=\"left\" valign=\"middle\" id=\"nonman_OCLC\">\n";
+		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">OCLC:</td>\n";
+		echo "					<td><input name=\"OCLC\" type=\"text\" maxlength=\"9\" size=\"15\" value=\"". $search_results['OCLC'] ."\" /></td>\n";
+		echo "				</tr>\n";		
 		
 		//only show this stuff for physical items
 		if( ($cmd == 'addPhysicalItem') || ($cmd == 'processRequest') ) {
@@ -797,24 +808,7 @@ class requestDisplayer extends noteDisplayer {
 			echo "				<tr align=\"left\" valign=\"middle\" id=\"nonman_barcode\">\n";
 			echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">Barcode:</td>\n";
 			echo "					<td><input name=\"barcode\" type=\"text\" size=\"15\" value=\"$barcode_value\"></td>\n";
-			echo "				</tr>\n";
-			
-			
-
-			echo "				<tr align=\"left\" valign=\"middle\" id=\"nonman_ISBN\">\n";
-			echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">ISBN:</td>\n";
-			echo "					<td><input name=\"ISBN\" type=\"text\" size=\"15\" maxlength=\"13\" /></td>\n";
-			echo "				</tr>\n";
-
-			echo "				<tr align=\"left\" valign=\"middle\" id=\"nonman_ISSN\">\n";
-			echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">ISSN:</td>\n";
-			echo "					<td><input name=\"ISSN\" type=\"text\" maxlength=\"8\" size=\"15\" /></td>\n";
-			echo "				</tr>\n";
-
-			echo "				<tr align=\"left\" valign=\"middle\" id=\"nonman_OCLC\">\n";
-			echo "					<td align=\"right\" bgcolor=\"#CCCCCC\" class=\"strong\">OCLC:</td>\n";
-			echo "					<td><input name=\"OCLC\" type=\"text\" maxlength=\"9\" size=\"15\" /></td>\n";
-			echo "				</tr>\n";					
+			echo "				</tr>\n";		
 						
 			
 			echo "				<tr align=\"left\" valign=\"middle\" id=\"nonman_control\">\n";

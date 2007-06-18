@@ -109,7 +109,7 @@ class zQuery
 
 	function parseToArray()
 	{
-		$search_results = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'volume_title'=>'', 'source'=>'', 'controlKey'=>'', 'personal_owner'=>null, 'physicalCopy'=>'');
+		$search_results = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'volume_title'=>'', 'source'=>'', 'controlKey'=>'', 'personal_owner'=>null, 'physicalCopy'=>'', 'OCLC'=>'', 'ISSN'=>'', 'ISBN'=>'');
 		$sXML = simplexml_load_string(rtrim(ltrim($this->xmlResults)));
 
 		//if (is_array($sXML->record->field) && !empty($sXML->record->field))
@@ -118,9 +118,36 @@ class zQuery
 			foreach ($sXML->record->field as $field) {
 			   switch ($field[@type])
 			   {
-						case '001':  // control Number
+					case '001':  // control Number
 			   			$search_results['controlKey'] = (string)$field;
+			   			
+			   			//also save this as OCLC w/o the letters
+			   			if(stripos((string)$field, 'ocm') !== false) {	//found 'ocm'
+			   				$search_results['OCLC'] = substr((string) $field, 3);	//strip off 'ocm'
+			   			}
+			   			elseif(stripos((string)$field, 'o') !== false) {	//did not find 'ocm', but found 'o'
+			   				$search_results['OCLC'] = substr((string) $field, 1);	//strip off 'o'
+			   			}
+			   			else {
+			   				$search_results['OCLC'] = (string)$field;	//just store the whole string
+			   			}
 			   		break;
+			   		
+					case '020':	// ISBN
+						foreach($field->subfield as $subfield) {
+							if((string)$subfield['type']=='a') {	//isbn = subfield type "a"
+								$search_results['ISBN'] = (string)$subfield;
+							}
+						}
+					break;
+					
+					case '022':	// ISSN
+						foreach($field->subfield as $subfield) {
+							if((string)$subfield['type']=='a') {	//issn = subfield type "a"
+								$search_results['ISSN'] = (string)$subfield;
+							}
+						}
+					break;
 
 			   		case '100':
 			   		case '110':
