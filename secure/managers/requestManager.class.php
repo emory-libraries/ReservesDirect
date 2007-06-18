@@ -411,47 +411,39 @@ class requestManager
 				//set ci so it will be displayed for user
 				$ci = new courseInstance($requestObj->courseInstanceID);
 				$ci->getPrimaryCourse();
-				if (isset($_REQUEST['searchField']) && (isset($_REQUEST['searchTerm']) && ltrim(rtrim($_REQUEST['searchTerm'])) != ""))
-				{
-					$zQry = new zQuery($_REQUEST['searchTerm'], $_REQUEST['searchField']);
-
-					//$sXML = $zQry->getResults();
-
-					//parse results into array
-					$search_results = $zQry->parseToArray();
-					$search_results['physicalCopy'] = $zQry->getHoldings($_REQUEST['searchField'], $_REQUEST['searchTerm']);
-				} else {
-					$pCopy = new physicalCopy();
-					$pCopy->getByItemID($item->getItemID());
-
-					list($qryValue, $qryField) = ($pCopy->getBarcode() != "" && !is_null($pCopy->getBarcode())) ? array($pCopy->getBarcode(), 'barcode') : array($item->getLocalControlKey(), 'control');
-
-					$zQry = new zQuery($qryValue, $qryField);
-					$search_results = $zQry->parseToArray();
-					//$search_results['physicalCopy'] = $zQry->getHoldings('control', $item->getLocalControlKey());
-					$search_results['physicalCopy'] = $zQry->getHoldings($qryField, $qryValue);
-
-//				} else ($item->getLocalControlKey() <> "") {
-//					$zQry = new zQuery($item->getLocalControlKey(), 'control');
-//					$search_results = $zQry->parseToArray();
-//					$search_results['physicalCopy'] = $zQry->getHoldings('control', $item->getLocalControlKey());
+				
+				//get item info
+				if(!empty($_REQUEST['searchTerm'])) {	//search info specified
+					$qryField = $_REQUEST['searchField'];
+					$qryValue = $_REQUEST['searchTerm'];
 				}
-
+				else {	//pull control number from DB
+					$qryField = 'control';
+					$qryValue = $item->getLocalControlKey();
+				}
+				
+				//query ILS
+				$zQry = new zQuery($qryValue, $qryField);
+				//parse results into array
+				$search_results = $zQry->parseToArray();
+				//get holdings
+				$search_results['physicalCopy'] = $zQry->getHoldings($_REQUEST['searchField'], $_REQUEST['searchTerm']);
+				
 				//we will pull item values from db if they exist otherwise default to searched values
-
-				$pre_value = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'source'=>'', 'notes'=>'', 'controlKey'=>'', 'personal_owner'=>null, 'physicalCopy'=>'');
-				$pre_values['title'] = ($item->getTitle() <> "") ? $item->getTitle() : $search_results['title'];
-				$pre_values['author'] = ($item->getAuthor() <> "") ? $item->getAuthor() : $search_results['author'];
-				$pre_values['edition'] = ($item->getVolumeEdition() <> "") ? $item->getVolumeEdition() : $search_results['edition'];
-				$pre_values['performer'] = ($item->getPerformer() <> "") ? $item->getPerformer() : $search_results['performer'];
-				$pre_values['volume_title'] = ($item->getVolumeTitle() <> "") ? $item->getVolumeTitle() : $search_results['volume_title'];
-				$pre_values['times_pages'] = ($item->getPagesTimes() <> "") ? $item->getPagesTimes() : $search_results['times_pages'];
-				$pre_values['source'] = ($item->getSource() <> "") ? $item->getSource() : $search_results['source'];
-				$pre_values['controlKey'] = ($item->getLocalControlKey() <> "") ? $item->getLocalControlKey() : $search_results['controlKey'];
-				$pre_values['personal_owner'] = $item->getPrivateUserID();
-				$pre_values['notes'] = $item->getNotes();
-
-				$pre_values['physicalCopy'] = $search_results['physicalCopy'];
+				$search_results['title'] = ($item->getTitle() <> "") ? $item->getTitle() : $search_results['title'];
+				$search_results['author'] = ($item->getAuthor() <> "") ? $item->getAuthor() : $search_results['author'];
+				$search_results['edition'] = ($item->getVolumeEdition() <> "") ? $item->getVolumeEdition() : $search_results['edition'];
+				$search_results['performer'] = ($item->getPerformer() <> "") ? $item->getPerformer() : $search_results['performer'];
+				$search_results['volume_title'] = ($item->getVolumeTitle() <> "") ? $item->getVolumeTitle() : $search_results['volume_title'];
+				$search_results['times_pages'] = ($item->getPagesTimes() <> "") ? $item->getPagesTimes() : $search_results['times_pages'];
+				$search_results['source'] = ($item->getSource() <> "") ? $item->getSource() : $search_results['source'];
+				$search_results['controlKey'] = ($item->getLocalControlKey() <> "") ? $item->getLocalControlKey() : $search_results['controlKey'];
+				$search_results['OCLC'] = ($item->getOCLC() <> "") ? $item->getOCLC() : $search_results['OCLC'];
+				$search_results['ISSN'] = ($item->getISSN() <> "") ? $item->getISSN() : $search_results['ISSN'];
+				$search_results['ISBN'] = ($item->getISBN() <> "") ? $item->getISBN() : $search_results['ISBN'];
+				$search_results['personal_owner'] = $item->getPrivateUserID();
+				$search_results['notes'] = $item->getNotes();		
+				$search_results['physicalCopy'] = $search_results['physicalCopy'];	
 
 				$isActive = ($reserve->getStatus() == 'ACTIVE' || $reserve->getStatus() == 'IN PROCESS') ? true : false;
 
@@ -459,7 +451,7 @@ class requestManager
 				$lib_list = $user->getLibraries();
 
 				$this->displayFunction = 'addItem';
-				$this->argList = array($user, $cmd, $pre_values, $lib_list, $requestObj->requestID, $_REQUEST, array('cmd'=>$cmd, 'previous_cmd'=>$cmd, 'ci'=>$ci->getCourseInstanceID(), 'request_id'=>$requestObj->requestID), null, $isActive, 'Process Item', $msg, $reserve->getRequestedLoanPeriod());
+				$this->argList = array($user, $cmd, $search_results, $lib_list, $requestObj->requestID, $_REQUEST, array('cmd'=>$cmd, 'previous_cmd'=>$cmd, 'ci'=>$ci->getCourseInstanceID(), 'request_id'=>$requestObj->requestID), null, $isActive, 'Process Item', $msg, $reserve->getRequestedLoanPeriod());
 			break;
 
 			case 'addDigitalItem':
@@ -534,40 +526,33 @@ class requestManager
 					break;
 				}
 				
-
-				if (isset($_REQUEST['searchField']) && (isset($_REQUEST['searchTerm']) && ltrim(rtrim($_REQUEST['searchTerm'])) != ""))
-				{
+				//search for item
+				if(!empty($_REQUEST['searchTerm'])) {
 					$zQry = new zQuery($_REQUEST['searchTerm'], $_REQUEST['searchField']);
-					//$sXML = $zQry->getResults();
-
 					//parse results into array
 					$search_results = $zQry->parseToArray();
 
 					//look for existing item in DB
 					$item = new reserveItem();
-					$item->getItemByLocalControl($search_results['controlKey']);										
-
-					if ($item->getItemID() != "")
-					{
-						$item_id = $item->getItemID();
-						$search_results = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'source'=>'', 'controlKey'=>'', 'personal_owner'=>null, 'notes'=>'', 'physicalCopy'=>'');
-						$search_results['title'] = ($item->getTitle() <> "") ? $item->getTitle() : "";
-						$search_results['author'] = ($item->getAuthor() <> "") ? $item->getAuthor() : "";
-						$search_results['edition'] = ($item->getVolumeEdition() <> "") ? $item->getVolumeEdition() : "";
-						$search_results['performer'] = ($item->getPerformer() <> "") ? $item->getPerformer() : "";
-						$search_results['volume_title'] = ($item->getVolumeTitle() <> "") ? $item->getVolumeTitle() : "";
-						$search_results['times_pages'] = ($item->getPagesTimes() <> "") ? $item->getPagesTimes() : "";
-						$search_results['source'] = ($item->getSource() <> "") ? $item->getSource() : "";
-						$search_results['controlKey'] = $item->getLocalControlKey();
-						$search_results['personal_owner'] = $item->getPrivateUserID();		
-						$search_results['notes'] = $item->getNotes();
-						$search_results['ISBN']	= $item->getISBN();
-						$search_results['ISSN']	= $item->getISSN();
-						$search_results['OCLC']	= $item->getOCLC();
-					} else {
-						$item_id = null;
-					}
-
+					if($item->getItemByLocalControl($search_results['controlKey'])) {
+						//we will pull item values from db if they exist otherwise default to searched values
+						$search_results['title'] = ($item->getTitle() <> "") ? $item->getTitle() : $search_results['title'];
+						$search_results['author'] = ($item->getAuthor() <> "") ? $item->getAuthor() : $search_results['author'];
+						$search_results['edition'] = ($item->getVolumeEdition() <> "") ? $item->getVolumeEdition() : $search_results['edition'];
+						$search_results['performer'] = ($item->getPerformer() <> "") ? $item->getPerformer() : $search_results['performer'];
+						$search_results['volume_title'] = ($item->getVolumeTitle() <> "") ? $item->getVolumeTitle() : $search_results['volume_title'];
+						$search_results['times_pages'] = ($item->getPagesTimes() <> "") ? $item->getPagesTimes() : $search_results['times_pages'];
+						$search_results['source'] = ($item->getSource() <> "") ? $item->getSource() : $search_results['source'];
+						$search_results['controlKey'] = ($item->getLocalControlKey() <> "") ? $item->getLocalControlKey() : $search_results['controlKey'];
+						$search_results['OCLC'] = ($item->getOCLC() <> "") ? $item->getOCLC() : $search_results['OCLC'];
+						$search_results['ISSN'] = ($item->getISSN() <> "") ? $item->getISSN() : $search_results['ISSN'];
+						$search_results['ISBN'] = ($item->getISBN() <> "") ? $item->getISBN() : $search_results['ISBN'];
+						$search_results['personal_owner'] = $item->getPrivateUserID();
+						$search_results['notes'] = $item->getNotes();		
+						$search_results['physicalCopy'] = $search_results['physicalCopy'];	
+					}			
+					
+					//get holdings
 					$search_results['physicalCopy'] = $zQry->getHoldings($_REQUEST['searchField'], $_REQUEST['searchTerm']);
 				} else {
 					$search_results = null;
@@ -590,7 +575,7 @@ class requestManager
 				if(!empty($_REQUEST['ci'])) {
 					$hidden_fields['ci'] = $_REQUEST['ci'];
 				}
-						
+;						
 				//when form is sumbitted for save cmd is set to storeRequest its ugly but it works
 				$this->argList = array($user, $cmd, $search_results, $lib_list, null, $_REQUEST, $hidden_fields, $docTypeIcons);
 			break;
