@@ -109,8 +109,8 @@ class item extends Notes {
 
 		$rs = $g_dbConn->getRow($sql, array($itemID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-	
-		if($rs->numRows() == 0) {
+
+		if(empty($rs)) {
 			return false;
 		}
 		else {
