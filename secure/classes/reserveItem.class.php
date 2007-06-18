@@ -68,8 +68,9 @@ class reserveItem extends item
 	{
 		global $g_dbConn;
 		
-		if(empty($itemID))
-			return;	//no ID	
+		if(empty($itemID)) {
+			return false;	//no ID	
+		}
 
 		switch ($g_dbConn->phptype)
 		{
@@ -82,26 +83,33 @@ class reserveItem extends item
 		$rs = $g_dbConn->getRow($sql, array($itemID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		
-		//pull the info
-		list($this->itemID, $this->title, $this->itemGroup, $this->lastModDate, $this->creationDate, $this->itemType, $this->author, $this->source, $this->volumeEdition, $this->pagesTimes, $this->performer, $this->localControlKey, $this->URL, $this->mimeTypeID, $this->homeLibraryID, $this->privateUserID, $this->volumeTitle, $this->itemIcon, $this->ISBN, $this->ISSN, $this->OCLC) = $rs;
+		if(empty($rs)) {
+			return false;
+		}
+		else {
+			//pull the info
+			list($this->itemID, $this->title, $this->itemGroup, $this->lastModDate, $this->creationDate, $this->itemType, $this->author, $this->source, $this->volumeEdition, $this->pagesTimes, $this->performer, $this->localControlKey, $this->URL, $this->mimeTypeID, $this->homeLibraryID, $this->privateUserID, $this->volumeTitle, $this->itemIcon, $this->ISBN, $this->ISSN, $this->OCLC) = $rs;
 				
-		//get the notes
-		$this->setupNotes('items', $this->itemID);
-		$this->fetchNotes();
+			//get the notes
+			$this->setupNotes('items', $this->itemID);
+			$this->fetchNotes();
+			
+			return true;
+		}
 	}
 	
 
 	/**
-	* @return void
+	* @return boolean
 	* @param string localControl
-	* @desc get item info from the database by localcontrolkey
+	* @desc get item info from the database by localcontrolkey; return TRUE on success, FALSE otherwise
 	*/
 	function getItemByLocalControl($local_control_key)
 	{
 		global $g_dbConn;
 		
 		if(empty($local_control_key))
-			return;	//no key
+			return false;	//no key
 		
 		switch($g_dbConn->phptype) {
 			default:	//mysql
@@ -109,11 +117,11 @@ class reserveItem extends item
 		}
 		
 		//query to get item ID
-		$rs = $g_dbConn->getOne($sql, array($local_control_key));
+		$rs = $g_dbConn->getOne($sql, $local_control_key);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		
+				
 		//get item by ID
-		$this->getItemByID($rs);
+		return $this->getItemByID($rs);
 	}
 		
 

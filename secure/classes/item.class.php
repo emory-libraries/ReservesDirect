@@ -93,6 +93,10 @@ class item extends Notes {
 	function getItemByID($itemID)
 	{
 		global $g_dbConn;
+			
+		if(empty($itemID)) {
+			return false;
+		}
 
 		switch ($g_dbConn->phptype)
 		{
@@ -105,12 +109,19 @@ class item extends Notes {
 
 		$rs = $g_dbConn->getRow($sql, array($itemID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+	
+		if($rs->numRows() == 0) {
+			return false;
+		}
+		else {
+			list($this->itemID, $this->title, $this->itemGroup, $this->lastModDate, $this->creationDate, $this->itemType) = $rs;
 
-		list($this->itemID, $this->title, $this->itemGroup, $this->lastModDate, $this->creationDate, $this->itemType) = $rs;
-
-		//get the notes
-		$this->setupNotes('items', $this->itemID);
-		$this->fetchNotes();
+			//get the notes
+			$this->setupNotes('items', $this->itemID);
+			$this->fetchNotes();
+			
+			return true;
+		}
 	}
 
 	/**
