@@ -213,6 +213,14 @@ Please visit http://reservesdirect.org for more information.
 			//commit this set
 			if($g_dbConn->provides('transactions')) { 
 				$g_dbConn->commit();
+				
+				//print some success messages;
+				if(isset($_REQUEST['create_db'])) {
+					print_success("Created <tt>{$config->database->dbname}</tt> database");
+				}
+				if(isset($_REQUEST['create_user'])) {
+					print_success("Granted access to <tt>{$config->database->username}</tt> user to database");
+				}
 			}
 						
 			//now need to reconnect and select the db (ideally would just select DB, but no such method)
@@ -241,6 +249,11 @@ Please visit http://reservesdirect.org for more information.
 			//commit this set
 			if($g_dbConn->provides('transactions')) { 
 				$g_dbConn->commit();
+				
+				//print success message
+				if(isset($_REQUEST['create_tables'])) {
+					print_success("Created ReservesDirect Tables");
+				}
 			}
 			
 			//disconnect and try to connect as RD user
@@ -565,7 +578,12 @@ Please visit http://reservesdirect.org for more information.
 		//open connection
 		$dbConn = DB::connect($dsn, $options);
 		if(DB::isError($dbConn)) {	//problem
-			print_step3_error('Could not connect to MySQL server: '.$dbConn->getMessage());
+			//default PEAR::DB error message sucks, construct a better one
+			$err_msg = "Could not connect to MySQL (<tt>{$dsn['phptype']}</tt>) server as <tt>{$dsn['username']}</tt>@<tt>{$dsn['hostspect']}</tt>";
+			//connecting to DB?
+			$err_msg .= $select_db ? ", selecting <tt>{$dsn['database']}</tt> database: " : ": ";
+			
+			print_step3_error($err_msg.$dbConn->getMessage());
 			die(-1);			
 		}
 		else {	//success
