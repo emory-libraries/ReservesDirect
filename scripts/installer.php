@@ -193,26 +193,29 @@ Please visit http://reservesdirect.org for more information.
 				$table_queries = parse_batch_sql(file_get_contents(RD_ROOT.'scripts/create_db.sql'), $mysql_int_version);				
 			}
 			
-			//attempt to use transactions
-			if($g_dbConn->provides('transactions')) {
-				$g_dbConn->autoCommit(false);
-			}
-			
 			//run the first set of queries
-			foreach($queries as $sql) {
-				$rs = $g_dbConn->query($sql);
-				if(DB::isError($rs)) {
-					print_step3_error('Problem executing query: '.$rs->getMessage());
-					if($g_dbConn->provides('transactions')) { 
-						$g_dbConn->rollback();
-					}
-					die(-1);
+			if(!empty($queries)) {
+				//attempt to use transactions
+				if($g_dbConn->provides('transactions')) {
+					$g_dbConn->autoCommit(false);
 				}
-			}
-			
-			//commit this set
-			if($g_dbConn->provides('transactions')) { 
-				$g_dbConn->commit();
+				
+				//execute statements
+				foreach($queries as $sql) {
+					$rs = $g_dbConn->query($sql);
+					if(DB::isError($rs)) {
+						print_step3_error('Problem executing query: '.$rs->getMessage());
+						if($g_dbConn->provides('transactions')) { 
+							$g_dbConn->rollback();
+						}
+						die(-1);
+					}
+				}
+				
+				//commit this set
+				if($g_dbConn->provides('transactions')) { 
+					$g_dbConn->commit();
+				}				
 				
 				//print some success messages;
 				if(isset($_REQUEST['create_db'])) {
@@ -222,33 +225,36 @@ Please visit http://reservesdirect.org for more information.
 					print_success("Granted access to <tt>{$config->database->username}</tt> user to database");
 				}
 			}
-						
+				
 			//now need to reconnect and select the db (ideally would just select DB, but no such method)
 			//will die w/ message on error
 			$g_dbConn->disconnect();
 			get_mysql_connection($config, $db_admin_username, $db_admin_pass, true);
 			
-			//attempt to use transactions
-			if($g_dbConn->provides('transactions')) {
-				$g_dbConn->autoCommit(false);
-			}
-			
 			//run table-creation queries
 			//WARNING: make sure DB has been selected before executing these!
-			foreach($table_queries as $sql) {
-				$rs = $g_dbConn->query($sql);
-				if(DB::isError($rs)) {
-					print_step3_error('Problem executing query: '.$rs->getMessage());
-					if($g_dbConn->provides('transactions')) { 
-						$g_dbConn->rollback();
-					}
-					die(-1);
+			if(!empty($table_queries)) {
+				//attempt to use transactions
+				if($g_dbConn->provides('transactions')) {
+					$g_dbConn->autoCommit(false);
 				}
-			}
-			
-			//commit this set
-			if($g_dbConn->provides('transactions')) { 
-				$g_dbConn->commit();
+
+				//execute statements	
+				foreach($table_queries as $sql) {
+					$rs = $g_dbConn->query($sql);
+					if(DB::isError($rs)) {
+						print_step3_error('Problem executing query: '.$rs->getMessage());
+						if($g_dbConn->provides('transactions')) { 
+							$g_dbConn->rollback();
+						}
+						die(-1);
+					}
+				}
+				
+				//commit this set
+				if($g_dbConn->provides('transactions')) { 
+					$g_dbConn->commit();
+				}
 				
 				//print success message
 				if(isset($_REQUEST['create_tables'])) {
