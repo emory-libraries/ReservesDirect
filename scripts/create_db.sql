@@ -954,7 +954,7 @@ DROP TABLE IF EXISTS `reports`;
 CREATE TABLE IF NOT EXISTS `reports` (
   `report_id` bigint(20) NOT NULL auto_increment,
   `title` varchar(255) NOT NULL default '',
-  `param_group` set('term','department','class','term_lib') default NULL,
+  `param_group` set('term','department','class','term_lib','term_dates') default NULL,
   `sql` text NOT NULL,
   `parameters` varchar(255) default NULL,
   `min_permissions` int(11) NOT NULL default '4',
