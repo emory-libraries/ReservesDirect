@@ -197,6 +197,68 @@ class reportDisplayer extends baseDisplayer {
 <?php    		
 			break;
 			
+	    	case 'term_dates':
+	    		//get array of all terms
+	    		$t = new terms();
+				$terms = $t->getTerms(true);
+?>
+	<tr>
+		<td colspan="2" valign="top">
+			<script type="text/javascript">
+				//define associative arrays indexed by term_id, containing begin and end dates
+				var term_begin_dates = {
+<?php
+			//need this so that we can string the rest w/ preceding comma
+			echo '"null":"null"';
+			foreach($terms as $term) {
+				echo ', "'.$term->getTermID().'":"'.$term->getBeginDate().'"';
+			}
+?>				
+				};
+				var term_end_dates = {
+<?php
+			//need this so that we can string the rest w/ preceding comma
+			echo '"null":"null"';
+			foreach($terms as $term) {
+				echo ', "'.$term->getTermID().'":"'.$term->getEndDate().'"';
+			}
+?>				
+				};
+				
+				function prefill_term_dates(term_id) {					
+					if(document.getElementById('begin_date')) {
+						document.getElementById('begin_date').value = term_begin_dates[term_id];
+					}
+					if(document.getElementById('end_date')) {
+						document.getElementById('end_date').value = term_end_dates[term_id];
+					}
+				}
+			</script>
+			
+			<form method="post" action="index.php">
+				<input type="hidden" name="reportID" value="<?=$report->getReportID()?>" />
+				<input type="hidden" name="cmd" value="viewReport" />
+				
+				<p />
+				<strong>Term:</strong>
+				<br />
+				<select name="term_id" onchange="javascript: prefill_term_dates(this.options[this.selectedIndex].value);">
+<?php		foreach($terms as $term): ?>
+					<option value="<?=$term->getTermID()?>"><?=$term->getTerm()?></option>
+<?php		endforeach; ?>
+				</select>
+				<p />
+				<strong>Dates (required):</strong>
+				<br />
+				<input type="text" id="begin_date" name="begin_date" size="10" maxlength="10" value="<?php echo $terms[0]->getBeginDate(); ?>" />&nbsp;to&nbsp;<input type="text" id="end_date" name="end_date" size="10" maxlength="10" value="<?php echo $terms[0]->getEndDate(); ?>" />&nbsp; (YYYY-MM-DD)
+				<p />
+				<input type="submit" name="submit" value="Generate Report" />
+			</form>
+		</td>
+	</tr>
+<?php 	    		
+	    	break;
+			
 			case 'class':
 				//generate class list for instructors
 				$class_list = $u->getCourseInstancesToEdit();				
