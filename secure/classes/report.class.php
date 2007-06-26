@@ -81,8 +81,8 @@ class cachedReport extends report {
 			if($this->isCacheable) {	//is this report cached?
 				$this->fetchCache();	//fetch cache data
 				
-				if($this->checkCache()) {	//if we have some valid cached data
-					return unserialize($this->cacheData);
+				if($this->checkCache() && (($cacheData = unserialize($this->cacheData)) !== false)) {	//if we have some valid cached data
+					return $cacheData;
 				}
 				else {	//need to refresh data
 					$data = parent::doQry();
