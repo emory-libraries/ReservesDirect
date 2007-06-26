@@ -991,7 +991,7 @@ CREATE TABLE IF NOT EXISTS `reports_cache` (
   `report_cache_id` bigint(20) NOT NULL auto_increment,
   `report_id` bigint(20) default NULL COMMENT 'foreign key -- `reports`',
   `params_cache` text,
-  `report_cache` text,
+  `report_cache` longtext,
   `last_modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (`report_cache_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
