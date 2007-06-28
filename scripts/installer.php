@@ -571,7 +571,7 @@ Please visit http://reservesdirect.org for more information.
 		);
 
 		//use Admin credentials, if provided
-		if(!empty($admin_user) && !empty($admin_pass)) {
+		if(!empty($admin_user)) {
 			$dsn['username'] = $admin_user;
 			$dsn['password'] = $admin_pass;
 		}
