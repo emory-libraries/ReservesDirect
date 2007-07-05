@@ -122,15 +122,8 @@ class zQuery
 			   			$search_results['controlKey'] = (string)$field;
 			   			
 			   			//also save this as OCLC w/o the letters
-			   			if(stripos((string)$field, 'ocm') !== false) {	//found 'ocm'
-			   				$search_results['OCLC'] = substr((string) $field, 3);	//strip off 'ocm'
-			   			}
-			   			elseif(stripos((string)$field, 'o') !== false) {	//did not find 'ocm', but found 'o'
-			   				$search_results['OCLC'] = substr((string) $field, 1);	//strip off 'o'
-			   			}
-			   			else {
-			   				$search_results['OCLC'] = (string)$field;	//just store the whole string
-			   			}
+			   			$search_results['OCLC'] = ereg_replace('ocm', '', (string) $field);		//strip off 'ocm' if it exists
+			   			$search_results['OCLC'] = ereg_replace('o', '', $search_results['OCLC']);	//failing that, strip off 'o'
 			   		break;
 			   		
 					case '020':	// ISBN
@@ -209,6 +202,10 @@ class zQuery
 	function getHoldings($keyType, $key)
 	{
 		global $g_holdingsScript;
+		
+		if(empty($key) || empty($keyType)) {
+			return null;
+		}
 
 		$rs = array();
 		

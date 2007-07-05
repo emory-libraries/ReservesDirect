@@ -50,7 +50,7 @@ class circRules
 			unset ($tmpArray);
 			$tmpArray['circRule'] = $row[0];
 			$tmpArray['alt_circRule'] = $row[1];
-			$tmpArray['default'] = ($row[2] == 'yes') ? 'selected' : '';
+			$tmpArray['default'] = ($row[2] == 'yes') ? 'selected="selected"' : '';
 
 			$cRules[$i] = $tmpArray;
 			$i++;
