@@ -147,7 +147,7 @@ class itemManager
 					$item->setSource($_REQUEST['source']);										
 					$item->setISBN($_REQUEST['ISBN']);
 					$item->setISSN($_REQUEST['ISSN']);
-					$item->setOCLC($_REQUEST['OCLC']);					
+					$item->setOCLC($_REQUEST['OCLC']);				
 					
 					//physical item data
 					if($item->isPhysicalItem()) {
@@ -158,6 +158,12 @@ class itemManager
 							//only set these if they were part of the form
 							if(isset($_REQUEST['barcode'])) $item->physicalCopy->setBarcode($_REQUEST['barcode']);
 							if(isset($_REQUEST['call_num'])) $item->physicalCopy->setCallNumber($_REQUEST['call_num']);							
+						}
+					}
+					else {	//digital item
+						//store created barcodes as `local-control-key` for digital items
+						if(!empty($_REQUEST['local_control_key'])) {
+							$item->setLocalControlKey($_REQUEST['local_control_key']);
 						}
 					}
 					
