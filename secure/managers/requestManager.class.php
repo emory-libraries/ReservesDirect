@@ -178,12 +178,12 @@ class requestManager
 							//get selected loan period
 							$circRule = unserialize(urldecode($_REQUEST['circRule']));
 							
-							$ils_results = '';	//store results of ils queries
-							
+							$ils_results = '<ul>';	//store results of ils queries
+												
 							//go through physical copies
-							foreach($_REQUEST['physical_copy'] as $phys_copy_raw_data) {
+							foreach($_REQUEST['physical_copy'] as $phys_copy_raw_data) {								
 								//the raw data is serialized and urlencoded, reverse the process
-								$phys_copy_raw_data = urldecode(unserialize($phys_copy_raw_data));
+								$phys_copy_raw_data = unserialize(urldecode($phys_copy_raw_data));
 								
 								//get an object
 								$physCopy = new physicalCopy();
@@ -211,8 +211,9 @@ class requestManager
 								//create ILS record
 								$ilsResult = $user->createILS_record($phys_copy_raw_data['bar'], $phys_copy_raw_data['copy'], $instructor->getILSUserID(), $item->getHomeLibraryID(), $ci->getTerm(), $circRule['circRule'], $circRule['alt_circRule'], $ci->getExpirationDate());
 								//store ilsResult for the future
-								$ils_results .= $ilsResult.'<br />';
-							}						
+								$ils_results .= '<li>'.$ilsResult.'</li>';
+							}
+							$ils_results .= '</ul>';						
 						}
 						
 						//process ILS requests (basically delete the ones that have been satisfied)
