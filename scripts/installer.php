@@ -321,7 +321,7 @@ Please visit http://reservesdirect.org for more information.
 				echo '<br />password: '.$password;
 			}
 			
-			echo '<p />For security purposes, DELETE THIS SCRIPT after you verify your ReservesDirect installation.<p />Also, do not forget to change permissions of <tt>'.RD_ROOT.'config_loc.inc.php<tt> and the directory of the config file to read-only.';
+			echo '<p />For security purposes:<ol><li>DELETE THIS SCRIPT after you verify your ReservesDirect installation.</li><li>Change permissions of <tt>'.RD_ROOT.'config_loc.inc.php<tt> to read-only for the HTTPd user</li><li>Change permissions of the directory of the config file to read-only for the HTTPd user</li>';
 		}
 		else {	//display initial form
 			//first make sure we have the SQL dump
