@@ -306,7 +306,7 @@ class requestManager
 			
 			case 'addDigitalItem':	//this case is for creating/editing digital items
 				$page = "addReserve";
-				$loc  = "create electronic item";
+				$loc  = "add electronic item";
 				
 				if(isset($_REQUEST['store_request'])) {	//form submitted, process item
 					//store item meta data
@@ -322,7 +322,7 @@ class requestManager
 				else {	//show edit-item form
 					//if searching for an item, get form pre-fill data
 					$item_data = $this->searchItem($cmd);
-					
+										
 					//pass on some info
 					$propagated_data = array();					
 					$propagated_data['cmd'] = $cmd;
@@ -494,7 +494,7 @@ class requestManager
 	 */
 	function searchItem($cmd) {
 		//create a blank array with all the needed indeces
-		$item_data = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'volume_title'=>'', 'source'=>'', 'controlKey'=>'', 'selected_owner'=>null, 'physicalCopy'=>null, 'OCLC'=>'', 'ISSN'=>'', 'ISBN'=>'', 'item_group'=>null, 'notes'=>null, 'home_library'=>null);
+		$item_data = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'volume_title'=>'', 'source'=>'', 'controlKey'=>'', 'selected_owner'=>null, 'physicalCopy'=>null, 'OCLC'=>'', 'ISSN'=>'', 'ISBN'=>'', 'item_group'=>null, 'notes'=>null, 'home_library'=>null, 'url'=>'', 'is_local_file'=>false);
 				
 		//decide if item info can be prefilled
 		$item = new reserveItem();
@@ -544,9 +544,9 @@ class requestManager
 				$item->getItemByLocalControl($search_results['controlKey']);
 			}
 
-//this is not needed at the moment, b/c do not want to show holdings for addPhysicalItem/processRequest
-//but that may change, so it's here, but commented
-$search_results['physicalCopy'] = null;
+			//this is not needed at the moment, b/c do not want to show holdings for addPhysicalItem/processRequest
+			//but that may change, so it's here, but commented
+			$search_results['physicalCopy'] = null;
 			//get holdings		
 			//$search_results['physicalCopy'] = $zQry->getHoldings($qryField, $qryValue);
 		}
@@ -572,10 +572,12 @@ $search_results['physicalCopy'] = null;
 		$item_data['home_library'] = $item->getHomeLibraryID();
 		$item_data['selected_owner'] = $item->getPrivateUserID();
 		$item_data['notes'] = $item->getNotes();
+		$item_data['url'] = $item->getURL();
+		$item_data['is_local_file'] = $item->isLocalFile();
 		$item_data['physicalCopy'] = $search_results['physicalCopy'];
 		
 		//pass on the item_id in case there was a valid DB record
-		$item_data['item_id'] = $item_id;
+		$item_data['item_id'] = $item->getItemID();
 		
 		return $item_data;
 	}
@@ -650,18 +652,18 @@ $search_results['physicalCopy'] = null;
 		
 		//if adding electronic item, need to process file or link
 		if(!$item->isPhysicalItem() && !empty($_REQUEST['documentType'])) {
-			//uploading a file
-			if($_REQUEST['documentType'] == 'DOCUMENT') {
+			if($_REQUEST['documentType'] == 'DOCUMENT') {	//uploading a file
 				$file = common_storeUploaded($_FILES['userFile'], $item->getItemID());														
 				$file_loc = $file['dir'] . $file['name'] . $file['ext'];
 				$item->setURL($file_loc);
 				$item->setMimeTypeByFileExt($file['ext']);
 			}
-			else {	//adding a URL
+			elseif($_REQUEST['documentType'] == 'URL') {	//adding a link
 				$item->setURL($_REQUEST['url']);
 			}
+			//else maintaining the same link; do nothing
 		}
-
+		
 		//return id of item
 		return $item->getItemID();	
 	}

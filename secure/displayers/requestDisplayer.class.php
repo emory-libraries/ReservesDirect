@@ -283,7 +283,7 @@ class requestDisplayer extends noteDisplayer {
 	
 	function addItem($cmd, $item_data, $hidden_fields=null) {
 		global $u, $g_permission, $g_notetype;
-				
+		
 		//for ease-of-use, define helper vars for determining digital/physical items
 		$isPhysical = ($cmd=='addPhysicalItem') ? true : false;
 		$isDigital = ($cmd=='addDigitalItem') ? true : false;
@@ -393,8 +393,6 @@ class requestDisplayer extends noteDisplayer {
 		<form action="index.php" method="post" id="additem_form" name="additem_form"<?=$form_enctype?>>
 		
 			<?php self::displayHiddenFields($hidden_fields); ?>
-
-		<div class="headingCell1" style="width:25%; text-align:center;">Item Source</div>
 		
 <?php	if($isPhysical):	//physical items; show ILS search fields ?>
 
@@ -464,7 +462,8 @@ class requestDisplayer extends noteDisplayer {
 				}
 			}
 		</script>
-
+		
+		<div class="headingCell1" style="width:25%; text-align:center;">Item Source</div>
 		<table width="100%" border="0" cellpadding="3" cellspacing="0" class="borders">
 			<tr bgcolor="#CCCCCC">
 				<td width="20%" align="left" valign="middle">
@@ -516,6 +515,67 @@ class requestDisplayer extends noteDisplayer {
 				}
 			}
 		</script>
+		
+		<div class="headingCell1" style="width:25%; text-align:center;">Search</div>
+		<div class="borders" style="background-color:#CCCCCC; padding:5px;">
+			<input type="hidden" name="searchField" value="control" />
+			<strong>Barcode:</strong>
+			<input type="text" name="searchTerm" value="<?=$_REQUEST['searchTerm']?>" />
+			&nbsp; <input type="submit" value="Search" onclick="this.form.cmd.value='<?=$cmd?>';" / >
+		</div>
+		<br />
+		
+		<div class="headingCell1" style="width:25%; text-align:center;">Item Source</div>
+		
+<?php		if(!empty($item_data['item_id'])):	//if editing digital item ?>
+		
+		<script type="text/javascript">
+			var currentItemSourceOptionID;
+				
+			function toggleItemSourceOptions(option_id) {
+				if(document.getElementById(currentItemSourceOptionID)) {
+					document.getElementById(currentItemSourceOptionID).style.display = 'none';
+				}
+				if(document.getElementById(option_id)) {
+					document.getElementById(option_id).style.display = '';
+				}
+				
+				currentItemSourceOptionID = option_id;
+			}
+		</script>
+		
+		<div id="item_source" class="borders" style="padding:8px 8px 12px 8px; background-color:#CCCCCC;">
+			<div style="overflow:auto;" class="strong">
+				Current URL <small>[<a href="reservesViewer.php?item=<?=$item_data['item_id']?>" target="_blank">Preview</a>]</small>: 
+<?php		if($item_data['is_local_file']): //local file ?>
+				Local File &ndash; <em><?=$item_data['url']?></em>
+<?php		else: //remote file - show link to everyone ?>
+				<em><?=$item_data['url']?></em>
+<?php		endif; ?>
+			</div>
+			<small>
+				Please note that items stored on the ReservesDirect server are access-restricted; use the Preview link to view the item.
+				<br />
+				To overwrite this URL, use the options below.
+			</small>
+			<p />
+			<div>
+				<input type="radio" name="documentType" value="" checked="checked" onclick="toggleItemSourceOptions('');" /> Maintain current URL &nbsp;
+				<input type="radio" name="documentType" value="DOCUMENT" onclick="toggleItemSourceOptions('item_source_upload');" /> Upload new file &nbsp;
+				<input type="radio" name="documentType" value="URL" onclick="toggleItemSourceOptions('item_source_link');" /> Change URL
+			</div>
+			<div style="margin-left:40px;">
+				<div id="item_source_upload" style="display:none;">
+					<input type="file" name="userFile" size="50" />
+				</div>
+				<div id="item_source_link" style="display:none;">
+					<input name="url" type="text" size="50" />
+					<input type="button" onclick="openNewWindow(this.form.url.value, 500);" value="Preview" />
+				</div>
+			</div>
+		</div>	
+
+<?php		else:	//new digital item ?>		
 
 		<table width="100%" border="0" cellpadding="3" cellspacing="0" bgcolor="#CCCCCC" class="borders">
 			<tr>
@@ -537,8 +597,11 @@ class requestDisplayer extends noteDisplayer {
 				</td>
 			</tr>
 		</table>
-		
-<?php	endif; ?>
+
+<?php		
+			endif;
+		endif;
+?>
 
 		<br />
 		<div class="headingCell1" style="width:25%; text-align:center;">Item Details</div>
