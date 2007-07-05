@@ -596,10 +596,6 @@ abstract class baseDisplayer {
 			$mgr->display();
 		} else {	//all others class select
 			//begin display
-			
-			
-		//WARNING
-		//if you add "onsubmit" to this form, requestDisplayer::displayCoursesForRequest() will break
 ?>
 		<form action="index.php" method="post" name="select_class" id="select_class">
 			<input type="hidden" id="cmd" name="cmd" value="<?=$next_cmd?>" />		
