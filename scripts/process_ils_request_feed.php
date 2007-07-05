@@ -27,7 +27,14 @@
 				$data = explode('|', $line);
 
 				//build insert statement
-				$sql = "INSERT INTO ils_requests (date_added, ils_request_id, barcode, user_net_id, user_ils_id, ils_course) VALUES (NOW(), '".trim($data[0])."', '".trim($data[3])."', '".trim($data[5])."', '".trim($data[6])."', '".trim($data[8])."')";		
+				//whether or not one of the fields gets populated depends on one of the variables in the feed
+				if((stripos($data[1], 'WRSRV_BOTH') !== false) && !empty($data[11])) {	//should have requested loan period
+					$sql = "INSERT INTO ils_requests (date_added, ils_request_id, ils_control_key, user_ils_id, user_net_id, ils_course, requested_loan_period) VALUES (NOW(), '".trim($data[0])."', '".trim($data[4])."', '".trim($data[5])."', '".trim($data[6])."', '".trim($data[8])."', '".trim($data[11])."')";	
+				}
+				else {	//no loan period info
+					$sql = "INSERT INTO ils_requests (date_added, ils_request_id, ils_control_key, user_ils_id, user_net_id, ils_course) VALUES (NOW(), '".trim($data[0])."', '".trim($data[4])."', '".trim($data[5])."', '".trim($data[6])."', '".trim($data[8])."')";
+				}
+				
 				//query
 				$rs = $g_dbConn->query($sql);
 				if(DB::isError($rs)) {
