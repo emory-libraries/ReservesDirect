@@ -29,42 +29,21 @@ http://www.reservesdirect.org/
 class ILS_Request {
 	private $request_id;
 	private $date_added;
-	private $barcode;
+	private $ils_control_key;
 	private $user_net_id;
 	private $user_ils_id;
-	private $ils_course;	
+	private $ils_course;
+	private $requested_loan_period;	
 	
 	
 	/**
-	 * Constructor - does NOT init object from DB
+	 * Constructor - Initializes object by request_id, if provided
+	 * 
+	 * @param int $request_id (optional)
 	 */
-	function __construct() {}
-	
-	
-	/**
-	 * Initializes object based on barcode; returns TRUE on success, FALSE on failure
-	 *
-	 * @param string $barcode
-	 * @return boolean
-	 */
-	function getByBarcode($barcode) {
-		global $g_dbConn;
-		
-		if(empty($barcode)) {
-			return false;
-		}
-		
-		$sql = "SELECT request_id, date_added, barcode, user_net_id, user_ils_id, ils_course
-				FROM ils_requests WHERE barcode = ?";
-		$rs = $g_dbConn->query($sql, $barcode);
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		if($rs->numRows() > 0) {		
-			list($this->request_id, $this->date_added, $this->barcode, $this->user_net_id, $this->user_ils_id, $this->ils_course) = $rs->fetchRow();
-			return true;
-		}
-		else {
-			return false;
+	function __construct($request_id=null) {
+		if(!empty($request_id)) {
+			$this->getByID($request_id);
 		}
 	}
 	
@@ -82,13 +61,13 @@ class ILS_Request {
 			return false;
 		}
 		
-		$sql = "SELECT request_id, date_added, barcode, user_net_id, user_ils_id, ils_course
+		$sql = "SELECT request_id, date_added, ils_control_key, user_net_id, user_ils_id, ils_course, requested_loan_period
 				FROM ils_requests WHERE request_id = !";
 		$rs = $g_dbConn->query($sql, $request_id);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
-		if($rs->numRows() > 0) {		
-			list($this->request_id, $this->date_added, $this->barcode, $this->user_net_id, $this->user_ils_id, $this->ils_course) = $rs->fetchRow();
+		if($rs->numRows() > 0) {
+			list($this->request_id, $this->date_added, $this->ils_control_key, $this->user_net_id, $this->user_ils_id, $this->ils_course, $this->requested_loan_period) = $rs->fetchRow();
 			return true;
 		}
 		else {
@@ -96,6 +75,36 @@ class ILS_Request {
 		}
 	}
 	
+	
+	/**
+	 * Retrieves rows matching on control key; Returns array of ILS_Request objects
+	 *
+	 * @param string $control_key
+	 * @return array
+	 */
+	function getRequestsByControlKey($control_key) {
+		global $g_dbConn;
+		
+		if(empty($control_key)) {
+			return array();
+		}
+		
+		//most control keys in DB have 'ocm' prefix, but the ils keys have 'o' prefix
+		$control_key = eregi_replace('ocm', 'o', trim($control_key));
+		
+		$sql = "SELECT request_id
+				FROM ils_requests WHERE ils_control_key = ?";
+		$rs = $g_dbConn->query($sql, $control_key);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+		$ils_requests = array();
+		while($row = $rs->fetchRow()) {
+			$ils_requests[] = new ILS_Request($row[0]);
+		}
+		
+		return $ils_requests;
+	}
+
 	
 	/**
 	 * Checks whether dept + course# provided in the feed match any aliases of the supplied CI
@@ -158,8 +167,26 @@ class ILS_Request {
 	 *
 	 * @return string
 	 */
-	function getILSUserID() {
+	function getUserILSID() {
 		return $this->user_ils_id;
+	}
+	
+	
+	function getUserNetID() {
+		return $this->user_net_id;
+	}
+	
+	function getCourseName() {
+		return $this->ils_course;
+	}
+	
+	/**
+	 * Returns requested loan period
+	 *
+	 * @return string
+	 */
+	function getRequestedLoanPeriod() {
+		return $this->requested_loan_period;
 	}
 }
 

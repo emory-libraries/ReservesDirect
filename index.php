@@ -185,7 +185,6 @@ switch ($cmd)
 	break;
 
 	case 'displayRequest':
-	case 'processRequest':
 	case 'storeRequest':
 	case 'deleteRequest':
 	case 'printRequest':

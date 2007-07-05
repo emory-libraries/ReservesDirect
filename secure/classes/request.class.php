@@ -97,7 +97,7 @@ class request
 	}
 
 	/**
-	* @return void
+	* @return boolean TRUE on success; FALSE on failure
 	* @param id $requestID
 	* @desc get data by id
 	*/
@@ -105,6 +105,10 @@ class request
 	{
 		global $g_dbConn;
 
+		if(empty($requestID)) {
+			return false;
+		}
+		
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
@@ -117,7 +121,13 @@ class request
 		$rs = $g_dbConn->query($sql, $requestID);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
-		list($this->requestID, $this->reserveID, $this->requestedItemID, $this->requestingUserID, $this->requestedDate, $this->processedDate, $this->desiredDate, $this->priority, $this->courseInstanceID) = $rs->fetchRow();
+		if($rs->numRows()==0) {
+			return false;
+		}
+		else {
+			list($this->requestID, $this->reserveID, $this->requestedItemID, $this->requestingUserID, $this->requestedDate, $this->processedDate, $this->desiredDate, $this->priority, $this->courseInstanceID) = $rs->fetchRow();
+			return true;
+		}
 	}
 
 	/**
@@ -148,6 +158,60 @@ class request
 			list($this->requestID, $this->reserveID, $this->requestedItemID, $this->requestingUserID, $this->requestedDate, $this->processedDate, $this->desiredDate, $this->priority, $this->courseInstanceID) = $rs;
 		}
 	}
+
+
+	/**
+	 * Initializes request object, based on CI ID and Item ID
+	 * 
+	 * @param int $ci_id CI ID
+	 * @param int $item_id Item ID
+	 * @return boolean TRUE on success, FALSE otherwise
+	 */
+	function getRequestByCI_Item($ci_id, $item_id) {
+		global $g_dbConn;
+
+		if(empty($ci_id) || empty($item_id)) {
+			return false;
+		}
+
+		$sql = "SELECT request_id FROM requests WHERE course_instance_id=? AND item_id=?";
+		$rs = $g_dbConn->getOne($sql, array($ci_id, $item_id));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+		if(empty($rs)) {
+			return false;
+		}
+		else {
+			return $this->getRequestByID($rs);
+		}
+	}
+	
+	
+	/**
+	 * Retrieves all requests matching the item ID and returns as array of request objects
+	 *
+	 * @param int $item_id Item ID to match
+	 * @return array
+	 */
+	function getRequestsByItem($item_id) {
+		global $g_dbConn;
+		
+		if(empty($item_id)) {
+			return array();
+		}
+		
+		$sql = "SELECT request_id FROM requests WHERE item_id = ? AND date_processed IS NULL";
+		$rs = $g_dbConn->query($sql, $item_id);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		$requests = array();
+		while($row = $rs->fetchRow()) {
+			$requests[] = new request($row[0]);
+		}
+		
+		return $requests;
+	}
+	
 	
 	function getHoldings()
 	{
@@ -330,7 +394,11 @@ class request
 	function getDesiredDate() { return $this->desiredDate; }
 	function getRequestedItem()  { $this->requestedItem = new reserveItem($this->requestedItemID); }
 	function getRequestingUser() { $this->requestingUser = new user($this->requestingUserID); }
-	function getCourseInstance() { $this->courseInstance = new courseInstance($this->courseInstanceID); }
+	function getCourseInstance() { 
+		$this->courseInstance = new courseInstance($this->courseInstanceID); 
+		return $this->courseInstance;
+	}
+	function getCourseInstanceID() { return $this->courseInstanceID; }
 	function getReserve(){ $this->reserve = new reserve($this->reserveID); }
 	function getPrority() { $this->priority; }
 
