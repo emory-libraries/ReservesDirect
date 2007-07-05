@@ -1025,9 +1025,13 @@ class courseInstance
 						
 						//create request
 						$req = new request();
-						$req->createNewRequest($target_ci->getCourseInstanceID(), $src_reserve->getItemID());
-						$req->setRequestingUser($target_ci->instructorIDs[0]);
-						$req->setReserveID($reserve->getReserveID());
+						//make sure request does not exist
+						//prevent duplicate requests
+						if($req->getRequestByCI_Item($target_ci->getCourseInstanceID(), $src_reserve->getItemID()) === false) {
+							$req->createNewRequest($target_ci->getCourseInstanceID(), $src_reserve->getItemID());
+							$req->setRequestingUser($target_ci->instructorIDs[0]);
+							$req->setReserveID($reserve->getReserveID());
+						}
 					}
 				}
 				//use this as the parent_id for any children
@@ -1150,10 +1154,15 @@ class courseInstance
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 
-	function displayInstructors() {
+	function displayInstructors($add_emails=false) {
 		$retValue = '';
 		foreach($this->instructorList as $instr) {
-			$retValue .= $instr->getName(false).', ';
+			if($add_emails) {
+				$retValue .= '<a href="mailto:'.$instr->getEmail().'">'.$instr->getName(false).'</a>, ';
+			}
+			else {
+				$retValue .= $instr->getName(false).', ';
+			}
 		}
 		$retValue = rtrim($retValue, ', ');	//trim the last comma
 		return empty($retValue) ? "None" : $retValue;

@@ -346,9 +346,13 @@ class reservesManager
 
 							//create request
 							$request = new request();
-							$request->createNewRequest($ci->getCourseInstanceID(), $i_id);
-							$request->setRequestingUser($user->getUserID());
-							$request->setReserveID($reserve->getReserveID());
+							//make sure request does not exist
+							//prevent duplicate requests
+							if($req->getRequestByCI_Item($ci->getCourseInstanceID(), $i_id) === false) {
+								$request->createNewRequest($ci->getCourseInstanceID(), $i_id);
+								$request->setRequestingUser($user->getUserID());
+								$request->setReserveID($reserve->getReserveID());
+							}
 						}
 					}
 				}

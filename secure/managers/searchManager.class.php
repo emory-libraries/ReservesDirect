@@ -170,9 +170,13 @@ class searchManager
 	
 								//create request
 								$req = new request();
-								$req->createNewRequest($ci->getCourseInstanceID(), $i_id);
-								$req->setRequestingUser($user->getUserID());
-								$req->setReserveID($reserve->getReserveID());
+								//make sure request does not exist
+								//prevent duplicate requests
+								if($req->getRequestByCI_Item($ci->getCourseInstanceID(), $i_id) === false) {
+									$req->createNewRequest($ci->getCourseInstanceID(), $i_id);
+									$req->setRequestingUser($user->getUserID());
+									$req->setReserveID($reserve->getReserveID());
+								}
 							}
 						}
 					}
