@@ -617,12 +617,14 @@ DROP TABLE IF EXISTS `ils_requests`;
 CREATE TABLE IF NOT EXISTS `ils_requests` (
   `request_id` int(8) unsigned NOT NULL auto_increment,
   `date_added` date default NULL,
-  `barcode` varchar(16) default NULL,
+  `ils_request_id` varchar(16) default NULL,
+  `ils_control_key` varchar(16) default NULL,
   `user_net_id` varchar(16) default NULL,
   `user_ils_id` varchar(16) default NULL,
   `ils_course` varchar(150) default NULL,
+  `requested_loan_period` varchar(16) default NULL,
   PRIMARY KEY  (`request_id`),
-  KEY `barcode` (`barcode`)
+  UNIQUE KEY `ils_request_id` (`ils_request_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 
