@@ -202,7 +202,7 @@ class reserve extends Notes {
 		switch ($g_dbConn->phptype) {
 			default:	//'mysql'
 				//insert item data
-				$sql_item = "INSERT INTO items (title, author, source, volume_title, volume_edition, pages_times, performer, local_control_key, creation_date, last_modified, url, mimetype, home_library, private_user_id, item_group, item_type, item_icon) VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?, ?, ?, ?, ?, ?)";
+				$sql_item = "INSERT INTO items (title, author, source, volume_title, volume_edition, pages_times, performer, local_control_key, creation_date, last_modified, url, mimetype, home_library, private_user_id, item_group, item_type, item_icon) VALUES (?, ?, ?, ?, ?, ?, ?, NULL, NOW(), NOW(), NULL, ?, ?, ?, ?, ?, ?)";
 			
 				//insert reserve data
 				$sql_reserve = "INSERT INTO reserves (course_instance_id, item_id, activation_date, expiration, status, sort_order, date_created, last_modified, requested_loan_period, parent_id) VALUES (!, !, ?, ?, 'INACTIVE', ?, NOW(), NOW(), ?, ?)";
@@ -219,6 +219,7 @@ class reserve extends Notes {
 		
 		$this->getItem();	//fetch data
 		//build array of data to insert
+		//do not copy URL and local_control_key as an attempt to keep down the number of duplicate items
 		$data = array(
 					$this->item->title.' (Duplicate)',
 					$this->item->author,
@@ -227,8 +228,6 @@ class reserve extends Notes {
 					$this->item->volumeEdition,
 					$this->item->pagesTimes,
 					$this->item->performer,
-					$this->item->localControlKey,
-					$this->item->URL,
 					$this->item->mimeTypeID,
 					$this->item->homeLibraryID,
 					$this->item->privateUserID,
