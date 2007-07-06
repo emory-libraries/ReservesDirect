@@ -33,7 +33,8 @@ session_start();
 //
 
 //if trying to initiate debugging mode, save that request to session
-if(!isset($_SESSION['debug']) && isset($_REQUEST['debug'])) $_SESSION['debug'] = true; 
+if(!isset($_SESSION['debug']) && isset($_REQUEST['debug'])) $_SESSION['debug'] = true;
+if(isset($_SESSION['debug']) && isset($_REQUEST['nodebug'])) unset($_SESSION['debug']);
 //if debug-mode is set in session
 if(isset($_SESSION['debug'])) {
 	error_reporting(E_ALL);	//report all errors
