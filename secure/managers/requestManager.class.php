@@ -128,109 +128,18 @@ class requestManager
 				//at the very least should have CI and item
 				if(!empty($ci_id) && !empty($item_id)) {
 					if(isset($_REQUEST['submit_store_item'])) {	//submitted info needed to create reserve
-						//get an unitialized reserves object
-						$reserve = new reserve();
-						$item = new reserveItem($item_id);
-						
-						//attempt to find a reserve
-						if(!empty($_REQUEST['rd_request'])) {	//if there is a request, grab reserve from request
-							$rd_request = new request($_REQUEST['rd_request']);
-							$reserve->getReserveByID($rd_request->getReserveID());
-							
-							//set the request as processed
-							$rd_request->setDateProcessed(date('Y-m-d'));
-							
-							//done with RD request - free memory
-							unset($rd_request);
-						}
-						elseif($reserve->getReserveByCI_Item($ci_id, $item_id) === false) {	//if not, try to find existing reserve
-							//if querying old reserve returns nothing, create new
-							$reserve->createNewReserve($ci_id, $item_id);
-							
-							//attempt to set a sort order for the reserve
-							//only need to do this for a newly created reserve
-							$reserve->insertIntoSortOrder($ci->getCourseInstanceID(), $item->getTitle(), $item->getAuthor());
-						}
-						
-						//set dates
-						$reserve->setActivationDate($_REQUEST['reserve_activation_date']);
-						$reserve->setExpirationDate($_REQUEST['reserve_expiration_date']);
-						//set status
-						$reserve->setStatus($_REQUEST['reserve_status']);
-						
-						//done for digital items
-						//the rest is for physical items
-						
-						//init a few vars so that php does not complain about uninitialized variables
-						$instructor = $ils_results = null;
-						
-						//create physical copy records if needed
-						//set up ILS records if needed
-						if(isset($_REQUEST['create_ils_record']) && !empty($_REQUEST['physical_copy'])) {
-							//need an instructor object
-							$ci = new courseInstance($ci_id);
-							$ci->getInstructors();
-							$instructor = $ci->instructorList[0];
-														
-							//grab instructor ILS info
-							$instructor->getInstructorAttributes();
-							
-							//get selected loan period
-							$circRule = unserialize(urldecode($_REQUEST['circRule']));
-							
-							$ils_results = '<ul>';	//store results of ils queries
-												
-							//go through physical copies
-							foreach($_REQUEST['physical_copy'] as $phys_copy_raw_data) {								
-								//the raw data is serialized and urlencoded, reverse the process
-								$phys_copy_raw_data = unserialize(urldecode($phys_copy_raw_data));
-								
-								//get an object
-								$physCopy = new physicalCopy();
-								//make sure the record does not already exist
-								if(!$physCopy->getByBarcode($phys_copy_raw_data['bar'])) {
-									//create a new record
-									$physCopy->createPhysicalCopy();
-									
-									//add data
-									$physCopy->setItemID($item->getItemID());
-									$physCopy->setBarcode($phys_copy_raw_data['bar']);
-									$physCopy->setCallNumber($phys_copy_raw_data['callNum']);
-									$physCopy->setStatus($phys_copy_raw_data['loc']);
-									$physCopy->setItemType($phys_copy_raw_data['type']);
-									$physCopy->setOwningLibrary($phys_copy_raw_data['library']);
-									
-									//check personal item owner
-									$private_owner_id = $item->getPrivateUserID();
-									if(!empty($private_owner_id)) {
-										$physCopy->setOwnerUserID($private_owner_id);
-									}
-								}
-								unset($physCopy);
-								
-								//create ILS record
-								$ilsResult = $user->createILS_record($phys_copy_raw_data['bar'], $phys_copy_raw_data['copy'], $instructor->getILSUserID(), $item->getHomeLibraryID(), $ci->getTerm(), $circRule['circRule'], $circRule['alt_circRule'], $ci->getExpirationDate());
-								//store ilsResult for the future
-								$ils_results .= '<li>'.$ilsResult.'</li>';
-							}
-							$ils_results .= '</ul>';						
-						}
-						
-						//process ILS requests (basically delete the ones that have been satisfied)
-						if(!empty($_REQUEST['ils_requests'])) {
-							foreach($_REQUEST['ils_requests'] as $ils_request_id) {
-								$ils_request = new ILS_Request($ils_request_id);
-								$ils_request->deleteRow();								
-							}
-						}
-						
-						//done, show success screen
+						//create the reserve
+						if(($data = $this->storeReserve()) !== false) {
+							$reserve = new reserve($data['reserve_id']);
+							$reserve->getItem();
 
-						//duplicate links for digital items
-						$duplicate = !$item->isPhysicalItem() ? $duplicate = true : false;
+							//allow "duplicate" links for digital items
+							$duplicate = !$reserve->item->isPhysicalItem() ? $duplicate = true : false;
 						
-						$this->displayFunction = 'addSuccessful';
-						$this->argList = array($ci, $item->getItemID(), $reserve->getReserveID(), $duplicate, $ils_results);					
+							//done, show success screen
+							$this->displayFunction = 'addSuccessful';
+							$this->argList = array(new courseInstance($ci_id), $reserve->item->getItemID(), $reserve->getReserveID(), $duplicate, $data['ils_results']);
+						}
 					}
 					else {	//have item-id and ci-id, but nothing else -- just did classLookup and need to show the create-reserve form
 						//need to pre-fetch some data
@@ -666,6 +575,130 @@ class requestManager
 		
 		//return id of item
 		return $item->getItemID();	
+	}
+	
+	
+	/**
+	 * Uses create_reserve_form data from $_REQUEST to create reserve and process requests
+	 *
+	 * @return mixed - Returns array('reserve_id'=>reserve-id, 'ils_results'=>ils-results) on success; (boolean) FALSE on failure - use strict (===) checking
+	 * 		Usage note: if(($reserve_id = storeReserve()) !== false) { ... }
+	 */
+	function storeReserve() {
+		//need ci-id and item-id
+		$ci_id = !empty($_REQUEST['ci']) ? $_REQUEST['ci'] : null;
+		$item_id = !empty($_REQUEST['item_id']) ? $_REQUEST['item_id'] : null;
+		
+		if(empty($ci_id) || empty($item_id)) {
+			return false;
+		}
+		
+		//get a ci object
+		$ci = new courseInstance($ci_id);
+				
+		//get an unitialized reserves object
+		$reserve = new reserve();
+		$item = new reserveItem($item_id);
+		
+		//attempt to find a reserve
+		if(!empty($_REQUEST['rd_request'])) {	//if there is a request, grab reserve from request
+			$rd_request = new request($_REQUEST['rd_request']);
+			$reserve->getReserveByID($rd_request->getReserveID());
+			
+			//set the request as processed
+			$rd_request->setDateProcessed(date('Y-m-d'));
+			
+			//done with RD request - free memory
+			unset($rd_request);
+		}
+		elseif($reserve->getReserveByCI_Item($ci_id, $item_id) === false) {	//if not, try to find existing reserve
+			//if querying old reserve returns nothing, create new
+			$reserve->createNewReserve($ci_id, $item_id);
+			
+			//attempt to set a sort order for the reserve
+			//only need to do this for a newly created reserve
+			$reserve->insertIntoSortOrder($ci->getCourseInstanceID(), $item->getTitle(), $item->getAuthor());
+		}
+		
+		//set dates
+		$reserve->setActivationDate($_REQUEST['reserve_activation_date']);
+		$reserve->setExpirationDate($_REQUEST['reserve_expiration_date']);
+		//set status
+		$reserve->setStatus($_REQUEST['reserve_status']);
+		
+		//done for digital items
+		//the rest is for physical items
+		
+		//init a few vars so that php does not complain about uninitialized variables
+		$instructor = $ils_results = null;
+		
+		//create physical copy records if needed
+		//set up ILS records if needed
+		if(isset($_REQUEST['create_ils_record']) && !empty($_REQUEST['physical_copy'])) {
+			//need an instructor object
+			$ci = new courseInstance($ci_id);
+			$ci->getInstructors();
+			$instructor = $ci->instructorList[0];
+										
+			//grab instructor ILS info
+			$instructor->getInstructorAttributes();
+			
+			//get selected loan period
+			$circRule = unserialize(urldecode($_REQUEST['circRule']));
+			
+			$ils_results = '<ul>';	//store results of ils queries
+								
+			//go through physical copies
+			foreach($_REQUEST['physical_copy'] as $phys_copy_raw_data) {								
+				//the raw data is serialized and urlencoded, reverse the process
+				$phys_copy_raw_data = unserialize(urldecode($phys_copy_raw_data));
+				
+				//get an object
+				$physCopy = new physicalCopy();
+				//make sure the record does not already exist
+				if(!$physCopy->getByBarcode($phys_copy_raw_data['bar'])) {
+					//create a new record
+					$physCopy->createPhysicalCopy();
+					
+					//add data
+					$physCopy->setItemID($item->getItemID());
+					$physCopy->setBarcode($phys_copy_raw_data['bar']);
+					$physCopy->setCallNumber($phys_copy_raw_data['callNum']);
+					$physCopy->setStatus($phys_copy_raw_data['loc']);
+					$physCopy->setItemType($phys_copy_raw_data['type']);
+					$physCopy->setOwningLibrary($phys_copy_raw_data['library']);
+					
+					//check personal item owner
+					$private_owner_id = $item->getPrivateUserID();
+					if(!empty($private_owner_id)) {
+						$physCopy->setOwnerUserID($private_owner_id);
+					}
+				}
+				unset($physCopy);
+				
+				//create ILS record
+				$ilsResult = $user->createILS_record($phys_copy_raw_data['bar'], $phys_copy_raw_data['copy'], $instructor->getILSUserID(), $item->getHomeLibraryID(), $ci->getTerm(), $circRule['circRule'], $circRule['alt_circRule'], $ci->getExpirationDate());
+				//store ilsResult for the future
+				$ils_results .= '<li>'.$ilsResult.'</li>';
+			}
+			$ils_results .= '</ul>';						
+		}
+		
+		//process ILS requests (basically delete the ones that have been satisfied)
+		if(!empty($_REQUEST['ils_requests'])) {
+			foreach($_REQUEST['ils_requests'] as $ils_request_id) {
+				$ils_request = new ILS_Request($ils_request_id);
+				$ils_request->deleteRow();								
+			}
+		}
+		
+		//need to pass a couple of things back
+		$return_data = array(
+			'reserve_id' => $reserve->getReserveID(),
+			'ils_results' => $ils_results
+		);
+		
+		return $return_data;
 	}
 }
 

@@ -203,7 +203,48 @@ function basicAJAX() {
 	this.json_decode = function(encoded_data) {
 		eval("var decoded_data = "+encoded_data);
 		return decoded_data;
-	}	
+	}
+	
+	
+	/**
+	 * @return string
+	 * @param object - Form object
+	 *
+	 * @desc Loops through the supplied form object's inputs and grabs all the data; returns the data as a query string (var1=val1&var2=val2...)
+	 */
+	this.get_form_data = function(formObj) {
+		var data_string = '';
+	
+		//walk through all the elements in the form
+		for(var x=0; x < formObj.elements.length; x++) {
+			//grab values differently based on the input field type
+			//in the end want a var=val&var=val&var=val... construct
+			switch(formObj.elements[x].type) {
+				case 'hidden':
+				case 'text':
+				case 'textarea':
+					//encode special characters of text fiels w/ escape()
+					data_string += formObj.elements[x].name + '=' + escape(formObj.elements[x].value) + '&';
+				break;
+				
+				case 'radio':
+				case 'checkbox':
+					if(formObj.elements[x].checked) {
+						data_string += formObj.elements[x].name + '=' + formObj.elements[x].value + '&';
+					}
+				break;
+				
+				case 'select-one':
+					data_string += formObj.elements[x].name + '=' + formObj.elements[x].options[formObj.elements[x].selectedIndex].value + '&';
+				break;
+			}
+		}
+		
+		//trim off the last &
+		data_string = data_string.substr(0, data_string.length-1);
+		
+		return data_string;
+	}
 	
 	
 	/**

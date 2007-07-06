@@ -39,6 +39,7 @@ http://www.reservesdirect.org/
 	require_once("secure/managers/noteManager.class.php");
 	require_once("secure/managers/copyrightManager.class.php");
 	require_once("secure/managers/helpManager.class.php");
+	require_once("secure/managers/requestManager.class.php");
 	require_once("secure/displayers/noteDisplayer.class.php");
 	require_once("secure/common.inc.php");
 	
@@ -299,6 +300,36 @@ http://www.reservesdirect.org/
 			parse_str(base64_decode($_REQUEST['query']), $request);
 			
 			helpManager::setTags($request['article_id'], $request['tags_string']);
+		break;
+		
+		case 'storeRequest':
+			//parse the request
+			parse_str(base64_decode($_REQUEST['query']), $request);
+			
+			//actually need all the data in $_REQUEST for storeReserve() to work, so we'll replace it
+			$_REQUEST = $request;
+			
+			//create the reserve
+			if(($data = requestManager::storeReserve()) !== false) {
+				$reserve = new reserve($data['reserve_id']);
+				$reserve->getItem();
+				
+				//duplicate links for digital items
+				$duplicate = !$reserve->item->isPhysicalItem() ? $duplicate = true : false;
+				
+				//build return message
+				$returnValue = '<div class="borders" style="margin:10px; padding:10px; background:lightgreen; text-align:center"><strong>Reserve created successfully</strong>';
+				
+				//show "duplicate" links for non-physical items
+				if(!$reserve->item->isPhysicalItem()) {
+					$returnValue .= '<p />You may <a href="index.php?cmd=duplicateReserve&amp;reserveID='.$reserve->getReserveID().'">duplicate this item and add copy to the same class</a><br /><small>Note: clicking this link will take you away from this screen</small>';
+				}
+				
+				$returnValue .= '</div>';
+			}
+			else {
+				$returnValue = '<div class="borders" style="margin:10px; padding:10px; background:#FF9900; text-align:center"><strong>Problem creating reserve.</strong>';
+			}
 		break;
 		
 		default:

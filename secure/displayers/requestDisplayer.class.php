@@ -520,7 +520,7 @@ class requestDisplayer extends noteDisplayer {
 		<div class="borders" style="background-color:#CCCCCC; padding:5px;">
 			<input type="hidden" name="searchField" value="control" />
 			<strong>Barcode:</strong>
-			<input type="text" name="searchTerm" value="<?=$_REQUEST['searchTerm']?>" />
+			<input type="text" name="searchTerm" value="<?php !empty($_REQUEST['searchTerm']) ? $_REQUEST['searchTerm'] : ''; ?>" />
 			&nbsp; <input type="submit" value="Search" onclick="this.form.cmd.value='<?=$cmd?>';" / >
 		</div>
 		<br />
@@ -916,24 +916,6 @@ class requestDisplayer extends noteDisplayer {
 	 * @param string $requested_barcode (optional) If searched for physical item, this is the barcode matching the exact copy searched
 	 */
 	function displaySelectCIForItem($item_id, $all_possible_CIs, $selected_CIs, $CI_request_matches, $requested_barcode=null) {
-
-/*		
-$selected_CIs = array(24827, 24826);		
-$item_id = 17768;
-$all_possible_CIs = array('rd_requests'=>array(24827,27553), 'ils_requests'=>array('1'=>array(24826,27552), '5'=>array(25000)));
-$requested_barcode = '000011147383';
-$CI_request_matches = array('24827'=>array('rd_request'=>1, 'ils_requests'=>array(array('request_id'=>20, 'requested_loan_period'=>'2 Hours'), array('request_id'=>21, 'requested_loan_period'=>'1 Day'))));
-
-echo '<pre>';
-echo 'all possible CIs = ';
-print_r($all_possible_CIs);
-echo 'selected CIs = ';
-print_r($selected_CIs);
-echo 'ci request matches = ';
-print_r($CI_request_matches);
-echo '</pre>';
-*/
-
 		//get holding info for physical items
 		$item = new reserveItem($item_id);
 		if($item->isPhysicalItem()) {
@@ -949,6 +931,9 @@ echo '</pre>';
 		//circ rules
 		$circRules = new circRules();
 ?>
+		<script type="text/javascript" language="JavaScript1.2" src="secure/javascript/basicAJAX.js"></script>
+		<script type="text/javascript" language="JavaScript1.2" src="secure/javascript/request_ajax.js"></script>
+				
 		<script type="text/javascript">
 			var current_form_block_id;
 			
@@ -1028,13 +1013,17 @@ echo '</pre>';
 			endforeach;
 ?>			
 		<p>
-			<img src="images/astx-green.gif" alt="selected" width="15" height="15"> <span style="font-size:small;">= CI requested item</span> &nbsp;
+			<img src="images/astx-green.gif" alt="selected" width="15" height="15"> <span style="font-size:small;">= course requested this item</span> &nbsp;
 			<img src="images/pencil.gif" width="24" height="20" /> <span style="font-size:small;">= active courses</span> &nbsp;
 			<img src="images/activate.gif" width="24" height="20" /> <span style="font-size:small;">= new courses not yet in use</span> &nbsp;
 			<img src="images/cancel.gif" width="24" height="20" /> <span style="font-size:small;">= courses canceled by the registrar</span> &nbsp;
 		</p>
 		<br />
 		<br />
+
+		<script type="text/javascript">
+			request_ajaxify_forms();
+		</script>
 		
 <?php	
 		endif;
@@ -1102,7 +1091,7 @@ echo '</pre>';
 			$rowStyle2 = (empty($rowStyle2) || ($rowStyle2=='oddRow')) ? 'evenRow' : 'oddRow';	//set the style
 ?>									
 			<div class="<?=$rowStyle?>" style="padding:5px;">					
-				<div style="width: 30px; float:left; text-align:left;"><input name="ci" type="radio" value="<?=$ci->getCourseInstanceID()?>" onclick="javascript: toggle_request_form('add_<?=$ci->getCourseInstanceID()?>');" /></div>
+				<div style="width: 30px; float:left; text-align:left;"><input id="select_ci_<?=$ci->getCourseInstanceID()?>" name="ci" type="radio" value="<?=$ci->getCourseInstanceID()?>" onclick="javascript: toggle_request_form('add_<?=$ci->getCourseInstanceID()?>');" /></div>
 				<div style="width: 50px; float:left; text-align:left"><?=$selected_img.$edit_icon?></div>
 				<div style="width:15%; float:left;"><?=$ci->course->displayCourseNo()?>&nbsp;</div>
 				<div style="width:30%; float:left;"><?=$ci->course->getName()?>&nbsp;</div>
@@ -1153,7 +1142,7 @@ echo '</pre>';
 		
 		$item = new reserveItem($item_id);
 ?>
-		<form method="post" action="index.php">
+		<form name="create_reserve_form" method="post" action="index.php">
 					<input type="hidden" name="cmd" value="storeRequest" />
 					<input type="hidden" name="ci" value="<?=$ci->getCourseInstanceID()?>" />
 					<input type="hidden" name="item_id" value="<?=$item_id?>" />
