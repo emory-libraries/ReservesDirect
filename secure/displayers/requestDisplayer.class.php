@@ -337,7 +337,7 @@ class requestDisplayer extends noteDisplayer {
 		}
 		
 		//decide if need to add form encoding type
-		$form_enctype = $isDigital ? 'enctype=" multipart/form-data"' : '';
+		$form_enctype = $isDigital ? ' enctype="multipart/form-data"' : '';
 ?>
 		<script type="text/javascript">
 			//shows/hides personal item elements; marks them as required or not

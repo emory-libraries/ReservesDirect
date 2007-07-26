@@ -206,8 +206,11 @@ class requestManager
 					}
 					if(!empty($item_data['item_id'])) {
 						$propagated_data['item_id'] = $item_data['item_id'];	//pass on the item_id if it exists
+					}					
+					if(!empty($_REQUEST['ci'])) {
+						$propagated_data['ci'] = $_REQUEST['ci'];	//pass on CI ID if it is pre-selected
 					}
-										
+
 					$this->displayFunction = 'addItem';
 					$this->argList = array($cmd, $item_data, $propagated_data);
 				}
@@ -238,7 +241,10 @@ class requestManager
 					if(!empty($item_data['item_id'])) {
 						$propagated_data['item_id'] = $item_data['item_id'];	//pass on the item_id if it exists
 					}
-					
+					if(!empty($_REQUEST['ci'])) {
+						$propagated_data['ci'] = $_REQUEST['ci'];	//pass on CI ID if it is pre-selected
+					}
+
 					$this->displayFunction = 'addItem';
 					$this->argList = array($cmd, $item_data, $propagated_data);
 				}
@@ -320,6 +326,13 @@ class requestManager
 		
 		//ignore duplicate requests
 		$processed_request_ids = array();
+	
+		//if CI already selected (using 'add item' link from edit-class screen)
+		//add it to the list
+		if(!empty($_REQUEST['ci'])) {
+			$all_possible_CIs['rd_requests'][] = $_REQUEST['ci'];
+			$selected_CIs[] = $_REQUEST['ci'];
+		}
 		
 		//if processing request, add requested CI to list
 		//this is truly not needed, as the next block would catch this request
@@ -327,12 +340,14 @@ class requestManager
 		if(!empty($_REQUEST['request_id'])) {
 			$request = new request();
 			if($request->getRequestByID($_REQUEST['request_id'])) {
-				$all_possible_CIs['rd_requests'][] = $request->getCourseInstanceID();
-				$selected_CIs[] = $request->getCourseInstanceID();
-				//match request to CI
-				$CI_request_matches[$request->getCourseInstanceID()]['rd_request'] = $request->getRequestID();
-				//add to list of processed requests
-				$processed_request_ids[] = $request->getRequestID();
+				if(!in_array($request->getCourseInstanceID(), $all_possible_CIs['rd_requests'])) {	//ignore duplicates
+					$all_possible_CIs['rd_requests'][] = $request->getCourseInstanceID();
+					$selected_CIs[] = $request->getCourseInstanceID();
+					//match request to CI
+					$CI_request_matches[$request->getCourseInstanceID()]['rd_request'] = $request->getRequestID();
+					//add to list of processed requests
+					$processed_request_ids[] = $request->getRequestID();
+				}
 			}
 			unset($request);
 		}
@@ -340,7 +355,7 @@ class requestManager
 		//may not be processing requests explicitly, but still working on an existing item that has requests pending
 		//attempt to find those
 		foreach(request::getRequestsByItem($item_id) as $request) {
-			if(!in_array($request->getRequestID(), $processed_request_ids)) {	//ignore duplicates
+			if(!in_array($request->getRequestID(), $processed_request_ids) && !in_array($request->getCourseInstanceID(), $all_possible_CIs['rd_requests'])) {	//ignore duplicates
 				$all_possible_CIs['rd_requests'][] = $request->getCourseInstanceID();
 				$selected_CIs[] = $request->getCourseInstanceID();
 				//match request to CI
@@ -498,9 +513,11 @@ class requestManager
 	 * @return int
 	 */
 	function storeItem() {
+		global $u;
+		
 		//when adding a 'MANUAL' physical item, the physical-copy data is hidden, but still passed on by the form
 		//make sure that we do not use it
-		if($_REQUEST['addType'] == 'MANUAL') {
+		if(!empty($_REQUEST['addType']) && ($_REQUEST['addType'] == 'MANUAL')) {
 			unset($_REQUEST['physical_copy']);
 		}
 		

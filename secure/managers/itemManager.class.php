@@ -200,8 +200,7 @@ class itemManager
 						$loc = 'add an item';
 						$this->displayClass = 'requestDisplayer';
 						$this->displayFunction = 'addSuccessful';
-						//reserve needs to be in an array
-						$this->argList = array($user, array($reserve), $ci, $_REQUEST['selected_instr'], true);
+						$this->argList = array($ci, $item->getItemID(), $reserve->getReserveID(), true);
 					}
 					else {
 						//get courseinstance id, if editing reserve
