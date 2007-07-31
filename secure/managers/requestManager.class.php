@@ -602,6 +602,8 @@ class requestManager
 	 * 		Usage note: if(($reserve_id = storeReserve()) !== false) { ... }
 	 */
 	function storeReserve() {
+		global $u;
+		
 		//need ci-id and item-id
 		$ci_id = !empty($_REQUEST['ci']) ? $_REQUEST['ci'] : null;
 		$item_id = !empty($_REQUEST['item_id']) ? $_REQUEST['item_id'] : null;
@@ -694,7 +696,7 @@ class requestManager
 				unset($physCopy);
 				
 				//create ILS record
-				$ilsResult = $user->createILS_record($phys_copy_raw_data['bar'], $phys_copy_raw_data['copy'], $instructor->getILSUserID(), $item->getHomeLibraryID(), $ci->getTerm(), $circRule['circRule'], $circRule['alt_circRule'], $ci->getExpirationDate());
+				$ilsResult = $u->createILS_record($phys_copy_raw_data['bar'], $phys_copy_raw_data['copy'], $instructor->getILSUserID(), $item->getHomeLibraryID(), $ci->getTerm(), $circRule['circRule'], $circRule['alt_circRule'], $ci->getExpirationDate());
 				//store ilsResult for the future
 				$ils_results .= '<li>'.$ilsResult.'</li>';
 			}
