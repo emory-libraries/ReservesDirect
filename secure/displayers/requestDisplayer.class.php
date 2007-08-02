@@ -1233,7 +1233,7 @@ class requestDisplayer extends noteDisplayer {
 					foreach($holdingInfo as $phys_copy):
 						$selected = ($phys_copy['bar'] == $selected_barcode) ? 'checked="checked"': '';
 ?>
-						<input type="checkbox" name="physical_copy[]" value="<?=urlencode(serialize($phys_copy))?>"<?=$selected?> />
+						<input type="checkbox" name="physical_copy[]" value="<?=base64_encode(serialize($phys_copy))?>"<?=$selected?> />
 						&nbsp;<?=$phys_copy['type']?> | <?=$phys_copy['library']?> | <?=$phys_copy['loc']?> | <?=$phys_copy['callNum']?> | <?=$phys_copy['bar']?>
 						<br />
 <?php				endforeach; ?>

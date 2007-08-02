@@ -668,10 +668,10 @@ class requestManager
 			$ils_results = '<ul>';	//store results of ils queries
 								
 			//go through physical copies
-			foreach($_REQUEST['physical_copy'] as $phys_copy_raw_data) {								
-				//the raw data is serialized and urlencoded, reverse the process
-				$phys_copy_raw_data = unserialize(urldecode($phys_copy_raw_data));
-				
+			foreach($_REQUEST['physical_copy'] as $phys_copy_raw_data) {	
+				//the raw data is serialized and base64_encoded, reverse the process
+				$phys_copy_raw_data = unserialize(base64_decode($phys_copy_raw_data));
+
 				//get an object
 				$physCopy = new physicalCopy();
 				//make sure the record does not already exist
