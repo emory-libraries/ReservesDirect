@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 	//paths - MAY NEED TO BE CHANGED
-	define('FEED_FILE', '/home/euclid/reserves-jason.txt');
+	define('FEED_FILE', '/home/euclid/reserves_jason.txt');
 	define('RD_ROOT', realpath('..').'/');
 	
 	//get config
