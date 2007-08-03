@@ -273,7 +273,7 @@ class staff extends instructor
 
 		list($Y,$M,$D) = split("-", $expiration);
 		$eDate = "$M/$D/$Y";
-		//echo $g_reserveScript . "?itemID=$barcode&borrowerID=$borrowerID&courseID=$course&reserve_desk=$desk&circ_rule=$circRule&alt_circ=$altCirc&expiration=$eDate&cpy=$copy<BR>";
+	        if (isset($_SESSION['debug'])) { echo $g_reserveScript . "?itemID=$barcode&borrowerID=$borrowerID&courseID=$course&reserve_desk=$desk&circ_rule=$circRule&alt_circ=$altCirc&expiration=$eDate&cpy=$copy<BR>"; }
 
 
 		$fp = fopen($g_reserveScript . "?itemID=$barcode&borrowerID=$borrowerID&courseID=$course&reserve_desk=$desk&circ_rule=$circRule&alt_circ=$altCirc&expiration=$eDate&cpy=$copy", "r");
