@@ -68,8 +68,8 @@ class searchManager
 				$loc  = "search for documents";
 			
 				//$this->search_sql_statement = (isset($request['sql']) && $request['sql'] != '') ? stripslashes(urldecode($request['sql'])) : null;
-        		//$search_array = (isset($_GET['search'])) ? unserialize(urldecode($_GET['search'])) : unserialize(urldecode($request['search']));
-        		$search_array = is_string($_REQUEST['search']) ? unserialize(urldecode($_REQUEST['search'])) : $_REQUEST['search'];
+        		//$search_array = (isset($_GET['search'])) ? unserialize(base64_decode($_GET['search'])) : unserialize(base64_decode($request['search']));
+        		$search_array = is_string($_REQUEST['search']) ? unserialize(base64_decode($_REQUEST['search'])) : $_REQUEST['search'];
 				
 				$items = $this->doSearch($search_array, $request['limit'], $request['item'], $request['sort']);
 				
@@ -88,7 +88,7 @@ class searchManager
 				
 				$hidden_fields = array(
 					'cmd'			=> 'addResultsToClass',
-					'search' 			=> urlencode(serialize($search_array)), 
+					'search' 			=> base64_encode(serialize($search_array)), 
 					'sort' 			=> $request['sort'],
 					'displayQry'	=> $displayQry
 				);

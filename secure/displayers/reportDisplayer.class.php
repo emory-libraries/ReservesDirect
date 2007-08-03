@@ -107,7 +107,7 @@ class reportDisplayer extends baseDisplayer {
 	
 	    echo "<div style=\"padding:15px; text-align:center;\">\n";
 	    echo "  <form method=\"post\" action=\"tsvGenerator.php\"><br/>\n";
-	    echo "      <input type=\"hidden\" name=\"dataSet\" value=\"" . urlencode(serialize($dataSet)) . "\"/>\n";
+	    echo "      <input type=\"hidden\" name=\"dataSet\" value=\"" . base64_encode(serialize($dataSet)) . "\"/>\n";
 	    echo "      <input type=\"submit\" name=\"exportTsv\" value=\"Export to Spreadsheet\"/><br/><br/>\n";
 	    echo "  </form>\n";
 	    echo "</div>\n";

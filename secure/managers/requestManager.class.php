@@ -663,7 +663,7 @@ class requestManager
 			$instructor->getInstructorAttributes();
 			
 			//get selected loan period
-			$circRule = unserialize(urldecode($_REQUEST['circRule']));
+			$circRule = unserialize(base64_decode($_REQUEST['circRule']));
 			
 			$ils_results = '<ul>';	//store results of ils queries
 								

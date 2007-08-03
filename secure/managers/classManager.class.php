@@ -540,7 +540,7 @@ class classManager
 					//make sure we go back to the previous screen
 					$preproc_cmd = !empty($_REQUEST['preproc_cmd']) ? $_REQUEST['preproc_cmd'] : 'createClass';
 					$_REQUEST['cmd'] = $preproc_cmd;
-					$this->argList = array($ci, urlencode(serialize($_REQUEST)));
+					$this->argList = array($ci, base64_encode(serialize($_REQUEST)));
 				}
 			break;
 
