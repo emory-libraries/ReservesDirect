@@ -711,46 +711,7 @@ class requestDisplayer extends noteDisplayer {
 			<tr id="man_local_control_row" align="left" valign="middle">
 				<td class="strong" align="right" bgcolor="#cccccc">Barcode / Alternate ID:</td>
 				<td><input id="man_local_control_input" name="local_control_key" size="15" value="" type="text"></td>
-			</tr>
-			
-<?php
-		//existing notes
-		if(!empty($item_data['notes'])) {
-			//build referrer string
-			if(!empty($_REQUEST['ci'])) {
-				$notes_referrer = 'ci='.$_REQUEST['ci'];
-			}
-			if(!empty($_REQUEST['selected_instr'])) {
-				$notes_referrer .= '&amp;selected_instr='.$_REQUEST['selected_instr'];
-			}
-			if(!empty($_REQUEST['request_id'])) {
-				$notes_referrer .= '&amp;request_id='.$_REQUEST['request_id'];
-			}
-			
-			//show notes
-			self::displayEditNotes($item_data['notes'], $notes_referrer);
-		}
-				
-		//add a new note
-?>
-		<tr valign="top">
-			<td align="right" bgcolor="#CCCCCC" class="strong">Note:</td>
-			<td>
-				<textarea name="new_note" cols="50" rows="3"></textarea>
-				<br />
-				<small>Note Type:
-				<label><input type="radio" name="new_note_type" value="<?=$g_notetype['instructor']?>" checked="true">Instructor Note</label>
-				
-<?php	if($u->getRole() >= $g_permission['staff']): ?>
-				<label><input type="radio" name="new_note_type" value="<?=$g_notetype['content']?>" checked="true">Content Note</label>
-				<label><input type="radio" name="new_note_type" value="<?=$g_notetype['staff']?>">Staff Note</label>
-				<label><input type="radio" name="new_note_type" value="<?=$g_notetype['copyright']?>">Copyright Note</label></small>
-<?php	endif; ?>
-
-				<br />
-				<br />
-			</td>
-		</tr>	
+			</tr>			
 
 <?php	
 		if($isPhysical):
@@ -809,6 +770,33 @@ class requestDisplayer extends noteDisplayer {
 <?php	endif; ?>
 
 		</table>
+		
+		<br />
+		<div class="headingCell1" style="width:25%; text-align:center;">Item Notes</div>
+		<div style="padding:8px 8px 12px 8px;" class="borders">
+		
+<?php	if(!empty($item_data['item_id'])):	//if editing existing item, use AJAX notes handler ?>
+
+		<script language="JavaScript1.2" src="secure/javascript/basicAJAX.js"></script>
+		<script language="JavaScript1.2" src="secure/javascript/notes_ajax.js"></script>
+		
+		<?php self::displayNotesBlockAJAX($item_data['notes'], 'item', $item_data['item_id'], true); ?>
+
+<?php 	else:	//just display plain note form ?>
+
+		<strong>Add a new note:</strong>
+		<br />
+        <textarea name="new_note" cols="50" rows="3"></textarea>
+        <br />
+        <small>Note Type:
+        <label><input type="radio" name="new_note_type" value="<?=$g_notetype['content']?>" checked="true">Content Note</label>
+        <label><input type="radio" name="new_note_type" value="<?=$g_notetype['staff']?>">Staff Note</label>
+
+<?php	endif; ?>
+				
+		</div>
+				
+		<br />
 		<strong><font color="#FF0000">* </font></strong><span class="helperText">= required fields</span></td></tr>
 
 		<br />

@@ -558,22 +558,9 @@ class requestManager
 			$item->setPrivateUserID($_REQUEST['selected_owner']);
 		}
 		
-		//notes
-		if(!empty($_REQUEST['notes'])) {
-			foreach($_REQUEST['notes'] as $note_id=>$note_text) {
-				if(!empty($note_id)) {
-					$note = new note($note_id);
-					$note->setText($note_text);
-				}
-			}
-		}
-		if(!empty($_REQUEST['new_note'])) {	//add new note
-			if($_REQUEST['new_note_type'] == $g_notetype['instructor']) {
-				$reserve->setNote($_REQUEST['new_note'], $_REQUEST['new_note_type']);
-			}
-			else {
-				$item->setNote($_REQUEST['new_note'], $_REQUEST['new_note_type']);
-			}
+		//add a new note
+		if(!empty($_REQUEST['new_note'])) {
+			$item->setNote($_REQUEST['new_note'], $_REQUEST['new_note_type']);
 		}
 		
 		//if adding electronic item, need to process file or link

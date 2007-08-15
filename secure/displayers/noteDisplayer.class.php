@@ -73,17 +73,17 @@ class noteDisplayer extends baseDisplayer {
 		//display notes
 ?>
 		<table border="0" cellpadding="2" cellspacing="0">
-<?php		
+<?php	
 		foreach($notes as $note):
 			if(in_array($note->getType(), $restricted_note_types) && ($u->getRole() < $g_permission['staff'])) {
 				continue;	//skip the note if it is restricted and user is less than staff
 			}
 ?>
 			<tr valign="top">
-				<td align="right">
+				<td align="right" style="width:100px;">
 					<strong><?=$note->getType()?> Note:</strong>
 					<br />
-					<a href="#" onclick="javascript: notes_show_form(<?=$note->getID()?>, '<?= preg_replace('"',"'", $note->getText())?>', '<?=$note->getType()?>'); return false;">edit</a> | <a href="#" onclick="javascript: notes_delete_note('<?=$obj_type?>', <?=$obj_id?>, <?=$note->getID()?>); return false;">delete</a>&nbsp;
+					<a href="#" onclick="javascript: notes_show_form(<?=$note->getID()?>, '<?=str_replace('"', "'", $note->getText())?>', '<?=$note->getType()?>'); return false;">edit</a> | <a href="#" onclick="javascript: notes_delete_note('<?=$obj_type?>', <?=$obj_id?>, <?=$note->getID()?>); return false;">delete</a>&nbsp;
 				</td>
 				<td>
 					<?=stripslashes($note->getText())?>
