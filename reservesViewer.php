@@ -37,7 +37,7 @@ http://www.reservesdirect.org/
 	//require_once("secure/session.inc.php");	
 	
 	header("Cache-control: private");	//send some headers
-    header("Pragma: public");
+    	header("Pragma: public");
 	
 	//authenticate user
 	//if user is valid, then initializes global user object as $u
@@ -72,8 +72,7 @@ http://www.reservesdirect.org/
         }
 		
 		if($item->isLocalFile()) {	//if item URL points to local server, serve the document directly
-			if($stream = @fopen("http://127.0.0.1/reserves_files/" . $url, "rb")) {	//open file for reading
-
+		if($stream = @fopen($g_documentDirectory . $url, "rb")) {       //open file for reading
                 $author = ereg_replace("[^A-Za-z0-9]", "", $item->author);
                 if ($author != "") {
                     $author = substr(($author), 0, 24) . "_";
