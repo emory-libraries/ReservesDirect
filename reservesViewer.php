@@ -29,6 +29,7 @@ http://www.reservesdirect.org/
 	require_once("secure/common.inc.php");
 	require_once("secure/classes/reserves.class.php");
 	require_once("secure/classes/reserveItem.class.php");
+	require_once("secure/classes/proxyHost.class.php");
 	require_once("secure/classes/user.class.php");
 	require_once("secure/classes/skins.class.php");
 	include("statusCodes.php");	
@@ -37,7 +38,7 @@ http://www.reservesdirect.org/
 	//require_once("secure/session.inc.php");	
 	
 	header("Cache-control: private");	//send some headers
-    	header("Pragma: public");
+    header("Pragma: public");
 	
 	//authenticate user
 	//if user is valid, then initializes global user object as $u
@@ -66,13 +67,14 @@ http://www.reservesdirect.org/
 	//if we have an item object, then we try to serve the doc
 	if($item instanceof reserveItem) {
 		$url = $item->getURL();	//grab the url
-        if ($url == FALSE) {
+        if ($url == FALSE) {        	
             sendStatusCode('404');
             exit;
         }
 		
 		if($item->isLocalFile()) {	//if item URL points to local server, serve the document directly
-		if($stream = @fopen($g_documentDirectory . $url, "rb")) {       //open file for reading
+			if($stream = @fopen($g_documentDirectory . $url, "rb")) {       //open file for reading
+
                 $author = ereg_replace("[^A-Za-z0-9]", "", $item->author);
                 if ($author != "") {
                     $author = substr(($author), 0, 24) . "_";
@@ -100,8 +102,8 @@ http://www.reservesdirect.org/
 				sendStatusCode(404);
 			}
 		}
-		else {	//item is on remote server -- redirect
-			header('Location: '.$url);
+		else {	//item is on remote server -- redirect			
+			header('Location: '.proxyHost::proxyURL($url));
 		}
 	}
 	else {	//no item, assume that no ID was specified
