@@ -59,7 +59,6 @@ if ($fp == false)
 
 require_once("secure/config.inc.php");
 require_once("secure/common.inc.php");
-require_once("decode_semester.php");
 
 //create needed sql statements
 switch($g_dbConn->phptype) 
