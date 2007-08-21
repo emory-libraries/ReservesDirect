@@ -44,7 +44,7 @@ if (count($argv) < 2)
 $feedDelimiter = " ";
 $feedLineLength = 1000;
 
-$proxyName = 'SFX';
+$proxyName = 'EZproxy';
 $proxyPrefix = 'http://proxy.library.emory.edu/login?url=';
 
 //open standard out
