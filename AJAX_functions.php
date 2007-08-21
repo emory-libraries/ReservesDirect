@@ -325,6 +325,8 @@ http://www.reservesdirect.org/
 					$returnValue .= '<p />You may <a href="index.php?cmd=duplicateReserve&amp;reserveID='.$reserve->getReserveID().'">duplicate this item and add copy to the same class</a><br /><small>Note: clicking this link will take you away from this screen</small>';
 				}
 				
+				$returnValue .= '<p /><a href="index.php?cmd=editClass&ci='.$reserve->getCourseInstanceID().'">Return to Edit Class.</a><br />';
+				
 				$returnValue .= '</div>';
 			}
 			else {
