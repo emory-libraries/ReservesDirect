@@ -970,6 +970,7 @@ class requestDisplayer extends noteDisplayer {
 				if($request_type == 'rd_requests') {
 					//the ci-data is the array of CIs
 					//show those
+					$selected_CIs = array($_REQUEST['ci']);
 					self::displayCoursesForRequest($item_id, $ci_data, $selected_CIs, $CI_request_matches, $circRules, $holdingInfo, $selected_barcode);
 				}
 				elseif($request_type == 'ils_requests') {
@@ -994,6 +995,7 @@ class requestDisplayer extends noteDisplayer {
 			<div style="padding:5px; border:1px solid black; background-color:#DFD8C6;">Item requested by <em><?=$instructor_name?></em> for <em><?=$ils_courses_string?></em></div>
 <?php
 						//display course list
+						$selected_CIs = array($_REQUEST['ci']);
 						self::displayCoursesForRequest($item_id, $request_data['ci_list'], $selected_CIs, $CI_request_matches, $circRules, $holdingInfo, $selected_barcode);
 					}
 				}
@@ -1066,9 +1068,16 @@ class requestDisplayer extends noteDisplayer {
 				break;						
 			}			
 						
+			$pre_select_ci_radio = '';
 			//mark pre-selected courses
 			if(in_array($ci->getCourseInstanceID(), $selected_CIs)) {
 				$selected_img = '<img src="images/astx-green.gif" alt="selected" width="15" height="15">&nbsp;';
+				if (sizeof($selected_CIs) == 1) 
+				{
+					//only one CI selected go ahead and select the radio button
+					$pre_select_ci_radio = ' checked="CHECKED" ';
+					$force_toggle = "<script language='JavaScript'>toggle_request_form('add_".$ci->getCourseInstanceID()."');</script>";
+				}
 			}
 			else {
 				$selected_img = '';
@@ -1079,7 +1088,7 @@ class requestDisplayer extends noteDisplayer {
 			$rowStyle2 = (empty($rowStyle2) || ($rowStyle2=='oddRow')) ? 'evenRow' : 'oddRow';	//set the style
 ?>									
 			<div class="<?=$rowStyle?>" style="padding:5px;">					
-				<div style="width: 30px; float:left; text-align:left;"><input id="select_ci_<?=$ci->getCourseInstanceID()?>" name="ci" type="radio" value="<?=$ci->getCourseInstanceID()?>" onclick="javascript: toggle_request_form('add_<?=$ci->getCourseInstanceID()?>');" /></div>
+				<div style="width: 30px; float:left; text-align:left;"><input id="select_ci_<?=$ci->getCourseInstanceID()?>" name="ci" type="radio" value="<?=$ci->getCourseInstanceID()?>" onclick="javascript: toggle_request_form('add_<?=$ci->getCourseInstanceID()?>');" <?= $pre_select_ci_radio ?>/></div>
 				<div style="width: 50px; float:left; text-align:left"><?=$selected_img.$edit_icon?></div>
 				<div style="width:15%; float:left;"><?=$ci->course->displayCourseNo()?>&nbsp;</div>
 				<div style="width:30%; float:left;"><?=$ci->course->getName()?>&nbsp;</div>
@@ -1095,11 +1104,11 @@ class requestDisplayer extends noteDisplayer {
 					<?php self::displayCreateReserveForm($ci, $item_id, $circRules, $holdingInfo, $requests, $selected_barcode, $rowStyle2) ?>
 				</div>
 			</div>
-
-<?php	endforeach; ?>
-
-		</div>
 		
+<?php	endforeach; ?>
+<?= $force_toggle ?>		
+		</div>
+
 <?php
 	}
 	
