@@ -1140,7 +1140,9 @@ function displayCustomSort(&$ci, &$reserves) {
 		</div>
 		<br />
 		<div class="helperText" style="margin-right:5%; margin-left:5%;">
-			NOTE: to sort items inside of a heading, return to the Edit Class screen and click on the <img src="images/sort.gif" alt="sort contents"> link next to the heading.
+			<? if ($_REQUEST['parentID'] == '') {?>
+				NOTE: to sort items inside of a heading, return to the Edit Class screen and click on the <img src="images/sort.gif" alt="sort contents"> link next to the heading.
+			<? } ?>
 		</div>
 		<br />		
 		<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
