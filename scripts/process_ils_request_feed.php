@@ -8,6 +8,17 @@
 	//will init $g_dbConn PEAR::DB object
 	require_once(RD_ROOT.'secure/config.inc.php');
 
+	//Remove old request over 1 month old
+	$lastmonth = date("Y-m-d", mktime(0, 0, 0, date("m")-1, date("d"),   date("Y")));
+	$sql = "DELETE FROM ils_requests WHERE date_added < '$lastmonth'";
+	
+	$rs = $g_dbConn->query($sql);
+	if(DB::isError($rs)) {
+		echo "<br />ERROR Could not delete old entries: {$rs->getMessage()}";
+		die(-1);
+	}
+	
+	
 	//read in feed
 	$processed_count = 0;
 	$nonblank_count = 0;
@@ -54,5 +65,5 @@
 		}
 	}
 	
-	echo "DONE! Processed $processed_count lines of feed ($nonblank_count non-empty); added $insert_count rows to DB.";
+	echo "DONE! Processed $processed_count lines of feed ($nonblank_count non-empty); added $insert_count rows to DB.\n\n";
 ?>
