@@ -92,6 +92,7 @@ http://www.reservesdirect.org/
     <copyrightNoticeURL>http://CHANGEME.example.edu/copyright.html</copyrightNoticeURL>
     
     <siteURL>https://CHANGEME.example.edu/CHANGEME/</siteURL>
+    <serverName>CHANGEME.example.edu</serverName>
 
     <newUserEmail comment="This is the message automatically sent to the user when a new account is created.">
         <subject>New Account Created</subject>
@@ -125,5 +126,6 @@ Please log into ?url as username ?username , password ?password
     	<activation_padding_days>14</activation_padding_days>
     	<expiration_padding_days>14</expiration_padding_days>
     </registar_feed>
-    
+    <EZproxyAuthorizationKey>reallybigsecret</EZproxyAuthorizationKey>
+    <BlackBoardLink>CHANGEME.edu/blackboard</BlackBoardLink>
 </configuration>
