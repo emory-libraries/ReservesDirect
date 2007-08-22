@@ -102,8 +102,9 @@ http://www.reservesdirect.org/
 				sendStatusCode(404);
 			}
 		}
-		else {	//item is on remote server -- redirect			
-			header('Location: '.proxyHost::proxyURL($url));
+		else {	//item is on remote server -- redirect	
+			//echo 'Location: '.proxyHost::proxyURL($url, $u->getUsername());exit;			
+			header('Location: '.proxyHost::proxyURL($url, $u->getUsername()));
 		}
 	}
 	else {	//no item, assume that no ID was specified
