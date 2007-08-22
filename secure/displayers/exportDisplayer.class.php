@@ -32,7 +32,8 @@ class exportDisplayer extends baseDisplayer {
 	
 	function getRSS_URL($file)
 	{
-		return "http://".$_SERVER['SERVER_NAME'] . ereg_replace('index.php', $file, $_SERVER['PHP_SELF']);
+		global $g_siteURL;
+		return "$g_siteURL" . ereg_replace('index.php', $file, $_SERVER['PHP_SELF']);
 	}
 	
 	function displaySelectExportOption($ci) {
@@ -56,7 +57,7 @@ class exportDisplayer extends baseDisplayer {
 					<label><input type="radio" name="course_ware" value="learnlink">Learnlink</label><br>
 					<label><input type="radio" name="course_ware" value="website">Personal Web Page</label>
 					<p />
-					<input type="submit" name="Submit" value="Get Instructions on How to Export Class">
+					<input type="submit" name="Submit" value="Get Instructions on How to Export Class">					
 				</div>
 			</div>
 		</form>
@@ -66,34 +67,43 @@ class exportDisplayer extends baseDisplayer {
 
 	function displayExportInstructions_blackboard($ci)
 	{
+		global $g_BlackboardLink;
+		
 		echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\" align=\"center\">\n";
 		echo "	<tr><td width=\"140\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
 		echo "	<tr>\n";
 		echo "		<td class=\"headingCell2\">Export Reserve List for ". $ci->course->displayCourseNo() . " -- " . $ci->course->getName() . " to Blackboard</td>\n";
 		echo "	</tr>\n";
+		
 		echo "	<tr>\n";
 		echo "		<td align=\"left\" valign=\"top\">\n";
 		echo "			<p><strong>Instructions:</strong></p>\n";
-		echo "			<p><strong>Please Note:</strong> These instructions will not work if you are using Internet Explorer 6. There is currently no way to export a class if you are logged into Blackboard using IE6. <strong>You must use a broswer other than IE6 (Netscape and Firefox are recommended) when following these instructions.</strong> Your reserves list will be viewable to students using any browser, but you must set it up using something other than IE6.</p>\n";
-		echo "			<p>Create a Folder or Item in one of your Content Areas and call it &quot;Reserves List&quot; or &quot;Course Readings&quot;. </p>\n";
-		echo "			<p>In the Text area, cut and paste:</p>\n";
-		echo "		</td>\n";
-		echo "	</tr>\n";
-		echo "	<tr>\n";
-		echo "		<td align=\"left\" valign=\"top\" bgcolor=\"#CCCCCC\" class=\"strong\">\n";
-		echo "			&lt;script src=&quot;". exportDisplayer::getRSS_URL('perl/reserves2.cgi') ."?ci=". $ci->getCourseInstanceID() ."&amp;style=reserves&quot;&gt;&lt;/script&gt;\n";
-		echo "		</td>\n";
-		echo "	</tr>\n";
-		echo "	<tr>\n";
-		echo "		<td align=\"left\" valign=\"top\">\n";
-		echo "			<p>Make sure the &quot;Smart Text&quot; radio button is selected.</p>\n";
+		echo "			<p>Generate the Blackboard connection with the link below.  When prompted save the file to your local machine with an html extension, making note of the save location.</p>\n";
+		echo "			<p>Then access your Blackboard course, choose the content area you would like to add the item to, select the \"Add Item\" option and add the HTML file as an attachment. Click \"Browse\" next to \"local content file\" and find your .html file on your computer.</p>\n";		
 		echo "			<p>Choose any other options you wish and click on Submit.</p>\n";
-		echo "			<p>Your reserve list (both electronic and physical, circulating items) will appear on the page. Physical items will have links to $g_catalogName for their bibliographic and holdings information.</p>\n";
-		echo "	        <p align=\"center\"><a href=\"index.php?cmd=exportClass\">Export another class</a><br> <a href=\"index.php\">Return to Home </a> </p>\n";
 		echo "		</td>\n";
 		echo "	</tr>\n";
+		
+		echo "	<tr>\n";
+		echo "		<td align=\"center\">\n";
+		echo "			<a href=\"index.php?cmd=generateBB&ci=". $ci->getCourseInstanceID()."\" target=\"_blank\">Generate Blackboard Link</a>\n";
+		echo "		</td>\n";		
+		echo "	</tr>\n";		
+
+		echo "	<tr>\n";
+		echo "		<td align=\"center\">\n";
+		echo "			<a href=\"$g_BlackboardLink\" target=\"_blank\">Go to Blackboard</a>\n";
+		echo "		</td>\n";		
+		echo "	</tr>\n";			
+		
 		echo "</table>\n";
 
+	}
+	
+	function downloadBBFile($filename, $data)
+	{
+		
+		echo "done";
 	}
 
 	function displayExportInstructions_learnlink($ci)
