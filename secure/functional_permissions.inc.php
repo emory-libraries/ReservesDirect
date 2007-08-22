@@ -96,6 +96,7 @@ $functional_permissions = array
 	 'addNote' 						=> $g_permission['proxy'],
 	 'saveNote' 					=> $g_permission['proxy'],
 	 'exportClass' 					=> $g_permission['proxy'],
+	 'generateBB' 					=> $g_permission['proxy'],
 
 	 'searchTab' 					=> $g_permission['staff'],
 	 'doSearch' 					=> $g_permission['staff'],

@@ -30,37 +30,65 @@ class exportManager extends baseManager {
 	public $user;
 
 	function exportManager($cmd) {
-		global $g_permission, $page, $loc, $ci, $u;
+		global $g_permission, $g_siteURL, $page, $loc, $ci, $u;
 
-		$this->displayClass = "exportDisplayer";
-		$loc = "export class";
-		//set the page (tab)
-		if($u->getRole() >= $g_permission['staff']) {
-			$page = 'manageclasses';
-		}
-		else {
-			$page = 'myReserves';
-		}
-		
-		if(empty($_REQUEST['ci'])) {	//get ci
-			//get array of CIs (ignored for staff)
-			$courses = $u->getCourseInstancesToEdit();
-			
-			$this->displayFunction = 'displaySelectClass';
-			$this->argList = array($cmd, $courses, 'Select class to export');
-		}
-		elseif(empty($_REQUEST['course_ware'])) {	//get export option
-			$course = new courseInstance($_REQUEST['ci']);
-			
-			$this->displayFunction = 'displaySelectExportOption';
-			$this->argList = array($course);
-		}
-		else {
-			$course = new courseInstance($_REQUEST['ci']);
-			$course->getCourseForUser();
-			
-			$this->displayFunction = 'displayExportInstructions_'.$_REQUEST['course_ware'];
-			$this->argList = array($course);
+		switch ($cmd) {
+			case 'generateBB':
+				$ci = new courseInstance($_REQUEST['ci']);
+				$ci->getPrimaryCourse();
+
+				$filename = 'blackboard_' . $ci->course->displayCourseNo() . '.html';
+				$filename = ereg_replace(" ", "_", $filename);
+				
+				$data = "<HTML>\n";
+				$data .= "	<HEAD>\n";		
+				$data .= "		<script src=\"". $g_siteURL."/reservelist.php?style=reserves&ci=". $ci->getCourseInstanceID() ."\"></script>\n";		
+				$data .= "	</HEAD>\n";
+				$data .= "</HTML>\n";		
+				
+				
+				
+				ob_clean();
+				
+				header("Content-Type: text/plain");
+				header("Content-Disposition: attachment; filename=\"$filename\"");
+				
+				echo $data;
+				exit;
+			break;		
+				
+			default:
+				$this->displayClass = "exportDisplayer";
+				$loc = "export class";
+				//set the page (tab)
+				if($u->getRole() >= $g_permission['staff']) {
+					$page = 'manageclasses';
+				}
+				else {
+					$page = 'myReserves';
+				}
+				
+				if(empty($_REQUEST['ci'])) {	//get ci
+					//get array of CIs (ignored for staff)
+					$courses = $u->getCourseInstancesToEdit();
+					
+					$this->displayFunction = 'displaySelectClass';
+					$this->argList = array($cmd, $courses, 'Select class to export');
+				}
+				elseif(empty($_REQUEST['course_ware'])) {	//get export option
+					$course = new courseInstance($_REQUEST['ci']);
+					
+					$this->displayFunction = 'displaySelectExportOption';
+					$this->argList = array($course);
+				}
+				else {
+					$course = new courseInstance($_REQUEST['ci']);
+					$course->getCourseForUser();
+					
+					$this->displayFunction = 'displayExportInstructions_'.$_REQUEST['course_ware'];
+					$this->argList = array($course);
+				}
 		}
 	}
+	
 }
