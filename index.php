@@ -58,6 +58,12 @@ require_once("secure/session.inc.php");
 //if user is valid, then initializes global user object as $u
 //else shows login page
 
+//*******************************************************
+//$_SESSION['debug'] = 'debug';
+//$_SESSION['username'] = 'jbwhite';
+//$_SESSION['userclass'] = 'admin';
+//*******************************************************
+
 require_once('secure/auth.inc.php');
 
 //read cmd
@@ -211,6 +217,7 @@ switch ($cmd)
 	break;
 
 	case 'exportClass':
+	case 'generateBB':
 		require_once("secure/managers/exportManager.class.php");
 		$mgr = new exportManager($cmd);
 	break;
@@ -266,4 +273,3 @@ if (isset($_SESSION['debug']))
 	echo "<br>this page took $load_time s to load";
 }
 ?>
-
