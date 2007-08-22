@@ -45,7 +45,7 @@ $feedDelimiter = " ";
 $feedLineLength = 1000;
 
 $proxyName = 'EZproxy';
-$proxyPrefix = 'http://proxy.library.emory.edu/login?url=';
+$proxyPrefix = 'https://proxy.library.emory.edu/login?';
 
 //open standard out
 $stdout = fopen('php://stdout', 'w');
