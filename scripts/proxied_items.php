@@ -1,8 +1,13 @@
 #!/usr/local/bin/php -q
 <?php
+	/*
+		This script will remove ezproxy prefixes from the database 
+		ezproxy will now be called dynamically by the reservesViewer
+	*/
+
 	require_once('../secure/config.inc.php');
 	
-	$sql = "SELECT item_id, url FROM items where url LIKE 'http://proxy.library.emory.edu/login?url=%' ORDER BY item_id";
+	$sql = "SELECT item_id, url FROM items where url LIKE '%proxy.library.emory.edu%' ORDER BY item_id";
 	$rs = $g_dbConn->query($sql);
 	if(DB::isError($rs)) {
 		echo '<p />'.$rs->getMessage().'<p />'.$rs->getDebugInfo().'<hr />';
