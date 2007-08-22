@@ -40,14 +40,47 @@ class proxyHost {
 	 * @return string proxied URL
 	 * @param  string URL
 	 * @desc   if url requires proxy proxy prefix is added
-	 */
-	public static function proxyURL($url) {
-		global $g_dbConn;
-		
+	 */	
+	public static function proxyURL($url, $username) 
+	{	
+		//use parse_url to get url fragments	
 		$fragments = parse_url($url);
 		$host = $fragments['host']; 
 		if (isset($fragments['port'])) $host .= ":" . $fragments['port']; 			
 		
+		//split on .
+		$parts = array_reverse(split("\.", $host));
+
+		
+		//recursively search database for partial urls
+		//reduce count by one we do not want to search for TLD
+		$times = count($parts) - 1;		
+		for ($i=0; $i < $times; $i++)
+		{
+			//reverse order to use array pop this also mean TDL will always be in 0 pos
+			$match = proxyHost::doSearch(implode('.', array_reverse($parts)));
+			
+			if (!is_null($match))
+			{
+				//if we have a hit then stop looking
+				break;
+			}
+			
+			array_pop($parts);  //shorten url then try again						
+		}
+		
+		if ($match['partial_match'] == 1 || ($match['partial_match'] == 0 && $match['domain'] == $host))
+		{
+			//return $match['prefix'] . $url;
+			return proxyHost::generateEZproxyTicket($match['prefix'], $url, $username);
+		} else {
+			return $url;
+		}		
+	}	
+	
+	public static function doSearch($host)
+	{
+		global $g_dbConn;					
 		
 		switch($g_dbConn->phptype) {
 			default:	//mysql
@@ -58,15 +91,20 @@ class proxyHost {
 				
 		}
 		$rs = $g_dbConn->query($sql, "%$host");
+
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 			
-		$row = $row = $rs->fetchRow(DB_FETCHMODE_ASSOC);	
+		return $rs->fetchRow(DB_FETCHMODE_ASSOC);			
+	}
+	
+	function generateEZproxyTicket($EZproxyServerURL, $url, $username)
+	{
+		global $g_EZproxyAuthorizationKey;
 		
-		if ($row['partial_match'] == 1 || ($row['partial_match'] == 0 && $row['domain'] == $host))
-		{
-			return $row['prefix'] . $url;
-		} else {
-			return $url;
-		}
+	
+		$packet = '$u' . time();
+		
+		$EZproxyTicket = urlencode(md5($g_EZproxyAuthorizationKey . $username . $packet) . $packet);
+		return $EZproxyServerURL . "/login?user=" . urlencode($username) . "&ticket=" . $EZproxyTicket . "&url=" . $url;
 	}
 }
