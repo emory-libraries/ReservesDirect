@@ -125,4 +125,8 @@ http://www.reservesdirect.org/
 	
     $g_activation_padding_days = (integer)$configure->registar_feed->activation_padding_days;
     $g_expiration_padding_days = (integer)$configure->registar_feed->expiration_padding_days;
+    
+    $g_EZproxyAuthorizationKey = (string)$configure->EZproxyAuthorizationKey;
+    
+    $g_BlackboardLink = (string)$configure->BlackBoardLink;
 ?>
