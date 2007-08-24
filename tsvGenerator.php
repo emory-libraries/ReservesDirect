@@ -30,7 +30,7 @@ header("Content-Type: text/tab-separated-values");
 header("Content-Disposition: attachment; filename=\"reservesData.tsv\"");
 
 
-$dataSet = unserialize(urldecode($_POST['dataSet']));
+$dataSet = unserialize(base64_decode($_POST['dataSet']));
 if (!isset($_POST['dataSet']) || (count($dataSet) < 1)) {
     echo "Empty data set.\t";
     die();

@@ -1211,7 +1211,7 @@ class requestDisplayer extends noteDisplayer {
 								<select id="circRule_<?=$ci->getCourseInstanceID()?>" name="circRule">
 <?php		
 				foreach($circRules->getCircRules() as $circRule):
-					$rule = urlencode(serialize($circRule));
+					$rule = base64_encode(serialize($circRule));
 					$display_rule = $circRule['circRule']." -- " . $circRule['alt_circRule'];
 					$selected = $circRule['default'];
 ?>

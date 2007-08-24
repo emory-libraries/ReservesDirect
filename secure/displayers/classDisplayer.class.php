@@ -344,7 +344,7 @@ class classDisplayer extends baseDisplayer {
 			</form>
 			<p />
 			<form method="post" id="tsv_export_form" name="tsv_export_form" action="tsvGenerator.php">
-				<input type="hidden" name="dataSet" value="<?=urlencode(serialize($dataSet))?>">
+				<input type="hidden" name="dataSet" value="<?=base64_encode(serialize($dataSet))?>">
             </form>
 		</div>
 <?php
@@ -1784,7 +1784,7 @@ class classDisplayer extends baseDisplayer {
 							{	
 								//echo "<div style=\"width:100%; margin:auto;\">\n";
 								echo "	<form action=\"index.php\" method=\"post\" name=\"return_to_previous\">\n";
-										self::displayHiddenFields(unserialize(urldecode($prev_state))); 
+										self::displayHiddenFields(unserialize(base64_decode($prev_state))); 
 								echo "		<input type=\"submit\" name=\"return\" value=\"Go Back to the Previous Screen\" />\n";
 								echo "	</form>\n";
 								//echo "</div>\n";
