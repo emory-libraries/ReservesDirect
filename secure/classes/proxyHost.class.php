@@ -105,6 +105,6 @@ class proxyHost {
 		$packet = '$u' . time();
 		
 		$EZproxyTicket = urlencode(md5($g_EZproxyAuthorizationKey . $username . $packet) . $packet);
-		return $EZproxyServerURL . "/login?user=" . urlencode($username) . "&ticket=" . $EZproxyTicket . "&url=" . $url;
+		return $EZproxyServerURL . "user=" . urlencode($username) . "&ticket=" . $EZproxyTicket . "&url=" . $url;
 	}
 }
