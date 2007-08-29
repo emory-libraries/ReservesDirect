@@ -82,19 +82,16 @@ class zQuery
 			echo "$g_zReflector?host=$g_zhost&port=$g_zport&db=$g_zdb&query=" . urlencode($query) . "&start=$start&limit=$limit<br>";
 
 		$xmlresults = "";
-		if (ereg('ocm[0-9]+', $query)) // until corrected we can only search for non-personal items
-		{
-			$fp = fopen("$g_zReflector?host=$g_zhost&port=$g_zport&db=$g_zdb&query=" . urlencode($query) . "&start=$start&limit=$limit", "r");
-			if(!$fp) {
-				echo("<TR><TD>Unable to access g_zReflector at $g_zReflector!</TD></TR>\n");
-			}
-			while(!feof($fp)) {
-			      $xmlresults.= fread($fp,1024);
-			}
-			fclose($fp);
+		$fp = fopen("$g_zReflector?host=$g_zhost&port=$g_zport&db=$g_zdb&query=" . urlencode($query) . "&start=$start&limit=$limit", "r");
+		if(!$fp) {
+			echo("<TR><TD>Unable to access g_zReflector at $g_zReflector!</TD></TR>\n");
+		}
+		while(!feof($fp)) {
+			$xmlresults.= fread($fp,1024);
+		}
+		fclose($fp);
 
-			$this->xmlResults = $xmlresults;
-		} //else  echo("<TR><TD>Record not found.  This item may be hidden from searches please enter catalog information manually.</TD></TR>\n");
+		$this->xmlResults = $xmlresults;
 	}
 
 	function getResults()
