@@ -489,7 +489,12 @@ class requestManager
 		$item_data['times_pages'] = ($item->getPagesTimes() <> "") ? $item->getPagesTimes() : $search_results['times_pages'];
 		$item_data['source'] = ($item->getSource() <> "") ? $item->getSource() : $search_results['source'];
 		$item_data['controlKey'] = ($item->getLocalControlKey() <> "") ? $item->getLocalControlKey() : $search_results['controlKey'];
-		$item_data['OCLC'] = ($item->getOCLC() <> "") ? $item->getOCLC() : $search_results['OCLC'];
+		
+		if (ereg('oc[mn][0-9]+', $query)) //oclc items will be 
+		{
+			$item_data['OCLC'] = ($item->getOCLC() <> "") ? $item->getOCLC() : $search_results['OCLC'];
+		}
+		
 		$item_data['ISSN'] = ($item->getISSN() <> "") ? $item->getISSN() : $search_results['ISSN'];
 		$item_data['ISBN'] = ($item->getISBN() <> "") ? $item->getISBN() : $search_results['ISBN'];
 		$item_data['item_group'] = $item->getItemGroup();
