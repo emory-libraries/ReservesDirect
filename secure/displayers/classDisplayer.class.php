@@ -531,8 +531,10 @@ class classDisplayer extends baseDisplayer {
 	 * @desc Displays form for editting title and crosslistings
 	 */	
 
-	function displayEditTitle($cmd, $ci, $deptID, $msg=null)
+	function displayEditTitle($cmd, $ci, $deptID, $msg=null, $potential_xlistings=null)
 	{
+		global $u, $g_permission;
+		
 		if(!is_null($msg)) {
 			echo "<span class=\"helperText\">$msg</span><p />\n";
 		}
@@ -625,11 +627,11 @@ class classDisplayer extends baseDisplayer {
 		echo "  </table>\n";
 		echo " </td>\n";
 		echo " </tr>\n";
-		echo "</form>\n";
+		//echo "</form>\n";
 		echo " <tr>\n";
 		echo " 	<td height=\"15\">&nbsp;</td>\n";
 		echo " </tr>\n";
-		echo " <form action=\"index.php\" method=\"post\">\n";
+		//echo " <form action=\"index.php\" method=\"get\">\n";
 		echo " <input type=\"hidden\" name=\"cmd\" value=\"editCrossListings\">\n";
 		echo " <input type=\"hidden\" name=\"ci\" value=\"".$ci->getCourseInstanceID()."\">\n";
 		echo " <tr> \n";
@@ -641,32 +643,7 @@ class classDisplayer extends baseDisplayer {
 		echo " 		</tr>\n";
 		echo " 	</table>\n";
 		echo " 	</td>\n";
-		echo " </tr>\n";
-
-		//Create New Course
-		echo "<tr> "
-		."    	<td align=\"left\" valign=\"top\" class=\"borders\">\n"
-		."    	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\">\n"
-		."      	<tr class=\"headingCell1\">"
-		."          	<td colspan=\"8\" align=\"left\">CREATE NEW COURSE</td>\n"	
-		."			</tr>\n"
-		."          <tr> "
-		."          	<td align=\"left\" valign=\"middle\" class=\"strong\"><div align=\"center\">Department:</div></td>\n"
-		."              <td align=\"left\" valign=\"middle\">\n";
-		
-		self::displayDepartmentSelect(null, true, 'newDept');
-
-		echo "          <td align=\"left\" valign=\"middle\" class=\"strong\"><div align=\"center\">Course Number:</div></td>\n"
-		."              <td align=\"left\" valign=\"middle\"> <div align=\"left\"><input name=\"newCourseNo\" type=\"text\" id=\"Title2\" size=\"4\" maxlength=\"6\"></div></td>\n"
-		."              <td align=\"left\" valign=\"middle\" class=\"strong\"><div align=\"center\">Section:</div></td>\n"
-		."              <td align=\"left\" valign=\"middle\"> <div align=\"left\"><input name=\"newSection\" type=\"text\" size=\"4\" maxlength=\"6\"></div></td>\n"
-		."              <td align=\"left\" valign=\"middle\" class=\"strong\"><div align=\"center\">Title:</div></td>\n"
-		."          	<td align=\"left\" valign=\"middle\"> <div align=\"left\"><input name=\"newCourseName\" type=\"text\" size=\"30\"></div></td>\n"
-		."			</tr>\n";	
-		
-		echo "      <tr class=\"headingCell1\">\n";
-		echo "          <td align=\"left\" valign=\"middle\" colspan=\"8\"><div align=\"right\"><input type=\"submit\" name=\"addCrossListing\" value=\"Add Crosslisting\"></div></td>\n";
-		echo "   	</tr>\n";		
+		echo " </tr>\n";		
 		
 		//SELECT EXISTING COURSE
 		echo "		<tr> \n";
@@ -678,9 +655,42 @@ class classDisplayer extends baseDisplayer {
 		echo "	</td>\n";
 		echo "</tr>\n";				
 		
-		echo "   	</table>\n";
-		echo "		</td>\n";
-		echo " 	</tr>\n";		
+		//echo "   	</table>\n";
+		//echo "		</td>\n";
+		//echo " 	</tr>\n";		
+
+		if (!isset($_REQUEST['xlist_new_course']))
+		{
+			//give list of possible xlistings or class selecter for staff or greater
+			echo "</form>\n"; //close form so that class lookup will work
+			self::displaySelectClass($cmd, $potential_xlistings, '', array('ci'=>$_REQUEST['ci'], 'addCrossListing' => 'true'), false, 'xlist_ci', 'index.php?cmd=editCrossListings&xlist_new_course=true&ci='.$ci->getCourseInstanceID());
+		} else {
+		//Create New Course
+			echo "<tr> "
+			."    	<td align=\"left\" valign=\"top\" class=\"borders\">\n"
+			."    	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\">\n"
+			."      	<tr class=\"headingCell1\">"
+			."          	<td colspan=\"8\" align=\"left\">CREATE NEW COURSE</td>\n"	
+			."			</tr>\n"
+			."          <tr> "
+			."          	<td align=\"left\" valign=\"middle\" class=\"strong\"><div align=\"center\">Department:</div></td>\n"
+			."              <td align=\"left\" valign=\"middle\">\n";
+			
+			self::displayDepartmentSelect(null, true, 'newDept');
+	
+			echo "          <td align=\"left\" valign=\"middle\" class=\"strong\"><div align=\"center\">Course Number:</div></td>\n"
+			."              <td align=\"left\" valign=\"middle\"> <div align=\"left\"><input name=\"newCourseNo\" type=\"text\" id=\"Title2\" size=\"4\" maxlength=\"6\"></div></td>\n"
+			."              <td align=\"left\" valign=\"middle\" class=\"strong\"><div align=\"center\">Section:</div></td>\n"
+			."              <td align=\"left\" valign=\"middle\"> <div align=\"left\"><input name=\"newSection\" type=\"text\" size=\"4\" maxlength=\"6\"></div></td>\n"
+			."              <td align=\"left\" valign=\"middle\" class=\"strong\"><div align=\"center\">Title:</div></td>\n"
+			."          	<td align=\"left\" valign=\"middle\"> <div align=\"left\"><input name=\"newCourseName\" type=\"text\" size=\"30\"></div></td>\n"
+			."			</tr>\n";	
+			
+			echo "      <tr class=\"headingCell1\">\n";
+			echo "          <td align=\"left\" valign=\"middle\" colspan=\"8\"><div align=\"right\"><input type=\"submit\" name=\"addCrossListing\" value=\"Add Crosslisting\"></div></td>\n";
+			echo "   	</tr>\n";				
+		}
+
 		
 		echo "<tr>\n"
 		."          <td>&nbsp;</td>\n"
@@ -692,6 +702,7 @@ class classDisplayer extends baseDisplayer {
 		."          <td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td>\n"
 		."        </tr>\n"
 		." </table>\n";
+		echo "</form>\n";
 	}
 
 	function displayEditInstructors($ci, $addTableTitle, $dropDownDefault, $userType, $removeTableTitle, $removeButtonText, $request)

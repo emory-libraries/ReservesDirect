@@ -305,6 +305,7 @@ class classManager
 
 			case 'editTitle':
 			case 'editCrossListings':
+	
 				$loc ="edit title and crosslistings";
 				$help_article = "29";
 
@@ -312,34 +313,47 @@ class classManager
 				
 				if (!isset($_REQUEST['ci']))
 				{
+					//Prompt user to select class to xlist
 					$this->displayFunction = 'displaySelectClass';
 					$this->argList = array($cmd, null, 'Select class to add Crosslisting:', null);
 				} else {
 					$ci = new courseInstance($_REQUEST['ci']);							
 	
+					//Delete xlist 	
 					if (isset($_REQUEST['deleteCrossListings']) 
 						&& is_array($_REQUEST['deleteCrossListing']) 
 						&& !empty($_REQUEST['deleteCrossListing']))
 					{
 						$ci->removeCrossListing($_REQUEST['deleteCrossListing']);
 						$msg = " Crosslistings Successfully Removed.";
-					}
+					}					
 	
-	
+					//User has selected CA to xlist
 					if (isset($_REQUEST['addCrossListing']))
 					{
-						if (isset($_REQUEST['ca_variable']))
+						if (isset($_REQUEST['xlist_ci']))
 						{
-							$c = new course($_REQUEST['selected_ca']);
-							$dept = $c->deptID;
-							$courseNo = $c->courseNo;
-							$section = $c->section;
-							$courseName = $c->name;							
+							$x_list_ci = new courseInstance($_REQUEST['xlist_ci']);
+							$x_list_ci->getPrimaryCourse();
+							
+							$dept 		= $x_list_ci->course->deptID;
+							$courseNo 	= $x_list_ci->course->courseNo;
+							$section 	= $x_list_ci->course->section;
+							$courseName = $x_list_ci->course->name;	
 						} else {
-							$dept = $_REQUEST['newDept'];
-							$courseNo = $_REQUEST['newCourseNo'];
-							$section = $_REQUEST['newSection'];
-							$courseName = $_REQUEST['newCourseName'];
+							if (isset($_REQUEST['ca_variable']))
+							{
+								$c = new course($_REQUEST['selected_ca']);
+								$dept = $c->deptID;
+								$courseNo = $c->courseNo;
+								$section = $c->section;
+								$courseName = $c->name;							
+							} else {
+								$dept = $_REQUEST['newDept'];
+								$courseNo = $_REQUEST['newCourseNo'];
+								$section = $_REQUEST['newSection'];
+								$courseName = $_REQUEST['newCourseName'];
+							}											
 						}
 						
 						if (is_null($dept) || is_null($courseNo) || is_null($courseName))	
@@ -389,9 +403,12 @@ class classManager
 					$ci->getCrossListings();
 	
 					$deptID = $ci->course->department->getDepartmentID();
+					
+					if ($u->getRole() < $g_permission['staff'])
+						$potential_xlistings = $u->fetchCourseInstances('instructor', date('Y-m-d'), date('Y-m-d'), 'ACTIVE');
 	
 					$this->displayFunction = 'displayEditTitle';
-					$this->argList = array($cmd, $ci, $deptID, $msg);
+					$this->argList = array($cmd, $ci, $deptID, $msg, $potential_xlistings);
 				}
 			break;
 
