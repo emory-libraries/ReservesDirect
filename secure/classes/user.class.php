@@ -272,11 +272,16 @@ class user
 	 */	
 	function getName($last_name_first=true) {
 		if($last_name_first) {
-			return stripslashes($this->lastName) . ", " . stripslashes($this->firstName);
+			$displayname = stripslashes($this->lastName) . ", " . stripslashes($this->firstName);			
 		}
 		else {
-			return stripslashes($this->firstName).' '.stripslashes($this->lastName);
+			$displayname = stripslashes($this->firstName).' '.stripslashes($this->lastName);
 		}
+		
+		if (trim($displayname) == '' || trim($displayname) == ',')
+			$displayname = $this->getUsername();
+		
+		return $displayname;
 	}
 
 	function getUserID() { return $this->userID; }
