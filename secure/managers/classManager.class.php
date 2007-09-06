@@ -340,7 +340,9 @@ class classManager
 							$courseNo 	= $x_list_ci->course->courseNo;
 							$section 	= $x_list_ci->course->section;
 							$courseName = $x_list_ci->course->name;	
+							$xlist_ca	= $x_list_ci->getPrimaryCourseAliasID();
 						} else {
+							$xlist_ca = null;
 							if (isset($_REQUEST['ca_variable']))
 							{
 								$c = new course($_REQUEST['selected_ca']);
@@ -355,11 +357,11 @@ class classManager
 								$courseName = $_REQUEST['newCourseName'];
 							}											
 						}
-						
+					
 						if (is_null($dept) || is_null($courseNo) || is_null($courseName))	
 							$alertMsg =	'Please supply a Department, Course#, Section, and Title before adding the Cross Listing.';
 						else 
-							$user->addCrossListing($ci, $dept, $courseNo, $section, $courseName);
+							$user->addCrossListing($ci, $dept, $courseNo, $section, $courseName, $xlist_ca);
 							$msg = " Crosslistings Successfully Added.";						
 	
 					}

@@ -122,11 +122,19 @@ class proxy extends student
 	* @return void
 	* @desc add a cross listing to a course_instance
 	*/
-	function addCrossListing($ci, $dept, $courseNo, $section, $courseName)
+	function addCrossListing($ci, $dept, $courseNo, $section, $courseName, $ca=null)
 	{
-		$course = new course();
-		$course->createNewCourse($ci->courseInstanceID);
 
+		$course = new course();
+		if (is_null($ca))
+			$course->createNewCourse($ci->courseInstanceID);
+		else
+		{
+			$course->course($ca);
+			$course->bindToCourseInstance($ci->courseInstanceID);
+		}
+	
+		
 		$course->setDepartmentID($dept);
 		$course->setCourseNo($courseNo);
 		$course->setSection($section);
