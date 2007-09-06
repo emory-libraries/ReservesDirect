@@ -341,11 +341,11 @@ class course
 
 		switch ($g_dbConn->phptype)
 		{
-			default: //'mysql'
-				$sql = "UPDATE course_aliases SET course_instance_id = ! WHERE course_id = !";
+			default: //'mysql'  
+				$sql = "UPDATE course_aliases SET course_instance_id = ! WHERE course_alias_id = !";
 		}
 
-		$rs = $g_dbConn->query($sql, array($course_instance_id, $this->courseID));
+		$rs = $g_dbConn->query($sql, array($course_instance_id, $this->courseAliasID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }		
 	}
 }
