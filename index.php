@@ -26,6 +26,10 @@ http://www.reservesdirect.org/
 
 *******************************************************************************/
 
+// workaround for workaround for ie's idiotic caching policy handling
+header("Cache-Control: no-cache");
+header("Pragma: no-cache");
+
 $load_start_time = time();
 require_once("secure/config.inc.php");
 require_once("secure/common.inc.php");
