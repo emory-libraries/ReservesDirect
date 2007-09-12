@@ -46,12 +46,10 @@ class exportManager extends baseManager {
 				$data .= "	</HEAD>\n";
 				$data .= "</HTML>\n";		
 				
-				
-				
-				ob_clean();
-				
 				header("Content-Type: text/plain");
 				header("Content-Disposition: attachment; filename=\"$filename\"");
+                header("Cache-control: ");
+                header("Pragma: ");
 				
 				echo $data;
 				exit;
