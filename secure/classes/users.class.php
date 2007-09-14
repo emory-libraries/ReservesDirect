@@ -340,7 +340,7 @@ class users
 					.  "FROM users as u "
 					.  " LEFT JOIN access as a ON a.user_id = u.user_id AND a.permission_level = ? "
 					.  " LEFT JOIN instructor_attributes as ia ON u.user_id = ia.user_id "
-					.  "WHERE u.dflt_permission_level >= ? "
+					.  "WHERE u.dflt_permission_level >= ? AND u.last_name IS NOT NULL AND u.last_name <> '' "
 					.  "ORDER BY u.last_name"
 					;
 		}
