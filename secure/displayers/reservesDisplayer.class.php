@@ -769,6 +769,16 @@ function displayUploadForm($user, $ci, $type, $docTypeIcons=null)
 		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>URL:</div></td>\n";
 		echo "					<td align=\"left\"><input name=\"url\" type=\"text\" size=\"50\"></td>\n";
 		echo "				</tr>\n";
+		echo "				<tr>\n";
+		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\">&nbsp;</td>\n";
+		echo "					<td><font size='-2'>\n";
+		echo "						   http://www.reservesdirect.org<br/>\n";
+		echo "						   http://links.jstor.org/xxxxx<br/>\n";
+		echo "						   http://dx.doi.org/10.xxxxx\n";
+		echo "						</font>\n";
+		echo "					</td>\n";
+		echo "				</tr>\n";
+		
 	} else {
 		echo "				<tr valign=\"middle\">\n";
 		echo "					<td align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\" class=\"strong\"><font color=\"#FF0000\"><strong>*</strong></font>File:</div></td>\n";

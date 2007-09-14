@@ -596,6 +596,15 @@ class requestDisplayer extends noteDisplayer {
 					<input name="url" type="text" size="50" DISABLED>
 				</td>
 			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td><font size='-2'>
+					   http://www.reservesdirect.org<br/>
+					   http://links.jstor.org/xxxxx<br/>
+					   http://dx.doi.org/10.xxxxx
+					</font>
+				</td>
+			</tr>
 		</table>
 
 <?php		
