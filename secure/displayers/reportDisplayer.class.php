@@ -93,6 +93,7 @@ class reportDisplayer extends baseDisplayer {
 				echo "<tr align=\"left\" valign=\"middle\" class=".$rowClass.">\n";
 				foreach ($dataSet[$i] as $key => $value) 
 				{
+					$value = urldecode($value);
 					echo "	<td>$value</td>\n";				
 				}
 				$i++;
