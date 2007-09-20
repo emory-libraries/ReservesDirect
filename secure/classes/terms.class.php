@@ -41,7 +41,7 @@ class terms
 				$sql = 	"SELECT term_id "
 				.		"FROM terms "
 				.		"WHERE end_date >= ? "
-				.		"ORDER BY sort_order DESC LIMIT 4"
+				.		"ORDER BY sort_order ASC LIMIT 4"
 				;
 				$d = date("Y-m-d");
 				
