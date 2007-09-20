@@ -145,7 +145,7 @@ class classDisplayer extends baseDisplayer {
 						<input type="hidden" name="cmd" value="<?=$next_cmd?>" />
 						<input type="hidden" name="ci" value="<?=$ci->getCourseInstanceID()?>" />
 						
-						<span class="label">Class Status: </span>
+						<span class="label">Class Status</span>:
 						<input type="radio" name="status" value="ACTIVE" <?php echo ($ci->getStatus()=='ACTIVE') ? 'checked="true"' : 'moo'; ?> /> <span class="<?=common_getStatusStyleTag('ACTIVE')?>">ACTIVE</span>
 						<input type="radio" name="status" value="INACTIVE" <?php echo (($ci->getStatus()=='INACTIVE') || ($ci->getStatus()=='AUTOFEED')) ? 'checked="true"' : ''; ?> /> <span class="<?=common_getStatusStyleTag('INACTIVE')?>">INACTIVE</span>
 <?php 		if($ci->getStatus()=='AUTOFEED'): ?>
@@ -162,12 +162,12 @@ class classDisplayer extends baseDisplayer {
 					<form name="change_dates_form" action="index.php" method="post">
 						<input type="hidden" name="cmd" value="<?=$next_cmd?>" />
 						<input type="hidden" name="ci" value="<?=$ci->getCourseInstanceID()?>" />
-						<span class="label">Class Active Dates: </span><input type="text" id="activation" name="activation" size="10" maxlength="10" value="<?=$ci->getActivationDate()?>" /> <?=$calendar->getWidgetAndTrigger('activation', $ci->getActivationDate())?> to <input type="text" id="expiration" name="expiration" size="10" maxlength="10" value="<?=$ci->getExpirationDate()?>" /> <?=$calendar->getWidgetAndTrigger('expiration', $ci->getExpirationDate())?> <input type="submit" name="updateClassDates" value="Change Dates">
+						<span class="label">Class Active Dates</span>: <input type="text" id="activation" name="activation" size="10" maxlength="10" value="<?=$ci->getActivationDate()?>" /> <?=$calendar->getWidgetAndTrigger('activation', $ci->getActivationDate())?> to <input type="text" id="expiration" name="expiration" size="10" maxlength="10" value="<?=$ci->getExpirationDate()?>" /> <?=$calendar->getWidgetAndTrigger('expiration', $ci->getExpirationDate())?> <input type="submit" name="updateClassDates" value="Change Dates">
 					</form>
 				</div>			
 <?php	endif; ?>
-
-			</div>
+			
+			</div>			
 
 <?php	if($show_quicklinks_box): ?>
 			<div id="courseActions">
@@ -186,9 +186,15 @@ class classDisplayer extends baseDisplayer {
 				</ul>
 			</div>
 <?php	endif; ?>
+		
+		</div>		
+		<div class="clear"></div>
 
-			<div class="clear"></div>
-		</div>
+		<div class="courseHeaders">
+			<span class="label">Copyright Approved</span>: <?= $ci->getReviewed(); ?>
+		</div>		
+
+			
 <?php		
 	} //displayEditClassHeader()
 	
@@ -334,7 +340,12 @@ class classDisplayer extends baseDisplayer {
 					</td>
 				</tr>
 				<tr valign="middle">
-					<td class="headingCell1" style="text-align:right; padding:2px;" align="right" colspan="2">
+					<td class="headingCell1" style="text-align:left; padding:2px;" align="left">
+						<? if ($u->getRole() >= $g_permission['staff'] && !$ci->reviewed()) { ?>
+							<input type="submit" name="approve_copyright" value="Approve Copyright" />
+						<? } ?>	&nbsp;				
+					</td>
+					<td class="headingCell1" style="text-align:right; padding:2px;" align="right">
 						<input type="submit" name="delete_multiple" value="Delete Selected" />
 						<input type="submit" name="copy_multiple" value="Copy Selected to Another Class" />
 						<input type="submit" name="edit_multiple" value="Edit Selected" />

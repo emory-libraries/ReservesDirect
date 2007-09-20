@@ -95,6 +95,9 @@ class reserve extends Notes {
 		$this->reserveID = $row[0];
 		$this->creationDate = $d;
 		$this->lastModDate = $d;
+		
+		$ci = new courseInstance($courseInstanceID);
+		$ci->clearReviewed(); //adding reserves requires review
 
 		$this->getReserveByID($this->reserveID);
 		return true;

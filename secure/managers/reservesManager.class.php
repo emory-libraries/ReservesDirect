@@ -561,6 +561,10 @@ class reservesManager
 					//need the CI
 					$ci = new courseInstance($_REQUEST['ci']);
 					
+					if ($_REQUEST['approve_copyright'])
+					{
+						$ci->setReviewed($u->getUserID(), date("Y-m-d"));
+					}
 					//get array of selected reserve IDs
 					$reserve_ids = !empty($_REQUEST['selected_reserves']) ? $_REQUEST['selected_reserves'] : array();
 									

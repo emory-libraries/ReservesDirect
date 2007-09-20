@@ -58,6 +58,9 @@ class courseInstance
 	public $containsHeading = false;
 	public $duplicates = array();
 	
+	public $reviewedBy;
+	public $reviewedOn;
+	
 
 
 	function courseInstance($courseInstanceID = NULL)
@@ -96,6 +99,7 @@ class courseInstance
 		
 		//set the ID -- needed for setting of the course info
 		$this->courseInstanceID = $ci_id;		
+		$this->clearReviewed();		
 		
 		//now get or create a course
 		
@@ -126,7 +130,7 @@ class courseInstance
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql  = "SELECT ci.primary_course_alias_id, ci.term, ci.year, ci.activation_date, ci.expiration_date, ci.status, ci.enrollment "
+				$sql  = "SELECT ci.primary_course_alias_id, ci.term, ci.year, ci.activation_date, ci.expiration_date, ci.status, ci.enrollment, ci.reviewed_date, ci.reviewed_by "
 					  //. "FROM course_instances as ci LEFT JOIN course_aliases as ca ON ci.course_instance_id = ca.course_instance_id "
 					  . "FROM course_instances as ci "
 					  . "WHERE ci.course_instance_id = !";
@@ -144,6 +148,8 @@ class courseInstance
 			$this->expirationDate		= $row[4];
 			$this->status				= $row[5];
 			$this->enrollment			= $row[6];
+			$this->reviewedOn			= $row[7];
+			$this->reviewedBy			= $row[8];
 	}
 	
 	
@@ -963,7 +969,8 @@ class courseInstance
 	 * @param array $requested_loan_periods (optional) Array of requested loan periods for physical-item reserves.
 	 * @desc Copies reserves from this CI to the destination CI
 	 */
-	function copyReserves($dst_ci_id, $selected_reserves=null, $requested_loan_periods=null) {
+	function copyReserves($dst_ci_id, $selected_reserves=null, $requested_loan_periods=null) 
+	{		
 		if(empty($dst_ci_id)) {
 			return;
 		}
@@ -978,6 +985,7 @@ class courseInstance
 
 		//copy reserves
 		$this->copyReserveTree($tree, $dst_ci, null, $selected_reserves, $requested_loan_periods);
+		$dst_ci->setReviewed($this->getReviewedBy(), $this->getReviewedOn());
 	}	
 	
 	
@@ -1192,6 +1200,41 @@ class courseInstance
 		}
 	}
 
+	/**
+	 * @return void
+	 * @param user_id integer modified user id
+	 * @param date date most likely now
+	 * @desc set reviewing user and date
+	 */	
+	function setReviewed($user_id, $date) {
+		global $g_dbConn;
+
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "UPDATE course_instances SET reviewed_by = !, reviewed_date = ? WHERE course_instance_id = !";
+		}
+
+		$rs = $g_dbConn->query($sql, array($user_id, $date, $this->getCourseInstanceID()));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }		
+	}
+
+	/**
+	 * @return void
+	 * @desc reset reviewed
+	 */	
+	function clearReviewed() {
+		global $g_dbConn;
+
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "UPDATE course_instances SET reviewed_by = null, reviewed_date = null WHERE course_instance_id = !";
+		}
+
+		$rs = $g_dbConn->query($sql, array($this->getCourseInstanceID()));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }		
+	}	
 
 	function getCourseInstanceID() { return $this->courseInstanceID; }
 	function getPrimaryCourseAliasID() {return $this->primaryCourseAliasID;}
@@ -1202,6 +1245,21 @@ class courseInstance
 	function getExpirationDate() { return $this->expirationDate; }
 	function getStatus() { return $this->status; }
 	function getEnrollment() { return $this->enrollment; }
+	
+	function reviewed() { return !is_null($this->reviewedBy); }
+	
+	function getReviewedBy() { return $this->reviewedBy; }
+	function getReviewedOn() { return $this->reviewedOn; }
+	function getReviewed() 
+	{
+		if (!is_null($this->reviewedBy))
+		{
+			$r_user = new user($this->reviewedBy);
+			return 	$r_user->getName() . ' on ' . $this->reviewedOn;
+		} else {
+			return '';
+		}
+	}
 
 }
 ?>
