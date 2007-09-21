@@ -190,9 +190,11 @@ class classDisplayer extends baseDisplayer {
 		</div>		
 		<div class="clear"></div>
 
+		<? $color = ($ci->reviewed() ? 'green' : 'red'); ?> 
 		<div class="courseHeaders">
-			<span class="label">Copyright Approved</span>: <?= $ci->getReviewed(); ?>
+			<span class="label">Copyright Approved</span>: <span style="color: <?=$color?>;"><?= $ci->getReviewed(); ?></span>
 		</div>		
+		<br/>
 
 			
 <?php		
@@ -342,7 +344,7 @@ class classDisplayer extends baseDisplayer {
 				<tr valign="middle">
 					<td class="headingCell1" style="text-align:left; padding:2px;" align="left">
 						<? if ($u->getRole() >= $g_permission['staff'] && !$ci->reviewed()) { ?>
-							<input type="submit" name="approve_copyright" value="Approve Copyright" />
+							<input type="submit" name="approve_copyright" value="Approve Copyrights" />
 						<? } ?>	&nbsp;				
 					</td>
 					<td class="headingCell1" style="text-align:right; padding:2px;" align="right">

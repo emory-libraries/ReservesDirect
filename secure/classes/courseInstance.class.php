@@ -1255,9 +1255,9 @@ class courseInstance
 		if (!is_null($this->reviewedBy))
 		{
 			$r_user = new user($this->reviewedBy);
-			return 	$r_user->getName() . ' on ' . $this->reviewedOn;
+			return 	'All copyrights approved by ' . $r_user->getName() . ' on ' . $this->reviewedOn;
 		} else {
-			return '';
+			return 'Staff review needed';
 		}
 	}
 
