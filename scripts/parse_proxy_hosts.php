@@ -1,4 +1,4 @@
-#!/usr/local/bin/php -q
+#!/usr/bin/php -q
 
 <?
 /*******************************************************************************
@@ -101,7 +101,7 @@ if ($proxy_id == '')
 
 while(($line = trim(fgets($fp, $feedLineLength))) != FALSE)
 {	
-	if ($line[0] != '#') //ignore comments
+	if (preg_match('/^[dhu][j\ ]?/i', $line))
 	{	
 		list($directive, $domain) = split($feedDelimiter, $line);
 				
