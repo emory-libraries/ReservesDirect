@@ -99,7 +99,7 @@ if ($proxy_id == '')
 	}	
 }
 
-while(($line = trim(fgets($fp, $feedLineLength))) != FALSE)
+while(($line = fgets($fp, $feedLineLength)) != FALSE)
 {	
 	if (preg_match('/^[dhu][j\ ]?/i', $line))
 	{	
@@ -115,7 +115,7 @@ while(($line = trim(fgets($fp, $feedLineLength))) != FALSE)
 		$host = trim(rtrim($domain, '/'));
 		$rs =& $g_dbConn->query($insert_host, array($proxy_id, $host, $partial_match));
 	
-		//echo ($sql . ", " .  $line[$net_id] . ", " .  $line[$last_name] . ", " .  $line[$first_name] . ", " .  $line[$email] . "\n");
+		//echo ($sql . ", " .  $line[$net_id] . ", " .  $line[$last_name] . ", " .  $line[$first_name] . ", " .  $line[$email] . "/n");
 
 		if (DB::isError($rs)) 
 		{	
