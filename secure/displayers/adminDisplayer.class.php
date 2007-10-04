@@ -41,12 +41,10 @@ class adminDisplayer extends baseDisplayer
 	function displayAdminFunctions()
 	{
 ?>
-	<a href="index.php?cmd=admin&function=editDept">Add/Edit Departments</a>
-	<p />
-	<a href="index.php?cmd=admin&function=editLib">Add/Edit Libraries</a>
-	<p />
-	<a href="index.php?cmd=admin&function=editClassFeed">Manage Course Feed for a Class</a>
-	<p />
+	<p><a href="index.php?cmd=admin&function=editDept">Add/Edit Departments</a></p>
+	<p><a href="index.php?cmd=admin&function=editLib">Add/Edit Libraries</a></p>
+	<p><a href="index.php?cmd=admin&function=editClassFeed">Manage Course Feed for a Class</a></p>
+	<p><a href="index.php?cmd=admin&function=clearReviewedFlag">Flag Course for Copyright Review</a></p>
 	
 	<strong>Help</strong>
 	<br />

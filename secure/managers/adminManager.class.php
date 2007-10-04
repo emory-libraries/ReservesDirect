@@ -165,6 +165,31 @@ class adminManager
 				}
 			break;
 			
+			case 'clearReviewedFlag':
+				$src_ci = null;				
+				if (!is_null($_REQUEST['src_ci']))
+				{
+					$src_ci =  new courseInstance($_REQUEST['src_ci']);
+					$src_ci->getPrimaryCourse();
+					$src_ci->getCrossListings();	
+					
+					$courseList =  array_merge(array($src_ci->course), $src_ci->crossListings);
+				}				
+
+				if (is_null($src_ci))
+				{
+					$this->displayFunction = "displaySelectClass";
+					$this->argList = array("admin", null, 'Select a course to reset review status', array("function" => $function), false, "src_ci", null);					
+				} else {				
+					$src_ci->clearReviewed();
+					
+					$alertMsg = "Copyright Status reset";
+					$this->adminManager($cmd, $user, $function);					
+				} 
+
+				
+			break;
+			
 			default:
 				$loc = "System Administration";
 			
