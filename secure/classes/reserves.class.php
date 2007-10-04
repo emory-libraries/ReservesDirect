@@ -97,9 +97,14 @@ class reserve extends Notes {
 		$this->lastModDate = $d;
 		
 		$ci = new courseInstance($courseInstanceID);
-		$ci->clearReviewed(); //adding reserves requires review
-
+		
 		$this->getReserveByID($this->reserveID);
+		$this->getItem();
+		
+		if($this->item->copyrightReviewRequired())
+		{ 
+			$ci->clearReviewed(); //adding reserves requires review
+		}		
 		return true;
 	}
 

@@ -88,7 +88,12 @@ class reserveItem extends item
 		}
 		else {
 			//pull the info
-			list($this->itemID, $this->title, $this->itemGroup, $this->lastModDate, $this->creationDate, $this->itemType, $this->author, $this->source, $this->volumeEdition, $this->pagesTimes, $this->performer, $this->localControlKey, $this->URL, $this->mimeTypeID, $this->homeLibraryID, $this->privateUserID, $this->volumeTitle, $this->itemIcon, $this->ISBN, $this->ISSN, $this->OCLC) = $rs;
+			list($this->itemID, $this->title, $this->itemGroup, $this->lastModDate, $this->creationDate, 
+				$this->itemType, $this->author, $this->source, $this->volumeEdition, $this->pagesTimes, 
+				$this->performer, $this->localControlKey, $this->URL, $this->mimeTypeID, 
+				$this->homeLibraryID, $this->privateUserID, $this->volumeTitle, $this->itemIcon, 
+				$this->ISBN, $this->ISSN, $this->OCLC) 
+			= $rs;
 				
 			//get the notes
 			$this->setupNotes('items', $this->itemID);
@@ -544,7 +549,7 @@ class reserveItem extends item
 	function getPagesTimes() { return htmlentities(stripslashes($this->pagesTimes)); }
 	function getPerformer() { return htmlentities(stripslashes($this->performer)); }
 	function getLocalControlKey() { return stripslashes($this->localControlKey); }
-	function getURL() { return ($this->URL != '') ? stripslashes($this->URL) : false; }
+	function getURL() { return ($this->URL != '' && !is_null($this->URL)) ? stripslashes($this->URL) : false; }
 	
 	function getISBN() { return $this->ISBN; }
 	function getISSN() { return $this->ISSN; }
@@ -649,4 +654,19 @@ class reserveItem extends item
 		
 		return $classes;
 	}
+	
+	/**
+	* @return boolean
+	* @desc determine if adding this item to a reserves list will require staff review
+	*/	
+	function copyrightReviewRequired()
+	{
+		//review is required for all documents except physical items and external links
+		
+		$not_heading 	= !$this->isHeading();
+		$local			= $this->isLocalFile();
+		$not_manuscript = !($this->getItemGroup() == 'MANUSCRIPT');
+		
+		return ($not_heading && $local && $not_manuscript);		
+	}	
 }
