@@ -48,7 +48,7 @@ class Calendar extends DHTML_Calendar {
 			'weekNumbers'	=> false,	//show week numbers
 			'showsTime'		=> false,
 			'cache'			=> false,
-			'range'			=> array(date('Y'), date('Y', mktime(date('Y')+1)))	//limit dates from current year to next year
+			'range'			=> array(date('Y'), date('Y')+2)	//limit dates from current year to next year
 //'range' => '[2000,2010]'
 		);
 			
