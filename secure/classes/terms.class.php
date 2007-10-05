@@ -40,10 +40,10 @@ class terms
 			default: //'mysql'
 				$sql = 	"SELECT term_id "
 				.		"FROM terms "
-				.		"WHERE end_date >= ? "
-				.		"ORDER BY sort_order ASC LIMIT 4"
+				. 		"WHERE end_date > NOW() "
+				.		"ORDER BY sort_order ASC "
+				.		"LIMIT 4"
 				;
-				$d = date("Y-m-d");
 				
 				if ($getAll)
 				{
@@ -51,12 +51,11 @@ class terms
 					.		"FROM terms "
 					.		"ORDER BY sort_order DESC"
 					;
-					$d = null;
 				}
 				
 		}
 
-		$rs = $g_dbConn->query($sql, $d);
+		$rs = $g_dbConn->query($sql);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		unset($tmpArray);
