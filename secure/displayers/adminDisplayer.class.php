@@ -43,6 +43,7 @@ class adminDisplayer extends baseDisplayer
 ?>
 	<p><a href="index.php?cmd=admin&function=editDept">Add/Edit Departments</a></p>
 	<p><a href="index.php?cmd=admin&function=editLib">Add/Edit Libraries</a></p>
+	<p><a href="index.php?cmd=admin&function=editTerms">Add/Edit Terms</a></p>
 	<p><a href="index.php?cmd=admin&function=editClassFeed">Manage Course Feed for a Class</a></p>
 	<p><a href="index.php?cmd=admin&function=clearReviewedFlag">Flag Course for Copyright Review</a></p>
 	
@@ -446,6 +447,168 @@ class adminDisplayer extends baseDisplayer
 		print "</table>\n";
 		
 		print("</form>\n");
+	}	
+	
+	
+	function displayEditTerm($function, $terms, $edit_id = null)
+	{	
+		global $calendar;	
+		?>
+		<script language="JavaScript1.2" src="secure/javascript/liveSearch.js"></script>
+		<script language="JavaScript1.2">
+			function termReturnAction(term_array)
+			{
+				eval("var term = " + decode64(term_array));	
+					
+				document.getElementById('editTermArea').style.display = '';	
+
+				if (typeof(term['term_id']) != "undefined")
+				{
+					document.getElementById('term_id').value 	= term['term_id'];					
+															
+					document.getElementById('sort_order').enabled = true;
+					document.getElementById('term_name').enabled = true;
+					document.getElementById('term_year').enabled = true;
+					document.getElementById('begin_date').enabled = true;					
+					document.getElementById('end_date').enabled = true;
+					
+					document.getElementById('term_name').focus();
+				}
+				
+			}
+			
+			function checkSubmit()
+			{
+				if (document.getElementById('term_name').SelectIndex == -1)
+				{
+					alert ("Term Name is required.");
+					return false;
+				}
+								
+				if (document.getElementById('term_year').value == "")
+				{
+					alert ("Year is required.");
+					return false;
+				}
+
+				if (document.getElementById('begin_date').value == "")
+				{
+					alert ("Begin Date is required.");
+					return false;
+				}				
+				if (document.getElementById('end_date').value == "")
+				{
+					alert ("End Date is required.");
+					return false;
+				}				
+				if (document.getElementById('sort_order').value == "")
+				{
+					alert ("Sort Order is required.");
+					return false;
+				}												
+			}
+			
+			function createNew(deptName){
+				document.getElementById('editTermArea').style.display = '';	
+				
+				document.getElementById('term_id').enabled = false;
+				document.getElementById('term_name').value 	= deptName;
+				
+				document.getElementById('term_name').focus();
+			}
+			
+			function load()
+			{
+				<? if (!is_null($edit_id)) { ?>
+				<? $term = new term($edit_id); ?>
+					document.getElementById('editTermArea').style.display = '';
+					document.getElementById('term_id').value 	=  <?=  $term->getTermID(); ?>;
+					document.getElementById('term_name').value 	= '<?= $term->getTermName(); ?>';
+					document.getElementById('term_year').value 	= '<?= $term->getTermYear(); ?>';
+					document.getElementById('begin_date').value 		= '<?= $term->getBeginDate(); ?>';
+					document.getElementById('end_date').value 		= '<?= $term->getEndDate(); ?>';
+					document.getElementById('sort_order').value = '<?= $term->getSortOrder(); ?>';
+					
+					document.getElementById('newTerm').style.display = 'none';
+					//document.getElementById('term_id_select').style.display = 'none';
+				<? } ?>
+			}
+		</script>			
+		
+		<table>
+			<tr>
+				<td width="5"></td>
+				<td><input type="button" onClick="createNew('');" value="New Term" id="newTerm"></td>
+			</tr>
+			<tr><td width="5"></td><td class="strong">Select a Term:</td></tr>
+		<form method="POST" action="index.php?cmd=admin&function=editTerms">	
+			<tr><td width="5"></td>
+		
+				<td>
+					<select id="term_id_select" name="term_id_select" onChange="this.form.submit();">
+						<option value=''>Select A Term</option>
+						<? foreach ($terms as $term) { ?>
+							<option value="<?= $term->getTermID() ?>"> <?= $term->getTermName() ?> <?= $term->getTermYear() ?>
+						<? } ?>
+					</select>
+				</td>
+		
+			</tr>
+		</form>
+		<form method="POST" action="index.php?cmd=admin&function=saveTerm" onSubmit="return checkSubmit();">
+		<input type="hidden" id="term_id" name="term_id" value="">			
+			<? $last_term = reset($terms); ?>
+			
+			<tr><td></td><td>&nbsp;</td></tr>
+
+			<table id="editTermArea" style="display: none;">
+				<tr>
+					<td>&nbsp;</td>
+					<td>Term:</td>
+					
+					<td align="left">
+						<select name="term_name" id="term_name">
+							<option>Fall</option>
+							<option>Spring</option>
+							<option>Summer</option>
+						</select>
+						<input id="term_year" name="term_year" value="<?= $last_term->getTermYear() + 1 ?>" size="4">
+					</td>
+				</tr>				
+				<tr>
+					<td>&nbsp;</td>
+					<td>Begin Date:</td>
+					<td>
+						<input type="text" id="begin_date" name="begin_date" size="10" maxlength="10" value="<?= $last_term->getEndDate() ?>"/>
+						<?=$calendar->getWidgetAndTrigger('begin_date', $last_term->getEndDate())?>
+					</td>
+					<td><i>default date for class/reserve activation if not provided in feed</i></td>
+				</tr>
+				<tr>
+					<td>&nbsp;</td>
+					<td>End Date:</td>
+					<td>
+						<input type="text" id="end_date" name="end_date" size="10" maxlength="10" value="<?= $last_term->getEndDate() ?>" />
+						<?=$calendar->getWidgetAndTrigger('end_date', $last_term->getEndDate())?>
+					</td>
+					<td><i>default date for class/reserve expiration if not provided in feed</i></td>
+				</tr>	
+				<tr>
+					<td>&nbsp;</td>
+					<td>Sort Order:</td>
+					<td><input type="text" id="sort_order" name="sort_order" size="4" maxlength="3" value="<?= $last_term->getSortOrder() + 1?>" /> </td>
+					<td><i><?= $last_term->getSortOrder() ?> is the current max sort.  You probably want to use the next value</i></td>
+				</tr>			
+			</table>
+			
+		</table>		
+		
+		<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+		<tr><td>&nbsp;</td><td><input type=submit value="Save Term" id="frmSubmit"></td></tr>
+		
+		</form>
+		<script language="JavaScript">load();</script>
+		<?
 	}	
 }
 ?>

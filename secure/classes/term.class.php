@@ -42,6 +42,30 @@ class term
 	}
 	
 	
+	function create($name, $year, $begin, $end, $sort)
+	{
+		global $g_dbConn;
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "INSERT INTO terms (term_name, term_year, begin_date, end_date, sort_order) VALUES (?, ?, ?, ?, !)";
+				$sql2 = "SELECT LAST_INSERT_ID() FROM terms";
+		}
+
+
+		$rs = $g_dbConn->query($sql, array($name, $year, $begin, $end, $sort));		
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+		$rs = $g_dbConn->query($sql2);
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+		$row = $rs->fetchRow();
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		$this->getTermByID($row[0]);
+		return true;		
+	}
+	
 	/**
 	 * @return boolean
 	 * @param int $term_id Term ID
@@ -139,5 +163,23 @@ class term
 	function getTermYear() { return $this->term_year; }
 	function getBeginDate() { return $this->begin_date; }
 	function getEndDate() { return $this->end_date; }
+	
+	function update($name, $year, $begin, $end, $sort)
+	{
+		global $g_dbConn;
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "UPDATE terms SET term_name = ?, term_year = ?, begin_date = ?, end_date = ?, sort_order = ! WHERE term_id = !";
+		}
+
+
+		$rs = $g_dbConn->query($sql, array($name, $year, $begin, $end, $sort, $this->getTermID()));		
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+		return true;		
+	}
+	
+	
 }
 ?>

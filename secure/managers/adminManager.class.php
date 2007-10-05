@@ -29,6 +29,8 @@ http://www.reservesdirect.org/
 require_once("secure/displayers/adminDisplayer.class.php");
 require_once("secure/classes/department.class.php");
 require_once("secure/classes/library.class.php");
+require_once("secure/classes/terms.class.php");
+require_once("secure/classes/json_wrapper.class.php");
 
 class adminManager
 {
@@ -55,7 +57,7 @@ class adminManager
 		
 		switch ($function)
 		{
-			
+/* Departments */			
 			case 'editDept':
 				$libraries = $u->getLibraries();
 			
@@ -86,7 +88,7 @@ class adminManager
 						
 				}
 			break;
-			
+/* Libraries */			
 			case 'editLib':
 				$this->displayFunction = "displayEditLibrary";
 				$this->argList = array($u->getLibraries());
@@ -124,7 +126,7 @@ class adminManager
 				$this->adminManager($cmd, $user, null);
 				
 			break;
-			
+/* Registrar Key */			
 			case 'editClassFeed':
 				//Admin will be prompted to select a CI 
 				//then if Cross-listings exist for this CI a course_alias (CA) must be selected
@@ -164,7 +166,7 @@ class adminManager
 					$this->adminManager($cmd, $user, null);
 				}
 			break;
-			
+/* Copyright Flag */			
 			case 'clearReviewedFlag':
 				$src_ci = null;				
 				if (!is_null($_REQUEST['src_ci']))
@@ -184,11 +186,37 @@ class adminManager
 					$src_ci->clearReviewed();
 					
 					$alertMsg = "Copyright Status reset";
-					$this->adminManager($cmd, $user, $function);					
+					$this->adminManager($cmd, $user, null);					
 				} 
 
 				
 			break;
+/* Term */
+			case 'editTerms':				
+				$terms = Terms::getTerms(true);
+				$this->displayFunction = "displayEditTerm";
+				$this->argList = array($function, $terms, $_REQUEST['term_id_select']);			
+			break;			
+
+			case 'saveTerm':
+				$t_id = (isset($_REQUEST['term_id']) && $_REQUEST['term_id'] != "") ? $_REQUEST['term_id'] : null;
+				$term = new term($t_id);
+				
+				if (is_null($t_id))
+				{
+					$term->create($_REQUEST['term_name'], $_REQUEST['term_year'], $_REQUEST['begin_date'], $_REQUEST['end_date'], $_REQUEST['sort_order']);
+					$alertMsg = "Term Successfully Added";
+					$this->adminManager($cmd, $user, null);
+				} else {
+
+					if ($term->update($_REQUEST['term_name'], $_REQUEST['term_year'], $_REQUEST['begin_date'], $_REQUEST['end_date'], $_REQUEST['sort_order']))
+					{
+						$alertMsg = "Term Successfully Updated";
+						$this->adminManager($cmd, $user, null);
+					}
+						
+				}
+			break;			
 			
 			default:
 				$loc = "System Administration";
