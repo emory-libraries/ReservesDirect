@@ -35,12 +35,12 @@ class zQuery
 
 	function zQuery($search_term, $search_field='control')
 	{
-		global $g_zhost;
+		global $g_zhost, $g_zport;
 
 		if ($search_field == 'barcode')  //use barcode to get controlNumber
 		{
 			//open socket to EUCLID widget which will return a controlNumber
-			$fp = fsockopen($g_zhost, 4321, $errno, $errstr, 60);
+			$fp = fsockopen($g_zhost, $g_zport, $errno, $errstr, 60);
 			if (!$fp) {
 				 trigger_error("zQuery could not connect $errstr ($errno)", E_USER_ERROR);
 			} else {
