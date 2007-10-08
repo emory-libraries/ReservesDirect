@@ -30,6 +30,7 @@ require_once("secure/displayers/adminDisplayer.class.php");
 require_once("secure/classes/department.class.php");
 require_once("secure/classes/library.class.php");
 require_once("secure/classes/terms.class.php");
+require_once("secure/classes/news.class.php");
 require_once("secure/classes/json_wrapper.class.php");
 
 class adminManager
@@ -48,7 +49,7 @@ class adminManager
 
 	function adminManager($cmd, $user, $request)
 	{
-		global $ci, $loc, $u, $alertMsg;
+		global $ci, $loc, $u, $alertMsg, $g_permission;
 		
 		$this->displayClass = "adminDisplayer";
 		$this->user = $user;
@@ -216,7 +217,60 @@ class adminManager
 					}
 						
 				}
-			break;			
+			break;		
+/* News */
+			case 'editNews':
+				if (isset($_REQUEST['id']))
+				{
+					$news_item = news::getByID($_REQUEST['id']);
+				} 
+				
+				$news = news::getAll();
+				$this->displayFunction = "displayEditNews";
+				$this->argList = array($function, $news, $news_item);			
+			break;	
+			
+			case 'insertNews':
+				$perm_levels = array();
+				if(sizeof($_REQUEST['permission_level']) == sizeof($g_permission))
+				{
+					$perm_levels[0] = null;
+				} else {
+					$perm_levels = $_REQUEST['permission_level'];
+				}
+				if(isset($_REQUEST['begin_time_null']) && $_REQUEST['begin_time_null'] == 'on')
+					$begin = null;
+				else
+					$begin = date('Y-m-d H:i:s', strtotime($_REQUEST['begin_time']));
+				if(isset($_REQUEST['end_time_null']) && $_REQUEST['end_time_null'] == 'on')
+					$end = null;
+				else
+					$end =  date('Y-m-d H:i:s', strtotime($_REQUEST['end_time']));
+									
+				foreach ($perm_levels as $p)
+				{
+					$n = new news();
+					$n->createNew($p, $_REQUEST['font_class'], $begin, $end, $_REQUEST['news_text'], $_REQUEST['sort_order']);
+				}
+				$alertMsg = "News Items Added";
+				$this->adminManager($cmd, $user, null);
+			break;		
+			
+			case 'updateNews':
+				if(isset($_REQUEST['begin_time_null']) && $_REQUEST['begin_time_null'] == 'on')
+					$begin = null;
+				else
+					$begin = date('Y-m-d H:i:s', strtotime($_REQUEST['begin_time']));
+				if(isset($_REQUEST['end_time_null']) && $_REQUEST['end_time_null'] == 'on')
+					$end = null;
+				else
+					$end =  date('Y-m-d H:i:s', strtotime($_REQUEST['end_time']));				
+				
+				
+				news::update($_REQUEST['font_class'], $begin, $end, $_REQUEST['news_text'], $_REQUEST['sort_order'], $_REQUEST['news_id']);
+				$alertMsg = "News Items Updated";
+				$this->adminManager($cmd, $user, null);				
+			break;
 			
 			default:
 				$loc = "System Administration";

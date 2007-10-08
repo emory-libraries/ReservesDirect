@@ -44,6 +44,7 @@ class adminDisplayer extends baseDisplayer
 	<p><a href="index.php?cmd=admin&function=editDept">Add/Edit Departments</a></p>
 	<p><a href="index.php?cmd=admin&function=editLib">Add/Edit Libraries</a></p>
 	<p><a href="index.php?cmd=admin&function=editTerms">Add/Edit Terms</a></p>
+	<p><a href="index.php?cmd=admin&function=editNews">Add/Edit System Notices</a></p>
 	<p><a href="index.php?cmd=admin&function=editClassFeed">Manage Course Feed for a Class</a></p>
 	<p><a href="index.php?cmd=admin&function=clearReviewedFlag">Flag Course for Copyright Review</a></p>
 	
@@ -452,7 +453,7 @@ class adminDisplayer extends baseDisplayer
 	
 	function displayEditTerm($function, $terms, $edit_id = null)
 	{	
-		global $calendar;	
+		global $calendar;
 		?>
 		<script language="JavaScript1.2" src="secure/javascript/liveSearch.js"></script>
 		<script language="JavaScript1.2">
@@ -610,5 +611,197 @@ class adminDisplayer extends baseDisplayer
 		<script language="JavaScript">load();</script>
 		<?
 	}	
+	
+	function displayEditNews($function, $news, $news_item=null)
+	{
+		global $g_permission;
+		$perms = array_flip($g_permission);
+		
+		$calendar = new Calendar();
+		$calendar->set_option('ifFormat', '%m-%d-%Y %H:%M');
+		$calendar->set_option('showsTime', true);	
+		$calendar->set_option('range', array(date('Y'), (date('Y')+5)));
+
+		?>
+		<script language="JavaScript">
+			function disable_dateSelect(self, id)
+			{
+				document.getElementById(id).enabled = false;
+				alert(document.getElementById(id).enabled);
+			}
+			
+			function checkSubmit()
+			{
+				
+				if (!(document.getElementById('permission_level_0').checked ||
+					  document.getElementById('permission_level_1').checked ||
+					  document.getElementById('permission_level_2').checked ||
+					  document.getElementById('permission_level_3').checked ||
+					  document.getElementById('permission_level_4').checked ||
+					  document.getElementById('permission_level_5').checked))
+				{
+					alert("Please select at least one Display Level.");
+					return false;	  	
+				}
+				
+				if (document.getElementById('font_class').selectedIndex == -1)
+				{
+					alert("Please select the desired CSS Class");
+					return false;
+				}
+				if ((document.getElementById('begin_time').value == '' && document.getElementById('begin_time_null').checked == false))
+				{
+					alert("Please set the Begin date/time or check On Going");
+					return false;
+				}
+				if ((document.getElementById('end_time').value == '' && document.getElementById('end_time_null').checked == false))
+				{
+					alert("Please set the End date/time or check On Going");
+					return false;
+				}												
+			}
+			
+		</script>
+		
+		<form id="insertNews" name="insertNews" action="index.php" onsubmit="return checkSubmit()" method="Post">
+		<input type="hidden" name="cmd" value="admin"/>
+		<? if (is_null($news_item)) { ?>
+			<input type="hidden" name="function" value="insertNews"/>			
+		<? } else { ?>
+			<input type="hidden" name="function" value="updateNews"/>			
+			<input type="hidden" name="news_id" id="news_id" value="<?= $news_item['id'] ?>" />					
+		<? } ?>
+		<h2>Add System Notice</h2>
+		<table>
+			<tr>
+				<td valign="top">Display Level:</td>
+					<? if (is_null($news_item)) { ?>
+						<td>
+						<? $i = 0; ?>					
+						<? foreach ($g_permission as $label => $value) { ?>						
+							<input type="checkbox" name="permission_level[]" id="permission_level_<?=$i?>" value="<?= $value ?>" <?= $checked ?>/>
+							<?= strtoupper($label) ?>
+							<? if ($i % 2)	echo "<br/>"; ?>
+							<? $i++; ?>
+						<? } ?>
+						</td>
+						<td valign="top"><i>Select each level for display explicitly</i></td>
+					<? } else { //Dont allow edit of display level
+							echo "<td>";
+							if (is_null($news_item['permission_level'])) { 
+								echo "ALL"; 
+							} else { 
+								echo strtoupper($perms[$news_item['permission_level']]);
+							}
+							echo "</td>";
+					   } ?>
+				</td>				
+			</tr>
+			
+			<tr>
+				<td>CSS Class:</td>
+				<?
+					if (!is_null($news_item))
+					{
+						$selected = $news_item['class'];
+						$$selected = "selected";
+					}
+				?>
+				<td>
+					<select id="font_class" name="font_class">
+						<option value="emergency" <?= $emergency ?> >Emergency</option>
+						<option value="notice" <?= $notice ?>>Notice</option>
+					</select>				
+				</td>
+			</tr>
+			
+			<tr>
+				<? 
+					if (is_null($news_item) || is_null($news_item['begin_time']))
+					{
+						$begin_null =  "checked";
+						$begin = '';
+					} else {
+						$begin_null = '';
+						$begin = $news_item['begin_time'];
+					}					
+				?>
+				<td>Begin:</td>
+				<td>
+					<input type="checkbox" id="begin_time_null" name="begin_time_null" <?= $begin_null ?> onclick="disable_dateSelect(this, 'begin_time');">
+						On Going
+					<input type="text" id="begin_time" name="begin_time"  value="<?= $begin ?>"/>
+					<?=$calendar->getWidgetAndTrigger('begin_time', $begin) ?>
+				</td>
+			</tr>
+			<tr>
+				<? 
+					if (is_null($news_item) || is_null($news_item['end_time']))
+					{
+						$end_null =  "checked";
+						$end = '';
+					} else {
+						$end_null = '';
+						$end = $news_item['end_time'];
+					}					
+				?>			
+				<td>End:</td>
+				<td>
+					<input type="checkbox" id="end_time_null" name="end_time_null" <?= $end_null ?> onclick="disable_dateSelect(this, 'end_time');">
+						On Going	
+					<input type="text" id="end_time" name="end_time" value="<?= $end ?>" />
+					<?=$calendar->getWidgetAndTrigger('end_time', $end) ?>
+				</td>
+			</tr>			
+			<tr>
+				<td>Sort:</td>
+				<td><input type="text" name="sort_order" id="sort_order" maxlength="3" size="4" value="<?= $news_item['sort_order'] ?>"/></td>
+			</tr>			
+			<tr>
+				<td valign="top">Message Text:</td>
+				<td colspan="2"><textarea name="news_text" id="news_text" wrap="virtual" cols="80" rows="6"><?= $news_item['text'] ?></textarea></td>
+			</tr>
+			
+			<? $butText = (is_null($news_item)) ? "Create New" : "Edit"; ?>
+			<tr><td colspan="3" align="left"><input type="submit" value="<?= $butText ?>" /></td></tr>
+		</table>
+		</form>
+		
+		
+		<br/><br/>
+				
+		<h2>Edit System Notices</h2>
+		<table width="100%" border="0" cellspacing="0" cellpadding="5" class="displayList">
+			<tr>
+				<th></th>
+				<th>User Level</th>
+				<th>Begin</th>
+				<th>End</th>
+				<th>Text</th>
+			</tr>
+			
+			<? foreach ($news as $n) { ?>
+			<? $p = (!is_null($n['permission_level'])) ? strtoupper($perms[$n['permission_level']]) : 'ALL'; ?>
+			<? $b = (!is_null($n['begin_time'])) ? $n['begin_time'] : 'On Going'; ?>
+			<? $e = (!is_null($n['end_time']))   ? $n['end_time']   : 'On Going'; ?>
+			
+			<? $rowClass = ($rowClass=='evenRow') ? 'oddRow' : 'evenRow'; ?>
+			
+			<tr class="<?= $rowClass ?>">
+				<td>
+					<a href="index.php?cmd=admin&function=editNews&id=<?= $n['id'] ?>">
+						<img src="images/pencil.gif" alt="edit" width="24" height="20" border="0"/> Edit
+				  	</a>
+				</td>
+				<td align="center"><?= $p ?></td>
+				<td align="center" nowrap><?= $b ?></td>
+				<td align="center" nowrap><?= $e ?></td>
+				<td><?= htmlentities(substr($n['text'], 0, 200)) ?></td>
+			</tr>
+			<? } ?>
+		</table>
+
+		<?
+	}
 }
 ?>
