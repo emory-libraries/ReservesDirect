@@ -129,6 +129,14 @@ class itemManager
 							$file_loc = $file['dir'] . $file['name'] . $file['ext'];
 							$item->setURL($file_loc);
 							$item->setMimeTypeByFileExt($file['ext']);
+							if ($item->copyrightReviewRequired())
+							{
+								$classes = $item->getAllCourseInstances();
+								for($i=0; $i < sizeof($classes); $i++)
+								{
+									$classes[$i]->clearReviewed();
+								}
+							}
 						}
 						elseif($_REQUEST['documentType'] == 'URL') {	//link?
 							$item->setURL($_REQUEST['url']);
