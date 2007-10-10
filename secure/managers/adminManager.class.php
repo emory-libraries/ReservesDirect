@@ -186,7 +186,7 @@ class adminManager
 				} else {				
 					$src_ci->clearReviewed();
 					
-					$alertMsg = "Copyright Status reset";
+					$alertMsg = "Course flagged for copyright review";
 					$this->adminManager($cmd, $user, null);					
 				} 
 
