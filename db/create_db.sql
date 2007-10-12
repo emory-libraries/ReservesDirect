@@ -492,6 +492,8 @@ CREATE TABLE `skins` (
   UNIQUE KEY `skin_name` (`skin_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+INSERT INTO `skins` (`id`, `skin_name`, `skin_stylesheet`, `default_selected`) VALUES (1,'default','css/ReservesStyles.css','yes')
+
 --
 -- Table structure for table `special_users`
 --
@@ -503,8 +505,6 @@ CREATE TABLE `special_users` (
   `expiration` date default NULL,
   PRIMARY KEY  (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-INSERT INTO `special_users` (`user_id`, `password`) VALUES (1, md5('admin'));
 
 --
 -- Table structure for table `special_users_audit`
