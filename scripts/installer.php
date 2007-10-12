@@ -190,7 +190,7 @@ Please visit http://reservesdirect.org for more information.
 				
 				//get table queries
 				//WARNING: make sure to select db before running these
-				$table_queries = parse_batch_sql(file_get_contents(RD_ROOT.'scripts/create_db.sql'), $mysql_int_version);				
+				$table_queries = parse_batch_sql(file_get_contents(RD_ROOT.'db/create_db.sql'), $mysql_int_version);				
 			}
 			
 			//run the first set of queries
@@ -325,8 +325,8 @@ Please visit http://reservesdirect.org for more information.
 		}
 		else {	//display initial form
 			//first make sure we have the SQL dump
-			if(!is_readable(RD_ROOT.'scripts/create_db.sql')) {
-				print_step3_error('Could not locate SQL dump file at <tt>'.RD_ROOT.'scripts/create_db.sql</tt>');
+			if(!is_readable(RD_ROOT.'db/create_db.sql')) {
+				print_step3_error('Could not locate SQL dump file at <tt>'.RD_ROOT.'db/create_db.sql</tt>');
 				die(-1);
 			}
 ?>
