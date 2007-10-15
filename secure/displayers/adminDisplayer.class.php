@@ -753,16 +753,17 @@ class adminDisplayer extends baseDisplayer
 					<?=$calendar->getWidgetAndTrigger('end_time', $end) ?>
 				</td>
 			</tr>			
+			<? $item_sort = (is_null($news_item['sort_order'])) ? 0 : $news_item['sort_order']; ?>
 			<tr>
 				<td>Sort:</td>
-				<td><input type="text" name="sort_order" id="sort_order" maxlength="3" size="4" value="<?= $news_item['sort_order'] ?>"/></td>
+				<td><input type="text" name="sort_order" id="sort_order" maxlength="3" size="4" value="<?= $item_sort ?>"/></td>
 			</tr>			
 			<tr>
 				<td valign="top">Message Text:</td>
 				<td colspan="2"><textarea name="news_text" id="news_text" wrap="virtual" cols="80" rows="6"><?= $news_item['text'] ?></textarea></td>
 			</tr>
 			
-			<? $butText = (is_null($news_item)) ? "Create New" : "Edit"; ?>
+			<? $butText = (is_null($news_item)) ? "Create New" : "Submit Changes"; ?>
 			<tr><td colspan="3" align="left"><input type="submit" value="<?= $butText ?>" /></td></tr>
 		</table>
 		</form>
