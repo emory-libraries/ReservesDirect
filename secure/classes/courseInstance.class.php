@@ -985,7 +985,12 @@ class courseInstance
 
 		//copy reserves
 		$this->copyReserveTree($tree, $dst_ci, null, $selected_reserves, $requested_loan_periods);
-		$dst_ci->setReviewed($this->getReviewedBy(), $this->getReviewedOn());
+		
+		if (!is_null($this->getReviewedBy()))
+		{
+			//if src has been reviewed set reviewed for copy
+			$dst_ci->setReviewed($this->getReviewedBy(), $this->getReviewedOn());
+		}
 	}	
 	
 	

@@ -92,7 +92,7 @@ foreach($walker as $leaf) {
 
 		foreach($itemNotes as $note) {
 				if($note->getType() == 'Content') {
-					$htmloutput .= $note->getText().'. ';
+					$htmloutput .= trim(str_replace("\r", "", str_replace("\n", " ", $note->getText().'. ')));
 				}
 			}
 		foreach($resNotes as $note) {

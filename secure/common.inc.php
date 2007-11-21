@@ -31,6 +31,7 @@ require_once("secure/classes/reserveItem.class.php");
 
 $g_permission = array("student"=>0, "custodian"=>1, "proxy"=>2, "instructor"=>3, "staff"=>4, "admin"=>5);
 $g_notetype = array('instructor'=>'Instructor', 'content'=>'Content', 'staff'=>'Staff', 'copyright'=>'Copyright');
+$g_terms	= array('Fall', 'Spring', 'Summer');
 
 // user defined error handling function
 /**

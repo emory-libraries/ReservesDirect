@@ -44,7 +44,7 @@ class adminDisplayer extends baseDisplayer
 	<p><a href="index.php?cmd=admin&function=editDept">Add/Edit Departments</a></p>
 	<p><a href="index.php?cmd=admin&function=editLib">Add/Edit Libraries</a></p>
 	<p><a href="index.php?cmd=admin&function=editTerms">Add/Edit Terms</a></p>
-	<p><a href="index.php?cmd=admin&function=editNews">Add/Edit System Notices</a></p>
+	<p><a href="index.php?cmd=admin&function=editNews">Add/Edit News</a></p>
 	<p><a href="index.php?cmd=admin&function=editClassFeed">Manage Course Feed for a Class</a></p>
 	<p><a href="index.php?cmd=admin&function=clearReviewedFlag">Flag Course for Copyright Review</a></p>
 	
@@ -453,7 +453,7 @@ class adminDisplayer extends baseDisplayer
 	
 	function displayEditTerm($function, $terms, $edit_id = null)
 	{	
-		global $calendar;
+		global $calendar, $g_terms;
 		?>
 		<script language="JavaScript1.2" src="secure/javascript/liveSearch.js"></script>
 		<script language="JavaScript1.2">
@@ -544,7 +544,7 @@ class adminDisplayer extends baseDisplayer
 			<tr><td width="5"></td><td class="strong">Select a Term:</td></tr>
 		<form method="POST" action="index.php?cmd=admin&function=editTerms">	
 			<tr><td width="5"></td>
-		
+			
 				<td>
 					<select id="term_id_select" name="term_id_select" onChange="this.form.submit();">
 						<option value=''>Select A Term</option>
@@ -566,12 +566,12 @@ class adminDisplayer extends baseDisplayer
 				<tr>
 					<td>&nbsp;</td>
 					<td>Term:</td>
-					
+									
 					<td align="left">
 						<select name="term_name" id="term_name">
-							<option>Fall</option>
-							<option>Spring</option>
-							<option>Summer</option>
+							<? foreach ($g_terms as $term) { ?>
+								<option><?= $term ?></option>
+							<? } ?>
 						</select>
 						<input id="term_year" name="term_year" value="<?= $last_term->getTermYear() + 1 ?>" size="4">
 					</td>
@@ -627,7 +627,6 @@ class adminDisplayer extends baseDisplayer
 			function disable_dateSelect(self, id)
 			{
 				document.getElementById(id).enabled = false;
-				alert(document.getElementById(id).enabled);
 			}
 			
 			function checkSubmit()
@@ -640,7 +639,7 @@ class adminDisplayer extends baseDisplayer
 					  document.getElementById('permission_level_4').checked ||
 					  document.getElementById('permission_level_5').checked))
 				{
-					alert("Please select at least one Display Level.");
+					alert("You must select at least one Show To group.");
 					return false;	  	
 				}
 				
@@ -651,12 +650,12 @@ class adminDisplayer extends baseDisplayer
 				}
 				if ((document.getElementById('begin_time').value == '' && document.getElementById('begin_time_null').checked == false))
 				{
-					alert("Please set the Begin date/time or check On Going");
+					alert("Please set the Begin date/time or check Ongoing");
 					return false;
 				}
 				if ((document.getElementById('end_time').value == '' && document.getElementById('end_time_null').checked == false))
 				{
-					alert("Please set the End date/time or check On Going");
+					alert("Please set the End date/time or check Ongoing");
 					return false;
 				}												
 			}
@@ -671,10 +670,10 @@ class adminDisplayer extends baseDisplayer
 			<input type="hidden" name="function" value="updateNews"/>			
 			<input type="hidden" name="news_id" id="news_id" value="<?= $news_item['id'] ?>" />					
 		<? } ?>
-		<h2>Add System Notice</h2>
+		<h2>Add News</h2>
 		<table>
 			<tr>
-				<td valign="top">Display Level:</td>
+				<td valign="top">Show To:</td>
 					<? if (is_null($news_item)) { ?>
 						<td>
 						<? $i = 0; ?>					
@@ -685,7 +684,7 @@ class adminDisplayer extends baseDisplayer
 							<? $i++; ?>
 						<? } ?>
 						</td>
-						<td valign="top"><i>Select each level for display explicitly</i></td>
+						<td valign="top"></td>
 					<? } else { //Dont allow edit of display level
 							echo "<td>";
 							if (is_null($news_item['permission_level'])) { 
@@ -699,7 +698,7 @@ class adminDisplayer extends baseDisplayer
 			</tr>
 			
 			<tr>
-				<td>CSS Class:</td>
+				<td>Style:</td>
 				<?
 					if (!is_null($news_item))
 					{
@@ -709,8 +708,8 @@ class adminDisplayer extends baseDisplayer
 				?>
 				<td>
 					<select id="font_class" name="font_class">
-						<option value="emergency" <?= $emergency ?> >Emergency</option>
 						<option value="notice" <?= $notice ?>>Notice</option>
+						<option value="emergency" <?= $emergency ?> >Emergency</option>						
 					</select>				
 				</td>
 			</tr>
@@ -720,18 +719,22 @@ class adminDisplayer extends baseDisplayer
 					if (is_null($news_item) || is_null($news_item['begin_time']))
 					{
 						$begin_null =  "checked";
-						$begin = '';
+						$begin = date("m-d-Y h:i A");
 					} else {
 						$begin_null = '';
 						$begin = $news_item['begin_time'];
 					}					
 				?>
 				<td>Begin:</td>
-				<td>
-					<input type="checkbox" id="begin_time_null" name="begin_time_null" <?= $begin_null ?> onclick="disable_dateSelect(this, 'begin_time');">
-						On Going
-					<input type="text" id="begin_time" name="begin_time"  value="<?= $begin ?>"/>
+				<td>					
+					<input type="text" id="begin_time" name="begin_time"  value="<?= $begin ?>"/>					
 					<?=$calendar->getWidgetAndTrigger('begin_time', $begin) ?>
+					<? 
+					/* allows setting begin date to null
+					<input type="checkbox" id="begin_time_null" name="begin_time_null" <?= $begin_null ?> onclick="disable_dateSelect(this, 'begin_time');">
+						Ongoing
+					*/
+					?>
 				</td>
 			</tr>
 			<tr>
@@ -746,14 +749,14 @@ class adminDisplayer extends baseDisplayer
 					}					
 				?>			
 				<td>End:</td>
-				<td>
-					<input type="checkbox" id="end_time_null" name="end_time_null" <?= $end_null ?> onclick="disable_dateSelect(this, 'end_time');">
-						On Going	
+				<td>						
 					<input type="text" id="end_time" name="end_time" value="<?= $end ?>" />
 					<?=$calendar->getWidgetAndTrigger('end_time', $end) ?>
+					<input type="checkbox" id="end_time_null" name="end_time_null" <?= $end_null ?> onclick="disable_dateSelect(this, 'end_time');">
+						Ongoing
 				</td>
 			</tr>			
-			<? $item_sort = (is_null($news_item['sort_order'])) ? 0 : $news_item['sort_order']; ?>
+			<? $item_sort = (is_null($news_item['sort_order'])) ? 1 : $news_item['sort_order']; ?>
 			<tr>
 				<td>Sort:</td>
 				<td><input type="text" name="sort_order" id="sort_order" maxlength="3" size="4" value="<?= $item_sort ?>"/></td>
@@ -771,7 +774,7 @@ class adminDisplayer extends baseDisplayer
 		
 		<br/><br/>
 				
-		<h2>Edit System Notices</h2>
+		<h2>Edit News</h2>
 		<table width="100%" border="0" cellspacing="0" cellpadding="5" class="displayList">
 			<tr>
 				<th></th>
@@ -783,8 +786,8 @@ class adminDisplayer extends baseDisplayer
 			
 			<? foreach ($news as $n) { ?>
 			<? $p = (!is_null($n['permission_level'])) ? strtoupper($perms[$n['permission_level']]) : 'ALL'; ?>
-			<? $b = (!is_null($n['begin_time'])) ? $n['begin_time'] : 'On Going'; ?>
-			<? $e = (!is_null($n['end_time']))   ? $n['end_time']   : 'On Going'; ?>
+			<? $b = (!is_null($n['begin_time'])) ? $n['begin_time'] : 'Ongoing'; ?>
+			<? $e = (!is_null($n['end_time']))   ? $n['end_time']   : 'Ongoing'; ?>
 			
 			<? $rowClass = ($rowClass=='evenRow') ? 'oddRow' : 'evenRow'; ?>
 			

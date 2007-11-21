@@ -1210,7 +1210,7 @@ class requestDisplayer extends noteDisplayer {
 						<tr>
 							<td align="right"><strong>ILS Record:</strong></td>
 							<td>
-								<input type="checkbox" name="create_ils_record" value="yes">
+								<input type="checkbox" name="create_ils_record" value="yes" CHECKED />
 								Create EUCLID Reserve Record
 							</td>
 						</tr>
