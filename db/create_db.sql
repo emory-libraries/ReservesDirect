@@ -492,7 +492,7 @@ CREATE TABLE `skins` (
   UNIQUE KEY `skin_name` (`skin_name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `skins` (`id`, `skin_name`, `skin_stylesheet`, `default_selected`) VALUES (1,'default','css/ReservesStyles.css','yes')
+INSERT INTO `skins` (`id`, `skin_name`, `skin_stylesheet`, `default_selected`) VALUES (1,'default','css/ReservesStyles.css','yes');
 
 --
 -- Table structure for table `special_users`
