@@ -68,7 +68,7 @@ class noteDisplayer extends baseDisplayer {
 		}
 		
 		//some notes should be shown only to staff
-		$restricted_note_types = array($g_notetype['staff'], $g_notetype['copyright'], $g_notetype['content']);
+		$restricted_note_types = array($g_notetype['staff'], $g_notetype['content']);
 		
 		//display notes
 ?>
@@ -124,7 +124,7 @@ class noteDisplayer extends baseDisplayer {
 				$available_note_types = array('content', 'staff');
 			break;			
 			case 'reserve':
-				$available_note_types = array('instructor', 'content', 'staff');
+				$available_note_types = array('instructor', 'content', 'staff', 'copyright');
 			break;			
 			case 'copyright':
 				$available_note_types = array('copyright');
@@ -233,19 +233,40 @@ class noteDisplayer extends baseDisplayer {
 	 * @desc outputs HTML for display of notes in reserve listings
 	 */
 	public function displayNotes(&$notes) {
-		global $u, $g_notetype, $g_permission;
+		global $u, $g_notetype, $g_permission, $cmd;
 		
 		if(empty($notes)) {
 			return;
 		}
 		
-		//some notes should be shown only to staff
-		$restricted_note_types = array($g_notetype['staff'], $g_notetype['copyright']);
-
+		$r = ($cmd == 'previewStudentView') ? $g_permission['student'] : $u->getRole(); //hack hack hackety hack
+		
 		foreach($notes as $note):
-			if(in_array($note->getType(), $restricted_note_types) && ($u->getRole() < $g_permission['staff'])) {
-				continue;	//skip the note if it is restricted and user is less than staff
+			switch ($r)
+			{
+				case $g_permission['staff']:			
+					$restricted_note_types = array();
+				break;								
+								
+				case $g_permission['staff']:			
+					$restricted_note_types = array($g_notetype['staff']);
+				break;
+				
+				case $g_permission['instructor']:			
+				case $g_permission['proxy']:			
+					$restricted_note_types = array($g_notetype['staff']);
+				break;				
+				
+				case $g_permission['student']:			
+				default:
+					$restricted_note_types = array($g_notetype['staff'], $g_notetype['copyright']);
+				break;				
 			}
+			
+			if(in_array($note->getType(), $restricted_note_types))
+			{
+				continue;	//skip the note if it is restricted and user is less than staff
+			}			
 ?>
 		<br />
 		<span class="noteType"><?=ucfirst($note->getType())?> Note:</span>&nbsp;

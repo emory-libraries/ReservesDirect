@@ -107,11 +107,6 @@ class noteManager
 				//get notes
 				$notes = $item->getNotes();
 			break;
-			
-			case 'copyright':
-				$copyright = new Copyright($obj_id);
-				$notes = $copyright->getNotes();
-			break;
 		}
 		
 		return $notes;
@@ -136,37 +131,33 @@ class noteManager
 		
 		//item notes or reserve notes?
 		switch($obj_type) {
-			case 'reserve':
-				//init reserve obj
-				$reserve = new reserve($obj_id);
-				//get the item
-				$item = new reserveItem($reserve->getItemID());
-			break;
-			
 			case 'item':
 				//init new rItem obj
 				$item = new reserveItem($obj_id);
 			break;
 			
-			case 'copyright':
-				$copyright = new Copyright($obj_id);
-			break;
+			case 'reserve':
+				//init reserve obj
+				$reserve = new reserve($obj_id);
+				//get the item
+				$item = new reserveItem($reserve->getItemID());
+			break;			
 		}
 		
 		//add/edit instructor note to reserve
-		if(($note_type==$g_notetype['instructor']) && ($reserve instanceof reserve)) {
+		if(($note_type==$g_notetype['instructor'] || $note_type==$g_notetype['copyright']) && ($reserve instanceof reserve)) {
 			$reserve->setNote(trim($note_text), $note_type, $note_id);
 		}
-		elseif(($note_type==$g_notetype['copyright']) && ($copyright instanceof Copyright)) {	//add/edit copyright note to copyright
-			$copyright->setNote(trim($note_text), $note_type, $note_id);
-			//add to log
-			if(!empty($note_id)) {	//editing note
-				$copyright->log('edit note', '#'.$note_id.' - '.substr($note_text, 0, 30));
-			}
-			else {
-				$copyright->log('add note', substr($note_text, 0, 30));
-			}
-		}
+//		elseif(($note_type==$g_notetype['copyright'])) {	//add/edit copyright note to copyright
+//			$copyright->setNote(trim($note_text), $note_type, $note_id);
+//			//add to log
+//			if(!empty($note_id)) {	//editing note
+//				$copyright->log('edit note', '#'.$note_id.' - '.substr($note_text, 0, 30));
+//			}
+//			else {
+//				$copyright->log('add note', substr($note_text, 0, 30));
+//			}
+//		}
 		elseif($item instanceof reserveItem) {	//add/edit all other types to item
 			$item->setNote(trim($note_text), $note_type, $note_id);
 		}

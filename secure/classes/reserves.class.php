@@ -136,9 +136,13 @@ class reserve extends Notes {
 
 		list($this->reserveID, $this->courseInstanceID, $this->itemID, $this->activationDate, $this->expirationDate, $this->status, $this->sortOrder, $this->creationDate, $this->lastModDate, $this->requested_loan_period, $this->parentID) = $rs;
 
-		//get the notes
+		//get instructor notes
 		$this->setupNotes('reserves', $this->reserveID, $g_notetype['instructor']);
 		$this->fetchNotesByType();
+		
+		//get copyright notes
+		$this->setupNotes('reserves', $this->reserveID, $g_notetype['copyright']);
+		$this ->fetchNotesByType();		
 	}
 
 	/**

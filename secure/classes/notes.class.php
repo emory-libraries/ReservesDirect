@@ -42,6 +42,10 @@ abstract class Notes {
 	private $noteType;			//Note type (optional)
 	private $notes = array();	//Array of note objects
 	
+	protected function __construct()
+	{
+		$this->notes = array();
+	}
 	
 	/**
 	 * @return void
@@ -120,9 +124,6 @@ abstract class Notes {
 		//query
 		$rs = $g_dbConn->query($sql);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-		
-		//reset $notes array
-		$this->notes = array();
 		
 		while($row = $rs->fetchRow()) {
 			$this->notes[] = new note($row[0]);	//fetch the note object and store to array
