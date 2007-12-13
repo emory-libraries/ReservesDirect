@@ -244,7 +244,7 @@ class noteDisplayer extends baseDisplayer {
 		foreach($notes as $note):
 			switch ($r)
 			{
-				case $g_permission['staff']:			
+				case $g_permission['admin']:			
 					$restricted_note_types = array();
 				break;								
 								
