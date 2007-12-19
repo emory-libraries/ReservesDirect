@@ -406,8 +406,8 @@ class reservesManager
 	    			$item->setMimeTypeByFileExt($file_path['extension']);
 	    		}
 	    		
-				$p = $_REQUEST['pagefrom'] . " - " . $_REQUEST['pageto'];
-				$t = $_REQUEST['timefrom'] . " - " . $_REQUEST['timeto'];
+				$p = $_REQUEST['pagefrom'] . " / " . $_REQUEST['pageto'];
+				$t = $_REQUEST['timefrom'] . " / " . $_REQUEST['timeto'];
 
 				//set time or pages if both set overwrite with time
 				if ($p != " - ") $item->setPagesTimes($p);
