@@ -707,7 +707,10 @@ function displayUploadForm($user, $ci, $type, $docTypeIcons=null)
 	if ($type == "URL")		
 		$documentTest = "if (frm.url.value == \"\") alertMsg = alertMsg + \"URL is required.<br>\";\n";
 	else
-		$documentTest = "if (frm.userFile.value == \"\") alertMsg = alertMsg + \"File is required.<br>\";\n";
+	{
+		$documentTest  = "if (frm.userFile.value == \"\") alertMsg = alertMsg + \"File is required.<br/>\";\n";
+		$documentTest .= "if (frm.pageto.value == \"\" && frm.timeto.value == \"\") alertMsg = alertMsg + \"Please specify Total Pages or Total Running Time.<br/>\";\n";
+	}
 	
 	echo "
 		<script language=\"JavaScript\">
@@ -733,7 +736,7 @@ function displayUploadForm($user, $ci, $type, $docTypeIcons=null)
 	";
 	
 	
-	echo "<form action=\"index.php\" method=\"post\"";
+	echo "<form action=\"index.php\" method=\"post\" id=\"frm\"";
 	if ($type == 'DOCUMENT') echo " ENCTYPE=\"multipart/form-data\"";
 	echo " onSubmit=\"return validateForm(this);\">\n";
 
@@ -826,13 +829,17 @@ function displayUploadForm($user, $ci, $type, $docTypeIcons=null)
 	echo "				</tr>\n";
 
 	echo "				<tr valign=\"middle\">\n";
-	echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Pages</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
-	echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"pagefrom\" SIZE=3>  To:  <INPUT TYPE=\"text\" NAME=\"pageto\" SIZE=3></td>\n";
+	echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Pages</span> (<font color=\"#FF0000\"><strong>*</strong></font><em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
+	echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"pagefrom\" ID=\"pagefrom\" SIZE=3>  Of:  <INPUT TYPE=\"text\" NAME=\"pageto\" ID=\"pageto\" SIZE=3>\n";
+	echo "						<font size='-2'>1 page uploaded of 10 pages total in work</font>\n";
+	echo "					</td>\n";	
 	echo "				</tr>\n";
 
 	echo "				<tr valign=\"middle\">\n";
-	echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Times</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
-	echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"timefrom\" SIZE=3>  To:  <INPUT TYPE=\"text\" NAME=\"timeto\" SIZE=3></td>\n";
+	echo "					<td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Times</span> (<font color=\"#FF0000\"><strong>*</strong></font><em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
+	echo "					<td align=\"left\"><INPUT TYPE=\"text\" NAME=\"timefrom\" ID=\"timefrom\" SIZE=3>  Of:  <INPUT TYPE=\"text\" NAME=\"timeto\" ID=\"timeto\" SIZE=3>\n";
+	echo "						<font size='-2'>1:23 minutes uploaded of 10:39 minutes total in work</font>\n";
+	echo "					</td>\n";		
 	echo "				</tr>\n";
 
 	echo "				<tr valign=\"middle\">\n";
