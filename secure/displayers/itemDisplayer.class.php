@@ -365,9 +365,9 @@ class itemDisplayer extends noteDisplayer {
 	    				<input name="source" type="text" id="source" size="50" value="<?=$item->getSource()?>">
 	    			</td>
 	    		</tr>
-				<tr><td align="right">ISBN:</td><td><input type="text" size="15" maxlength="13" value="<?= $item->getISBN() ?>" name="ISBN" /></td></tr>
-                <tr><td align="right">OCLC:</td><td><input type="text" size="11" maxlength="9"  value="<?= $item->getOCLC() ?>" name="OCLC" /></td></tr>
-                <tr><td align="right">ISSN:</td><td><input type="text" size="10" maxlength="8"  value="<?= $item->getISSN() ?>" name="ISSN" /></td></tr>
+				<tr><td align="right">ISBN:</td><td><input type="text" size="15" maxlength="15" value="<?= $item->getISBN() ?>" name="ISBN" /></td></tr>
+                <tr><td align="right">OCLC:</td><td><input type="text" size="15" maxlength="9"  value="<?= $item->getOCLC() ?>" name="OCLC" /></td></tr>
+                <tr><td align="right">ISSN:</td><td><input type="text" size="15" maxlength="15"  value="<?= $item->getISSN() ?>" name="ISSN" /></td></tr>
 
 <?php	
 		//show barcode for digital items only

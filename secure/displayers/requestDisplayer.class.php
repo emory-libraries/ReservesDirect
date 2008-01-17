@@ -707,11 +707,11 @@ class requestDisplayer extends noteDisplayer {
 
 			<tr align="left" valign="middle">
 				<td class="strong" align="right" bgcolor="#cccccc">ISBN:</td>
-				<td><input name="ISBN" size="15" maxlength="13" value="<?=$item_data['ISBN']?>" type="text"></td>
+				<td><input name="ISBN" size="15" maxlength="15" value="<?=$item_data['ISBN']?>" type="text"></td>
 			</tr>
 			<tr align="left" valign="middle">
 				<td class="strong" align="right" bgcolor="#cccccc">ISSN:</td>
-				<td><input name="ISSN" maxlength="8" size="15" value="<?=$item_data['ISSN']?>" type="text"></td>
+				<td><input name="ISSN" maxlength="15" size="15" value="<?=$item_data['ISSN']?>" type="text"></td>
 			</tr>
 			<tr align="left" valign="middle">
 				<td class="strong" align="right" bgcolor="#cccccc">OCLC:</td>

@@ -493,13 +493,13 @@ class reserveItem extends item
 	{
 		global $g_dbConn;
 
-		$this->ISBN = $ISBN;
+		$this->ISBN = substr(preg_replace('/[^0-9]/i', '', $ISBN), 0, 13);
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
 				$sql = "UPDATE items SET ISBN = ? WHERE item_id = !";
 		}
-		$rs = $g_dbConn->query($sql, array($ISBN, $this->itemID));
+		$rs = $g_dbConn->query($sql, array($this->ISBN, $this->itemID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}	
 	
@@ -512,13 +512,13 @@ class reserveItem extends item
 	{
 		global $g_dbConn;
 
-		$this->ISSN = $ISSN;
+		$this->ISSN = substr(preg_replace('/[^0-9]/i', '', $ISSN), 0, 8);
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
 				$sql = "UPDATE items SET ISSN = ? WHERE item_id = !";
 		}
-		$rs = $g_dbConn->query($sql, array($ISSN, $this->itemID));
+		$rs = $g_dbConn->query($sql, array($this->ISSN, $this->itemID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}		
 	
@@ -537,7 +537,7 @@ class reserveItem extends item
 			default: //'mysql'
 				$sql = "UPDATE items SET OCLC = ? WHERE item_id = !";
 		}
-		$rs = $g_dbConn->query($sql, array($OCLC, $this->itemID));
+		$rs = $g_dbConn->query($sql, array($this->OCLC, $this->itemID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}		
 	
