@@ -800,6 +800,7 @@ class requestDisplayer extends noteDisplayer {
         <small>Note Type:
         <label><input type="radio" name="new_note_type" value="<?=$g_notetype['content']?>" checked="true">Content Note</label>
         <label><input type="radio" name="new_note_type" value="<?=$g_notetype['staff']?>">Staff Note</label>
+        <label><input type="radio" name="new_note_type" value="<?=$g_notetype['copyright']?>">Copyright Note</label>
 
 <?php	endif; ?>
 				
