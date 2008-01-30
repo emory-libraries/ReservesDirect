@@ -121,7 +121,7 @@ class noteDisplayer extends baseDisplayer {
 		$available_note_types = array();
 		switch($obj_type) {
 			case 'item':
-				$available_note_types = array('content', 'staff');
+				$available_note_types = array('content', 'staff', 'copyright');
 			break;			
 			case 'reserve':
 				$available_note_types = array('instructor', 'content', 'staff', 'copyright');
