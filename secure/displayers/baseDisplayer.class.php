@@ -281,7 +281,6 @@ abstract class baseDisplayer {
 
        		<br />
        		<span class="itemMetaPre">Pages/Time:</span><span class="itemMeta"><?=$pagesTimes?></span>
-       		<small>pp. 336-371 and pp. 399-442 (78 of 719)</small>
        		
 <?php	endif; ?>
 <?php	if($source): ?>
