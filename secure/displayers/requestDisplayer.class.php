@@ -685,7 +685,7 @@ class requestDisplayer extends noteDisplayer {
 			<tr valign="middle">
 				<td align="right" bgcolor="#CCCCCC"><span class="strong">Pages/Times:</span></td>
 				<td align="left"><input name="times_pages" type="text" size="50" value="<?=$item_data['times_pages']?>"></td>
-				<td><small>pp. 336-371 and pp. 399-442 (78 of 719)</small></td>
+				<? if ($isDigital) { echo "<td><small>pp. 336-371 and pp. 399-442 (78 of 719)</small></td>"; } ?>
 			</tr>
 			<tr valign="middle">
 				<td align="right" bgcolor="#CCCCCC"><span class="strong">Source / Year:</span></td>
