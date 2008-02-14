@@ -356,7 +356,7 @@ class itemDisplayer extends noteDisplayer {
 	    			<td>
 	    				<input name="pagesTimes" type="text" id="pagesTimes" size="50" value="<?=$item->getPagesTimes()?>">
 	    			</td>
-	    			<td><small>pp. 336-371 and pp. 399-442 (78 of 719)</small></td>
+	    			<? if ($item->getItemGroup() == 'ELECTRONIC') { echo "<td><small>pp. 336-371 and pp. 399-442 (78 of 719)</small></td>"; } ?>	    			
 	    		</tr>
 	    		<tr>
 	    			<td align="right">
