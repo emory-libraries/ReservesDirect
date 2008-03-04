@@ -129,4 +129,15 @@ http://www.reservesdirect.org/
     $g_EZproxyAuthorizationKey = (string)$configure->EZproxyAuthorizationKey;
     
     $g_BlackboardLink = (string)$configure->BlackBoardLink;
+    
+    $trustedSystems = $configure->trusted_systems;
+    foreach ($trustedSystems->system as $sys)
+    {	
+    	$k = (string)$sys['id'];
+    	$t = (string)$sys['timeout'];
+    	$g_trusted_systems[$k]['secret'] = (string)$sys;    	
+    	$g_trusted_systems[$k]['timeout'] = $t;    	
+    	unset($k, $t);
+    }
+    unset($trustedSystems);    
 ?>

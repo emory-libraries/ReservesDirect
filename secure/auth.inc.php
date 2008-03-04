@@ -40,32 +40,34 @@ require_once('secure/classes/ldapAuthN.class.php');
 if(session_id()=='') {
 	session_start();
 }
-
-//if passed a username/password, assume that user is trying to log in
-if(!empty($_REQUEST['username']) && !empty($_REQUEST['pwd'])) {
-	//switch on authentication type
-	switch($g_authenticationType) {
-		/**********************
-			NOT IMPLEMENTED
-		***********************
-		case 'NT':
-			authByNTDom($_REQUEST['username'], $_REQUEST['pwd']);
-		break;
-		***********************/
-		
-		case 'LDAP':
-			authByLDAP($_REQUEST['username'], $_REQUEST['pwd']);		
-		break;
-		
-		case 'StandAlone':
-			authByDB($_REQUEST['username'], $_REQUEST['pwd']);
-		break;
-		
-		default:
-			authByAny($_REQUEST['username'], $_REQUEST['pwd']);
+if(empty($_SESSION['username'])) {
+	if (!authBySecretKey(key($_REQUEST))) {
+		//if passed a username/password, assume that user is trying to log in
+		if(!empty($_REQUEST['username']) && !empty($_REQUEST['pwd'])) {
+			//switch on authentication type
+			switch($g_authenticationType) {
+				/**********************
+					NOT IMPLEMENTEDths
+				***********************
+				case 'NT':
+					authByNTDom($_REQUEST['username'], $_REQUEST['pwd']);
+				break;
+				***********************/
+				
+				case 'LDAP':
+					authByLDAP($_REQUEST['username'], $_REQUEST['pwd']);		
+				break;
+				
+				case 'StandAlone':
+					authByDB($_REQUEST['username'], $_REQUEST['pwd']);
+				break;
+				
+				default:
+					authByAny($_REQUEST['username'], $_REQUEST['pwd']);
+			}
+		}
 	}
 }
-
 //assume that our sessions are done server-side and that the files are secure
 //if this is not the case, then a more-robust mechanism must be used.
 if(!empty($_SESSION['username']) && !empty($_SESSION['userclass'])) {
@@ -193,5 +195,50 @@ function authByAny($username, $password) {
 	else {
 		return authByDB($username, $password);	//try standalone db
 	}
+}
+
+
+/**
+ * @return boolean
+ * @param string $qs QueryString data
+ * @desc Attempt to auth from external system.  Compare passed values against secret key
+ * 		$qs key values: u username, 
+ * 						sys  external system identifier
+ * 						t	timestamp  seconds since ‘00:00:00 1970-01-01 UTC’
+ * 						key md5 of concatenation of above
+ */
+function authBySecretKey($qs_data) {
+	global $g_trusted_systems, $g_permission;
+		
+	parse_str(base64_decode($qs_data), $auth_data);
+	
+	
+	$trusted_system_key = $g_trusted_systems[$auth_data['sys']]['secret'];
+	$timeout = $g_trusted_systems[$auth_data['sys']]['timeout'];
+	
+	$timestamp = new DateTime($auth_data['t']);
+	$timestamp->modify("+$timeout minutes");
+	if (time() > date_format($timestamp, 'U'))
+		return false; //encode timestamp is too old
+	else {
+		$user = new user();
+		
+		if ($user->getUserByUserName($auth_data['u']) == false || $user->getRole() > $g_permission['instructor'])
+			return false;	//do not allow privileged users access without login
+		
+		$verification = $auth_data['u'] . $auth_data['t'];
+			
+		$verification .= $auth_data['sys'];
+		$verification .= $trusted_system_key;			
+			
+		if (md5($verification) == $auth_data['key'])
+		{
+			setAuthSession(true, $user);
+			return true;
+		}
+	}
+	
+	
+	return false;
 }
 ?>
