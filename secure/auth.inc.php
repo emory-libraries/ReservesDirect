@@ -41,7 +41,7 @@ if(session_id()=='') {
 	session_start();
 }
 if(empty($_SESSION['username'])) {
-	if (!authBySecretKey(key($_REQUEST))) {
+	if (!authBySecretKey($_REQUEST['authKey'])) {
 		//if passed a username/password, assume that user is trying to log in
 		if(!empty($_REQUEST['username']) && !empty($_REQUEST['pwd'])) {
 			//switch on authentication type
@@ -217,9 +217,11 @@ function authBySecretKey($qs_data) {
 	$timeout = $g_trusted_systems[$auth_data['sys']]['timeout'];
 	
 	$timestamp = new DateTime($auth_data['t']);
-	$timestamp->modify("+$timeout minutes");
-	if (time() > date_format($timestamp, 'U'))
-		return false; //encode timestamp is too old
+	$expire = new DateTime(time());
+	$expire->modify("+$timeout minutes");
+	
+	if ($timestamp >  $expire)
+		return false; //encoded timestamp is too old
 	else {
 		$user = new user();
 		
@@ -231,7 +233,7 @@ function authBySecretKey($qs_data) {
 		$verification .= $auth_data['sys'];
 		$verification .= $trusted_system_key;			
 			
-		if (md5($verification) == $auth_data['key'])
+		if (hash("sha256", $verification) == $auth_data['key'])
 		{
 			setAuthSession(true, $user);
 			return true;
