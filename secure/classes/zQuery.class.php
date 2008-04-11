@@ -206,7 +206,7 @@ class zQuery
 
 		$rs = array();
 		
-		$key = ereg_replace('ocm','o',$key);
+		$key = ereg_replace('oc[mn]','o',$key);		
 		
 		if (isset($_SESSION['debug']))
 			echo $g_holdingsScript . "?key=" . $key . "&key_type=$keyType<P>";
