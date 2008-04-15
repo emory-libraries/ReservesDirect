@@ -512,7 +512,8 @@ class reserveItem extends item
 	{
 		global $g_dbConn;
 
-		$this->ISSN = substr(preg_replace('/[^09X]/i', '', $ISSN), 0, 9);
+		//$this->ISSN = substr(preg_replace('/[^0-9xX]/i', '', $ISSN), 0, 9);
+		$this->ISSN = $ISSN;
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
