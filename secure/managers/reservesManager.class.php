@@ -54,7 +54,8 @@ class reservesManager
 
 	function reservesManager($cmd, $user)
 	{
-		global $g_permission, $page, $loc, $g_faxDirectory, $g_documentDirectory, $g_documentURL, $ci, $g_notetype, $u, $help_article;
+		global $g_permission, $page, $loc, $g_faxDirectory;
+		global $g_documentDirectory, $g_documentURL, $ci, $g_notetype, $u, $help_article, $g_dbConn;
 
 		$this->displayClass = "reservesDisplayer";
 		//$this->user = $user;
@@ -306,59 +307,74 @@ class reservesManager
 			break;
 			case 'storeReserve':
 				$page = "addReserve";
-
-				$requests = (isset($_REQUEST['request'])) ? $_REQUEST['request'] : null;
-				$items = (isset($_REQUEST['reserve'])) ? $_REQUEST['reserve'] : null;
-
-				$ci = new courseInstance($_REQUEST['ci']);
-
-				//add items to reserve
-				if (is_array($items) && !empty($items)){
-					foreach($items as $i_id)
-					{
-						$reserve = new reserve();
-						if ($reserve->createNewReserve($ci->getCourseInstanceID(), $i_id))
-						{
-							$reserve->setActivationDate($ci->getActivationDate());
-							$reserve->setExpirationDate($ci->getExpirationDate());
-							//attempt to insert this reserve into order
-							$reserve->getItem();
-							$reserve->insertIntoSortOrder($ci->getCourseInstanceID(), $reserve->item->getTitle(), $reserve->item->getAuthor());
-						}
-					}
+				
+				//attempt to use transactions
+				if($g_dbConn->provides('transactions')) {
+					$g_dbConn->autoCommit(false);
 				}
-
-				//make requests
-				if (is_array($requests) && !empty($requests)){
-					foreach($requests as $i_id)
-					{
-						//store reserve with status processing
-						$reserve = new reserve();
-						if ($reserve->createNewReserve($ci->getCourseInstanceID(), $i_id))
+				try {
+					$requests = (isset($_REQUEST['request'])) ? $_REQUEST['request'] : null;
+					$items = (isset($_REQUEST['reserve'])) ? $_REQUEST['reserve'] : null;
+	
+					$ci = new courseInstance($_REQUEST['ci']);
+	
+					//add items to reserve
+					if (is_array($items) && !empty($items)){
+						foreach($items as $i_id)
 						{
-							$reserve->setStatus("IN PROCESS");
-							$reserve->setActivationDate($ci->getActivationDate());
-							$reserve->setExpirationDate($ci->getExpirationDate());
-							$reserve->setRequestedLoanPeriod($_REQUEST['requestedLoanPeriod_'.$i_id]);
-							//attempt to insert this reserve into order
-							$reserve->getItem();
-							$reserve->insertIntoSortOrder($ci->getCourseInstanceID(), $reserve->item->getTitle(), $reserve->item->getAuthor());
-
-							//create request
-							$request = new request();
-							//make sure request does not exist
-							//prevent duplicate requests
-							if($request->getRequestByCI_Item($ci->getCourseInstanceID(), $i_id) === false) {
-								$request->createNewRequest($ci->getCourseInstanceID(), $i_id);
-								$request->setRequestingUser($user->getUserID());
-								$request->setReserveID($reserve->getReserveID());
+							$reserve = new reserve();
+							if ($reserve->createNewReserve($ci->getCourseInstanceID(), $i_id))
+							{
+								$reserve->setActivationDate($ci->getActivationDate());
+								$reserve->setExpirationDate($ci->getExpirationDate());
+								//attempt to insert this reserve into order
+								$reserve->getItem();
+								$reserve->insertIntoSortOrder($ci->getCourseInstanceID(), $reserve->item->getTitle(), $reserve->item->getAuthor());
 							}
 						}
 					}
+	
+					//make requests
+					if (is_array($requests) && !empty($requests)){
+						foreach($requests as $i_id)
+						{
+							//store reserve with status processing
+							$reserve = new reserve();
+							if ($reserve->createNewReserve($ci->getCourseInstanceID(), $i_id))
+							{
+								$reserve->setStatus("IN PROCESS");
+								$reserve->setActivationDate($ci->getActivationDate());
+								$reserve->setExpirationDate($ci->getExpirationDate());
+								$reserve->setRequestedLoanPeriod($_REQUEST['requestedLoanPeriod_'.$i_id]);
+								//attempt to insert this reserve into order
+								$reserve->getItem();
+								$reserve->insertIntoSortOrder($ci->getCourseInstanceID(), $reserve->item->getTitle(), $reserve->item->getAuthor());
+	
+								//create request
+								$request = new request();
+								//make sure request does not exist
+								//prevent duplicate requests
+								if($request->getRequestByCI_Item($ci->getCourseInstanceID(), $i_id) === false) {
+									$request->createNewRequest($ci->getCourseInstanceID(), $i_id);
+									$request->setRequestingUser($user->getUserID());
+									$request->setReserveID($reserve->getReserveID());
+								}
+							}
+						}
+					}
+				} catch (Exception $e) {
+					trigger_error("Error Occurred While processing StoreRequest ".$e->getMessage(), E_USER_ERROR);
+					if($g_dbConn->provides('transactions')) { 
+						$g_dbConn->rollback();
+					}					
 				}
+				//commit this set
+				if($g_dbConn->provides('transactions')) { 
+					$g_dbConn->commit();
+				}
+								
 				$this->displayFunction = "displayReserveAdded";
 				$this->argList = array($user, null, $_REQUEST['ci']);
-				//$this->argList = array($ci);
 			break;
 			case 'uploadDocument':
 				$page="addReserve";
