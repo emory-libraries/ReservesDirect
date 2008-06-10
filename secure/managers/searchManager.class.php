@@ -210,7 +210,7 @@ class searchManager
 	 */
 	function doSearch($search, $limit, $itemGroup, $sort)
 	{
-		global $g_dbConn, $g_permission;
+		global $g_dbConn, $g_permission, $u;
 
 		if (is_null($this->search_sql_statement))
 		{
@@ -242,7 +242,13 @@ class searchManager
 						
 					if ($search[0]['term'] != '') //if 1st term is not set we are going to ignore all others
 					{
-						$sql_where = "WHERE i.item_type != 'HEADING' AND ";			
+						$sql_where = "WHERE i.item_type != 'HEADING' AND ";	
+						//hide copyright denied items and reserves unless staff
+						if ($u->getRole() < $g_permission['staff'])
+						{
+							$sql_where = " (i.status <> 'DENIED' AND r.status <> 'DENIED') ";
+						}
+								
 						for($i=0;$i<count($search);$i++)
 						{							
 							if ($search[$i]['term'] != '')

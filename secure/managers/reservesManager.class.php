@@ -577,7 +577,7 @@ class reservesManager
 					//need the CI
 					$ci = new courseInstance($_REQUEST['ci']);
 					
-					if ($_REQUEST['approve_copyright'])
+					if (isset($_REQUEST['approve_copyright']))
 					{
 						$ci->setReviewed($u->getUserID(), date("Y-m-d"));
 					}
@@ -591,8 +591,9 @@ class reservesManager
 					}
 					
 					//determine if need to pull in descendants for selected headings
-					//only need descendants if deleting OR editing status/dates
-					if(isset($_REQUEST['delete_multiple']) || (isset($_REQUEST['submit_edit_multiple']) && (isset($_REQUEST['edit_status']) || isset($_REQUEST['edit_dates'])))) {
+					//only need descendants if deleting OR editing status/dates OR setting copyright flags
+					if(isset($_REQUEST['delete_multiple']) || isset($_REQUEST['submit_edit_multiple']) 
+						|| isset($_REQUEST['copyright_deny_class']) || isset($_REQUEST['copyright_deny_all_classes'])) {
 						//get reserve tree
 						$tree = $ci->getReservesAsTree('getReserves');
 						
@@ -613,10 +614,10 @@ class reservesManager
 						foreach($reserve_ids_with_desc as $reserve_id) {
 							//init the reserve object
 							$reserve = new reserve($reserve_id);
+							$reserve->getItem();
 							
 							//delete reserve
 							if(isset($_REQUEST['delete_multiple'])) {
-								$reserve->getItem();
 								//delete request for physical items
 								if($reserve->item->isPhysicalItem()) {
 									$request = new request();
@@ -626,32 +627,50 @@ class reservesManager
 								//delete reserve
 								$reserve->destroy();
 							}
-							else {	//edit
-								//edit status
-								if(isset($_REQUEST['edit_status']) && isset($_REQUEST['reserve_status'])) {
-									//do NOT allow anyone to change status of a heading
-									//do NOT allow anyone to change status of a physical item that is 'IN PROCESS'
-									//DO allow staff (or above) to change status of a physical item that is NOT 'IN PROCESS'
-									$reserve->getItem();
-									if(!$reserve->isHeading() && (!$reserve->item->isPhysicalItem() || (($reserve->getStatus() != 'IN PROCESS') && ($u->getRole() >= $g_permission['staff'])))) {
-										$reserve->setStatus($_REQUEST['reserve_status']);
-									}
-								}
-								
-								//edit dates
-								if(isset($_REQUEST['edit_dates'])) {
-									//do not change dates of a heading
-									if(!$reserve->isHeading()) {
-										if(!empty($_REQUEST['reserve_activation_date'])) {
-											$reserve->setActivationDate($_REQUEST['reserve_activation_date']);
-										}
-										if(!empty($_REQUEST['reserve_expiration_date'])) {
-											$reserve->setExpirationDate($_REQUEST['reserve_expiration_date']);
-										}
-									}	
+
+							if (isset($_REQUEST['copyright_deny_class']))
+							{
+								//flag for this class only
+								//physical items cant be denied copyright	
+								if (!($reserve->item->isPhysicalItem() || $reserve->getStatus() == 'IN PROCESS')) {
+									$reserve->setStatus('DENIED');
 								}
 							}
-						}		
+							
+							if (isset($_REQUEST['copyright_deny_all_classes']))
+							{
+								//flag item and disable all usage
+								//physical items cant be denied copyright	
+								if (!($reserve->item->isPhysicalItem() || $reserve->getStatus() == 'IN PROCESS')) {
+									$reserve->item->setStatus('DENIED');
+								}
+							}
+							
+							if(isset($_REQUEST['edit_status']) && isset($_REQUEST['reserve_status'])) {
+								//do NOT allow anyone to change status of a physical item that is 'IN PROCESS'	
+								//do NOT allow < Staff to change Copyright status	
+								if ((($u->getRole() == $g_permission['proxy'] || $u->getRole() == $g_permission['instructor']) 
+									&& ($reserve->getStatus() == 'ACTIVE' || $reserve->getStatus() == 'INACTIVE'))
+									|| ($u->getRole() >= $g_permission['staff'] && !($reserve->item->isPhysicalItem() || $reserve->getStatus() == 'IN PROCESS' )))
+								{
+									$reserve->setStatus($_REQUEST['reserve_status']);
+								}
+							}
+							
+							//edit dates
+							if(isset($_REQUEST['edit_dates'])) {
+								//do not change dates of a heading
+								if(!$reserve->isHeading()) {
+									if(!empty($_REQUEST['reserve_activation_date'])) {
+										$reserve->setActivationDate($_REQUEST['reserve_activation_date']);
+									}
+									if(!empty($_REQUEST['reserve_expiration_date'])) {
+										$reserve->setExpirationDate($_REQUEST['reserve_expiration_date']);
+									}
+								}	
+							}
+
+						}	//end reserves and decendants loop	
 					}
 					
 					//changes to parent headings and notes do not apply to descendants of a heading					

@@ -241,7 +241,11 @@ function common_getStatusStyleTag($status)
 		case 'HEADING':
 			$statusTag = 'heading';
 		break;
-
+		
+		case 'DENIED':
+		case 'DENIED ALL':	
+			$statusTag = 'copyright_denied';
+		break;
 		default:
 			$statusTag = 'black';
 	}

@@ -93,6 +93,22 @@ class itemDisplayer extends noteDisplayer {
 					<input type="button" onclick="openNewWindow(this.form.url.value, 500);" value="Preview" />
 				</div>
 			</div>
+
+<?php	if($u->getRole() >= $g_permission['staff']): //only show status to staff or greater ?>
+			<? 
+				$status = $reserveItem->getStatus();
+				$$status = " checked='CHECKED' ";
+			?>
+			<div style="overflow:auto;">
+				<p>
+					<div class="strong">Item Status</div>
+					<div>
+						<input type="radio" name="item_status" <?= $ACTIVE ?> value="ACTIVE"/> Activate for all Classes
+						<input type="radio" name="item_status" <?= $DENIED ?> value="DENIED"/> Deny use for all Classes
+					</div>
+				</p>
+			</div>
+<?php	endif; ?>			
 		</div>	
 <?php	
 		//editing a physical item - show library, etc.
@@ -153,19 +169,26 @@ class itemDisplayer extends noteDisplayer {
 	 * @desc Displays the edit-item-reserve-details block
 	 */
 	function displayEditItemReserveDetails(&$reserve) {
-		global $calendar;
+		global $calendar, $g_permission, $u;
 		
 		switch($reserve->getStatus()) {
 			case 'ACTIVE':
-				$reserve_status_active = 'checked="true"';
+				$reserve_status_active = 'checked="CHECKED"';
 				$reserve_status_inactive = '';
+				$reserve_status_denied_all = '';
 				$reserve_block_vis = '';
 				break;
 			case 'INACTIVE':
 				$reserve_status_active = '';
-				$reserve_status_inactive = 'checked="true"';
+				$reserve_status_inactive = 'checked="CHECKED"';
+				$reserve_status_denied_all = '';
 				$reserve_block_vis = ' display:none;';
 				break;
+			case 'DENIED':
+				$reserve_status_active = '';
+				$reserve_status_inactive = '';
+				$reserve_status_denied = 'checked="CHECKED"';
+				$reserve_block_vis = ' display:none;';
 		}
 		
 		//dates
@@ -205,43 +228,55 @@ class itemDisplayer extends noteDisplayer {
 		
 		<div class="headingCell1">RESERVE DETAILS</div>
 		<div id="reserve_details" style="padding:8px 8px 12px 8px;">
-		
-<?php	if($reserve->getStatus()=='IN PROCESS'): ?>
-
+<?php	if($reserve->getStatus()=='DENIED ALL'): ?>	
 			<div>
-				<strong>Current Status:</strong>&nbsp;<span class="inProcess">IN PROCESS</span>
+				<strong>Current Status:</strong>&nbsp;<span class="copyright_denied">Item Access Denied</span>
 				<br />
-				Please contact your Reserves staff to inquire about the status of this reserve.
-				<input type="hidden" name="reserve_status" value="IN PROCESS" />
+				Access to this item has be denied for All Classes.  You must reactive the item status before making changes. 
+				<input type="hidden" name="reserve_status" value="<?=$reserve->status?>"/>
 			</div>
-						
-<?php	else: ?>
+<?php else: ?>
+	<?php	if (($reserve->getStatus() != 'DENIED' && $reserve->getStatus() != 'DENIED ALL') || $u->getRole() >= $g_permission['staff']): ?>				
+		<?php	if($reserve->getStatus()=='IN PROCESS'): ?>
 	
-			<div style="float:left; width:30%;">
-				<strong>Set Status:</strong>
-				<br />
-				<div style="margin-left:10px; padding:3px;">
-					<input type="radio" name="reserve_status" id="reserve_status_active" value="ACTIVE" onChange="toggleDates();" <?=$reserve_status_active?> />&nbsp;<span class="active">ACTIVE</span>
-					<input type="radio" name="reserve_status" id="reserve_status_inactive" value="INACTIVE" onChange="toggleDates();" <?=$reserve_status_inactive?> />&nbsp;<span class="inactive">INACTIVE</span>
+				<div>
+					<strong>Current Status:</strong>&nbsp;<span class="inProcess">IN PROCESS</span>
+					<br />
+					Please contact your Reserves staff to inquire about the status of this reserve.
+					<input type="hidden" name="reserve_status" value="IN PROCESS" />
 				</div>
-			</div>
-						
-			<div id="reserve_dates_block" style="float:left;<?=$reserve_block_vis?>">
-				<strong>Active Dates</strong> (YYYY-MM-DD) &nbsp;&nbsp; [<a href="#" name="reset_dates" onclick="resetDates('<?=$course_activation_date?>', '<?=$course_expiration_date?>'); return false;">Reset dates</a>]
-				<br />
-				<div style="margin-left:10px;">
-					From:&nbsp;<input type="text" id="reserve_activation_date" name="reserve_activation_date" size="10" maxlength="10" value="<?=$reserve_activation_date?>" /> <?=$calendar->getWidgetAndTrigger('reserve_activation_date', $reserve_activation_date)?>
-					To:&nbsp;<input type="text" id="reserve_expiration_date" name="reserve_expiration_date" size="10" maxlength="10" value="<?=$reserve_expiration_date?>" />  <?=$calendar->getWidgetAndTrigger('reserve_expiration_date', $reserve_expiration_date)?>
-				</div>
-			</div>
-				
-<?php	endif; ?>
+							
+		<?php	else: ?>
+				<div style="float:left; width:30%;">
+					<strong>Set Status:</strong>
+					<br />
 
+					<div style="margin-left:10px; padding:3px;">
+						<input type="radio" name="reserve_status" id="reserve_status_active" value="ACTIVE" onChange="toggleDates();" <?=$reserve_status_active?> />&nbsp;<span class="active">ACTIVE</span>
+						<input type="radio" name="reserve_status" id="reserve_status_inactive" value="INACTIVE" onChange="toggleDates();" <?=$reserve_status_inactive?> />&nbsp;<span class="inactive">INACTIVE</span>					
+			<?php	if ($u->getRole() >= $g_permission['staff']): ?>
+						<br/><input type="radio" name="reserve_status" id="reserve_status_denied" value="DENIED" onChange="toggleDates();" <?=$reserve_status_denied?> />&nbsp;<span class="inactive">DENY ACCESS FOR THIS CLASS ONLY</span>
+			<?php 	endif; ?>
+					</div>
+		<?php 	endif; #if in process?>
+				</div>
+							
+				<div id="reserve_dates_block" style="float:left;<?=$reserve_block_vis?>">
+					<strong>Active Dates</strong> (YYYY-MM-DD) &nbsp;&nbsp; [<a href="#" name="reset_dates" onclick="resetDates('<?=$course_activation_date?>', '<?=$course_expiration_date?>'); return false;">Reset dates</a>]
+					<br />
+					<div style="margin-left:10px;">
+						From:&nbsp;<input type="text" id="reserve_activation_date" name="reserve_activation_date" size="10" maxlength="10" value="<?=$reserve_activation_date?>" /> <?=$calendar->getWidgetAndTrigger('reserve_activation_date', $reserve_activation_date)?>
+						To:&nbsp;<input type="text" id="reserve_expiration_date" name="reserve_expiration_date" size="10" maxlength="10" value="<?=$reserve_expiration_date?>" />  <?=$calendar->getWidgetAndTrigger('reserve_expiration_date', $reserve_expiration_date)?>
+					</div>
+				</div>
+							
 			<div style="clear:left; padding-top:10px;">
 				<strong>Current Heading:</strong> 
 				<?php self::displayHeadingSelect($ci, $parent_heading_id); ?>
 			</div>		
-		</div>
+		</div>					
+	<?php	endif; ?>	
+<?php	endif; ?>		
 <?php
 	}
 	
@@ -940,6 +975,22 @@ class itemDisplayer extends noteDisplayer {
 	function displayEditItem($item, $reserve=null, $dub_array=null) {
 		global $u, $g_permission;
 		
+//		if(is_null($reserve) && !empty($_REQUEST['reserveID'])) {	//editing item+reserve
+//			//get reserve
+//			$reserve = new reserve($_REQUEST['reserveID']);
+//			//get item
+//			$item = new reserveItem($reserve->getItemID());
+//			
+//			//init a courseInstance to show location				
+//			$ci = new courseInstance($reserve->getCourseInstanceID());
+//		}
+//		elseif(is_null($item) && !empty($_REQUEST['itemID'])) {	//editing item only
+//			$item = new reserveItem($_REQUEST['itemID']);
+//		}
+//		else {	//no IDs set, error
+//			break;
+//		}				
+		
 		//determine if editing a reserve
 		if(!empty($reserve) && ($reserve instanceof reserve)) {
 			$edit_reserve = true;
@@ -1029,7 +1080,21 @@ class itemDisplayer extends noteDisplayer {
 #########################################
 			
 			default:
-				self::displayEditItemMeta($item, $reserve, $dub_array);
+				if ($reserve instanceof Reserve)
+				{
+					$status = $reserve->status;
+				} elseif ($item instanceof reserveItem ) {
+					$status = $item->status;
+				} else {
+					$status = 'DENIED';
+				}
+				
+				if ($status != 'DENIED' || $u->getRole() >= $g_permission['staff'])
+				{
+					self::displayEditItemMeta($item, $reserve, $dub_array);
+				} else {
+					echo "Access to this item has be denied.  Please contact your reserves desk for assistance.";
+				}
 			break;
 		}
 ?>

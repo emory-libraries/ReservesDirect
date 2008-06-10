@@ -46,6 +46,7 @@ class reserveItem extends item
 	public $privateUser;
 	public $physicalCopy;
 	public $itemIcon;
+	public $status;
 	
 	private $ISSN;
 	private $ISBN;
@@ -75,7 +76,7 @@ class reserveItem extends item
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT item_id, title, item_group, last_modified, creation_date, item_type, author, source, volume_edition, pages_times, performer, local_control_key, url, mimeType, home_library, private_user_id, volume_title, item_icon, ISBN, ISSN, OCLC
+				$sql = "SELECT item_id, title, item_group, last_modified, creation_date, item_type, author, source, volume_edition, pages_times, performer, local_control_key, url, mimeType, home_library, private_user_id, volume_title, item_icon, ISBN, ISSN, OCLC, status
 						FROM items
 						WHERE item_id = !";
 		}
@@ -92,7 +93,7 @@ class reserveItem extends item
 				$this->itemType, $this->author, $this->source, $this->volumeEdition, $this->pagesTimes, 
 				$this->performer, $this->localControlKey, $this->URL, $this->mimeTypeID, 
 				$this->homeLibraryID, $this->privateUserID, $this->volumeTitle, $this->itemIcon, 
-				$this->ISBN, $this->ISSN, $this->OCLC) 
+				$this->ISBN, $this->ISSN, $this->OCLC, $this->status) 
 			= $rs;
 				
 			//get the notes
@@ -522,6 +523,32 @@ class reserveItem extends item
 		$rs = $g_dbConn->query($sql, array($this->ISSN, $this->itemID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}		
+
+	/**
+	* @return void
+	* @param string $status
+	* @desc Updates the status value
+	*/
+	function setStatus($status)
+	{
+		if ($this->isHeading())
+		{
+			//do not update the status of headings
+			return null;
+		} else {
+			global $g_dbConn;
+	
+			$this->status = $status;
+			switch ($g_dbConn->phptype)
+			{
+				default: //'mysql'
+					$sql = "UPDATE items SET status = ? WHERE item_id = !";
+			}
+			$rs = $g_dbConn->query($sql, array($status, $this->itemID));
+			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		}
+	}	
+	
 	
 	/**
 	* @return void
@@ -555,6 +582,8 @@ class reserveItem extends item
 	function getISBN() { return $this->ISBN; }
 	function getISSN() { return $this->ISSN; }
 	function getOCLC() { return $this->OCLC; }	
+	
+	function getStatus() { return $this->status; }	
 	
 	
 	function getMimeType()

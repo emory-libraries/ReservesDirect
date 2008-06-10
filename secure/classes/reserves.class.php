@@ -420,19 +420,27 @@ class reserve extends Notes {
 	*/
 	function setStatus($status)
 	{
-		global $g_dbConn;
-
-		switch ($g_dbConn->phptype)
+		//do NOT allow anyone to change status of a heading
+		//do NOT allow anyone to change status of a physical item that is 'IN PROCESS'
+		if (!isset($this->item) || is_null($this->item))
+			$this->getItem();
+			
+		if(!$this->item->isHeading())  
 		{
-			default: //'mysql'
-				$sql = "UPDATE reserves SET status = ?, last_modified = ? WHERE reserve_id = !";
-				$d = date("Y-m-d"); //get current date
+			global $g_dbConn;
+	
+			switch ($g_dbConn->phptype)
+			{
+				default: //'mysql'
+					$sql = "UPDATE reserves SET status = ?, last_modified = ? WHERE reserve_id = !";
+					$d = date("Y-m-d"); //get current date
+			}
+			$rs = $g_dbConn->query($sql, array($status, $d, $this->reserveID));
+			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+	
+			$this->status = $status;
+			$this->lastModDate = $d;
 		}
-		$rs = $g_dbConn->query($sql, array($status, $d, $this->reserveID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		$this->status = $status;
-		$this->lastModDate = $d;
 	}
 
 		/**
@@ -669,53 +677,71 @@ class reserve extends Notes {
 		{
 			$this->getItem();
 			return true;
-		}
-		
-		switch ($g_dbConn->phptype)
-		{
-			default: //'mysql'
-				$sql = "SELECT DISTINCT a.permission_level, ci.activation_date, ci.expiration_date, ci.status, a.enrollment_status
-						FROM reserves as r
-							JOIN course_aliases as ca ON r.course_instance_id = ca.course_instance_id
-							JOIN course_instances as ci ON r.course_instance_id = ci.course_instance_id
-							JOIN access as a ON ca.course_alias_id = a.alias_id
-						WHERE a.user_id = ".$user->getUserID()." 
-							AND r.reserve_id = ".$this->reserveID;
+		} elseif ($this->getStatus() != 'DENIED' && $this->getStatus() != 'DENIED ALL') {		
+			switch ($g_dbConn->phptype)
+			{
+				default: //'mysql'
+					$sql = "SELECT DISTINCT a.permission_level, ci.activation_date, ci.expiration_date, ci.status, a.enrollment_status
+							FROM reserves as r
+								JOIN course_aliases as ca ON r.course_instance_id = ca.course_instance_id
+								JOIN course_instances as ci ON r.course_instance_id = ci.course_instance_id
+								JOIN access as a ON ca.course_alias_id = a.alias_id
+							WHERE a.user_id = ".$user->getUserID()." 
+								AND r.reserve_id = ".$this->reserveID;
+				
+					$d = date("Y-m-d"); //get current date
+			}
 			
-				$d = date("Y-m-d"); //get current date
-		}
-		
-		$rs = $g_dbConn->query($sql);
-		if (DB::isError($rs)) { return false; }
-
-		if($row = $rs->fetchRow(DB_FETCHMODE_ASSOC)) {
-			if($row['permission_level'] < $g_permission['proxy']) {	//if the user is below proxy (student, custodian)
-				//add restrictions - the CI must be current and active; the student must be on the approved roll
-				if(($row['activation_date'] <= $d) && ($row['expiration_date'] >= $d) && ($row['status'] == 'ACTIVE') && (($row['enrollment_status'] == 'AUTOFEED') || ($row['enrollment_status'] == 'APPROVED'))) {
-					//fetch the reserveItem object
+			$rs = $g_dbConn->query($sql);
+			if (DB::isError($rs)) { return false; }
+	
+			if($row = $rs->fetchRow(DB_FETCHMODE_ASSOC)) {
+				if($row['permission_level'] < $g_permission['proxy']) {	//if the user is below proxy (student, custodian)
+					//add restrictions - the CI must be current and active; the student must be on the approved roll
+					if(($row['activation_date'] <= $d) && ($row['expiration_date'] >= $d) && ($row['status'] == 'ACTIVE') && (($row['enrollment_status'] == 'AUTOFEED') || ($row['enrollment_status'] == 'APPROVED'))) {
+						//fetch the reserveItem object
+						$this->getItem();
+						return true;
+					}
+					else {	//student did not pass restrictions
+						return false;
+					}								
+				}
+				else {	//if proxy or better, do not need restrictions
 					$this->getItem();
 					return true;
 				}
-				else {	//student did not pass restrictions
-					return false;
-				}								
 			}
-			else {	//if proxy or better, do not need restrictions
-				$this->getItem();
-				return true;
+			else {	//no access
+				return false;
 			}
-		}
-		else {	//no access
+		} else {
 			return false;
 		}
 	}
 
+	/**
+	 * @return String reserve status
+	 * @desc Return reserve status unless item copyright has been denied for the item
+	 * 		 in which case item status will override 	
+	 */
+	function getStatus() { 
+		if (! $this->item instanceof reserveItem )
+			$this->getItem();
+		
+		if ($this->item->getStatus() == "ACTIVE")
+		{
+			return $this->status; 
+		} else {
+			return "DENIED ALL";
+		}
+	}	
+	
 	function getReserveID(){ return $this->reserveID; }
 	function getCourseInstanceID() { return $this->courseInstanceID; }
 	function getItemID() { return $this->itemID; }
 	function getActivationDate() { return $this->activationDate; }
-	function getExpirationDate() { return $this->expirationDate; }
-	function getStatus() { return $this->status;}
+	function getExpirationDate() { return $this->expirationDate; }	
 	function getSortOrder() { return $this->sortOrder; }
 	function getCreationDate() { return $this->creationDate; }
 	function getModificationDate() { return $this->lastModDate; }

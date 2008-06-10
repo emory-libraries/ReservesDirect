@@ -342,17 +342,25 @@ class classDisplayer extends baseDisplayer {
 					</td>
 				</tr>
 				<tr valign="middle">
-					<td class="headingCell1" style="text-align:left; padding:2px;" align="left">
-						<? if ($u->getRole() >= $g_permission['staff'] && !$ci->reviewed()) { ?>
-							<input type="submit" name="approve_copyright" value="Approve Copyrights" />
-						<? } ?>	&nbsp;				
-					</td>
-					<td class="headingCell1" style="text-align:right; padding:2px;" align="right">
+					<td class="headingCell1" style="text-align:right; padding:2px;" align="right" colspan="2">
 						<input type="submit" name="delete_multiple" value="Delete Selected" />
 						<input type="submit" name="copy_multiple" value="Copy Selected to Another Class" />
 						<input type="submit" name="edit_multiple" value="Edit Selected" />
 					</td>
-				</tr>			
+				</tr>	
+				<? if ($u->getRole() >= $g_permission['staff']) { ?>		
+					<tr>
+						<? if (!$ci->reviewed()) { ?>
+						<td class="headingCell1" style="text-align:left; padding:2px;" align="left">						
+							<input type="submit" name="approve_copyright" value="Set Copyright Reviewed" />
+						</td>
+						<? } ?>												
+						<td class="headingCell1" style="text-align:right; padding:2px;" align="right">						
+							<input type="submit" name="copyright_deny_class" value="Deny Use For This Class" />
+							<input type="submit" name="copyright_deny_all_classes" value="Deny Use For All Classes" />
+						</td>				
+					</tr>
+				<? } ?>					
 			</table>
 			</form>
 			<p />

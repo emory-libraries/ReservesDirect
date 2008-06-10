@@ -70,6 +70,8 @@ abstract class baseDisplayer {
 	 * @desc outputs HTML showing information about a reserve plus aditional links and info to edit reserve.  For use in class/reserve lists.
 	 */
 	public function displayReserveRowEdit(&$reserve, $block_style='') {
+		global $g_permission, $u;
+		
 		if(!($reserve->item instanceof reserveItem)) {
 			$reserve->getItem();	//pull in item info
 		}
@@ -81,23 +83,35 @@ abstract class baseDisplayer {
 		}
 ?>	
 	<div <?=$block_style?>>
-		<div class="editOptions">
-			<div class="itemNumber">
-				<?=$reserve->counter?>
+		<? if ($u->getRole() >= $g_permission['staff'] || ($reserve->getStatus() != 'DENIED' && $reserve->getStatus() != 'DENIED ALL' )) { ?>
+			<div class="editOptions">
+				<div class="itemNumber">
+					<?=$reserve->counter?>
+				</div>
+				<div class="checkBox">
+					<input type="checkbox" name="selected_reserves[]" value="<?=$reserve->getReserveID()?>" <?=$checkbox_onchange?> />
+				</div>
+				<div class="sortBox">
+					<?=$reserve->sort_link?>&nbsp;
+				</div>
+				<div class="editBox">
+					<?=$reserve->edit_link?>&nbsp;
+				</div>
+				<div class="statusBox">
+					<span class="<?=common_getStatusStyleTag($reserve->status)?>"><?=$reserve->status?></span>
+				</div>
 			</div>
-			<div class="checkBox">
-				<input type="checkbox" name="selected_reserves[]" value="<?=$reserve->getReserveID()?>" <?=$checkbox_onchange?> />
-			</div>
-			<div class="sortBox">
-				<?=$reserve->sort_link?>&nbsp;
-			</div>
-			<div class="editBox">
-				<?=$reserve->edit_link?>&nbsp;
-			</div>
-			<div class="statusBox">
-				<span class="<?=common_getStatusStyleTag($reserve->status)?>"><?=$reserve->status?></span>
-			</div>
-		</div>
+		<? } else { ?>
+			<div class="editOptions">
+				<div class="itemNumber">&nbsp;</div>
+				<div class="checkBox">&nbsp;</div>
+				<div class="sortBox">&nbsp;</div>
+				<div class="editBox">&nbsp;</div>
+				<div class="statusBox">
+					<span class="<?=common_getStatusStyleTag($reserve->status)?>"><?=$reserve->status?></span>
+				</div>
+			</div>		
+		<? } ?>
 		
 		<?php self::displayReserveInfo($reserve, 'class="metaBlock"'); ?>
 
@@ -251,8 +265,11 @@ abstract class baseDisplayer {
 			<span class="itemMetaPre">On Reserve at:</span><span class="itemMeta"><?=$reserveDesk?></span> [<a href="<?=$viewReserveURL?>" target="_blank" class="strong">more info</a>]	
 			
 <?php	else: ?>
-
-			<a href="<?=$viewReserveURL?>" target="_blank" class="itemTitle" style="margin:0px; padding:0px;"><?=$title?></a>
+			<?php if ($reserve->getStatus() != 'DENIED' && $reserve->getStatus() != 'DENIED ALL'): ?>
+				<a href="<?=$viewReserveURL?>" target="_blank" class="itemTitle" style="margin:0px; padding:0px;"><?=$title?></a>
+			<?php	else: ?>
+				<span class="itemTitleNoLink"><?=$title?></span>
+			<?php	endif; ?>
 			<br />
 			<span class="itemAuthor"><?=$author?></span>
 			

@@ -928,6 +928,7 @@ of materials on reserve. */
 
 }
 
+.copyright_denied,
 .inactive {
 	color: #CC0000;
 	font-weight: bold;

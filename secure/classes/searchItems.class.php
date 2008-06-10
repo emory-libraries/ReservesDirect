@@ -44,7 +44,7 @@ class searchItems
 	*/
 	function search($term, $value, $f=0, $e=20)
 	{
-		global $g_dbConn, $u;
+		global $g_dbConn, $u, $g_permission;
 
 		$this->query = rtrim(ltrim($value));
 		$this->field = $term;
@@ -57,10 +57,17 @@ class searchItems
 				$sql_select = "SELECT i.item_id, i.item_group ";
 				$sql_cnt    = "SELECT count(i.item_id) ";
 
-				$sql = "FROM items as i "
-					.  "WHERE (i.item_type != 'HEADING') "
-					.  "AND ( i.private_user_id IS NULL OR i.private_user_id = " . $u->getUserID() . " ) "
-					.  "AND ("
+				$sql = "FROM items as i ";
+					
+				$sql .=  "WHERE (i.item_type != 'HEADING') ";
+				
+				if ($u->getRole() < $g_permission['staff'])
+				{
+					$sql .= " AND (i.status <> 'DENIED') ";
+				}
+				
+				$sql .= " AND ( i.private_user_id IS NULL OR i.private_user_id = " . $u->getUserID() . " ) ";
+				$sql .=  "AND ("
 					;
 
 				for($i=0;$i<count($values);$i++)
@@ -105,7 +112,7 @@ class searchItems
 						.	   "  JOIN reserves as r ON ci.course_instance_id = r.course_instance_id "
 						.	   "  JOIN items as i ON r.item_id = i.item_id "
 						//.	   "WHERE a.user_id = " . $values[0]
-						.	   "WHERE i.item_type != 'HEADING' AND a.user_id = " . $values[0]
+						.	   "WHERE i.item_type != 'HEADING' AND a.user_id = " . $values[0] . " AND i.status <> 'DENIED'" 
 						.	   "  AND ( i.private_user_id IS NULL OR i.private_user_id = " . $u->getUserID() . " ) "
 						;
 				}
@@ -114,7 +121,12 @@ class searchItems
 				$this->end   = ($e > $this->end) ? $e : $this->end;
 				$sql_order  = " ORDER BY item_group LIMIT " . $this->first . "," . $this->end;
 		}
-		//echo "itemSeach::search $sql_select . $sql . $sql_order<br>";
+		
+		if (isset($_SESSION['debug'])) 
+		{
+		 	echo "itemSeach::search $sql_select . $sql . $sql_order<br>";
+		}
+		
 		$rs = $g_dbConn->query($sql_select . $sql . $sql_order);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 

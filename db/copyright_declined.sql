@@ -1,0 +1,4 @@
+ALTER TABLE `reserves` CHANGE `status` `status` SET( 'ACTIVE', 'INACTIVE', 'IN PROCESS', 'DENIED' )
+  CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'ACTIVE';
+  
+ALTER TABLE `items` ADD `status` SET( 'ACTIVE', 'DENIED' ) NOT NULL DEFAULT 'ACTIVE' AFTER `OCLC` ;  

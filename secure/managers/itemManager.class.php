@@ -81,6 +81,7 @@ class itemManager
 						
 			case 'editItem':
 				//switch b/n editing item or editing reserve+item
+
 				if(!empty($_REQUEST['reserveID'])) {	//editing item+reserve
 					//get reserve
 					$reserve = new reserve($_REQUEST['reserveID']);
@@ -96,7 +97,7 @@ class itemManager
 				else {	//no IDs set, error
 					break;
 				}
-				
+
 				//form submitted - edit item meta
 				if(!empty($_REQUEST['submit_edit_item_meta'])) {
 					//were we editing a reserve?
@@ -155,7 +156,8 @@ class itemManager
 					$item->setSource($_REQUEST['source']);										
 					$item->setISBN($_REQUEST['ISBN']);
 					$item->setISSN($_REQUEST['ISSN']);
-					$item->setOCLC($_REQUEST['OCLC']);				
+					$item->setOCLC($_REQUEST['OCLC']);	
+					$item->setStatus($_REQUEST['item_status']);		
 					
 					//physical item data
 					if($item->isPhysicalItem()) {
