@@ -1225,7 +1225,7 @@ function displayCustomSort(&$ci, &$reserves) {
 	 * @desc Displays the screen to edit reserve-info of multiple reserves
 	 */
 	function displayEditMultipleReserves(&$ci, $reserve_ids) {
-		global $calendar, $u, $g_permission, $g_notetype;
+		global $calendar, $u, $g_permission, $g_notetype, $u;
 		
 		//set default activation/deactivation dates
 		$course_activation_date = $ci->getActivationDate();	
@@ -1304,6 +1304,12 @@ function displayCustomSort(&$ci, &$reserves) {
 								
 								<input type="radio" name="reserve_status" id="reserve_status_active" value="ACTIVE" />&nbsp;<span class="active">ACTIVE</span>
 								<input type="radio" name="reserve_status" id="reserve_status_inactive" value="INACTIVE" />&nbsp;<span class="inactive">INACTIVE</span>
+								
+								<?php if ($u->getRole() >= $g_permission['staff']): ?>
+									<br/><input type="radio" name="reserve_status" id="reserve_status_denied" value="DENIED" <?=$reserve_status_denied?> />&nbsp;<span class="copyright_denied">DENY ACCESS FOR THIS CLASS ONLY</span>
+									<br/><input type="radio" name="reserve_status" id="item_status_denied"    value="DENY ALL" <?=$item_status_denied?> />&nbsp;<span class="copyright_denied">DENY ACCESS FOR ALL CLASSES</span> 	
+								<?php 	endif; ?>								
+								
 								<p><small>If you are editing headings, changes will also affect all reserves in those headings.</small></p>
 							</fieldset>
 						</td>
