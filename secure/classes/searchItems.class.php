@@ -124,7 +124,7 @@ class searchItems
 		
 		if (isset($_SESSION['debug'])) 
 		{
-		 	echo "itemSeach::search $sql_select . $sql . $sql_order<br>";
+		 	echo "itemSearch::search $sql_select $sql $sql_order<br>";
 		}
 		
 		$rs = $g_dbConn->query($sql_select . $sql . $sql_order);
