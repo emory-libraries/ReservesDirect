@@ -8,17 +8,6 @@
 	//will init $g_dbConn PEAR::DB object
 	require_once(RD_ROOT.'secure/config.inc.php');
 
-	//Remove old request over 1 month old
-	$lastmonth = date("Y-m-d", mktime(0, 0, 0, date("m")-1, date("d"),   date("Y")));
-	$sql = "DELETE FROM ils_requests WHERE date_added < '$lastmonth'";
-	
-	$rs = $g_dbConn->query($sql);
-	if(DB::isError($rs)) {
-		echo "<br />ERROR Could not delete old entries: {$rs->getMessage()}";
-		die(-1);
-	}
-	
-	
 	//read in feed
 	$processed_count = 0;
 	$nonblank_count = 0;
@@ -41,10 +30,10 @@
 				//build insert statement
 				//whether or not one of the fields gets populated depends on one of the variables in the feed
 				if((stripos($data[1], 'WRSRV_BOTH') !== false) && !empty($data[11])) {	//should have requested loan period
-					$sql = "INSERT INTO ils_requests (date_added, ils_request_id, ils_control_key, user_ils_id, user_net_id, ils_course, requested_loan_period) VALUES (NOW(), '".trim($data[0])."', '".trim($data[4])."', '".trim($data[5])."', '".trim($data[6])."', '".trim($data[8])."', '".trim($data[11])."')";	
+					$sql = "INSERT INTO ils_requests (date_added, ils_request_id, ils_control_key, user_ils_id, user_net_id, ils_course, requested_loan_period) VALUES (CURRENT_TIMESTAMP, '".trim($data[0])."', '".trim($data[4])."', '".trim($data[5])."', '".trim($data[6])."', '".trim($data[8])."', '".trim($data[11])."')";	
 				}
 				else {	//no loan period info
-					$sql = "INSERT INTO ils_requests (date_added, ils_request_id, ils_control_key, user_ils_id, user_net_id, ils_course) VALUES (NOW(), '".trim($data[0])."', '".trim($data[4])."', '".trim($data[5])."', '".trim($data[6])."', '".trim($data[8])."')";
+					$sql = "INSERT INTO ils_requests (date_added, ils_request_id, ils_control_key, user_ils_id, user_net_id, ils_course) VALUES (CURRENT_TIMESTAMP, '".trim($data[0])."', '".trim($data[4])."', '".trim($data[5])."', '".trim($data[6])."', '".trim($data[8])."')";
 				}
 				
 				//query

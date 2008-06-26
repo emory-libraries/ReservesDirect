@@ -209,10 +209,11 @@ function authByAny($username, $password) {
  */
 function authBySecretKey($qs_data) {
 	global $g_trusted_systems, $g_permission;
+	
+	if (is_null($qs_data)) return false;
 		
 	parse_str(base64_decode($qs_data), $auth_data);
-	
-	
+		
 	$trusted_system_key = $g_trusted_systems[$auth_data['sys']]['secret'];
 	$timeout = $g_trusted_systems[$auth_data['sys']]['timeout'];
 	

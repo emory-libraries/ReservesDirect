@@ -29,6 +29,7 @@ http://www.reservesdirect.org/
 class ILS_Request {
 	private $request_id;
 	private $date_added;
+	private $date_processed;
 	private $ils_control_key;
 	private $user_net_id;
 	private $user_ils_id;
@@ -61,13 +62,13 @@ class ILS_Request {
 			return false;
 		}
 		
-		$sql = "SELECT request_id, date_added, ils_control_key, user_net_id, user_ils_id, ils_course, requested_loan_period
-				FROM ils_requests WHERE request_id = !";
+		$sql = "SELECT request_id, date_added, date_processed, ils_control_key, user_net_id, user_ils_id, ils_course, requested_loan_period
+				FROM ils_requests WHERE request_id = ! and date_processed IS NULL";
 		$rs = $g_dbConn->query($sql, $request_id);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		if($rs->numRows() > 0) {
-			list($this->request_id, $this->date_added, $this->ils_control_key, $this->user_net_id, $this->user_ils_id, $this->ils_course, $this->requested_loan_period) = $rs->fetchRow();
+			list($this->request_id, $this->date_added, $this->date_processed, $this->ils_control_key, $this->user_net_id, $this->user_ils_id, $this->ils_course, $this->requested_loan_period) = $rs->fetchRow();
 			return true;
 		}
 		else {
@@ -140,13 +141,13 @@ class ILS_Request {
 	
 	
 	/**
-	 * Deletes row matching this object from DB
+	 * Mark ils request as processed
 	 */
-	function deleteRow() {
+	function markAsProcessed() {
 		global $g_dbConn;
 		
 		if(!empty($this->request_id)) {
-			$sql = "DELETE FROM ils_requests WHERE request_id = !";
+			$sql = " UPDATE ils_requests SET date_processed = CURRENT_TIMESTAMP WHERE request_id = !";
 			$rs = $g_dbConn->query($sql, $this->request_id);
 			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		}

@@ -699,7 +699,7 @@ class requestManager
 		if(!empty($_REQUEST['ils_requests'])) {
 			foreach($_REQUEST['ils_requests'] as $ils_request_id) {
 				$ils_request = new ILS_Request($ils_request_id);
-				$ils_request->deleteRow();								
+				$ils_request->markAsProcessed();								
 			}
 		}
 		
