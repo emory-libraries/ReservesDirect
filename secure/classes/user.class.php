@@ -38,6 +38,7 @@ class user
 	public $lastLogin;
 	private $userClass;
 	private $not_trained;
+	public $external_user_key;
 
 	/**
 	* Constructor Method
@@ -99,7 +100,6 @@ class user
 				$d = date("Y-m-d");
 		}		
 		$rs = $g_dbConn->query($sql, array($userName, $pwd, $d));		
-
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		if ($rs->numRows() == 1)
@@ -258,7 +258,6 @@ class user
 		}
 
 		$rs = $g_dbConn->query($sql, array($d, $this->getUserID()));
-
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		$this->lastLogin = $d;
@@ -284,12 +283,13 @@ class user
 		return $displayname;
 	}
 
-	function getUserID() { return $this->userID; }
-	function getUsername() { return stripslashes($this->userName); }
-	function getFirstName() { return stripslashes($this->firstName); }
-	function getLastName() { return stripslashes($this->lastName); }
-	function getEmail() { return stripslashes($this->email); }
-	function getLastLogin() { return $this->lastLogin; }
+	public function getUserID() { return $this->userID; }
+	public function getUsername() { return stripslashes($this->userName); }
+	public function getFirstName() { return stripslashes($this->firstName); }
+	public function getLastName() { return stripslashes($this->lastName); }
+	public function getEmail() { return stripslashes($this->email); }
+	public function getLastLogin() { return $this->lastLogin; }
+	public function getExternalUserKey() { return $this->external_user_key; }
 
 	function isSpecialUser()
 	{
@@ -359,7 +359,7 @@ class user
 		{
 			default: //'mysql'
 				$sql = "
-						SELECT u.user_id, u.username, u.first_name, u.last_name, u.email, u.dflt_permission_level, p.label,
+						SELECT u.user_id, u.username, u.first_name, u.last_name, u.email, u.external_user_key, u.dflt_permission_level, p.label,
 							CASE WHEN nt.user_id IS NOT NULL THEN nt.permission_level
 								ELSE u.dflt_permission_level END as permission_level, 
 							CASE WHEN nt.user_id IS NOT NULL THEN nt_p.label
@@ -381,7 +381,7 @@ class user
 			return false;
 		}
 		else {
-			list($this->userID, $this->userName, $this->firstName, $this->lastName, $this->email, $this->dfltRole, $this->dfltClass, $this->role, $this->userClass, $this->not_trained) = $rs->fetchRow();			
+			list($this->userID, $this->userName, $this->firstName, $this->lastName, $this->email, $this->external_user_key, $this->dfltRole, $this->dfltClass, $this->role, $this->userClass, $this->not_trained) = $rs->fetchRow();			
 			return true;
 		}
 	}
@@ -461,6 +461,7 @@ class user
 		}
 
 		$rs = $g_dbConn->query($sql, $this->getUserID());
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		//reload user object
 		$this->getUserByID($this->getUserID());	
@@ -477,6 +478,7 @@ class user
 		}
 		
 		$rs = $g_dbConn->query($sql, $this->getUserID());
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 		//reload user object
 		$this->getUserByID($this->getUserID());		
@@ -484,6 +486,22 @@ class user
 	
 	function isNotTrained() { return $this->not_trained; }
 	
+	
+	public function setExternalUserKey($user_key)
+	{
+		global $g_dbConn;
+
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "UPDATE users SET external_user_key = ? WHERE user_id = !";					
+		}
+
+		$rs = $g_dbConn->query($sql, array($user_key, $this->getUserID()));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+		$this->external_user_key = $user_key;
+	}
 	
 	/**
 	 * @return array - Array of CourseInstances
