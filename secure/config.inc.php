@@ -140,4 +140,6 @@ http://www.reservesdirect.org/
     	unset($k, $t);
     }
     unset($trustedSystems);    
+    
+    $g_ils = (array)$configure->ils;
 ?>

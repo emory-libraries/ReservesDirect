@@ -29,9 +29,11 @@ require_once("secure/common.inc.php");
 require_once("secure/classes/itemAudit.class.php");
 require_once("secure/classes/ils_request.class.php");
 require_once("secure/classes/users.class.php");
-require_once("secure/classes/zQuery.class.php");
+//require_once("secure/classes/zQuery.class.php");
 require_once("secure/displayers/requestDisplayer.class.php");
-require_once('secure/classes/note.class.php');
+require_once("secure/classes/note.class.php");
+
+require_once("lib/RD/Ils.php");
 
 class requestManager
 {
@@ -147,7 +149,7 @@ class requestManager
 						//get holding info for physical items
 						$item = new reserveItem($item_id);
 						if($item->isPhysicalItem()) {
-							$zQry = new zQuery('');
+							$zQry = RD_Ils::initILS();
 							$holdingInfo = $zQry->getHoldings('control', $item->getLocalControlKey());
 							$selected_barcode = $propagated_data['requested_barcode'];
 						}
@@ -457,9 +459,9 @@ class requestManager
 		//this should return an indexed array, which may be populated w/ data
 		if(($cmd=='addPhysicalItem') && !empty($qryValue)) {
 			//query ILS
-			$zQry = new zQuery($qryValue, $qryField);
-			//parse results into array
-			$search_results = $zQry->parseToArray();
+			//$zQry = new zQuery($qryValue, $qryField);
+			$zQry = RD_Ils::initILS();
+			$search_results = $zQry->search($qryValue, $qryField)->to_a();
 		
 			//if still do not have an initialized item object
 			//try one more time by control key pulled from ILS

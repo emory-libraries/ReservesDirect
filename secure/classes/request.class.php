@@ -29,7 +29,6 @@ http://www.reservesdirect.org/
 
 require_once("secure/classes/item.class.php");
 require_once("secure/classes/user.class.php");
-require_once("secure/classes/zQuery.class.php");
 
 class request
 {
@@ -49,7 +48,7 @@ class request
 	public $courseInstance;
 	public $holdings = array();
 	
-	private $zQry;
+	private $_ils;
 
 	/**
 	* @return request
@@ -61,7 +60,7 @@ class request
 		if (!is_null($requestID)){
 			$this->getRequestByID($requestID);
 		}
-		$this->zQry = new zQuery(null);
+		$this->_ils = RD_Ils::initILS();
 	}
 
 	/**
@@ -217,7 +216,7 @@ class request
 	{
 		$item = new reserveItem($this->requestedItemID);
 				
-		$this->holdings = $this->zQry->getHoldings('control', $item->getLocalControlKey());
+		$this->holdings = $this->_ils->getHoldings($item->getLocalControlKey(), 'control');
 	}
 
 	function destroy()

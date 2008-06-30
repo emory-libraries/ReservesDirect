@@ -41,6 +41,11 @@ http://www.reservesdirect.org/
         <debug>true</debug>
     </database>
     
+    <ils>
+    	<class_name>RD_Ils_EuclidTest</class_name><!-- Class returned by init ILS -->
+    	<view_path></view_path>
+    </ils>
+    
     <catalog>
         <catalogName>CHANGEME</catalogName>
         <useCatalog comment="OPTIONS: yes/no; all others may be blank if 'no'">yes</useCatalog>
