@@ -52,7 +52,10 @@ class proxy extends student
 		$expiration_date = date('Y-m-d');
 		
 		//now query
-		return $this->fetchCourseInstances('proxy', $activation_date, $expiration_date, 'ACTIVE');
+		return array_merge(
+			$this->fetchCourseInstances('proxy', $activation_date, $expiration_date, 'ACTIVE'),
+			$this->fetchCourseInstances('proxy', $activation_date, $expiration_date, 'AUTOFEED')
+		);
 	}
 	
 

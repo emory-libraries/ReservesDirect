@@ -71,5 +71,10 @@ class terms
 		$term->getTermByDate(date("Y-m-d"));
 		return $term;
 	}
+	
+	function getLastEditableTerm() {
+		$terms = $this->getTerms(false); 		
+		return end($terms);
+	}	
 }
 ?>

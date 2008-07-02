@@ -82,6 +82,32 @@ class user
 
 	/**
 	* @return void
+	* @param string $external_user_key
+	* @desc alternate constructor method
+	*/
+	function getUserByExternalUserKey($external_user_key)
+	{
+		global $g_dbConn;
+
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql' 
+				$sql = "SELECT user_id FROM users WHERE external_user_key = ?";
+		}
+		$rs = $g_dbConn->query($sql, array($external_user_key));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+		if ($rs->numRows() == 1)
+		{
+			$row = $rs->fetchRow();
+			$this->user($row[0]);
+			return true;
+		} else return false;
+
+	}	
+	
+	/**
+	* @return void
 	* @param string $userName, string encrypted pwd
 	* @desc retrieve user by username and encrypted pwd
 	*/

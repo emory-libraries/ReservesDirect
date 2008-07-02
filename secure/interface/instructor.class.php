@@ -232,12 +232,18 @@ class instructor extends proxy
 		$expiration_date = date('Y-m-d');
 	
 		//get CIs where user is an instructor
-		$intructor_CIs = $this->fetchCourseInstances('instructor', $activation_date, $expiration_date, 'ACTIVE');
+		$intructor_CIs = array_merge(
+			$this->fetchCourseInstances('instructor', $activation_date, $expiration_date, 'ACTIVE'),
+			$this->fetchCourseInstances('instructor', $activation_date, $expiration_date, 'AUTOFEED')
+		);
 		//get CIs where user is a proxy
-		$proxy_CIs = $this->fetchCourseInstances('proxy', $activation_date, $expiration_date, 'ACTIVE');
+		$proxy_CIs = array_merge(
+			$this->fetchCourseInstances('proxy', $activation_date, $expiration_date, 'ACTIVE'),
+			$this->fetchCourseInstances('proxy', $activation_date, $expiration_date, 'AUTOFEED')
+		);
 		
 		//return the combined list
-		return ($intructor_CIs + $proxy_CIs);
+		return array_merge($intructor_CIs, $proxy_CIs);
 	}
 	
 	/**
