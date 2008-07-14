@@ -34,10 +34,7 @@ $load_start_time = time();
 require_once("secure/config.inc.php");
 require_once("secure/common.inc.php");
 
-require_once("secure/classes/calendar.class.php");
 require_once("secure/classes/users.class.php");
-require_once("secure/classes/skins.class.php");
-require_once("secure/classes/news.class.php");
 
 require_once("secure/interface/student.class.php");
 require_once("secure/interface/custodian.class.php");
@@ -46,6 +43,10 @@ require_once("secure/interface/instructor.class.php");
 require_once("secure/interface/staff.class.php");
 require_once("secure/interface/admin.class.php");
 
+require_once("secure/classes/reserveItem.class.php");
+require_once("secure/classes/request.class.php");
+require_once("secure/classes/reserves.class.php");
+require_once("secure/classes/courseInstance.class.php");
 
 //set up error-handling/debugging, skins, etc.
 require_once("secure/session.inc.php");
@@ -54,11 +55,18 @@ require_once("secure/session.inc.php");
 //pull Book info from ILS
 require_once("lib/RD/Ils.php");
 
+//echo "<pre>"; print_r($_REQUEST); echo "</pre>";
+
 $barcode = $_REQUEST['itemID'];
 $u_key   = $_REQUEST['u_key'];
 
 $tmpUsr = new user();
-$tmpUsr->getUserByExternalUserKey($u_key);
+if (isset($_REQUEST['u_id']))
+{
+	$tmpUsr->getUserByID($_REQUEST['u_id']);
+} else {	
+	$tmpUsr->getUserByExternalUserKey($u_key);
+}
 
 //Users must be proxy or greater otherwise show access denied
 //TEST how do not-trained users evaluate?
@@ -72,12 +80,64 @@ switch ($tmpUsr->getUserClass())
 		exit;
 }
 
+$usersObject = new users();
+$u = $usersObject->initUser($tmpUsr->getUserClass(), $tmpUsr->getUsername());
+
+$ils = RD_Ils::initILS();
+$ils_result = $ils->search('barcode', $barcode); 
+$item_data  = $ils_result->to_a();
+
+//TODO: set item_group from external src check the Bernado on how to
+$physical_group = 'MONOGRAPH';  //other MULTIMEDIA
+
+
+//echo $ils_result->getData();
+//exit();
+
+if (isset($_REQUEST['cmd']) && $_REQUEST['cmd'] == 'storeILSRequest')
+{
+	// Assume we are processing the form
+	// Create Reserve, Request and Item records
+	// 1 for physical requests 
+	// 1 for each scan request section
+
+	$form_data = array();
+	$form_data['ci'] 						= $_REQUEST['ci'];
+	$form_data['ils_request_loanPeriod']	= $_REQUEST['ils_request_loanPeriod'];
+	$form_data['note']   = array();
+	$form_data['note'][] = $_REQUEST['note'];
+		
+	$form_data['maxEnrollment']				= $_REQUEST['maxEnrollment'];
+	
+	if ($_REQUEST['placeAtDesk'] == 'yes')
+	{
+		$form_data['note'][] = "PLACE {$_REQUEST['numCopies']} copy(ies) on Reserve";
+	
+		if ($_REQUEST['reserveAnyAvailable'] == 'yes')
+			$form_data['note'][] = 'PLACE ANY AVAILABLE VOLUME ON RESERVE';	
+				
+		storeData($u, $item_data, $physical_group, $form_data, 'PHYSICAL');
+	}
+	
+	if ($_REQUEST['scanItem'] == 'yes')
+	{
+		for($j = 0; $j < sizeof($_REQUEST['scan_request']); $j++)
+		{		
+			$end = "";
+			if (isset($_REQUEST['scan_request'][$j]['end']) && !empty($_REQUEST['scan_request'][$j]['end']))
+				$end = " - {$_REQUEST['scan_request'][$j]['end']}";
+			
+			$form_data['pages'] 		= ($physical_group == 'MONOGRAPH') ? "pp. {$_REQUEST['scan_request'][$j]['start']} $end" : $_REQUEST['scan_request'][$j]['start'] . " - " . $_REQUEST['scan_request'][$j]['end'];
+			$form_data['chapter_title']	= $_REQUEST['scan_request'][$j]['chapter_title'];
+					
+			storeData($u, $item_data, 'ELECTRONIC', $form_data, 'SCAN');
+		}
+	}
+}
+
 $termObject = new terms();
 $terms = $termObject->getTerms(false); //get current + next 3 terms
 $current_term = $termObject->getCurrentTerm();
-
-$usersObject = new users();
-$u = $usersObject->initUser($tmpUsr->getUserClass(), $tmpUsr->getUsername());
 
 #Limit to current and upcoming courses
 $editableCI = $u->getCourseInstancesToEdit();
@@ -88,8 +148,59 @@ foreach ($editableCI as $ci) {
 	$courseList[$ci->getTerm().$ci->getYear()][] = $ci; 
 }
 
-$ils = RD_Ils::initILS();
-$item_data = $ils->search('barcode', $barcode)->to_a();
+function storeData($u, $item_data, $item_group, $form_data, $request_type)
+{
+	global $g_dbConn;
+	
+	//attempt to use transactions
+	if($g_dbConn->provides('transactions')) {
+		$g_dbConn->autoCommit(false);
+	}
+	try {	
+		$ci = new courseInstance($form_data['ci']);
+		
+		$item = new reserveItem();
+			$item->createNewItem();
+			$item->setLocalControlKey($item_data['controlKey']);
+			$item->setTitle($item_data['title']);
+			$item->setAuthor($item_data['author']);
+			$item->setOCLC($item_data['OCLC']);
+			$item->setISBN($item_data['ISBN']);
+			$item->setISSN($item_data['ISSN']);
+			$item->setGroup($item_group); 
+			$item->setType('ITEM');
+			$item->setPagesTimes($form_data['pages']);
+			$item->setVolumeTitle($form_data['chapter_title']);
+		
+		$reserve = new reserve();
+			$reserve->createNewReserve($ci->getCourseInstanceID(), $item->getItemID());
+			$reserve->setActivationDate($ci->getActivationDate());
+			$reserve->setExpirationDate($ci->getExpirationDate());
+			$reserve->setRequestedLoanPeriod($form_data['ils_request_loanPeriod']);
+			$reserve->setStatus('IN PROCESS');
+		
+		$request = new request();
+			$request->createNewRequest($ci->getCourseInstanceID(), $item->getItemID());
+			$request->setRequestingUser($u->getUserID());
+			$request->setReserveID($reserve->getReserveID());
+			$request->setMaxEnrollment($form_data['maxEnrollment']);
+			$request->setType($request_type);
+		
+		foreach($form_data['note'] as $note)
+		{
+			$request->setNote($note, 'Instructor');
+		}
+	} catch (Exception $e) {
+		trigger_error("Error Occurred While processing StoreRequest ".$e->getMessage(), E_USER_ERROR);
+		if($g_dbConn->provides('transactions')) { 
+			$g_dbConn->rollback();
+		}					
+	}
+	//commit this set
+	if($g_dbConn->provides('transactions')) { 
+		$g_dbConn->commit();
+	}	
+}
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -105,23 +216,34 @@ $item_data = $ils->search('barcode', $barcode)->to_a();
   <meta name="keywords" content="reserves, ereserves, electronic reserves, e-reserves, request, scanning, scan, digitization, Emory, Woodruff, library, Woodruff library, Emory University, main library" />
 
 <style type="text/css">
+	p, h1, h2, legend, li { font-family: verdana; margin-left: 50px; }
+	p, li { font-size: small; }
+	
+	h1 { font-size: x-large; font-weight: bold; } 
+	h2 { font-size: large; font-weight: bold; }
 
-p, h1, h2, legend, li { font-family: verdana; margin-left: 50px; }
-p, li { font-size: small; }
-h1 { font-size: x-large; font-weight: bold; } 
-h2 { font-size: large; font-weight: bold; }
+	legend { font-size: medium; font-weight: bold; }
+	.example { font-size: x-small; white-space: nowrap; }
 
-legend { font-size: medium; font-weight: bold; }
-.example { font-size: x-small; white-space: nowrap; }
-
-div#course_selection_area {margin-left: 25px;}
-div#term_selector { font-size: small; padding-bottom: 20px; }
-td.course_number, td.course_title { font-size: small; }
-td.course_instructors { font-size: x-small; }
+	div#course_selection_area {margin-left: 25px;}
+	div#course_selection_area p {margin-left: 0px;}
+		
+	div#maxEnrollment {margin-left: 25px; font-family: verdana; font-size: small;}
+	
+	div#item_info {margin-left: 50px;}
+	div#term_selector { font-size: small; padding-bottom: 20px; }
+	td.course_number, td.course_title { font-size: small; }
+	td.course_instructors { font-size: x-small; }
+		
+	span.required {color: red;}
+	
+	
+	div.error  {border: 2px double red; padding-left: 5px;}	
+	span.error {color: red;}
 
 </style>
 
-<script language="JavaScript">
+<script language="JavaScript1.2">
 	function toggle_courses_for(termID)
 	{
 		<? foreach ($terms as $t) { ?>
@@ -129,14 +251,82 @@ td.course_instructors { font-size: x-small; }
 		<? } ?>
 		document.getElementById('courses_for_'+termID).style.display = '';
 	}
-</script>
+	
+	var rowNdx = 0;
+	function addNewScanRequest(tableRef)
+	{
+		rowNdx++;
+		newRow =  		  '<tr>';		
+		newRow = newRow + '	<td class="course_number"><input type="text" name="scan_request[' + rowNdx + '][chapter_title]" size="50" /></td>';
+		newRow = newRow + '	<td class="course_number"><input type="text" name="scan_request[' + rowNdx + '][start]" size="4" /></td>';
+		newRow = newRow + '	<td class="course_number"><input type="text" name="scan_request[' + rowNdx + '][end]" size="4" /></td>';
+		newRow = newRow + '</tr>';
+		
+		
+		$(tableRef).insert({bottom: newRow});
 
+	}
+	
+	function validateForm(frm)
+	{	
+		var errorCnt = 0;						
+		
+		//verify that maxEnrollment is int > 0
+		if (isNaN(frm.maxEnrollment.value) || frm.maxEnrollment.value < 0)
+		{
+			$('maxEnrollment').className = "error";
+			$('maxEnrollment_error').replace('Maximum Enrollment must be a whole number greater than 0.');
+			errorCnt++;
+		} else {			
+			$('maxEnrollment').className = "";
+			$('maxEnrollment_error').replace('');			
+		}
+		
+		//verify that ci has been selected
+		var selectedCI;
+		for(i=0; i < frm.elements['ci'].length; i++) 
+		{
+			if (frm.elements['ci'][i].checked)
+				selectedCI = frm.elements['ci'][i].value;
+		}
+		if (selectedCI == undefined)
+		{
+			$('ci_errors').insert("Please select a course.")
+			$('course_selection_area').className = 'error';
+			errorCnt++;
+		} else {
+			$('ci_errors').replace("")
+			$('course_selection_area').className = '';
+		}
+		
+		//verify that placeAtDesk and scanItem are not both no 		
+		if (frm.placeAtDesk[1].checked && frm.scanItem[1].checked)
+		{
+			$('rd_info_error').className = "error";
+			$('rd_info_error_txt').replace("Please select to place the physical item at the Reserve Desk and/or place part(s) of the item online.");
+			errorCnt++;
+		} else {
+			$('rd_info_error').className = "";
+			$('rd_info_error_txt').replace("");			
+		}
+		
+		
+		if (frm.scanItem[0].checked)
+		{
+			//for(i=0; i < frm.elements['ci'].length; i++) 
+			alert(frm.scanItem[0].value);
+			alert(frm.scan_request);
+		}
+		
+		alert(errorCnt);
+		return false;
+	}
+</script>
+<script language="JavaScript1.2" src="secure/javascript/prototype.js"></script>
 </head>
 
-<body bgcolor="#FFFFCC" text="#000000" link="#000080" vlink="#800080" alink="#FF0000" onload="document.forms[0].NHYOURNAME.focus();">
-
+<body bgcolor="#FFFFCC" text="#000000" link="#000080" vlink="#800080" alink="#FF0000">
 <h1>Reserve Request for Woodruff Library</h1>
-<p>This form is for instructors and their proxies only.</p>
 
 <ul>
 <li>Reserve requests are processed in the order received.</li>
@@ -145,16 +335,22 @@ td.course_instructors { font-size: x-small; }
 <li>Reserve requests can take significantly longer to fulfill when items are checked out or missing.</li>
 </ul>
  
-<form action="/uhtbin/woodruff_rsrv_both_request" method="post" name="RESERVEREQUEST">
+<form action="ils_request_form.php" method="post" name="RESERVEREQUEST" > <!-- onSubmit="return validateForm(this)"> -->
 
-<input type="hidden" name="state" value="1" />
-<input type="hidden" name="itemID" value="010000529626" />
-<input type="hidden" name="u_key" value="47654" />
+<input type="hidden" name="itemID" value="<?= $barcode ?>" />
+<input type="hidden" name="u_key"  value="<?= $u_key ?>" />
+<input type="hidden" name="cmd" value="storeILSRequest"/>
+<input type="hidden" name="u_id" value="<?= $u->getUserID() ?>" />
+<input type="hidden" name="physical_group" value="<?= $physical_group ?>" />
 
-
-<h2>Title: <?= $item_data['title'] ?></h2>
-
-<h2>Call number: <?= $item_data['holdings'][0]['callNum'] ?></h2>
+<div id="item_info">
+	<table cellspacing="5">
+		<tr><td><b>Title:</b></td><td><?= $item_data['title'] ?></b></td></tr>
+		<tr><td><b>Call number:</b></td><td><?= $item_data['holdings'][0]['callNum'] ?></b></td></tr>
+		<tr><td><b>Status:</b></td><td><?= $item_data['holdings'][0]['status'] ?></td></tr>
+	</table>
+</div>
+<p />
 
 <fieldset>
 <legend>Class Information</legend>
@@ -188,17 +384,29 @@ td.course_instructors { font-size: x-small; }
 							<td class="course_title"><?= $ci->course->getName() ?></td>
 							<td class="course_instructors"><?= $ci->displayInstructors(false) ?></td>
 						</tr>	
-					<? } ?>
-					</table>								
+					<? } ?>						
+					</table>	
+					<p>
+						Please contact your Reserves Desk if your desired course is not displayed. <br/>
+						<a "href="http://ereserves.library.emory.edu/emailReservesDesk.php" target="_blank">Email the Reserves Desk</a>
+					</p>							
 				<? } else { ?>
 					<h2>
-						There are no active courses for this term.  Please contact your Reserves Desk for assistance. <a href="http://ereserves.library.emory.edu/emailReservesDesk.php" target="_blank">Email the Reserves Desk</a>
+						There are no active courses for this term.  Please contact your Reserves Desk for assistance.<br/>
+						<a href="http://ereserves.library.emory.edu/emailReservesDesk.php" target="_blank">Email the Reserves Desk</a>
 					</h2>
 				<? } ?>		
 			</div>
-		<? } //end terms loop ?> 
-	</div>
+		<? } //end terms loop ?> 				
+		<span id="ci_errors" class="error"></span>
+	</div>	
 	<!-- end Courses Block -->
+</div>
+<br/>
+<div id="maxEnrollment">
+	<b>Maximum Enrollment for this course:</b> <span class="required">*</span>
+	<input type="text" name="maxEnrollment" size="3" maxlength="4"/>
+	<span id="maxEnrollment_error" class="error"></span>
 </div>
 </fieldset>
 
@@ -207,44 +415,71 @@ td.course_instructors { font-size: x-small; }
 <fieldset>
 <legend>ReservesDirect Information</legend>
 
-<p><strong>Reserve the physical item at the Reserve Desk: </strong>
-	<input type="radio" name="NHATDESK" value="yes" onClick="document.getElementById('physical_request_detail').style.display='';"/>Yes 
-	<input type="radio" name="NHATDESK" value="no" checked="checked" onClick="document.getElementById('physical_request_detail').style.display='none';"/>No</p>
+<div id="rd_info_error"><span id="rd_info_error_txt" class="error"></span></div>
+
+<p>
+	<strong>Reserve the physical item at the Reserve Desk: </strong>
+	<input type="radio" name="placeAtDesk" value="yes" onClick="document.getElementById('physical_request_detail').style.display='';"/>Yes 
+	<input type="radio" name="placeAtDesk" value="no" checked="checked" onClick="document.getElementById('physical_request_detail').style.display='none';"/>No
+</p>
 
 <div id="physical_request_detail" style="display: none; margin-left: 10px; border: 1px solid black;">
-	<p>If item is unavailable, reserve any available edition: <input type="radio" name="NHANYEDN" value="yes" checked="checked" />Yes <input type="radio" name="NHANYEDN" value="no" />No</p>
+	<p>If item is unavailable, reserve any available edition: 
+		<input type="radio" name="reserveAnyAvailable" value="yes" checked="checked" />Yes 
+		<input type="radio" name="reserveAnyAvailable" value="no" />No
+	</p>
+	<p>Number of copies to reserve: 
+		<input type="radio" name="numCopies" value="one" checked="checked" />One 
+		<input type="radio" name="numCopies" value="all available" />All available
+	</p>
 
-	<p>Number of copies to reserve: <input type="radio" name="NH#_COPIES" value="one" checked="checked" />One <input type="radio" name="NH#_COPIES" value="all" />All available</p>
-
-	<p>Checkout period:  <input type="radio" name="NHLOANPERIOD" value="twohours" checked="checked" />2 hours <input type="radio" name="NHLOANPERIOD" value="oneday" />1 day <input type="radio" name="NHLOANPERIOD" value="threedays" />3 days</p>
+	<p>
+		Checkout period:  
+		<label for="ils_request_loanPeriod"><input type="radio" name="loanPeriod" value="2 Hours" checked="checked" />2 hours</label>
+		<label for="ils_request_loanPeriod"><input type="radio" name="loanPeriod" value="1 Day" />1 day</label>
+		<label for="ils_request_loanPeriod"><input type="radio" name="loanPeriod" value="3 Days" />3 days</label>
+	</p>
 </div>
 	
 <p><strong>Reserve part or all of the item online? </strong>
-<input type="radio" name="NHONLINEINFO" value="yes" onClick="document.getElementById('scan_request_detail').style.display='';"/>Yes
-<input type="radio" name="NHONLINEINFO" value="no" checked="checked" onClick="document.getElementById('scan_request_detail').style.display='none';"/>No</p>
+<input type="radio" name="scanItem" value="yes" onClick="document.getElementById('scan_request_detail').style.display='';"/>Yes
+<input type="radio" name="scanItem" value="no" checked="checked" onClick="document.getElementById('scan_request_detail').style.display='none';"/>No</p>
 
 <div id="scan_request_detail" style="display: none; margin-left: 10px; border: 1px solid black;">
-	<p>If Emory Libraries determines that this reserve is for material not in the public domain and in excess of fair use, I would like the library staff to request and pay for permission to place the material on e-reserve: <input type="radio" name="NHPAYPRMSSN" value="yes" checked="checked" />Yes <input type="radio" name="NHPAYPRMSSN" value="no" />No</p>
+	<p>
+		If Emory Libraries determines that this reserve is for material not in the public domain and in excess of fair use,
+		I would like the library staff to request and pay for permission to place the material on e-reserve: 
+		<label for="ils_request_payPermission"><input type="radio" name="payPermission" value="yes" checked="checked" />Yes</label>
+		<label for="ils_request_payPermission"><input type="radio" name="payPermission" value="no" />No</label>
+	</p>
 	
-	<p><label for="input10"><strong>Part(s) of the work to put online</strong></label><br />
+	<p><b>Part(s) of the work to put online</b><br />
 
 	<div style="margin-left: 50px;">
-	<table cellspacing="5px">
-		<tr><td class="course_number">Chapter / Article Title</td><td class="course_number">First Page</td><td class="course_number">Last Page</td></tr>
-		<tr>
-			<td class="course_number"><input type="text" size="50"></td>
-			<td class="course_number"><input type="text" size="4"></td>
-			<td class="course_number"><input type="text" size="4"></td>
-		</tr>
-		<tr><td colspan="3"  class="course_number"><a href="#" onClick="alert('not implemented')">Add More Sections</a></td></tr>
-	</table>
+		<table cellspacing="5px" id="scan_request_table">
+			<tbody>
+				<tr>
+				<? if ($physical_group == 'MONOGRAPH') {?>
+					<td class="course_number">Chapter / Article Title</td><td class="course_number">First Page</td><td class="course_number">Last Page</td>
+				<? } else { ?>
+					<td class="course_number">Track / Song Title</td><td class="course_number">Start Time</td><td class="course_number">End Time</td>
+				<? } ?>
+				</tr>
+				<tr>
+					<td class="course_number"><input type="text" name="scan_request[0][chapter_title]" size="50" /></td>
+					<td class="course_number"><input type="text" name="scan_request[0][start]" size="4" /></td>
+					<td class="course_number"><input type="text" name="scan_request[0][end]" size="4" /></td>
+				</tr>		
+			</tbody>
+		</table>
+		<p style="margin-left: 0px;"><a href="#" onClick="addNewScanRequest('scan_request_table'); return false;">Add More Sections</a></p>
 	</div>
 	
 </div>
 </p>
 </fieldset>
 <p><strong><label for="input11">Notes or Special Instructions</label></strong><br />
-<textarea name="NHNOTE" cols="80" rows="5" id="input11"></textarea>
+<textarea name="note" cols="80" rows="5" id="input11"></textarea>
 </p>
 <p>To see and manage your reserved materials, please go to ReservesDirect at <a href="https://ereserves.library.emory.edu/">https://ereserves.library.emory.edu/</a> and log in with your NetID. Students also use ReservesDirect to access online materials.</p>
 

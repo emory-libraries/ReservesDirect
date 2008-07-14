@@ -176,7 +176,8 @@ class requestDisplayer extends noteDisplayer {
 			if (is_null($printView) || $printView == "false") {
 				echo "								<input type=\"checkbox\" name=\"selectedRequest[]\" value=\"" . $r->requestID . "\">&nbsp;&nbsp;<br>\n";
 			}
-			echo "								<span class=\"strong\">Request ID: </span>".sprintf("%06s",$r->requestID)."\n";		
+			echo "								<span class=\"strong\">Request ID: </span>".sprintf("%06s",$r->requestID)."<br/>\n";		
+			echo "								{$r->getType()} Request\n";
 			echo 							"</td>";
 			echo "							<td>";
 			echo "								<table>";
@@ -258,6 +259,15 @@ class requestDisplayer extends noteDisplayer {
 			echo "					        <td align=\"left\" valign=\"top\">". $r->reserve->getRequestedLoanPeriod() ."</td>\n";
 			echo "					      </tr>\n";				
 
+			$notes = $r->getNotes();
+			if (!empty($notes)) {
+				foreach ($notes as $note) {
+					echo "					      <tr>\n";
+					echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">{$note->getType()} Note:</td>\n";
+					echo "					        <td align=\"left\" valign=\"top\">{$note->getText()}</td>\n";
+					echo "					      </tr>\n";				
+				}
+			}
 			echo "    					</table>\n";
 			echo "    				</td>\n";
 			echo "    				<td align=\"right\" valign=\"top\" width=\"15%\">\n";

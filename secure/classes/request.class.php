@@ -28,9 +28,10 @@ http://www.reservesdirect.org/
 *******************************************************************************/
 
 require_once("secure/classes/item.class.php");
+require_once('secure/classes/notes.class.php');
 require_once("secure/classes/user.class.php");
 
-class request
+class request extends Notes
 {
 	//Attributes
 	public $requestID;
@@ -45,7 +46,9 @@ class request
 	public $desiredDate;
 	public $priority;
 	public $courseInstanceID;
+	public $maxEnrollment;
 	public $courseInstance;
+	public $type;
 	public $holdings = array();
 	
 	private $_ils;
@@ -60,6 +63,7 @@ class request
 		if (!is_null($requestID)){
 			$this->getRequestByID($requestID);
 		}
+		
 		$this->_ils = RD_Ils::initILS();
 	}
 
@@ -102,7 +106,7 @@ class request
 	*/
 	function getRequestByID($requestID)
 	{
-		global $g_dbConn;
+		global $g_dbConn, $g_notetype;
 
 		if(empty($requestID)) {
 			return false;
@@ -111,7 +115,7 @@ class request
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT request_id, reserve_id, item_id, user_id, date_requested, date_processed, date_desired, priority, course_instance_id "
+				$sql = "SELECT request_id, reserve_id, item_id, user_id, date_requested, date_processed, date_desired, priority, course_instance_id, max_enrollment, type "
 					.  "FROM requests "
 					.  "WHERE request_id = !"
 					;
@@ -124,9 +128,17 @@ class request
 			return false;
 		}
 		else {
-			list($this->requestID, $this->reserveID, $this->requestedItemID, $this->requestingUserID, $this->requestedDate, $this->processedDate, $this->desiredDate, $this->priority, $this->courseInstanceID) = $rs->fetchRow();
-			return true;
+			list($this->requestID, $this->reserveID, $this->requestedItemID, $this->requestingUserID, $this->requestedDate, $this->processedDate, $this->desiredDate, $this->priority, $this->courseInstanceID, $this->maxEnrollment, $this->type) = $rs->fetchRow();			
 		}
+		
+		//get instructor notes
+		$this->setupNotes('requests', $this->requestID, $g_notetype['instructor']);
+		$this->fetchNotesByType();
+		
+		//get copyright notes
+		$this->setupNotes('requests', $this->requestID, $g_notetype['staff']);
+		$this->fetchNotesByType();
+		return true;
 	}
 
 	/**
@@ -141,7 +153,7 @@ class request
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT request_id, reserve_id, item_id, user_id, date_requested, date_processed, date_desired, priority, course_instance_id "
+				$sql = "SELECT request_id "
 					.  "FROM requests "
 					.  "WHERE reserve_id = !"
 					;
@@ -154,7 +166,9 @@ class request
 			return false;
 		}
 		else {
-			list($this->requestID, $this->reserveID, $this->requestedItemID, $this->requestingUserID, $this->requestedDate, $this->processedDate, $this->desiredDate, $this->priority, $this->courseInstanceID) = $rs;
+			$row = $rs->fetchRow();
+			$this->requestID = $row[0];
+			$this->getRequestByID($this->requestID);  // get values from DB
 		}
 	}
 
@@ -386,6 +400,48 @@ class request
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 	
+	/**
+	* @return void
+	* @param $max_enrollment
+	* @desc set the max enrollment
+	*/
+	function setMaxEnrollment($max_enrollment)
+	{
+		global $g_dbConn;		
+
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "UPDATE requests SET max_enrollment = ! WHERE request_id = !";
+		}
+
+		$rs = $g_dbConn->query($sql, array($max_enrollment, $this->requestID));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		$this->maxEnrollment = $max_enrollment;
+	}	
+
+	/**
+	* @return void
+	* @param $type
+	* @desc set the request type
+	*/
+	function setType($type)
+	{
+		global $g_dbConn;		
+
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "UPDATE requests SET type = ? WHERE request_id = !";
+		}
+
+		$rs = $g_dbConn->query($sql, array($type, $this->requestID));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		$this->type = $type;
+	}		
+	
 	function getRequestID() { return $this->requestID; }
 	function getReserveID()		{ return $this->reserveID; }
 	function getDateRequested() { return $this->requestedDate; }
@@ -400,6 +456,7 @@ class request
 	function getCourseInstanceID() { return $this->courseInstanceID; }
 	function getReserve(){ $this->reserve = new reserve($this->reserveID); }
 	function getPrority() { $this->priority; }
-
+	function getMaxEnrollment() { $this->maxEnrollment; }
+	function getType() { return $this->type; }
 }
 ?>
