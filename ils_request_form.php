@@ -72,6 +72,7 @@ if (isset($_REQUEST['u_id']))
 //TEST how do not-trained users evaluate?
 switch ($tmpUsr->getUserClass())
 {
+	case null:
 	case '0':
 	case 'student':
 	case '1':
@@ -85,14 +86,19 @@ $u = $usersObject->initUser($tmpUsr->getUserClass(), $tmpUsr->getUsername());
 
 $ils = RD_Ils::initILS();
 $ils_result = $ils->search('barcode', $barcode); 
+
 $item_data  = $ils_result->to_a();
 
-//TODO: set item_group from external src check the Bernado on how to
-$physical_group = 'MONOGRAPH';  //other MULTIMEDIA
+if (empty($item_data['title']))
+{
+	include "ils_request_item_not_found.html";
+	exit;
+}
 
-
-//echo $ils_result->getData();
-//exit();
+//Determine how to route material.  Currently routing is based on item_group
+//This is terrible but its the best we can do for now.  look for changes
+$mm_array = array("MEDIA", "MM-DESK", "MM-REF", "MM-RESERVE", "MMNEWBOOKS", "MUSIC-DEPT", "MUSICMEDIA");
+$physical_group = (in_array($item_data['holdings'][0]['loc'], $mm_array)) ? 'MULTIMEDIA' : 'MONOGRAPH';
 
 if (isset($_REQUEST['cmd']) && $_REQUEST['cmd'] == 'storeILSRequest')
 {
@@ -347,7 +353,7 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 	<table cellspacing="5">
 		<tr><td><b>Title:</b></td><td><?= $item_data['title'] ?></b></td></tr>
 		<tr><td><b>Call number:</b></td><td><?= $item_data['holdings'][0]['callNum'] ?></b></td></tr>
-		<tr><td><b>Status:</b></td><td><?= $item_data['holdings'][0]['status'] ?></td></tr>
+		<tr><td><b>Current Location:</b></td><td><?= $item_data['holdings'][0]['loc'] ?></td></tr>
 	</table>
 </div>
 <p />
