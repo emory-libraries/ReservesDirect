@@ -1,2 +1,0 @@
-ALTER TABLE `requests` ADD `max_enrollment` INT NULL COMMENT 'max enrollment as specified by instructor' AFTER `course_instance_id`;
-ALTER TABLE `requests` ADD `type` SET( 'PHYSICAL', 'SCAN' ) NOT NULL DEFAULT 'PHYSICAL';
