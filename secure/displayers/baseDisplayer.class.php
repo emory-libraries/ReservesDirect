@@ -98,7 +98,7 @@ abstract class baseDisplayer {
 					<?=$reserve->edit_link?>&nbsp;
 				</div>
 				<div class="statusBox">
-					<span class="<?=common_getStatusStyleTag($reserve->status)?>"><?=$reserve->status?></span>
+					<span class="<?=common_getStatusStyleTag($reserve->getStatus())?>"><?=$reserve->getStatus()?></span>
 				</div>
 			</div>
 		<? } else { ?>
@@ -108,7 +108,7 @@ abstract class baseDisplayer {
 				<div class="sortBox">&nbsp;</div>
 				<div class="editBox">&nbsp;</div>
 				<div class="statusBox">
-					<span class="<?=common_getStatusStyleTag($reserve->status)?>"><?=$reserve->status?></span>
+					<span class="<?=common_getStatusStyleTag($reserve->getStatus())?>"><?=$reserve->getStatus()?></span>
 				</div>
 			</div>		
 		<? } ?>
