@@ -36,7 +36,22 @@ class requestDisplayer extends noteDisplayer {
 	
 	function displayAllRequest($requestList, $libList, $request, $user, $msg="")
 	{
-
+		echo "<script language='JavaScript1.2'>
+				  var jsFunctions = new basicAJAX();
+			 	  function setRequestStatus(select, request_id, notice) 
+  				  {				
+						var status = select.options[select.selectedIndex].value;
+						var u   = 'AJAX_functions.php?f=updateRequestStatus';
+						var qs  = 'request_id=' + request_id + '&status=' + status;
+						
+						var url = u + '&rf=' + jsFunctions.base64_encode(qs);
+						
+						ajax_transport(url, notice);
+				  }
+			  </script>
+		\n";
+		
+		
 		echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		//echo "	<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
 		if (!is_null($msg) && $msg != "")
@@ -270,13 +285,32 @@ class requestDisplayer extends noteDisplayer {
 			}
 			echo "    					</table>\n";
 			echo "    				</td>\n";
-			echo "    				<td align=\"right\" valign=\"top\" width=\"15%\">\n";
+			echo "    				<td align=\"right\" valign=\"top\" width=\"25%\">\n";
 			
 			if (is_null($printView) || $printView == "false")
 			{
-				echo "							<input type=\"button\" value=\"Process this Item\" onClick=\"this.form.cmd.value='addPhysicalItem'; this.form.target=window.name; this.form.no_table.value='false'; this.form.request_id.value=".$r->requestID.";this.form.submit();\">\n";
-			
-				echo "						<br /><a href=\"index.php?cmd=deleteRequest&request_id=".$r->requestID."\">Delete Request</a>&nbsp;";	
+				$selected = str_replace(' ', '', $r->getStatus());
+				$$selected = ' SELECTED ';
+				
+				echo "							<a class='requestButton' href=\"index.php?cmd=addPhysicalItem&request_id=".$r->requestID."\">Process Request</a>&nbsp;\n";	
+				echo "							<br/>\n";			
+				echo "							<a class='requestButton' href=\"index.php?cmd=deleteRequest&request_id=".$r->requestID."\">Delete Request</a>&nbsp;\n";	
+				echo "							<br/>\n";							
+				//echo "							<p>\n";
+				echo "								<div id='notice_{$r->requestID}' style='display: inline;'><img width='16px' height='16px' src='images/spacer.gif' /></div>\n";
+				echo "								<select onChange='setRequestStatus(this, {$r->requestID}, \"notice_{$r->requestID}\");'>\n";
+				echo "									<option {$INPROCESS} value='IN PROCESS'>IN PROCESS</option>\n";
+				//echo "									<option {$DENIED} value='DENIED'>COPYRIGHT DENIED</option>\n";
+				echo "									<option {$RUSH} value='RUSH'>RUSH</option>\n";
+				echo "									<option {$PULLED} value='PULLED'>PULLED</option>\n";
+				echo "									<option {$CHECKEDOUT} value='CHECKED OUT'>CHECKED OUT</option>\n";
+				echo "									<option {$RECALLED} value='RECALLED'>RECALLED</option>\n";
+				echo "									<option {$PURCHASING} value='PURCHASING'>PURCHASING</option>\n";
+				echo "									<option {$REQUESTED} value='REQUESTED'>REQUESTED</option>\n";
+				echo "									<option {$AWAITINGREVIEW} value='AWAITING REVIEW'>AWAITING REVIEW</option>\n";
+				echo "								</select>\n";				
+				//echo "							</p>\n";											
+				
 			}	
 			echo "					&nbsp;</td>\n";
 			echo " 				</tr>\n";

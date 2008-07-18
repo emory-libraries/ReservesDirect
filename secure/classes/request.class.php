@@ -441,6 +441,31 @@ class request extends Notes
 		
 		$this->type = $type;
 	}		
+
+	/**
+	* @return boolean
+	* @param $status 
+	* @desc updates status
+	*/	
+	public function setStatus($status)
+	{		
+		//we'll store the request status in the reserve table
+		//this will allow seemless display to instructors/staff
+		if (!isset($this->reserve))
+			$this->getReserve();
+		
+		$this->reserve->setStatus($status);
+		
+		return $this->reserve->getStatus() == $status;	
+	}
+	
+	public function getStatus()
+	{
+		if (!isset($this->reserve))
+			$this->getReserve();
+			
+		return $this->reserve->getStatus();				
+	}
 	
 	function getRequestID() { return $this->requestID; }
 	function getReserveID()		{ return $this->reserveID; }
