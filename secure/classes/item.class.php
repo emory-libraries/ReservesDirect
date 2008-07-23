@@ -164,8 +164,11 @@ class item extends Notes {
 					;
 		}
 
-		$rs = $g_dbConn->query($sql, $requestID);
+		$rs = $g_dbConn->query($sql, $this->itemID);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		//delete the notes too
+		$this->destroyNotes();
 	}
 
 	/**

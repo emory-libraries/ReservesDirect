@@ -104,6 +104,52 @@ class reserveItem extends item
 		}
 	}
 	
+	/**
+	* @return void
+	* @desc destroy the database entry and file if one exists
+	* @param boolean if true will destroy even if attached to a class
+	*/
+	function destroy($override = false)
+	{
+		global $g_dbConn;
+
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "SELECT count(*) FROM reserves WHERE item_id = !";
+		}		
+		
+		if(!empty($this->itemID)) {			
+			//attempt to use transactions
+			if($g_dbConn->provides('transactions')) {
+				$g_dbConn->autoCommit(false);
+			}
+			
+			try {						
+				$reserveCnt = $g_dbConn->getOne($sql, array($this->itemID));
+				
+				if ($reserveCnt == 0 || $override)
+				{
+					if ($this->isLocalFile())
+					{
+						unlink($this->URL);
+					}
+					
+					parent::destroy();
+				}
+			} catch (Exception $e) {
+				if($g_dbConn->provides('transactions')) { 
+					$g_dbConn->rollback();
+				}
+				trigger_error($reserveCnt->getMessage(), E_USER_ERROR);
+			}
+			
+			//commit this set
+			if($g_dbConn->provides('transactions')) { 
+				$g_dbConn->commit();
+			}		
+		}
+	}
 
 	/**
 	* @return boolean

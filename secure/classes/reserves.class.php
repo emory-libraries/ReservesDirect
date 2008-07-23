@@ -187,6 +187,9 @@ class reserve extends Notes {
 					;
 		}
 
+		if (!isset($this->item) || is_null($this->item))
+			$this->getItem();
+		
 		if (!is_null($this->reserveID))
 		{
 			$rs = $g_dbConn->query($sql, $this->reserveID);
@@ -195,6 +198,8 @@ class reserve extends Notes {
 			//delete the notes too
 			$this->destroyNotes();
 		}
+		
+		$this->item->destroy(false);
 	}
 
 	

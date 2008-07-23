@@ -240,16 +240,32 @@ class request extends Notes
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "DELETE "
-					.  "FROM requests "
-					.  "WHERE request_id = !"
-					;
+				$sql = "DELETE FROM requests WHERE request_id = ! LIMIT 1";
 		}
 
 		if (!is_null($this->requestID))
 		{
-			$rs = $g_dbConn->query($sql, $this->requestID);
-			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+			//attempt to use transactions
+			if($g_dbConn->provides('transactions')) {
+				$g_dbConn->autoCommit(false);
+			}
+			try {							
+				$rs = $g_dbConn->query($sql, $this->requestID);
+				
+				if (!isset($this->reserve) || is_null($this->reserve))
+					$this->getReserve();
+				$this->reserve->destroy();
+				
+			} catch (Exception $e) {
+				if($g_dbConn->provides('transactions')) { 
+					$g_dbConn->rollback();
+				}					
+				if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+			}
+			//commit this set
+			if($g_dbConn->provides('transactions')) { 
+				$g_dbConn->commit();
+			}				
 		}
 	}
 
@@ -451,7 +467,7 @@ class request extends Notes
 	{		
 		//we'll store the request status in the reserve table
 		//this will allow seemless display to instructors/staff
-		if (!isset($this->reserve))
+		if (!isset($this->reserve) || is_null($this->reserve))
 			$this->getReserve();
 		
 		$this->reserve->setStatus($status);
@@ -461,7 +477,7 @@ class request extends Notes
 	
 	public function getStatus()
 	{
-		if (!isset($this->reserve))
+		if (!isset($this->reserve) || is_null($this->reserve))
 			$this->getReserve();
 			
 		return $this->reserve->getStatus();				
