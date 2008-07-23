@@ -334,6 +334,13 @@ http://www.reservesdirect.org/
 			}
 		break;
 		
+		case 'updateRequestStatus':
+			parse_str($rf, $args);		
+			$r = new request($args['request_id']);
+			$r->setStatus($args['status']);
+			$returnValue = "<img src='images/check.png' />";
+		break;
+		
 		default:
 			return null;
 	}

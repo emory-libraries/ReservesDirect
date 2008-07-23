@@ -25,7 +25,6 @@ ReservesDirect is located at:
 http://www.reservesdirect.org/
 
 *******************************************************************************/
-
 // workaround for workaround for ie's idiotic caching policy handling
 header("Cache-Control: no-cache");
 header("Pragma: no-cache");
@@ -54,8 +53,6 @@ require_once("secure/session.inc.php");
 
 //pull Book info from ILS
 require_once("lib/RD/Ils.php");
-
-//echo "<pre>"; print_r($_REQUEST); echo "</pre>";
 
 $barcode = $_REQUEST['itemID'];
 $u_key   = $_REQUEST['u_key'];
@@ -91,7 +88,7 @@ $item_data  = $ils_result->to_a();
 
 if (empty($item_data['title']))
 {
-	include "ils_request_item_not_found.html";
+	include "secure/html/ils_request_item_not_found.html";
 	exit;
 }
 
@@ -139,6 +136,12 @@ if (isset($_REQUEST['cmd']) && $_REQUEST['cmd'] == 'storeILSRequest')
 			storeData($u, $item_data, 'ELECTRONIC', $form_data, 'SCAN');
 		}
 	}
+	
+	//redirect to confirmation screen
+	?>
+		<script language="JavaScript1.2">document.location.href = "ils_request_confirm.php?ci=<?= $form_data['ci'] ?>";</script>
+	<?
+	exit;
 }
 
 $termObject = new terms();
@@ -215,13 +218,12 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
   <title>Reserve Request for Woodruff Library, Emory University</title>
   <link rev="made" href="mailto:reserves@emory.edu" />
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <meta name="generator" content="NoteTab Light 5.6" />
-  <meta name="author" content="Amanda French" />
   <meta name="description" content="Request form for reserving books in Woodruff Library and for requesting book chapters and other materials for online use in  ReservesDirect." />
 
   <meta name="keywords" content="reserves, ereserves, electronic reserves, e-reserves, request, scanning, scan, digitization, Emory, Woodruff, library, Woodruff library, Emory University, main library" />
 
 <style type="text/css">
+	body {font-family: verdana;}
 	p, h1, h2, legend, li { font-family: verdana; margin-left: 50px; }
 	p, li { font-size: small; }
 	
@@ -244,12 +246,15 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 	span.required {color: red;}
 	
 	
-	div.error  {border: 2px double red; padding-left: 5px;}	
-	span.error {color: red;}
+	div.error, td.error  {border: 2px double red; padding-left: 5px; padding-right: 5px; font-size: small; color: red;}	
+	span.error {color: red; font-size: small;}
 
 </style>
-
+<script language="JavaScript1.2" src="secure/javascript/basicAJAX.js"></script>
+<script language="JavaScript1.2" src="secure/javascript/prototype.js"></script>
 <script language="JavaScript1.2">
+	var jsFunctions = new basicAJAX();
+	
 	function toggle_courses_for(termID)
 	{
 		<? foreach ($terms as $t) { ?>
@@ -262,30 +267,40 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 	function addNewScanRequest(tableRef)
 	{
 		rowNdx++;
-		newRow =  		  '<tr>';		
-		newRow = newRow + '	<td class="course_number"><input type="text" name="scan_request[' + rowNdx + '][chapter_title]" size="50" /></td>';
-		newRow = newRow + '	<td class="course_number"><input type="text" name="scan_request[' + rowNdx + '][start]" size="4" /></td>';
-		newRow = newRow + '	<td class="course_number"><input type="text" name="scan_request[' + rowNdx + '][end]" size="4" /></td>';
-		newRow = newRow + '</tr>';
+		newRow =  		  '<tbody id="request_row_'+rowNdx+'">';		
+		newRow = newRow + ' <tr>';
+		newRow = newRow + '	  <td class="course_number"><input type="text" id="scan_request_' + rowNdx + '_chapter_title" name="scan_request[' + rowNdx + '][chapter_title]" size="50" /></td>';
+		newRow = newRow + '	  <td class="course_number"><input type="text" id="scan_request_' + rowNdx + '_start" name="scan_request[' + rowNdx + '][start]" size="4" /></td>';
+		newRow = newRow + '	  <td class="course_number"><input type="text" id="scan_request_' + rowNdx + '_end" name="scan_request[' + rowNdx + '][end]" size="4" /></td>';
+		newRow = newRow + '	  <td class="course_number"><span id="scan_request_' + rowNdx + '_remove"><a href="javascript:remove_request(' + rowNdx + ');">Remove</a></span></td>';
+		newRow = newRow + '	  <td id="request_row_' + rowNdx + '_error" style="display: none;"><span></span></td>';		
+		newRow = newRow + ' </tr>';		
+		newRow = newRow + '</tbody>';
 		
-		
+		//$('scan_request_'+(rowNdx - 1)+'_remove').style.display = '';
 		$(tableRef).insert({bottom: newRow});
 
 	}
+
+	function remove_request(ndx)
+	{
+		$('request_row_'+ndx).remove();
+		//$('request_row_'+ndx).update('');
+		//$('request_row_'+ndx).style.display = 'none';
+	}
 	
-	function validateForm(frm)
+	function validateFrm(frm)
 	{	
 		var errorCnt = 0;						
 		
-		//verify that maxEnrollment is int > 0
-		if (isNaN(frm.maxEnrollment.value) || frm.maxEnrollment.value < 0)
+		//verify that maxEnrollment is int > 0		
+		$('maxEnrollment').className = "";
+		$('maxEnrollment_error').update('');
+		if (isNaN(frm.maxEnrollment.value) || frm.maxEnrollment.value < 0 || frm.maxEnrollment.value == '')
 		{
 			$('maxEnrollment').className = "error";
-			$('maxEnrollment_error').replace('Maximum Enrollment must be a whole number greater than 0.');
+			$('maxEnrollment_error').update('Maximum Enrollment must be a whole number greater than 0.');
 			errorCnt++;
-		} else {			
-			$('maxEnrollment').className = "";
-			$('maxEnrollment_error').replace('');			
 		}
 		
 		//verify that ci has been selected
@@ -295,40 +310,63 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 			if (frm.elements['ci'][i].checked)
 				selectedCI = frm.elements['ci'][i].value;
 		}
+		
+		$('ci_errors').update("")
+		$('course_selection_area').className = '';
 		if (selectedCI == undefined)
 		{
 			$('ci_errors').insert("Please select a course.")
 			$('course_selection_area').className = 'error';
 			errorCnt++;
-		} else {
-			$('ci_errors').replace("")
-			$('course_selection_area').className = '';
-		}
+		} 
 		
 		//verify that placeAtDesk and scanItem are not both no 		
+		$('rd_info_error').className = "";
+		$('rd_info_error_txt').update("");		
 		if (frm.placeAtDesk[1].checked && frm.scanItem[1].checked)
 		{
 			$('rd_info_error').className = "error";
-			$('rd_info_error_txt').replace("Please select to place the physical item at the Reserve Desk and/or place part(s) of the item online.");
+			$('rd_info_error_txt').update("Please select to place the physical item at the Reserve Desk and/or place part(s) of the item online.");
 			errorCnt++;
-		} else {
-			$('rd_info_error').className = "";
-			$('rd_info_error_txt').replace("");			
 		}
 		
-		
+		//if scan request verify that first page is <= last page	
 		if (frm.scanItem[0].checked)
 		{
-			//for(i=0; i < frm.elements['ci'].length; i++) 
-			alert(frm.scanItem[0].value);
-			alert(frm.scan_request);
+			for(var i=0; i <= rowNdx; i++) {
+				var chapter_title = $('scan_request_' + i + '_chapter_title');
+				var row_error = $('request_row_' + i + '_error');
+				if (chapter_title != undefined) //if chapter_title is missing assume row has been removed
+				{
+					row_error.style.display = "none";
+					row_error.update('<span></span>');
+					row_error.className = "";
+					if (chapter_title.value == '')
+					{
+						row_error.style.display = "";
+						row_error.className = "error";
+						row_error.insert("Please specify a Title. ");						
+						errorCnt++;
+					} 
+					
+					if ($('scan_request_' + i + '_start').value == '')
+					{
+						row_error.style.display = "";
+						row_error.className = "error";
+						row_error.insert(" Please specify a start value. ");		
+						errorCnt++;				
+					}
+				}
+			}
 		}
 		
-		alert(errorCnt);
-		return false;
+		if (errorCnt == 0)
+		{
+			frm.submit();
+		}
 	}
+	
 </script>
-<script language="JavaScript1.2" src="secure/javascript/prototype.js"></script>
 </head>
 
 <body bgcolor="#FFFFCC" text="#000000" link="#000080" vlink="#800080" alink="#FF0000">
@@ -341,7 +379,7 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 <li>Reserve requests can take significantly longer to fulfill when items are checked out or missing.</li>
 </ul>
  
-<form action="ils_request_form.php" method="post" name="RESERVEREQUEST" > <!-- onSubmit="return validateForm(this)"> -->
+<form action="ils_request_form.php" method="post" name="RESERVEREQUEST">
 
 <input type="hidden" name="itemID" value="<?= $barcode ?>" />
 <input type="hidden" name="u_key"  value="<?= $u_key ?>" />
@@ -359,6 +397,8 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 <p />
 
 <fieldset>
+
+<div id="errors" class="error" style="display: none;"></div>
 <legend>Class Information</legend>
 <div id="course_selection_area">
 	<div id="term_selector">
@@ -411,7 +451,7 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 <br/>
 <div id="maxEnrollment">
 	<b>Maximum Enrollment for this course:</b> <span class="required">*</span>
-	<input type="text" name="maxEnrollment" size="3" maxlength="4"/>
+	<input type="text" name="maxEnrollment" id="maxEnrollment" size="3" maxlength="4"/>
 	<span id="maxEnrollment_error" class="error"></span>
 </div>
 </fieldset>
@@ -471,10 +511,12 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 					<td class="course_number">Track / Song Title</td><td class="course_number">Start Time</td><td class="course_number">End Time</td>
 				<? } ?>
 				</tr>
-				<tr>
-					<td class="course_number"><input type="text" name="scan_request[0][chapter_title]" size="50" /></td>
-					<td class="course_number"><input type="text" name="scan_request[0][start]" size="4" /></td>
-					<td class="course_number"><input type="text" name="scan_request[0][end]" size="4" /></td>
+				<tr id="request_row_0">
+					<td class="course_number"><input type="text" id="scan_request_0_chapter_title" name="scan_request[0][chapter_title]" size="50" /></td>
+					<td class="course_number"><input type="text" id="scan_request_0_start" name="scan_request[0][start]" size="4" /></td>
+					<td class="course_number"><input type="text" id="scan_request_0_end" name="scan_request[0][end]" size="4" /></td>
+					<td class="course_number"><span id="scan_request_0_remove" style="display: none;"><a href="javascript:remove_request(0);">Remove</a></span></td>
+					<td id="request_row_0_error" style="display: none;"><span></span></td>
 				</tr>		
 			</tbody>
 		</table>
@@ -489,11 +531,10 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 </p>
 <p>To see and manage your reserved materials, please go to ReservesDirect at <a href="https://ereserves.library.emory.edu/">https://ereserves.library.emory.edu/</a> and log in with your NetID. Students also use ReservesDirect to access online materials.</p>
 
-<p align="center"><input type="submit" value="Submit Reserve Request" /></p>
+<p align="center"><input type="button" value="Submit Reserve Request" onClick="validateFrm(this.form);"/></p>
 </form>
 
 <hr />
 
-<p><small>Created on ... January 09, 2008</small></p>
 </body>
 </html>
