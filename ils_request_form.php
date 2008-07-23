@@ -124,14 +124,14 @@ if (isset($_REQUEST['cmd']) && $_REQUEST['cmd'] == 'storeILSRequest')
 	
 	if ($_REQUEST['scanItem'] == 'yes')
 	{
-		for($j = 0; $j < sizeof($_REQUEST['scan_request']); $j++)
+		foreach($_REQUEST['scan_request'] as $scan_request)
 		{		
 			$end = "";
-			if (isset($_REQUEST['scan_request'][$j]['end']) && !empty($_REQUEST['scan_request'][$j]['end']))
-				$end = " - {$_REQUEST['scan_request'][$j]['end']}";
+			if (isset($scan_request['end']) && !empty($scan_request['end']))
+				$end = "- {$scan_request['end']}";
 			
-			$form_data['pages'] 		= ($physical_group == 'MONOGRAPH') ? "pp. {$_REQUEST['scan_request'][$j]['start']} $end" : $_REQUEST['scan_request'][$j]['start'] . " - " . $_REQUEST['scan_request'][$j]['end'];
-			$form_data['chapter_title']	= $_REQUEST['scan_request'][$j]['chapter_title'];
+			$form_data['pages'] 		= ($physical_group == 'MONOGRAPH') ? "pp. {$scan_request['start']} $end" : "{$scan_request['start']} {$end}";
+			$form_data['chapter_title']	= $scan_request['chapter_title'];
 					
 			storeData($u, $item_data, 'ELECTRONIC', $form_data, 'SCAN');
 		}
@@ -199,11 +199,11 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 		{
 			$request->setNote($note, 'Instructor');
 		}
-	} catch (Exception $e) {
-		trigger_error("Error Occurred While processing StoreRequest ".$e->getMessage(), E_USER_ERROR);
+	} catch (Exception $e) {		
 		if($g_dbConn->provides('transactions')) { 
 			$g_dbConn->rollback();
 		}					
+		trigger_error("Error Occurred While processing StoreRequest ".$e->getMessage(), E_USER_ERROR);
 	}
 	//commit this set
 	if($g_dbConn->provides('transactions')) { 
