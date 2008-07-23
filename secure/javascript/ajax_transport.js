@@ -51,7 +51,7 @@ function ajax_transport(url, notice_id)
 	    notice.update(transport.responseText);
 	  },
 	  onFailure: function(transport) {
-	  	alert("Status not updated. " + transport.status);
+	  	alert("Error! not updated. " + transport.status);
 	  	notice.update("");
 	  }
 	});
