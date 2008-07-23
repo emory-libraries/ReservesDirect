@@ -96,8 +96,6 @@ class requestManager
 			
 			case 'deleteRequest':
 				$requestObj = new request($request['request_id']);
-				$reserve = new reserve($requestObj->getReserveID());
-				$reserve->destroy();
 				$requestObj->destroy();
 
 			case 'displayRequest':			
