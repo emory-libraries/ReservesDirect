@@ -305,6 +305,7 @@ class requestDisplayer extends noteDisplayer {
 				echo "									<option {$PULLED} value='PULLED'>PULLED</option>\n";
 				echo "									<option {$CHECKEDOUT} value='CHECKED OUT'>CHECKED OUT</option>\n";
 				echo "									<option {$RECALLED} value='RECALLED'>RECALLED</option>\n";
+				echo "									<option {$MISSING} value='MISSING'>MISSING</option>\n";
 				echo "									<option {$PURCHASING} value='PURCHASING'>PURCHASING</option>\n";
 				echo "									<option {$REQUESTED} value='REQUESTED'>REQUESTED</option>\n";
 				echo "									<option {$AWAITINGREVIEW} value='AWAITING REVIEW'>AWAITING REVIEW</option>\n";
@@ -457,7 +458,7 @@ class requestDisplayer extends noteDisplayer {
 					//submit form
 					return true;
 				} else {
-					document.getElementById('alertMsg').innerHTML = alertMsg;
+					document.getElementById('alertMsg').innerHTML = alertMsg;				
 					//do not submit form
 					return false;
 				}

@@ -23,5 +23,5 @@ ALTER TABLE `items` ADD `status` SET( 'ACTIVE', 'DENIED' ) NOT NULL DEFAULT 'ACT
 --
 -- add new status to reserves to allow tracking of request processing
 --
-ALTER TABLE `reserves` CHANGE `status` `status` SET( 'ACTIVE', 'INACTIVE', 'IN PROCESS', 'DENIED', 'RUSH', 'PULLED', 'CHECKED OUT',  'RECALLED', 'PURCHASING', 'REQUESTED', 'AWAITING REVIEW')
+ALTER TABLE `reserves` CHANGE `status` `status` SET( 'ACTIVE', 'INACTIVE', 'IN PROCESS', 'DENIED', 'RUSH', 'PULLED', 'CHECKED OUT',  'RECALLED', 'PURCHASING', 'REQUESTED', 'MISSING', 'AWAITING REVIEW')
   CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT 'ACTIVE';

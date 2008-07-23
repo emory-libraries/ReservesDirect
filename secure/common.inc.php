@@ -241,6 +241,7 @@ function common_getStatusStyleTag($status)
 		case 'RECALLED':
 		case 'PURCHASING':
 		case 'REQUESTED':
+		case 'MISSING':
 		case 'AWAITING REVIEW':
 			$statusTag = 'inprocess';
 		break;
