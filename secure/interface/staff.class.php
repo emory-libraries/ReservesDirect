@@ -214,6 +214,7 @@ class staff extends instructor
 			{
 				$sql .=  "WHERE "
 					 .  	"CASE "
+					 .  		"WHEN i.item_group = 'ELECTRONIC'  THEN l.monograph_library_id  = $unit AND r.type = 'SCAN' "
 					 .  		"WHEN i.item_group = 'MONOGRAPH'  THEN l.monograph_library_id  = $unit "
 					 .  		"WHEN i.item_group = 'MULTIMEDIA' THEN l.multimedia_library_id = $unit "
 					 .	"END "
