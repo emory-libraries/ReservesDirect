@@ -211,14 +211,28 @@ class requestDisplayer extends noteDisplayer {
 			echo "					      </tr>\n";
 
 			echo "					      <tr>\n";
-			echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Title:</td>\n";
-			echo "					        <td align=\"left\" valign=\"top\">". $item->title ."</td>\n";
-			echo "					      </tr>\n";
-
-			echo "					      <tr>\n";
 			echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Author:</td>\n";
-			echo "					        <td align=\"left\" valign=\"top\">". $item->author ."</td>\n";
+			echo "					        <td align=\"left\" valign=\"top\">". $item->getAuthor() ."</td>\n";
+			echo "					      </tr>\n";			
+			
+			echo "					      <tr>\n";
+			echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Title:</td>\n";
+			echo "					        <td align=\"left\" valign=\"top\">". $item->getTitle() ."</td>\n";
 			echo "					      </tr>\n";
+			
+			echo "					      <tr>\n";
+			echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Volume Title:</td>\n";
+			echo "					        <td align=\"left\" valign=\"top\">". $item->getVolumeTitle() ."</td>\n";
+			echo "					      </tr>\n";			
+			
+			if ($r->isScanRequest())
+			{				
+				echo "					  <tr>\n";
+				echo "					  	<td align=\"right\" valign=\"top\" class=\"strong\">Pages/Times:</td>\n";
+				echo "					    <td align=\"left\" valign=\"top\">{$item->getPagesTimes()}</td>\n";
+				echo "					  </tr>\n";									
+			}			
+			
 
 			echo "					      <tr>\n";
 			echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">ISSN:</td>\n";
@@ -272,7 +286,7 @@ class requestDisplayer extends noteDisplayer {
 			echo "					      <tr>\n";
 			echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Requested Loan Period:</td>\n";
 			echo "					        <td align=\"left\" valign=\"top\">". $r->reserve->getRequestedLoanPeriod() ."</td>\n";
-			echo "					      </tr>\n";				
+			echo "					      </tr>\n";							
 
 			$notes = $r->getNotes();
 			if (!empty($notes)) {
@@ -292,7 +306,7 @@ class requestDisplayer extends noteDisplayer {
 				$selected = str_replace(' ', '', $r->getStatus());
 				$$selected = ' SELECTED="true" ';
 				
-				$processCmd = (strtoupper($r->getType()) == 'SCAN') ? "addDigitalItem" : "addPhysicalItem";
+				$processCmd = ($r->isScanRequest()) ? "addDigitalItem" : "addPhysicalItem";
 				
 				echo "							<a class='requestButton' href=\"index.php?cmd={$processCmd}&request_id={$r->requestID}\">Process Request</a>&nbsp;\n";	
 				echo "							<br/>\n";			

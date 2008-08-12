@@ -499,5 +499,10 @@ class request extends Notes
 	function getPrority() { $this->priority; }
 	function getMaxEnrollment() { $this->maxEnrollment; }
 	function getType() { return $this->type; }
+	
+	function isScanRequest()
+	{
+		return strtoupper($this->getType()) == 'SCAN';
+	}
 }
 ?>

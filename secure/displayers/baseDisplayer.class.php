@@ -265,7 +265,7 @@ abstract class baseDisplayer {
 			<span class="itemMetaPre">On Reserve at:</span><span class="itemMeta"><?=$reserveDesk?></span> [<a href="<?=$viewReserveURL?>" target="_blank" class="strong">more info</a>]	
 			
 <?php	else: ?>
-			<?php if ($reserve->getStatus() != 'DENIED' && $reserve->getStatus() != 'DENIED ALL'): ?>
+			<?php if ($reserve->getStatus() == 'ACTIVE' || $reserve->getStatus() == 'INACTIVE'): ?>
 				<a href="<?=$viewReserveURL?>" target="_blank" class="itemTitle" style="margin:0px; padding:0px;"><?=$title?></a>
 			<?php	else: ?>
 				<span class="itemTitleNoLink"><?=$title?></span>
