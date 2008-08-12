@@ -290,7 +290,7 @@ class requestDisplayer extends noteDisplayer {
 			if (is_null($printView) || $printView == "false")
 			{
 				$selected = str_replace(' ', '', $r->getStatus());
-				$$selected = ' SELECTED ';
+				$$selected = ' SELECTED="true" ';
 				
 				echo "							<a class='requestButton' href=\"index.php?cmd=addPhysicalItem&request_id=".$r->requestID."\">Process Request</a>&nbsp;\n";	
 				echo "							<br/>\n";			
@@ -298,7 +298,7 @@ class requestDisplayer extends noteDisplayer {
 				echo "							<br/>\n";							
 				//echo "							<p>\n";
 				echo "								<div id='notice_{$r->requestID}' style='display: inline;'><img width='16px' height='16px' src='images/spacer.gif' /></div>\n";
-				echo "								<select onChange='setRequestStatus(this, {$r->requestID}, \"notice_{$r->requestID}\");'>\n";
+				echo "								<select name='{$r->requestID}_status' onChange='setRequestStatus(this, {$r->requestID}, \"notice_{$r->requestID}\");'>\n";
 				echo "									<option {$INPROCESS} value='IN PROCESS'>IN PROCESS</option>\n";
 				//echo "									<option {$DENIED} value='DENIED'>COPYRIGHT DENIED</option>\n";
 				echo "									<option {$RUSH} value='RUSH'>RUSH</option>\n";
@@ -311,6 +311,8 @@ class requestDisplayer extends noteDisplayer {
 				echo "									<option {$AWAITINGREVIEW} value='AWAITING REVIEW'>AWAITING REVIEW</option>\n";
 				echo "								</select>\n";				
 				//echo "							</p>\n";											
+				
+				$$selected = "";
 				
 			}	
 			echo "					&nbsp;</td>\n";
