@@ -292,7 +292,9 @@ class requestDisplayer extends noteDisplayer {
 				$selected = str_replace(' ', '', $r->getStatus());
 				$$selected = ' SELECTED="true" ';
 				
-				echo "							<a class='requestButton' href=\"index.php?cmd=addPhysicalItem&request_id=".$r->requestID."\">Process Request</a>&nbsp;\n";	
+				$processCmd = (strtoupper($r->getType()) == 'SCAN') ? "addDigitalItem" : "addPhysicalItem";
+				
+				echo "							<a class='requestButton' href=\"index.php?cmd={$processCmd}&request_id={$r->requestID}\">Process Request</a>&nbsp;\n";	
 				echo "							<br/>\n";			
 				echo "							<a class='requestButton' href=\"index.php?cmd=deleteRequest&request_id=".$r->requestID."\">Delete Request</a>&nbsp;\n";	
 				echo "							<br/>\n";							
@@ -574,7 +576,7 @@ class requestDisplayer extends noteDisplayer {
 		
 		<div class="headingCell1" style="width:25%; text-align:center;">Item Source</div>
 		
-<?php		if(!empty($item_data['item_id'])):	//if editing digital item ?>
+<?php		if(!empty($item_data['item_id']) && !empty($item_data['url'])):	//if editing digital item ?>
 		
 		<script type="text/javascript">
 			var currentItemSourceOptionID;
