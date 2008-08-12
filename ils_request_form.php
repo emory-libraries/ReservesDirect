@@ -221,16 +221,18 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
   <meta name="description" content="Request form for reserving books in Woodruff Library and for requesting book chapters and other materials for online use in  ReservesDirect." />
 
   <meta name="keywords" content="reserves, ereserves, electronic reserves, e-reserves, request, scanning, scan, digitization, Emory, Woodruff, library, Woodruff library, Emory University, main library" />
+  <link rel="stylesheet" href="css/ReservesStyles.css" type="text/css">
 
 <style type="text/css">
-	body {font-family: verdana;}
+	body {font-family: verdana; margin: 25px;}
 	p, h1, h2, legend, li { font-family: verdana; margin-left: 50px; }
 	p, li { font-size: small; }
 	
 	h1 { font-size: x-large; font-weight: bold; } 
 	h2 { font-size: large; font-weight: bold; }
 
-	legend { font-size: medium; font-weight: bold; }
+	fieldset {  margin: 25px; }
+	legend { font-size: medium; font-weight: bold;}
 	.example { font-size: x-small; white-space: nowrap; }
 
 	div#course_selection_area {margin-left: 25px;}
@@ -534,7 +536,6 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 <p align="center"><input type="button" value="Submit Reserve Request" onClick="validateFrm(this.form);"/></p>
 </form>
 
-<hr />
-
+<? include("secure/html/footer.inc.html"); ?>
 </body>
 </html>

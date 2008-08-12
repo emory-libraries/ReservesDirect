@@ -43,34 +43,16 @@ header("Pragma: no-cache");
   <meta name="description" content="Request form for reserving books in Woodruff Library and for requesting book chapters and other materials for online use in  ReservesDirect." />
 
   <meta name="keywords" content="reserves, ereserves, electronic reserves, e-reserves, request, scanning, scan, digitization, Emory, Woodruff, library, Woodruff library, Emory University, main library" />
+  <link rel="stylesheet" href="css/ReservesStyles.css" type="text/css">
 
-<style type="text/css">
+  <style type="text/css">
+	body {font-family: verdana; margin: 25px;}
 	p, h1, h2, legend, li { font-family: verdana; margin-left: 50px; }
 	p, li { font-size: small; }
 	
 	h1 { font-size: x-large; font-weight: bold; } 
 	h2 { font-size: large; font-weight: bold; }
-
-	legend { font-size: medium; font-weight: bold; }
-	.example { font-size: x-small; white-space: nowrap; }
-
-	div#course_selection_area {margin-left: 25px;}
-	div#course_selection_area p {margin-left: 0px;}
-		
-	div#maxEnrollment {margin-left: 25px; font-family: verdana; font-size: small;}
-	
-	div#item_info {margin-left: 50px;}
-	div#term_selector { font-size: small; padding-bottom: 20px; }
-	td.course_number, td.course_title { font-size: small; }
-	td.course_instructors { font-size: x-small; }
-		
-	span.required {color: red;}
-	
-	
-	div.error  {border: 2px double red; padding-left: 5px;}	
-	span.error {color: red;}
-
-</style>
+  </style>
 </head>
 
 <body bgcolor="#FFFFCC" text="#000000" link="#000080" vlink="#800080" alink="#FF0000">
@@ -89,8 +71,9 @@ header("Pragma: no-cache");
 		<li>Reserve requests can take significantly longer to fulfill when items are checked out or missing.</li>
 	</ul>
 	
-	<p><h3>Click <a href="<?= $g_siteURL ?>?cmd=editClass&ci=<?= $_REQUEST['ci'] ?>">here</a> to review your course materials.</h3> 
+	<p>Click <a href="<?= $g_siteURL ?>?cmd=editClass&ci=<?= $_REQUEST['ci'] ?>">here</a> to review your course materials.</p>
+	<div style="height: 300px;"></div>
 	
-
+    <? include("secure/html/footer.inc.html"); ?>
 </body>
 </html>
