@@ -180,6 +180,9 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 			$item->setType('ITEM');
 			$item->setPagesTimes($form_data['pages']);
 			$item->setVolumeTitle($form_data['chapter_title']);
+			if ($request_type == 'SCAN')
+				$item->setDocTypeIcon('images/doc_type_icons/doctype-pdf.gif');
+			
 		
 		$reserve = new reserve();
 			$reserve->createNewReserve($ci->getCourseInstanceID(), $item->getItemID());
