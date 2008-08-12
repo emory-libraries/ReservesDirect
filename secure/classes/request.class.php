@@ -30,6 +30,7 @@ http://www.reservesdirect.org/
 require_once("secure/classes/item.class.php");
 require_once('secure/classes/notes.class.php');
 require_once("secure/classes/user.class.php");
+require_once("lib/RD/Ils.php");
 
 class request extends Notes
 {
@@ -166,8 +167,7 @@ class request extends Notes
 			return false;
 		}
 		else {
-			$row = $rs->fetchRow();
-			$this->requestID = $row[0];
+			$this->requestID = $rs[0];
 			$this->getRequestByID($this->requestID);  // get values from DB
 		}
 	}
