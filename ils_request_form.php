@@ -139,7 +139,7 @@ if (isset($_REQUEST['cmd']) && $_REQUEST['cmd'] == 'storeILSRequest')
 	
 	//redirect to confirmation screen
 	?>
-		<script language="JavaScript1.2">document.location.href = "ils_request_confirm.php?ci=<?= $form_data['ci'] ?>";</script>
+		<script language="JavaScript1.2">document.location.href = "ils_request_confirm.php?ci=<?= $form_data['ci'] ?>&barcode=<?= $barcode ?>";</script>
 	<?
 	exit;
 }
@@ -375,7 +375,7 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 </head>
 
 <body bgcolor="#FFFFCC" text="#000000" link="#000080" vlink="#800080" alink="#FF0000">
-<h1>Reserve Request for Woodruff Library</h1>
+<h1>Reserve Request</h1>
 
 <ul>
 <li>Reserve requests are processed in the order received.</li>

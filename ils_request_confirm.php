@@ -27,6 +27,16 @@ http://www.reservesdirect.org/
 *******************************************************************************/
 require_once("secure/config.inc.php");
 require_once("secure/common.inc.php");
+require_once("secure/classes/courseInstance.class.php");
+require_once("lib/RD/Ils.php");
+
+$ils = RD_Ils::initILS();
+$ils_result = $ils->search('barcode', $_REQUEST['barcode']); 
+
+$item_data  = $ils_result->to_a();
+
+$ci = new courseInstance($_REQUEST['ci']);
+$ci->getPrimaryCourse();
 
 
 // workaround for workaround for ie's idiotic caching policy handling
@@ -56,10 +66,10 @@ header("Pragma: no-cache");
 </head>
 
 <body bgcolor="#FFFFCC" text="#000000" link="#000080" vlink="#800080" alink="#FF0000">
-	<h1>Reserve Request for Woodruff Library</h1>
+	<h1>Reserve Request Successful</h1>
 
 	<p>
-		<h2>Your reserves request has been submitted.</h2>
+		<h2>You have requested <?= $item_data['title'] ?> for <?= $ci->course->displayCourseNo() ?>, <?= $ci->getTerm() ?> <?= $ci->getYear() ?>.</h2>
 		<br/>
 		Please remember:
 	</p>	
@@ -71,7 +81,7 @@ header("Pragma: no-cache");
 		<li>Reserve requests can take significantly longer to fulfill when items are checked out or missing.</li>
 	</ul>
 	
-	<p>Click <a href="<?= $g_siteURL ?>?cmd=editClass&ci=<?= $_REQUEST['ci'] ?>">here</a> to review your course materials.</p>
+	<p>Login to <a href="<?= $g_siteURL ?>?cmd=editClass&ci=<?= $_REQUEST['ci'] ?>">ReservesDirect</a> to review your course materials.</p>
 	<div style="height: 300px;"></div>
 	
     <? include("secure/html/footer.inc.html"); ?>
