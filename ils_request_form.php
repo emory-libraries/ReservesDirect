@@ -462,12 +462,13 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 
 <p>
 <fieldset>
-<legend>ReservesDirect Information</legend>
+<legend>Request a physical item</legend>
+<p>Book, CD, DVD, printed volume of a periodical</p>
 
 <div id="rd_info_error"><span id="rd_info_error_txt" class="error"></span></div>
 
 <p>
-	<strong>Reserve the physical item at the Reserve Desk: </strong>
+	<strong>Reserve the physical item at the Reserve Desk? </strong>
 	<input type="radio" name="placeAtDesk" value="yes" onClick="document.getElementById('physical_request_detail').style.display='';"/>Yes 
 	<input type="radio" name="placeAtDesk" value="no" checked="checked" onClick="document.getElementById('physical_request_detail').style.display='none';"/>No
 </p>
@@ -490,13 +491,21 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 	</p>
 </div>
 	
-<p><strong>Reserve part or all of the item online? </strong>
+</fieldset>
+</p>
+
+<p>
+<fieldset>
+<legend>Request digitizing services</legend>
+<p>Book chapters or journal articles as .pdf, audio as .ram, video as .avi</p>
+
+<p><strong>Digitize part of the item and put it online? </strong>
 <input type="radio" name="scanItem" value="yes" onClick="document.getElementById('scan_request_detail').style.display='';"/>Yes
 <input type="radio" name="scanItem" value="no" checked="checked" onClick="document.getElementById('scan_request_detail').style.display='none';"/>No</p>
 
 <div id="scan_request_detail" style="display: none; margin-left: 10px; border: 1px solid black;">
 	<p>
-		If Emory Libraries determines that this reserve is for material not in the public domain and in excess of fair use,
+		If Emory Libraries determines that this material is not in the public domain and is in excess of fair use,
 		I would like the library staff to request and pay for permission to place the material on e-reserve: 
 		<label for="ils_request_payPermission"><input type="radio" name="payPermission" value="yes" checked="checked" />Yes</label>
 		<label for="ils_request_payPermission"><input type="radio" name="payPermission" value="no" />No</label>
@@ -527,8 +536,8 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 	</div>
 	
 </div>
-</p>
 </fieldset>
+</p>
 <p><strong><label for="input11">Notes or Special Instructions</label></strong><br />
 <textarea name="note" cols="80" rows="5" id="input11"></textarea>
 </p>
