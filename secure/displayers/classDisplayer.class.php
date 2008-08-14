@@ -192,7 +192,7 @@ class classDisplayer extends baseDisplayer {
 
 		<? $color = ($ci->reviewed() ? 'green' : 'red'); ?> 
 		<div class="courseHeaders">
-			<span class="label">Copyright Approved</span>: <span style="color: <?=$color?>;"><?= $ci->getReviewed(); ?></span>
+			<span class="label">Copyright</span>: <span style="color: <?=$color?>;"><?= $ci->getReviewed(); ?></span>
 		</div>		
 		<br/>
 
