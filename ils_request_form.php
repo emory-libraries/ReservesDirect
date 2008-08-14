@@ -486,6 +486,7 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 	<p>
 		Checkout period:  
 		<label for="ils_request_loanPeriod"><input type="radio" name="loanPeriod" value="2 Hours" checked="checked" />2 hours</label>
+		<label for="ils_request_loanPeriod"><input type="radio" name="loanPeriod" value="3 Hours" />3 hours</label>
 		<label for="ils_request_loanPeriod"><input type="radio" name="loanPeriod" value="1 Day" />1 day</label>
 		<label for="ils_request_loanPeriod"><input type="radio" name="loanPeriod" value="3 Days" />3 days</label>
 	</p>
@@ -520,7 +521,7 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 				<? if ($physical_group == 'MONOGRAPH') {?>
 					<td class="course_number">Chapter / Article Title</td><td class="course_number">First Page</td><td class="course_number">Last Page</td>
 				<? } else { ?>
-					<td class="course_number">Track / Song Title</td><td class="course_number">Start Time</td><td class="course_number">End Time</td>
+					<td class="course_number" colspan="2">Song / Track / Scene Title</td><td class="course_number">Track / Scene Number</td>
 				<? } ?>
 				</tr>
 				<tr id="request_row_0">
