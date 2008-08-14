@@ -282,7 +282,6 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 		newRow = newRow + ' </tr>';		
 		newRow = newRow + '</tbody>';
 		
-		//$('scan_request_'+(rowNdx - 1)+'_remove').style.display = '';
 		$(tableRef).insert({bottom: newRow});
 
 	}
@@ -290,8 +289,6 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 	function remove_request(ndx)
 	{
 		$('request_row_'+ndx).remove();
-		//$('request_row_'+ndx).update('');
-		//$('request_row_'+ndx).style.display = 'none';
 	}
 	
 	function validateFrm(frm)
@@ -310,10 +307,11 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 		
 		//verify that ci has been selected
 		var selectedCI;
-		for(i=0; i < frm.elements['ci'].length; i++) 
+		var radios = $$('input.ci_radio');
+		for(i=0; i < radios.length; i++) 
 		{
-			if (frm.elements['ci'][i].checked)
-				selectedCI = frm.elements['ci'][i].value;
+			if (radios[i].checked)
+				selectedCI = radios[i].value;
 		}
 		
 		$('ci_errors').update("")
@@ -430,7 +428,7 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 						<? $ci->getCourseForUser($u->getUserID()); ?>
 						<? $ci->getInstructors(); ?>
 						<tr id="ci_<?= $ci->getCourseInstanceID() ?>" class="course_instance">
-							<td><input type="radio" name="ci" value="<?= $ci->getCourseInstanceID() ?>"/></td>
+							<td><input type="radio" class="ci_radio" name="ci" value="<?= $ci->getCourseInstanceID() ?>"/></td>
 							<td class="course_number"><?= $ci->course->displayCourseNo() ?></td>
 							<td class="course_title"><?= $ci->course->getName() ?></td>
 							<td class="course_instructors"><?= $ci->displayInstructors(false) ?></td>
