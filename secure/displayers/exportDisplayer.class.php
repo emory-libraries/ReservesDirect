@@ -33,7 +33,7 @@ class exportDisplayer extends baseDisplayer {
 	function getRSS_URL($file)
 	{
 		global $g_siteURL;
-		return "$g_siteURL" . ereg_replace('index.php', $file, $_SERVER['PHP_SELF']);
+		return ereg_replace('index.php', $file, $_SERVER['PHP_SELF']);
 	}
 	
 	function displaySelectExportOption($ci) {
