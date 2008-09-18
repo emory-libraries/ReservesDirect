@@ -425,6 +425,10 @@ class reserve extends Notes {
 	*/
 	function setStatus($status)
 	{
+		if (is_null($status))
+		{
+			return null;
+		}
 		//do NOT allow anyone to change status of a heading
 		//do NOT allow anyone to change status of a physical item that is 'IN PROCESS'
 		if (!isset($this->item) || is_null($this->item))

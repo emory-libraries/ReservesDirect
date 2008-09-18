@@ -577,7 +577,7 @@ class reserveItem extends item
 	*/
 	function setStatus($status)
 	{
-		if ($this->isHeading())
+		if (is_null($status) || $this->isHeading())
 		{
 			//do not update the status of headings
 			return null;

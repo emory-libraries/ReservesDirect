@@ -1232,13 +1232,15 @@ function displayCustomSort(&$ci, &$reserves) {
 		$course_expiration_date = $ci->getExpirationDate();
 		
 		//set up note form
-		$available_note_types = array('instructor', 'content', 'staff');	//all note types valid for a reserve		
+		$available_note_types = array('instructor', 'content', 'staff', 'copyright');	//all note types valid for a reserve		
 		//filter allowed note types based on permission level
 		$restricted_note_types = array('content', 'staff', 'copyright');
-		//filter out restricted notes if role is less than staff
+		//filter out restricted notes if role is less than staff		
+		
 		if($u->getRole() < $g_permission['staff']) {
+			//user does not have permission so remove restricted note types
 			$available_note_types = array_diff($available_note_types, $restricted_note_types);
-		}
+		}	
 		
 		//convert $reserve_ids into an associative array so that we can pass it to displayHiddenFields()
 		$reserves_array = array('selected_reserves'=>$reserve_ids);

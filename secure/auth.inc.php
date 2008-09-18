@@ -208,39 +208,40 @@ function authByAny($username, $password) {
  * 						key md5 of concatenation of above
  */
 function authBySecretKey($qs_data) {
-	global $g_trusted_systems, $g_permission;
+	if (!is_null($qs_data)) {
+		global $g_trusted_systems, $g_permission;
 	
 	if (is_null($qs_data)) return false;
 		
-	parse_str(base64_decode($qs_data), $auth_data);
+		parse_str(base64_decode($qs_data), $auth_data);
 		
-	$trusted_system_key = $g_trusted_systems[$auth_data['sys']]['secret'];
-	$timeout = $g_trusted_systems[$auth_data['sys']]['timeout'];
+		$trusted_system_key = $g_trusted_systems[$auth_data['sys']]['secret'];
+		$timeout = $g_trusted_systems[$auth_data['sys']]['timeout'];
 	
-	$timestamp = new DateTime($auth_data['t']);
-	$expire = new DateTime(time());
-	$expire->modify("+$timeout minutes");
+		$timestamp = new DateTime($auth_data['t']);
+		$expire = new DateTime(time());
+		$expire->modify("+$timeout minutes");
 	
-	if ($timestamp >  $expire)
-		return false; //encoded timestamp is too old
-	else {
-		$user = new user();
+		if ($timestamp >  $expire)
+			return false; //encoded timestamp is too old
+		else {
+			$user = new user();
 		
-		if ($user->getUserByUserName($auth_data['u']) == false || $user->getRole() > $g_permission['instructor'])
-			return false;	//do not allow privileged users access without login
+			if ($user->getUserByUserName($auth_data['u']) == false || $user->getRole() > $g_permission['instructor'])
+				return false;	//do not allow privileged users access without login
 		
-		$verification = $auth_data['u'] . $auth_data['t'];
+			$verification = $auth_data['u'] . $auth_data['t'];
 			
-		$verification .= $auth_data['sys'];
-		$verification .= $trusted_system_key;			
+			$verification .= $auth_data['sys'];
+			$verification .= $trusted_system_key;			
 			
-		if (hash("sha256", $verification) == $auth_data['key'])
-		{
-			setAuthSession(true, $user);
-			return true;
+			if (hash("sha256", $verification) == $auth_data['key'])
+			{
+				setAuthSession(true, $user);
+				return true;
+			}
 		}
 	}
-	
 	
 	return false;
 }
