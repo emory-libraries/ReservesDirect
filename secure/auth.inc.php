@@ -46,13 +46,10 @@ if(empty($_SESSION['username'])) {
 		if(!empty($_REQUEST['username']) && !empty($_REQUEST['pwd'])) {
 			//switch on authentication type
 			switch($g_authenticationType) {
-				/**********************
-					NOT IMPLEMENTEDths
-				***********************
-				case 'NT':
-					authByNTDom($_REQUEST['username'], $_REQUEST['pwd']);
+				case 'DEMO':
+					$permission = (isset($_REQUEST['permission'])) ? $_REQUEST['permission'] : null;
+					authByDemo($_REQUEST['user'], $permission);		
 				break;
-				***********************/
 				
 				case 'LDAP':
 					authByLDAP($_REQUEST['username'], $_REQUEST['pwd']);		
