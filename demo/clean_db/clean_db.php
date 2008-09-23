@@ -162,7 +162,9 @@
 	
     
     //Clean Items
-	$update_pdf = "UPDATE items set url='http://www.reservesdirect.org/demo/data/DisplayDisabled.pdf' WHERE url is not NULL";
+	$update_pdf = "UPDATE items set url='http://www.reservesdirect.org/demo/data/DisplayDisabled.pdf' WHERE url IS NOT NULL";
 	$rs = $g_dbConn->query($update_pdf);
+	
+	$g_dbConn->query("UPDATE items set pages_times = NULL, ISBN = NULL, ISSN = NULL, OCLC = NULL");
   
 ?>
