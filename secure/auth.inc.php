@@ -48,7 +48,7 @@ if(empty($_SESSION['username'])) {
 			switch($g_authenticationType) {
 				case 'DEMO':
 					$permission = (isset($_REQUEST['permission'])) ? $_REQUEST['permission'] : null;
-					authByDemo($_REQUEST['user'], $permission);		
+					authByDemo($_REQUEST['username'], $permission);		
 				break;
 				
 				case 'LDAP':
