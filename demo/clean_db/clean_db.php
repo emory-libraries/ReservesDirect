@@ -6,7 +6,7 @@
     
     
     require_once("DB.php");
-    $xmlConfig = "/home/jbwhite/projects/configs/rd_config.xml";
+    require_once("../../demo/config_loc.inc.php");
 	
 	if (!is_readable($xmlConfig)) { die ("Could not read configure xml file path=$xmlConfig"); }
 	
