@@ -242,4 +242,31 @@ function authBySecretKey($qs_data) {
 	
 	return false;
 }
+
+/**
+ * @return boolean
+ * @param string $username Username
+ * @param string $password Password
+ * @desc Attempt to auth against local database. Returns true on success, and sets $_SESSION['username'], $_SESSION['userclass'];  Returns false on failure, and sets both session vars to null;
+ */
+function authByDemo($username, $permission) {
+        global $g_permission;
+        $perm = array_flip($g_permission);
+
+        $user = new user();
+
+        //attempt to authenticate user against our database
+        if($user->getUserByUserName($username)) {
+                session_regenerate_id();
+                $_SESSION['username']  = $user->getUsername();
+                $_SESSION['userclass'] = $user->getUserClass();
+                $user->setLastLogin();  //mark user's last logi         
+        }
+        else {
+                $user->createUser($username, '', '', '', $permission);
+                $_SESSION['username']  = $username;
+                $_SESSION['userclass'] = $permission;
+        }
+        return true;
+}
 ?>
