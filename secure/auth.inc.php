@@ -43,7 +43,7 @@ if(session_id()=='') {
 if(empty($_SESSION['username'])) {
 	if (!authBySecretKey($_REQUEST['authKey'])) {
 		//if passed a username/password, assume that user is trying to log in
-		if(!empty($_REQUEST['username']) && !empty($_REQUEST['pwd'])) {
+		if(!empty($_REQUEST['username']) && (!empty($_REQUEST['pwd']) || $g_authenticationType == 'DEMO')) {
 			//switch on authentication type
 			switch($g_authenticationType) {
 				case 'DEMO':
