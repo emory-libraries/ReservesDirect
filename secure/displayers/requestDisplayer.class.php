@@ -140,7 +140,7 @@ class requestDisplayer extends noteDisplayer {
 		echo "	</tr>\n";
 
 		echo "</table>\n";		
-		if (is_array($requestList) && !empty($requestList))
+		if (!empty($requestList))
 			requestDisplayer::displayRequestList($requestList, "true");
 		else 
 			echo "<p style=\"text-align: center\">No Request selected for printing.</p>";

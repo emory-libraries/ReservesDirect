@@ -34,6 +34,7 @@ require_once("secure/displayers/requestDisplayer.class.php");
 require_once("secure/classes/note.class.php");
 
 require_once("lib/RD/Ils.php");
+require_once("secure/classes/requestCollection.class.php");
 
 class requestManager
 {
@@ -67,6 +68,7 @@ class requestManager
 
 				$unit = (!isset($request['unit'])) ? $user->getStaffLibrary() : $request['unit'];
 				
+				$requestList = new requestCollection();
 				for($i=0;$i<count($request['selectedRequest']);$i++)
 				{
 		 			$tmpRequest = new request($request['selectedRequest'][$i]);
@@ -90,6 +92,8 @@ class requestManager
 					$requestList[$i]->courseInstance->getCrossListings();								
 				}
 
+				$requestList->sort('call_number');
+				
 				$this->displayFunction = 'printSelectedRequest';
 				$this->argList = array($requestList, $user->getLibraries(), $request, $user);				
 			break;
