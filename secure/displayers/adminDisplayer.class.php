@@ -415,6 +415,7 @@ class adminDisplayer extends baseDisplayer
 	 */
 	public function displayEditRegistrarKey($next_cmd, $courses=null, $msg=null, $hidden_fields=null, $return_variable='ca') 	
 	{
+
 		if(!empty($msg)) {
 			echo "<span class=\"helperText\">$msg</span><p />\n";
 		}
@@ -423,21 +424,29 @@ class adminDisplayer extends baseDisplayer
 		print("	<input type=\"hidden\" id=\"cmd\" name=\"cmd\" value=\"$next_cmd\" />\n");
 		
 		self::displayHiddenFields($hidden_fields);
-		
+
 		$c = new course();
 		
 		print "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\" align=\"center\">\n";
 		
 		$rowNumber = 0;
+
+		print("<td></td><td></td><td></td></td><td style='text-align:center'>Override All&nbsp;&nbsp; <input type='checkbox' id='overrideAll'></td>");
 		foreach($courses as $c)
 		{
 			$c->getDepartment();	
-		
+
+			$checked = ($c->getOverrideFeed() == TRUE) ? "CHECKED" : "";
 			$rowClass = ($rowNumber % 2) ? "evenRow" : "oddRow\n";
+
+
 			print("<tr class=\"$rowClass\">\n");
 			print("<td style=\"text-align:center;\">".$c->displayCourseNo().$c->getSection() . "</td>");
 			print("<td style=\"text-align:center;\">" . $c->getName() . "</td>");
-			print("<td style=\"text-align:center;\"><input type=\"text\" id=\"$return_variable_$rowNumber\" name=\"".$return_variable."[" . $c->getCourseAliasID() ."]\" value=\"". $c->getRegistrarKey() ."\" size=\"30\" maxlength=\"255\"/></td>\n");
+			print("<td style=\"text-align:center;\"><input type=\"text\" id=\"{$return_variable}_{$rowNumber}_reg\" name=\"".$return_variable."[" . $c->getCourseAliasID() ."][registrar_key]\" value=\"". $c->getRegistrarKey() ."\" size=\"60\" maxlength=\"255\"/></td>\n");
+			print("<td style=\"text-align:center;\"><label for=\"override\">Override Feed<input type=\"checkbox\" id=\"{$return_variable}_{$rowNumber}_override\" name=\"".$return_variable."[" . $c->getCourseAliasID() ."][override_feed]\"  $checked value=\"true\"\"></td>\n");
+
+
 			print("</tr>\n");
 			$rowNumber++;
 		}
@@ -448,6 +457,21 @@ class adminDisplayer extends baseDisplayer
 		print "</table>\n";
 		
 		print("</form>\n");
+?>
+		<script type="text/javascript" charset="utf-8">
+    
+				    var checkboxes = $$("#select_class input[type=checkbox]");
+				    var cbControl = $("overrideAll");
+    
+				    cbControl.observe("click", function(){
+				     checkboxes.each(function(box){
+				     box.checked = cbControl.checked;
+				     });
+			    });
+    
+ 		</script>
+<?
+
 	}	
 	
 	

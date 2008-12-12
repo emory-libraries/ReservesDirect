@@ -40,6 +40,7 @@ class course
 	public $section;
 	public $uniformTitle;
 	public $registrarKey;
+	public $override_feed;
 
 	/**
 	* @return course
@@ -120,7 +121,7 @@ class course
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT ca.course_id, c.department_id, c.course_number, ca.course_name, c.uniform_title, ca.section, ca.course_alias_id, ca.registrar_key "
+				$sql = "SELECT ca.course_id, c.department_id, c.course_number, ca.course_name, c.uniform_title, ca.section, ca.course_alias_id, ca.registrar_key, ca.override_feed "
 					.  "FROM courses as c JOIN course_aliases as ca ON c.course_id = ca.course_id AND ca.course_alias_id = !";
 		}
 
@@ -131,11 +132,12 @@ class course
 			$this->courseID 		= $row[0];
 			$this->deptID 			= $row[1];
 			$this->courseNo			= $row[2];
-			$this->name	 			= $row[3];
-			$this->uniformTitle 	= $row[4];
+			$this->name	 		= $row[3];
+			$this->uniformTitle 		= $row[4];
 			$this->section 			= $row[5];
-			$this->courseAliasID	= $row[6];
+			$this->courseAliasID		= $row[6];
 			$this->registrarKey		= $row[7];
+			$this->override_feed		= $row[8];
 	}
 
 	/**
@@ -247,6 +249,23 @@ class course
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
 	}	
+
+	function setOverrideFeed($override)
+	{
+		global $g_dbConn;
+
+		$this->override_feed = $override;
+
+		switch ($g_dbConn->phptype)
+		{
+			default: //'mysql'
+				$sql = "UPDATE course_aliases SET override_feed = ! WHERE course_alias_id = !";
+		}
+
+		$rs = $g_dbConn->query($sql, array($override, $this->courseAliasID));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+	}	
 	
 	function setCourseNo($courseNo)
 	{
@@ -334,6 +353,8 @@ class course
 	function getCourseID() { return $this->courseID; }
 	
 	function getRegistrarKey() { return $this->registrarKey; }
+
+	function getOverrideFeed() { return $this->override_feed; }
 
 	function bindToCourseInstance($course_instance_id)
 	{

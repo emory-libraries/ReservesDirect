@@ -131,36 +131,34 @@ class adminManager
 			case 'editClassFeed':
 				//Admin will be prompted to select a CI 
 				//then if Cross-listings exist for this CI a course_alias (CA) must be selected
-				
-				$src_ci = null;				
-				if (!is_null($_REQUEST['src_ci']))
-				{
-					$src_ci =  new courseInstance($_REQUEST['src_ci']);
-					$src_ci->getPrimaryCourse();
-					$src_ci->getCrossListings();	
-					
-					$courseList =  array_merge(array($src_ci->course), $src_ci->crossListings);
-				}
-				
-				$registrar_keys = ($_REQUEST['registrar_keys']) ? $_REQUEST['registrar_keys'] : null;
+				$courses = ($_REQUEST['course_aliases']) ? $_REQUEST['course_aliases'] : null;
 								
-				if (is_null($src_ci))
+				if (is_null($_REQUEST['src_ci']))
 				{
 					$this->displayFunction = "displaySelectClass";
 					$this->argList = array("admin", null, "", array("function" => "editClassFeed"), false, "src_ci", null);					
-				} elseif (is_null($registrar_keys)) {				
-					//IF no crosslisting then use getPrimaryCourseAliasID else prompt for crosslisting selection					
-					
+				} elseif (is_null($courses)) {				
+				
+                                        $src_ci =  new courseInstance($_REQUEST['src_ci']);
+                                        $src_ci->getPrimaryCourse();
+                                        $src_ci->getCrossListings();
+
+                                        $courseList =  array_merge(array($src_ci->course), $src_ci->crossListings);
+
 					$this->displayFunction = "displayEditRegistrarKey";
-					$this->argList = array ("admin", $courseList, "To detach from Registrar Feed clear registrar key.", array("function" => "editClassFeed", "src_ci" => $src_ci->getCourseInstanceID()), "registrar_keys");
+					$this->argList = array ("admin", $courseList, "To detach from Registrar Feed check override box.", array("function" => "editClassFeed", "src_ci" => $src_ci->getCourseInstanceID()), "course_aliases");
 					
 				} else {
 					//store Registrar keys if blank store null
-					foreach ($registrar_keys as $key => $value)
+					foreach ($courses as $ca_id => $value)
 					{
-						$ca = new course($key);
-						$rk = ($value == '') ? null : $value;
+
+						$ca = new course($ca_id);
+						$rk = ($value['registrar_key'] == '') ? null : $value['registrar_key'];
 						$ca->setRegistrarKey($rk);
+
+						$or = (isset($value['override_feed']) && $value['override_feed'] == 'true') ? 1 : 0;
+						$ca->setOverrideFeed($or);
 					}
 					
 					$alertMsg = "Course(s) Successfully Updated";

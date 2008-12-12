@@ -61,7 +61,7 @@ class student extends user
 
 		switch ($g_dbConn->phptype)	{
 			default:	//mysql
-				$sql_check = "SELECT access_id from access WHERE user_id = ! AND alias_id = ! and permission_level = 0";
+				$sql_check = "SELECT access_id from access WHERE user_id = ! AND alias_id = ! and permission_level = " + $this->role;
 				$sql_insert = "INSERT INTO access (user_id, alias_id, permission_level, enrollment_status) VALUES (!,!,0,?)";
 				$sql_update = "UPDATE access SET enrollment_status=? WHERE user_id = ! AND alias_id = !";
 		}
@@ -90,7 +90,7 @@ class student extends user
 
 		switch($g_dbConn->phptype)	{
 			default:	//mysql
-				$sql = "DELETE FROM access WHERE user_id = ! AND alias_id = ! and permission_level = 0 LIMIT 1";
+				$sql = "DELETE FROM access WHERE user_id = ! AND alias_id = ! and permission_level = " + $this->role + " LIMIT 1";
 		}
 
 		$rs = $g_dbConn->query($sql, array($this->userID, $courseAliasID));
