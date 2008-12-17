@@ -99,15 +99,6 @@ class itemDisplayer extends noteDisplayer {
 				$status = $reserveItem->getStatus();
 				$$status = " checked='CHECKED' ";
 			?>
-			<div style="overflow:auto;">
-				<p>
-					<div class="strong">Item Status</div>
-					<div>
-						<input type="radio" name="item_status" <?= $ACTIVE ?> value="ACTIVE"/> Activate for all Classes
-						<input type="radio" name="item_status" <?= $DENIED ?> value="DENIED"/> Deny use for all Classes
-					</div>
-				</p>
-			</div>
 <?php	endif; ?>			
 		</div>	
 <?php	
@@ -235,6 +226,14 @@ class itemDisplayer extends noteDisplayer {
 				Access to this item has be denied for All Classes.  You must reactive the item status before making changes. 
 				<input type="hidden" name="reserve_status" value="<?=$reserve->status?>"/>
 			</div>
+            <?php if($u->getRole() >= $g_permission['staff']): ?>
+            <p>
+				<div>
+                        <input type="radio" name="item_status" <?= $ACTIVE ?> value="ACTIVE"/> <span class="active">Activate for all Classes</span>
+                        <br /> <input type="radio" name="item_status" <?= $DENIED ?> value="DENIED"/> <span class="inactive">Deny use for all Classes</span>
+				</div>
+			</p>
+            <?php endif; ?>
 <?php else: ?>
 	<?php	if (($reserve->getStatus() != 'DENIED' && $reserve->getStatus() != 'DENIED ALL') || $u->getRole() >= $g_permission['staff']): ?>				
 		<?php	if($reserve->getStatus()=='IN PROCESS'): ?>
@@ -256,6 +255,15 @@ class itemDisplayer extends noteDisplayer {
 						<input type="radio" name="reserve_status" id="reserve_status_inactive" value="INACTIVE" onChange="toggleDates();" <?=$reserve_status_inactive?> />&nbsp;<span class="inactive">INACTIVE</span>					
 			<?php	if ($u->getRole() >= $g_permission['staff']): ?>
 						<br/><input type="radio" name="reserve_status" id="reserve_status_denied" value="DENIED" onChange="toggleDates();" <?=$reserve_status_denied?> />&nbsp;<span class="copyright_denied">DENY ACCESS FOR THIS CLASS ONLY</span>
+                        <div style="overflow:auto;">
+				<p>
+                    <div class="strong">Item Status</div>
+                    <div>
+                        <input type="radio" name="item_status" <?= $ACTIVE ?> value="ACTIVE"/> <span class="active">Activate for all Classes</span>
+                        <br /> <input type="radio" name="item_status" <?= $DENIED ?> value="DENIED"/> <span class="inactive">Deny use for all Classes</span>
+                    </div>
+				</p>
+			</div>
 			<?php 	endif; ?>
 					</div>
 		<?php 	endif; #if in process?>
