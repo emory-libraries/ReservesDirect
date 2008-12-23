@@ -128,9 +128,16 @@ if (isset($_REQUEST['cmd']) && $_REQUEST['cmd'] == 'storeILSRequest')
 		{		
 			$end = "";
 			if (isset($scan_request['end']) && !empty($scan_request['end']))
+            {
 				$end = "- {$scan_request['end']}";
-			
-			$form_data['pages'] 		= ($physical_group == 'MONOGRAPH') ? "pp. {$scan_request['start']} $end" : "{$scan_request['start']} {$end}";
+            }
+
+            if ($physical_group == 'MONOGRAPH'){
+                $total_p = (isset($scan_request['end']) && !is_nan($scan_request['end'])) ? ($scan_request['end'] - $scan_request['start']) + 1 : 1;
+                $form_data['pages'] = "pp. {$scan_request['start']} $end total: $total_p"  ;
+            } else {
+                $form_data['pages'] = "{$scan_request['start']} : {$end}";
+            }
 			$form_data['chapter_title']	= $scan_request['chapter_title'];
 					
 			storeData($u, $item_data, 'ELECTRONIC', $form_data, 'SCAN');
@@ -237,6 +244,7 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 	fieldset {  margin: 25px; }
 	legend { font-size: medium; font-weight: bold;}
 	.example { font-size: x-small; white-space: nowrap; }
+    .heading_note { font-size: xx-small; font-style: italic;}
 
 	div#course_selection_area {margin-left: 25px;}
 	div#course_selection_area p {margin-left: 0px;}
@@ -275,8 +283,9 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 		newRow =  		  '<tbody id="request_row_'+rowNdx+'">';		
 		newRow = newRow + ' <tr>';
 		newRow = newRow + '	  <td class="course_number"><input type="text" id="scan_request_' + rowNdx + '_chapter_title" name="scan_request[' + rowNdx + '][chapter_title]" size="50" /></td>';
-		newRow = newRow + '	  <td class="course_number"><input type="text" id="scan_request_' + rowNdx + '_start" name="scan_request[' + rowNdx + '][start]" size="4" /></td>';
-		newRow = newRow + '	  <td class="course_number"><input type="text" id="scan_request_' + rowNdx + '_end" name="scan_request[' + rowNdx + '][end]" size="4" /></td>';
+		newRow = newRow + '	  <td class="course_number"><input type="text" id="scan_request_' + rowNdx + '_start" name="scan_request[' + rowNdx + '][start]" size="4" onkeyup="calcTotalPages('+rowNdx+')" /></td>';
+		newRow = newRow + '	  <td class="course_number"><input type="text" id="scan_request_' + rowNdx + '_end" name="scan_request[' + rowNdx + '][end]" size="4" onkeyup="calcTotalPages('+rowNdx+')" /></td>';
+        newRow = newRow + '	  <td class="course_number">Total Pages:<span id="scan_request_' + rowNdx + '_total"></span></td>';
 		newRow = newRow + '	  <td class="course_number"><span id="scan_request_' + rowNdx + '_remove"><a href="javascript:remove_request(' + rowNdx + ');">Remove</a></span></td>';
 		newRow = newRow + '	  <td id="request_row_' + rowNdx + '_error" style="display: none;"><span></span></td>';		
 		newRow = newRow + ' </tr>';		
@@ -351,13 +360,20 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 						row_error.insert("Please specify a Title. ");						
 						errorCnt++;
 					} 
-					
+
 					if ($('scan_request_' + i + '_start').value == '')
 					{
 						row_error.style.display = "";
 						row_error.className = "error";
 						row_error.insert(" Please specify a start value. ");		
 						errorCnt++;				
+					}
+					if ($('scan_request_' + i + '_start').value > $('scan_request_' + i + '_end').value)
+					{
+						row_error.style.display = "";
+						row_error.className = "error";
+						row_error.insert(" First Page Can Not Be Smaller Than Last Page. ");
+						errorCnt++;
 					}
 				}
 			}
@@ -368,7 +384,32 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 			frm.submit();
 		}
 	}
-	
+
+    function calcTotalPages(rowId)
+    {
+        var startId='scan_request_'+rowId+'_start';
+        var endId='scan_request_'+rowId+'_end';
+        var totalId='scan_request_'+rowId+'_total';
+        
+        var start=Number(document.getElementById(startId).value);
+        var end=Number(document.getElementById(endId).value);
+
+        if(end==0)
+        {    
+            var total=1;
+        } else {
+            var total= end - start + 1;
+        }
+
+        total=Math.abs(total);
+
+        if(isNaN(total) || (end==0 && total != 1) || (end > 0 && start > end))
+        {
+            total="";
+        }
+
+        document.getElementById(totalId).innerHTML=total;
+    }
 </script>
 </head>
 
@@ -519,15 +560,16 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 			<tbody>
 				<tr>
 				<? if ($physical_group == 'MONOGRAPH') {?>
-					<td class="course_number">Chapter / Article Title</td><td class="course_number">First Page</td><td class="course_number">Last Page</td>
+					<td class="course_number">Chapter / Article Title</td><td class="course_number">First Page</td><td class="course_number">Last Page <span class="heading_note">blank for single page</span></td>
 				<? } else { ?>
 					<td class="course_number" colspan="2">Song / Track / Scene Title</td><td class="course_number">Track / Scene Number</td>
 				<? } ?>
 				</tr>
 				<tr id="request_row_0">
 					<td class="course_number"><input type="text" id="scan_request_0_chapter_title" name="scan_request[0][chapter_title]" size="50" /></td>
-					<td class="course_number"><input type="text" id="scan_request_0_start" name="scan_request[0][start]" size="4" /></td>
-					<td class="course_number"><input type="text" id="scan_request_0_end" name="scan_request[0][end]" size="4" /></td>
+					<td class="course_number"><input type="text" id="scan_request_0_start" name="scan_request[0][start]" size="4" onkeyup="calcTotalPages(0)" /></td>
+					<td class="course_number"><input type="text" id="scan_request_0_end" name="scan_request[0][end]" size="4" onkeyup="calcTotalPages(0)" /></td>
+                    <td class="course_number">Total Pages:<span id="scan_request_0_total"</td>
 					<td class="course_number"><span id="scan_request_0_remove" style="display: none;"><a href="javascript:remove_request(0);">Remove</a></span></td>
 					<td id="request_row_0_error" style="display: none;"><span></span></td>
 				</tr>		
