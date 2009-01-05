@@ -1384,7 +1384,7 @@ class classDisplayer extends baseDisplayer {
 		//and also order those terms (according to their sort order)
 		$instructor_ci_array = array();
 		$proxy_ci_array = array();
-		foreach($termsObj->getTerms() as $term) {
+		foreach($termsObj->getTerms(true) as $term) {
 			//rearrange the term info as Array[year][term] = term_obj_id to quickly index it by CI-year/term
 			$terms[$term->getTermYear()][$term->getTermName()] = $term->getTermID();
 			//also initialize these arrays, so that the term arrays are in proper order
