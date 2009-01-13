@@ -642,7 +642,7 @@ class adminDisplayer extends baseDisplayer
 		$perms = array_flip($g_permission);
 		
 		$calendar = new Calendar();
-		$calendar->set_option('ifFormat', '%m-%d-%Y %H:%M');
+		$calendar->set_option('ifFormat', '%Y-%m-%d %H:%M');
 		$calendar->set_option('showsTime', true);	
 		$calendar->set_option('range', array(date('Y'), (date('Y')+5)));
 
@@ -743,7 +743,7 @@ class adminDisplayer extends baseDisplayer
 					if (is_null($news_item) || is_null($news_item['begin_time']))
 					{
 						$begin_null =  "checked";
-						$begin = date("m-d-Y h:i A");
+						$begin = date("Y-m-d h:i");
 					} else {
 						$begin_null = '';
 						$begin = $news_item['begin_time'];
@@ -751,7 +751,8 @@ class adminDisplayer extends baseDisplayer
 				?>
 				<td>Begin:</td>
 				<td>					
-					<input type="text" id="begin_time" name="begin_time"  value="<?= $begin ?>"/>					
+					<input type="text" id="begin_time" name="begin_time"  value="<?= $begin ?>"/>
+                     (YYYY-MM-DD 24H:MIN)
 					<?=$calendar->getWidgetAndTrigger('begin_time', $begin) ?>
 					<? 
 					/* allows setting begin date to null
@@ -760,7 +761,7 @@ class adminDisplayer extends baseDisplayer
 					*/
 					?>
 				</td>
-			</tr>
+           	</tr>
 			<tr>
 				<? 
 					if (is_null($news_item) || is_null($news_item['end_time']))
@@ -775,6 +776,7 @@ class adminDisplayer extends baseDisplayer
 				<td>End:</td>
 				<td>						
 					<input type="text" id="end_time" name="end_time" value="<?= $end ?>" />
+                    (YYYY-MM-DD 24H:MIN)
 					<?=$calendar->getWidgetAndTrigger('end_time', $end) ?>
 					<input type="checkbox" id="end_time_null" name="end_time_null" <?= $end_null ?> onclick="disable_dateSelect(this, 'end_time');">
 						Ongoing
