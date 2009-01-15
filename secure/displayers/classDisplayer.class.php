@@ -138,9 +138,8 @@ class classDisplayer extends baseDisplayer {
 				</div>
 				
 				<div class="courseHeaders"><span class="label">Enrollment&nbsp;</span><small>[ <a href="index.php?cmd=<?=$next_cmd?>&amp;ci=<?=$ci->getCourseInstanceID()?>&amp;tab=enrollment" class="editlinks">view</a> ]</small>: <span class="<?=common_getEnrollmentStyleTag($ci->getEnrollment())?>"><?=strtoupper($ci->getEnrollment())?></span></div>
-
-<?php	if($u->getRole() >= $g_permission['staff']): 	//hide activate/deactivate dates from non-staff ?>
 				<div class="courseHeaders">
+<?php	if($u->getRole() >= $g_permission['staff']): 	//hide activate/deactivate dates from non-staff ?>				
 					<form name="change_status_form" action="index.php" method="post">
 						<input type="hidden" name="cmd" value="<?=$next_cmd?>" />
 						<input type="hidden" name="ci" value="<?=$ci->getCourseInstanceID()?>" />
@@ -164,9 +163,11 @@ class classDisplayer extends baseDisplayer {
 						<input type="hidden" name="ci" value="<?=$ci->getCourseInstanceID()?>" />
 						<span class="label">Class Active Dates</span>: <input type="text" id="activation" name="activation" size="10" maxlength="10" value="<?=$ci->getActivationDate()?>" /> <?=$calendar->getWidgetAndTrigger('activation', $ci->getActivationDate())?> to <input type="text" id="expiration" name="expiration" size="10" maxlength="10" value="<?=$ci->getExpirationDate()?>" /> <?=$calendar->getWidgetAndTrigger('expiration', $ci->getExpirationDate())?> <input type="submit" name="updateClassDates" value="Change Dates">
 					</form>
-				</div>			
+<?php	else: ?>
+					<span class="label">Class Status</span>: <span class="<?=common_getStatusStyleTag($ci->getStatus())?>"><?=$ci->getStatus()?></span>
+					<?php if ($ci->getStatus() <> 'ACTIVE'): ?> <i>Please contact your reserves desk to Activate this class </i> <?php	endif; ?>
 <?php	endif; ?>
-			
+				</div>				
 			</div>			
 
 <?php	if($show_quicklinks_box): ?>

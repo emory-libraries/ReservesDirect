@@ -82,18 +82,21 @@ class classManager
 				
 				//get editable CIs for proxy or better
 				//use getDefaultRole (instead of getRole) to account for not-trained instructors
-				if($u->getDefaultRole() >= $g_permission['proxy']) {
+				if($u->getDefaultRole() >= $g_permission['instructor']) {
 					//get current courses, or those that will start within a year
 					//do not get expired courses
 					$activation_date = date('Y-m-d', strtotime('+1 year'));
 					$expiration_date = date('Y-m-d');
 								
-					//get CIs where user is an instructor - separate by CI status
-					$ciList_instructor = array();
+					//get CIs where user is an instructor - separate by CI status				
 					$tmp = $u->fetchCourseInstances('instructor', $activation_date, $expiration_date, 'ACTIVE');
 					if(!empty($tmp)) {
 						$ciList_instructor['ACTIVE'] = $tmp;
 					}
+					$tmp = $u->fetchCourseInstances('instructor', $activation_date, $expiration_date, 'INACTIVE');
+					if(!empty($tmp)) {
+						$ciList_instructor['INACTIVE'] = $tmp;
+					}					
 					$tmp = $u->fetchCourseInstances('instructor', $activation_date, $expiration_date, 'AUTOFEED');
 					if(!empty($tmp)) {
 						$ciList_instructor['AUTOFEED'] = $tmp;
@@ -102,9 +105,16 @@ class classManager
 					if(!empty($tmp)) {
 						$ciList_instructor['CANCELED'] = $tmp;
 					}
-									
+			   	}
+				if($u->getDefaultRole() >= $g_permission['proxy']) {									
+					//get current courses, or those that will start within a year
+					//do not get expired courses
+					$activation_date = date('Y-m-d', strtotime('+1 year'));
+					$expiration_date = date('Y-m-d');
+										
 					//get CIs where user is a proxy
-					$ciList_proxy = $u->fetchCourseInstances('proxy', $activation_date, $expiration_date, 'ACTIVE');					
+					$ciList_proxy = $u->fetchCourseInstances('proxy', $activation_date, $expiration_date, 'ACTIVE');
+					$ciList_proxy = array_merge($ciList_proxy, $u->fetchCourseInstances('proxy', $activation_date, $expiration_date, 'INACTIVE'));
 				}
 								
 				//get viewable CIs for everyone
