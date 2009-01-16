@@ -36,7 +36,6 @@ class custodian extends student
 	function custodian($userName=null) {
 		if(!empty($userName)) {
 			$this->getUserByUserName($userName);	
-			$this->role = 1;
 		}
 	}
 

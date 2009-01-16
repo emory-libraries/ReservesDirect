@@ -41,7 +41,6 @@ class instructor extends proxy
 	{
 		if (!is_null($userName)) {
 			$this->getUserByUserName($userName);
-			$this->role = 3;
 		}
 	}
 

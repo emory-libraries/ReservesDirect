@@ -36,7 +36,6 @@ class proxy extends student
 	{
 		if (!is_null($userName)) {
 			$this->getUserByUserName($userName);
-			$this->role = 2;
 		}
 	}
 
@@ -245,4 +244,17 @@ class proxy extends student
 		}
 	}
 
+	/**
+	* @return void
+	* @desc Updates the DB setting the user's default role if the current role < proxy
+	*/
+	function setAsProxy()
+	{
+        global $g_permission;
+
+        if ($this->dfltRole < $g_permission['proxy'])
+        {
+            $this->setDefaultRole($g_permission['proxy']);
+        }
+	}
 }

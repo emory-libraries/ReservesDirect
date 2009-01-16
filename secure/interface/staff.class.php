@@ -38,7 +38,6 @@ class staff extends instructor
 	{
 		if (!is_null($userName)) {
 			$this->getUserByUserName($userName);
-			$this->role = 4;
 		}
 	}
 

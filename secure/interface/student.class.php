@@ -41,7 +41,6 @@ class student extends user
 		if (is_null($userName)) trigger_error($userName . " has not been authorized as student", E_ERROR);
 		else {
 			$this->getUserByUserName($userName);
-			$this->role = 0;
 		}		
 	}
 

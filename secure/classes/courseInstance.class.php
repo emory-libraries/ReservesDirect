@@ -1135,13 +1135,20 @@ class courseInstance
 				$sql3 = "UPDATE access set enrollment_status='APPROVED', permission_level = ".$g_permission['proxy']." WHERE access_id = !"; 
 		}
 
+        $proxy = new Proxy();
+        $proxy->getUserByID($proxyID);
+        $proxy->setAsProxy(); //upgrade default user role if needed
+        unset($proxy);
+
 		$rs = $g_dbConn->query($sql, array($proxyID, $courseAliasID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
+        //if numRows == 0 then insert new enrollment record
 		if ($rs->numRows() == 0) {
-			$rs = $g_dbConn->query($sql2, array($proxyID, $courseAliasID, $g_permission['proxy'], 'APPROVED'));
-			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+			$rs2 = $g_dbConn->query($sql2, array($proxyID, $courseAliasID, $g_permission['proxy'], 'APPROVED'));
+			if (DB::isError($rs2)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 		} else {
+            //enrollment record exists upgrade class permissions if needed
 			$data = $rs->fetchRow(DB_FETCHMODE_ASSOC); 
 			
 			if ($data['permission_level'] < $g_permission['proxy'])

@@ -37,7 +37,6 @@ class admin extends staff
 	{
 		if (!is_null($userName)) {
 			$this->getUserByUserName($userName);
-			$this->role = 5;
 		}
 	}
 }

@@ -286,6 +286,7 @@ class userManager extends baseManager {
 				$page = 'manageUser';	//set tab
 				$loc = "assign $user_role_label to class >> ";
 				
+				//init a manager - sets the displayer
 					
 				if(!empty($_REQUEST[$field_name])) {	//if already selected a user, show class lookup
 					$loc .= "select class";	//show where we are
@@ -295,7 +296,6 @@ class userManager extends baseManager {
 					$this->displayClass 	= "ajaxDisplayer";
 					$this->displayFunction 	= "classLookup";
 					$this->argList 			= array($next_cmd, 'Select Class', $hidden);
-
 				}
 				else {	//show user lookup
 					$loc .= "select user";	//show where we are
