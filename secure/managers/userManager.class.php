@@ -28,7 +28,6 @@ http://www.reservesdirect.org/
 *******************************************************************************/
 
 require_once("secure/displayers/userDisplayer.class.php");
-require_once("secure/managers/ajaxManager.class.php");
 require_once('secure/managers/baseManager.class.php');
 require_once('secure/classes/specialUser.class.php');
 require_once('secure/interface/admin.class.php');	//this will also include all children
@@ -287,17 +286,24 @@ class userManager extends baseManager {
 				$page = 'manageUser';	//set tab
 				$loc = "assign $user_role_label to class >> ";
 				
-				//init a manager - sets the displayer
-				ajaxManager::ajaxManager();			
 					
 				if(!empty($_REQUEST[$field_name])) {	//if already selected a user, show class lookup
 					$loc .= "select class";	//show where we are
 					$hidden[$field_name] = $_REQUEST[$field_name];	//pass on the user id
-					ajaxManager::lookup('lookupClass', $next_cmd, 'manageUser', 'Select Class', $hidden);
+					
+					//override displayer to show ajaxDisplayer::classLookup
+					$this->displayClass 	= "ajaxDisplayer";
+					$this->displayFunction 	= "classLookup";
+					$this->argList 			= array($next_cmd, 'Select Class', $hidden);
+
 				}
 				else {	//show user lookup
 					$loc .= "select user";	//show where we are
-					ajaxManager::lookup('lookupUser', $cmd, 'manageUser', "Select User", null, true, array('min_user_role'=>$min_user_role, 'field_id'=>$field_name));
+
+					//override displayer to show ajaxDisplayer::userLookup
+					$this->displayClass		= "ajaxDisplayer";					
+					$this->displayFunction 	= "userLookup";
+					$this->argList 			= array($cmd, "Select User", array('min_user_role'=>$min_user_role), true, $g_permission['student'], $field_name);
 				}
 
 			break;
@@ -422,10 +428,11 @@ class userManager extends baseManager {
 	function getUser($cmd) {
 		$page = 'manageUser';
 		$loc = 'select user';
-			
-		//init ajax manager - sets the displayer
-		ajaxManager::ajaxManager();			
-		ajaxManager::lookup('lookupUser', $cmd, 'manageUser', "Select User", null, true, array('min_user_role'=>0, 'field_id'=>'selectedUser'));
+
+		//override displayer to show ajaxDisplayer::userLookup
+		$this->displayClass		= "ajaxDisplayer";					
+		$this->displayFunction 	= "userLookup";
+		$this->argList 			= array($cmd, "Select User", array('min_user_role' => $g_permission['student']), true, $g_permission['student'], 'selectedUser');		
 	}
 }
 ?>
