@@ -46,6 +46,7 @@ require_once("secure/classes/reserveItem.class.php");
 require_once("secure/classes/request.class.php");
 require_once("secure/classes/reserves.class.php");
 require_once("secure/classes/courseInstance.class.php");
+require_once("secure/classes/calendar.class.php");
 
 //set up error-handling/debugging, skins, etc.
 require_once("secure/session.inc.php");
@@ -89,7 +90,7 @@ $item_data  = $ils_result->to_a();
 if (empty($item_data['title']))
 {
 	include "secure/html/ils_request_item_not_found.html";
-	exit;
+    exit;
 }
 
 //Determine how to route material.  Currently routing is based on item_group
@@ -111,10 +112,11 @@ if (isset($_REQUEST['cmd']) && $_REQUEST['cmd'] == 'storeILSRequest')
 	$form_data['note'][] = $_REQUEST['note'];
 		
 	$form_data['maxEnrollment']				= $_REQUEST['maxEnrollment'];
-	
+
 	if ($_REQUEST['placeAtDesk'] == 'yes')
 	{
-		$form_data['note'][] = "PLACE {$_REQUEST['numCopies']} copy(ies) on Reserve";
+		$form_data['note'][]        = "PLACE {$_REQUEST['numCopies']} copy(ies) on Reserve";
+        $form_data['dateDesired']   = $_REQUEST['ils_request_date_desired'];
 	
 		if ($_REQUEST['reserveAnyAvailable'] == 'yes')
 			$form_data['note'][] = 'PLACE ANY AVAILABLE VOLUME ON RESERVE';	
@@ -125,7 +127,8 @@ if (isset($_REQUEST['cmd']) && $_REQUEST['cmd'] == 'storeILSRequest')
 	if ($_REQUEST['scanItem'] == 'yes')
 	{
 		foreach($_REQUEST['scan_request'] as $scan_request)
-		{		
+		{
+
 			$end = "";
 			if (isset($scan_request['end']) && !empty($scan_request['end']))
             {
@@ -138,8 +141,10 @@ if (isset($_REQUEST['cmd']) && $_REQUEST['cmd'] == 'storeILSRequest')
             } else {
                 $form_data['pages'] = "{$scan_request['start']} : {$end}";
             }
+
 			$form_data['chapter_title']	= $scan_request['chapter_title'];
-					
+            $form_data['dateDesired']	= $scan_request['dateDesired'];
+
 			storeData($u, $item_data, 'ELECTRONIC', $form_data, 'SCAN');
 		}
 	}
@@ -204,11 +209,13 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 			$request->setReserveID($reserve->getReserveID());
 			$request->setMaxEnrollment($form_data['maxEnrollment']);
 			$request->setType($request_type);
+            $request->setDateDesired($form_data['dateDesired']);
 		
 		foreach($form_data['note'] as $note)
 		{
 			$request->setNote($note, 'Instructor');
 		}
+
 	} catch (Exception $e) {		
 		if($g_dbConn->provides('transactions')) { 
 			$g_dbConn->rollback();
@@ -265,6 +272,11 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 </style>
 <script language="JavaScript1.2" src="secure/javascript/basicAJAX.js"></script>
 <script language="JavaScript1.2" src="secure/javascript/prototype.js"></script>
+
+<?php 
+    $calendar = new Calendar();
+    $calendar->load_files(); //load JSCalendar JS files
+?>
 <script language="JavaScript1.2">
 	var jsFunctions = new basicAJAX();
 	
@@ -285,6 +297,7 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 		newRow = newRow + '	  <td class="course_number"><input type="text" id="scan_request_' + rowNdx + '_chapter_title" name="scan_request[' + rowNdx + '][chapter_title]" size="50" /></td>';
 		newRow = newRow + '	  <td class="course_number"><input type="text" id="scan_request_' + rowNdx + '_start" name="scan_request[' + rowNdx + '][start]" size="4" onkeyup="calcTotalPages('+rowNdx+')" /></td>';
 		newRow = newRow + '	  <td class="course_number"><input type="text" id="scan_request_' + rowNdx + '_end" name="scan_request[' + rowNdx + '][end]" size="4" onkeyup="calcTotalPages('+rowNdx+')" /></td>';
+        newRow = newRow + '	  <td class="course_number"><input type="text" id="scan_request_' + rowNdx + '_dateDesired" name="scan_request[' + rowNdx + '][dateDesired]"/></td>';
         newRow = newRow + '	  <td class="course_number">Total Pages:<span id="scan_request_' + rowNdx + '_total"></span></td>';
 		newRow = newRow + '	  <td class="course_number"><span id="scan_request_' + rowNdx + '_remove"><a href="javascript:remove_request(' + rowNdx + ');">Remove</a></span></td>';
 		newRow = newRow + '	  <td id="request_row_' + rowNdx + '_error" style="display: none;"><span></span></td>';		
@@ -530,6 +543,8 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 		<label for="ils_request_loanPeriod"><input type="radio" name="loanPeriod" value="3 Hours" />3 hours</label>
 		<label for="ils_request_loanPeriod"><input type="radio" name="loanPeriod" value="1 Day" />1 day</label>
 		<label for="ils_request_loanPeriod"><input type="radio" name="loanPeriod" value="3 Days" />3 days</label>
+        <br />
+        <label for="ils_request_date_desired">Date Desired : <input type="text" id="ils_request_date_desired" name="ils_request_date_desired"  value='YYYY-MM-DD'/></label>
 	</p>
 </div>
 	
@@ -560,7 +575,7 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 			<tbody>
 				<tr>
 				<? if ($physical_group == 'MONOGRAPH') {?>
-					<td class="course_number">Chapter / Article Title</td><td class="course_number">First Page</td><td class="course_number">Last Page <span class="heading_note">blank for single page</span></td>
+					<td class="course_number">Chapter / Article Title</td><td class="course_number">First Page</td><td class="course_number">Last Page <span class="heading_note">blank for single page</span></td><td class="course_number">Date Desired</td>
 				<? } else { ?>
 					<td class="course_number" colspan="2">Song / Track / Scene Title</td><td class="course_number">Track / Scene Number</td>
 				<? } ?>
@@ -569,6 +584,7 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 					<td class="course_number"><input type="text" id="scan_request_0_chapter_title" name="scan_request[0][chapter_title]" size="50" /></td>
 					<td class="course_number"><input type="text" id="scan_request_0_start" name="scan_request[0][start]" size="4" onkeyup="calcTotalPages(0)" /></td>
 					<td class="course_number"><input type="text" id="scan_request_0_end" name="scan_request[0][end]" size="4" onkeyup="calcTotalPages(0)" /></td>
+                    <td class="course_number"><input type="text" id="scan_request_0_dateDesired" name="scan_request[0][dateDesired]" /></td>
                     <td class="course_number">Total Pages:<span id="scan_request_0_total"</td>
 					<td class="course_number"><span id="scan_request_0_remove" style="display: none;"><a href="javascript:remove_request(0);">Remove</a></span></td>
 					<td id="request_row_0_error" style="display: none;"><span></span></td>
