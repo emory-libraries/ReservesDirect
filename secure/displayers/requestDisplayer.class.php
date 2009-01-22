@@ -283,6 +283,11 @@ class requestDisplayer extends noteDisplayer {
 			echo "					        <td align=\"left\" valign=\"top\">". common_formatdate($r->getDateRequested(), "MM-DD-YYYY") ."</td>\n";
 			echo "					      </tr>\n";
 
+    		echo "					      <tr>\n";
+			echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Date Needed:</td>\n";
+			echo "					        <td align=\"left\" valign=\"top\">". common_formatdate($r->getDesiredDate(), "MM-DD-YYYY") ."</td>\n";
+			echo "					      </tr>\n";
+
 			echo "					      <tr>\n";
 			echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Requested Loan Period:</td>\n";
 			echo "					        <td align=\"left\" valign=\"top\">". $r->reserve->getRequestedLoanPeriod() ."</td>\n";

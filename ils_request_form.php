@@ -297,7 +297,7 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 		newRow = newRow + '	  <td class="course_number"><input type="text" id="scan_request_' + rowNdx + '_chapter_title" name="scan_request[' + rowNdx + '][chapter_title]" size="50" /></td>';
 		newRow = newRow + '	  <td class="course_number"><input type="text" id="scan_request_' + rowNdx + '_start" name="scan_request[' + rowNdx + '][start]" size="4" onkeyup="calcTotalPages('+rowNdx+')" /></td>';
 		newRow = newRow + '	  <td class="course_number"><input type="text" id="scan_request_' + rowNdx + '_end" name="scan_request[' + rowNdx + '][end]" size="4" onkeyup="calcTotalPages('+rowNdx+')" /></td>';
-        newRow = newRow + '	  <td class="course_number"><input type="text" id="scan_request_' + rowNdx + '_dateDesired" name="scan_request[' + rowNdx + '][dateDesired]"/></td>';
+        newRow = newRow + '	  <td class="course_number"><input type="text" id="scan_request_' + rowNdx + '_dateDesired" name="scan_request[' + rowNdx + '][dateDesired]" value="YYYY-MM-DD"/></td>';
         newRow = newRow + '	  <td class="course_number">Total Pages:<span id="scan_request_' + rowNdx + '_total"></span></td>';
 		newRow = newRow + '	  <td class="course_number"><span id="scan_request_' + rowNdx + '_remove"><a href="javascript:remove_request(' + rowNdx + ');">Remove</a></span></td>';
 		newRow = newRow + '	  <td id="request_row_' + rowNdx + '_error" style="display: none;"><span></span></td>';		
@@ -544,7 +544,7 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 		<label for="ils_request_loanPeriod"><input type="radio" name="loanPeriod" value="1 Day" />1 day</label>
 		<label for="ils_request_loanPeriod"><input type="radio" name="loanPeriod" value="3 Days" />3 days</label>
         <br />
-        <label for="ils_request_date_desired">Date Desired : <input type="text" id="ils_request_date_desired" name="ils_request_date_desired"  value='YYYY-MM-DD'/></label>
+        <label for="ils_request_date_desired">Date Needed: <input type="text" id="ils_request_date_desired" name="ils_request_date_desired"  value='YYYY-MM-DD'/></label>
 	</p>
 </div>
 	
@@ -575,7 +575,7 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 			<tbody>
 				<tr>
 				<? if ($physical_group == 'MONOGRAPH') {?>
-					<td class="course_number">Chapter / Article Title</td><td class="course_number">First Page</td><td class="course_number">Last Page <span class="heading_note">blank for single page</span></td><td class="course_number">Date Desired</td>
+					<td class="course_number">Chapter / Article Title</td><td class="course_number">First Page</td><td class="course_number">Last Page <span class="heading_note">blank for single page</span></td><td class="course_number">Date Needed</td>
 				<? } else { ?>
 					<td class="course_number" colspan="2">Song / Track / Scene Title</td><td class="course_number">Track / Scene Number</td>
 				<? } ?>
@@ -584,7 +584,7 @@ function storeData($u, $item_data, $item_group, $form_data, $request_type)
 					<td class="course_number"><input type="text" id="scan_request_0_chapter_title" name="scan_request[0][chapter_title]" size="50" /></td>
 					<td class="course_number"><input type="text" id="scan_request_0_start" name="scan_request[0][start]" size="4" onkeyup="calcTotalPages(0)" /></td>
 					<td class="course_number"><input type="text" id="scan_request_0_end" name="scan_request[0][end]" size="4" onkeyup="calcTotalPages(0)" /></td>
-                    <td class="course_number"><input type="text" id="scan_request_0_dateDesired" name="scan_request[0][dateDesired]" /></td>
+                    <td class="course_number"><input type="text" id="scan_request_0_dateDesired" name="scan_request[0][dateDesired]" value="YYYY-MM-DD" /></td>
                     <td class="course_number">Total Pages:<span id="scan_request_0_total"</td>
 					<td class="course_number"><span id="scan_request_0_remove" style="display: none;"><a href="javascript:remove_request(0);">Remove</a></span></td>
 					<td id="request_row_0_error" style="display: none;"><span></span></td>
