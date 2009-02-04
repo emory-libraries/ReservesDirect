@@ -27,7 +27,7 @@ http://www.reservesdirect.org/
 header("Content-Type:  application/octet-stream");
 header("Content-Disposition:  attachment; filename=reserves.html");
 
-$link = "http://".$_SERVER['SERVER_NAME'] . ereg_replace('export.php', 'perl/reserves2.cgi', $_SERVER['PHP_SELF']) . "?ci=" . $_REQUEST['ci'];
+$link = "http://".$_SERVER['SERVER_NAME'] . ereg_replace('export.php', 'reservelist.php', $_SERVER['PHP_SELF']) . "?ci=" . $_REQUEST['ci'];
 
 echo("<html>\n<head><title>Reserves List</title>\n<script  src=\"$link\"></script>\n</head>\n<body>\n</body>\n</html>\n");
 ?>
