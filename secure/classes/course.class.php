@@ -132,12 +132,12 @@ class course
 			$this->courseID 		= $row[0];
 			$this->deptID 			= $row[1];
 			$this->courseNo			= $row[2];
-			$this->name	 		= $row[3];
-			$this->uniformTitle 		= $row[4];
+			$this->name	 			= $row[3];
+			$this->uniformTitle 	= $row[4];
 			$this->section 			= $row[5];
-			$this->courseAliasID		= $row[6];
+			$this->courseAliasID	= $row[6];
 			$this->registrarKey		= $row[7];
-			$this->override_feed		= $row[8];
+			$this->override_feed	= $row[8];
 	}
 
 	/**
