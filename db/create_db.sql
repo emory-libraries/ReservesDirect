@@ -1,31 +1,23 @@
--- MySQL dump 10.9
---
--- Host: localhost    Database: reserves
--- ------------------------------------------------------
--- Server version	4.1.16-standard-log
+-- phpMyAdmin SQL Dump
+-- version 2.9.1.1-Debian-1
+-- http://www.phpmyadmin.net
+-- 
+-- Host: localhost
+-- Generation Time: Dec 15, 2006 at 01:38 PM
+-- Server version: 5.0.30
+-- PHP Version: 5.2.0-7
+-- 
+-- Database: `reserves_empty`
+-- 
 
---
--- PLEASE NOTE:
---
--- This file is the result of the manual integration of a dump without
--- data and a dump containing data for selected tables.
---
+-- --------------------------------------------------------
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
---
+-- 
 -- Table structure for table `access`
---
+-- 
 
 DROP TABLE IF EXISTS `access`;
-CREATE TABLE `access` (
+CREATE TABLE IF NOT EXISTS `access` (
   `access_id` int(20) NOT NULL auto_increment,
   `user_id` int(11) NOT NULL default '0',
   `alias_id` int(20) NOT NULL default '0',
@@ -36,27 +28,41 @@ CREATE TABLE `access` (
   UNIQUE KEY `user_ca` (`user_id`,`alias_id`),
   KEY `alias_id` (`alias_id`),
   KEY `permission_level` (`permission_level`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
+-- 
+-- Dumping data for table `access`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `circ_rules`
---
+-- 
 
 DROP TABLE IF EXISTS `circ_rules`;
-CREATE TABLE `circ_rules` (
+CREATE TABLE IF NOT EXISTS `circ_rules` (
   `id` int(11) NOT NULL auto_increment,
   `circ_rule` varchar(50) NOT NULL default '',
   `alt_circ_rule` varchar(50) NOT NULL default '',
   `default_selected` set('yes','no') NOT NULL default 'no',
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
+-- 
+-- Dumping data for table `circ_rules`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `course_aliases`
---
+-- 
 
 DROP TABLE IF EXISTS `course_aliases`;
-CREATE TABLE `course_aliases` (
+CREATE TABLE IF NOT EXISTS `course_aliases` (
   `course_alias_id` bigint(20) NOT NULL auto_increment,
   `course_id` int(11) default NULL,
   `course_instance_id` bigint(20) default NULL,
@@ -68,14 +74,21 @@ CREATE TABLE `course_aliases` (
   KEY `course_id` (`course_id`),
   KEY `course_instance_id` (`course_instance_id`),
   KEY `course_name` (`course_name`(255))
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
+-- 
+-- Dumping data for table `course_aliases`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `course_instances`
---
+-- 
 
 DROP TABLE IF EXISTS `course_instances`;
-CREATE TABLE `course_instances` (
+CREATE TABLE IF NOT EXISTS `course_instances` (
   `course_instance_id` bigint(20) NOT NULL auto_increment,
   `primary_course_alias_id` bigint(20) default NULL,
   `term` varchar(12) NOT NULL default '',
@@ -84,22 +97,27 @@ CREATE TABLE `course_instances` (
   `expiration_date` date NOT NULL default '0000-00-00',
   `status` set('ACTIVE','INACTIVE','IN PROGRESS','AUTOFEED','CANCELED') NOT NULL default '',
   `enrollment` set('OPEN','MODERATED','CLOSED') NOT NULL default 'OPEN',
-  `reviewed_date` date default NULL COMMENT 'reviewed by staff for copyright compliance',
-  `reviewed_by` int(11) default NULL COMMENT 'reviewed by staff for copyright compliance',
   PRIMARY KEY  (`course_instance_id`),
   KEY `primary_course_alias_id` (`primary_course_alias_id`),
   KEY `term_year_idx` (`term`,`year`),
   KEY `status` (`status`),
   KEY `enrollment` (`enrollment`),
   KEY `ci_date_range_idx` (`activation_date`,`expiration_date`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
+-- 
+-- Dumping data for table `course_instances`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `courses`
---
+-- 
 
 DROP TABLE IF EXISTS `courses`;
-CREATE TABLE `courses` (
+CREATE TABLE IF NOT EXISTS `courses` (
   `course_id` int(11) NOT NULL auto_increment,
   `department_id` int(11) NOT NULL default '0',
   `course_number` varchar(10) default NULL,
@@ -110,34 +128,21 @@ CREATE TABLE `courses` (
   KEY `old_id` (`old_id`),
   KEY `course_number` (`course_number`),
   KEY `uniform_title` (`uniform_title`(255))
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
--- Table structure for table `courses_no_dept`
---
+-- 
+-- Dumping data for table `courses`
+-- 
 
-DROP TABLE IF EXISTS `courses_no_dept`;
-CREATE TABLE `courses_no_dept` (
-  `course_id` int(11) NOT NULL auto_increment,
-  `department_id` int(11) NOT NULL default '0',
-  `course_number` varchar(10) default NULL,
-  `course_name` text,
-  `uniform_title` enum('t','f') NOT NULL default 't',
-  `old_id` int(11) NOT NULL default '0',
-  `dept_abv` varchar(50) NOT NULL default '',
-  `old_course_num` varchar(50) NOT NULL default '',
-  PRIMARY KEY  (`course_id`),
-  KEY `department_id` (`department_id`),
-  KEY `uniform_title` (`uniform_title`),
-  KEY `old_id` (`old_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `departments`
---
+-- 
 
 DROP TABLE IF EXISTS `departments`;
-CREATE TABLE `departments` (
+CREATE TABLE IF NOT EXISTS `departments` (
   `department_id` int(11) NOT NULL auto_increment,
   `abbreviation` varchar(8) default NULL,
   `name` text,
@@ -146,14 +151,21 @@ CREATE TABLE `departments` (
   PRIMARY KEY  (`department_id`),
   KEY `library_id` (`library_id`),
   KEY `abbr_index` (`abbreviation`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
+-- 
+-- Dumping data for table `departments`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `electronic_item_audit`
---
+-- 
 
 DROP TABLE IF EXISTS `electronic_item_audit`;
-CREATE TABLE `electronic_item_audit` (
+CREATE TABLE IF NOT EXISTS `electronic_item_audit` (
   `audit_id` int(20) NOT NULL auto_increment,
   `item_id` bigint(20) NOT NULL default '0',
   `date_added` date NOT NULL default '0000-00-00',
@@ -162,27 +174,447 @@ CREATE TABLE `electronic_item_audit` (
   `reviewed_by` int(11) default NULL,
   PRIMARY KEY  (`audit_id`),
   KEY `item_id` (`item_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
+-- 
+-- Dumping data for table `electronic_item_audit`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `help_art_tags`
+-- 
+
+DROP TABLE IF EXISTS `help_art_tags`;
+CREATE TABLE IF NOT EXISTS `help_art_tags` (
+  `article_id` int(8) unsigned default NULL,
+  `tag` varchar(50) default NULL,
+  `user_id` int(11) unsigned default NULL,
+  UNIQUE KEY `ndx_uniq_combo` (`article_id`,`tag`,`user_id`),
+  KEY `user_id` (`user_id`),
+  FULLTEXT KEY `tag` (`tag`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- 
+-- Dumping data for table `help_art_tags`
+-- 
+
+INSERT INTO `help_art_tags` (`article_id`, `tag`, `user_id`) VALUES 
+(5, 'email', 1073),
+(5, 'phone', 1073),
+(5, 'requests', 13139),
+(6, 'phone', 1073),
+(6, 'website', 1073),
+(11, 'statistics', 4048),
+(12, 'instructor', 4048),
+(13, 'proxies', 4048),
+(14, 'users', 4048),
+(15, 'add', 4048),
+(15, 'materials', 4048),
+(15, 'new', 4048),
+(16, 'links', 1073),
+(16, 'url', 4048),
+(17, 'fax', 4048),
+(18, 'upload', 4048),
+(19, 'search', 4048),
+(20, 'copy', 4048),
+(21, 'copyright', 4048),
+(33, 'editing', 4048),
+(40, 'contact', 1073),
+(40, 'email', 1073);
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `help_art_to_art`
+-- 
+
+DROP TABLE IF EXISTS `help_art_to_art`;
+CREATE TABLE IF NOT EXISTS `help_art_to_art` (
+  `article1_id` int(8) unsigned default NULL,
+  `article2_id` int(8) unsigned default NULL,
+  `relation_2to1` enum('child','sibling') default NULL,
+  UNIQUE KEY `ndx_uniq_combo` (`article1_id`,`article2_id`),
+  KEY `article2_id` (`article2_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='In child relationship, article1 is always parent';
+
+-- 
+-- Dumping data for table `help_art_to_art`
+-- 
+
+INSERT INTO `help_art_to_art` (`article1_id`, `article2_id`, `relation_2to1`) VALUES 
+(1, 2, 'child'),
+(2, 3, 'sibling'),
+(1, 4, 'child'),
+(5, 6, 'sibling'),
+(15, 20, 'sibling'),
+(15, 38, 'sibling'),
+(15, 33, 'sibling'),
+(15, 21, 'sibling'),
+(15, 28, 'sibling'),
+(15, 19, 'child'),
+(15, 17, 'child'),
+(15, 18, 'child'),
+(15, 16, 'child'),
+(16, 18, 'sibling'),
+(16, 19, 'sibling'),
+(16, 17, 'sibling'),
+(17, 18, 'sibling'),
+(17, 19, 'sibling'),
+(18, 19, 'sibling'),
+(20, 38, 'sibling'),
+(20, 33, 'sibling'),
+(21, 19, 'sibling'),
+(21, 16, 'sibling'),
+(21, 18, 'sibling'),
+(21, 17, 'sibling'),
+(28, 36, 'sibling'),
+(36, 35, 'sibling'),
+(36, 39, 'sibling'),
+(36, 34, 'sibling'),
+(35, 39, 'sibling'),
+(35, 34, 'sibling'),
+(39, 34, 'sibling'),
+(33, 38, 'sibling'),
+(33, 35, 'child'),
+(23, 38, 'child'),
+(23, 20, 'child'),
+(23, 33, 'child'),
+(23, 15, 'child'),
+(23, 39, 'child'),
+(23, 34, 'child'),
+(23, 35, 'child'),
+(23, 36, 'child'),
+(23, 30, 'sibling'),
+(23, 29, 'sibling'),
+(23, 12, 'sibling'),
+(23, 13, 'sibling'),
+(13, 12, 'sibling'),
+(22, 23, 'child'),
+(22, 25, 'child'),
+(22, 26, 'child'),
+(22, 31, 'child'),
+(22, 32, 'child'),
+(22, 30, 'sibling'),
+(22, 27, 'sibling'),
+(27, 30, 'sibling'),
+(14, 13, 'child'),
+(14, 12, 'child'),
+(25, 26, 'sibling'),
+(25, 31, 'sibling'),
+(25, 32, 'sibling'),
+(26, 31, 'sibling'),
+(26, 32, 'sibling'),
+(31, 32, 'sibling'),
+(40, 5, 'sibling'),
+(41, 33, 'sibling'),
+(41, 38, 'sibling');
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `help_art_to_role`
+-- 
+
+DROP TABLE IF EXISTS `help_art_to_role`;
+CREATE TABLE IF NOT EXISTS `help_art_to_role` (
+  `article_id` int(8) unsigned default NULL,
+  `permission_level` tinyint(2) unsigned default NULL,
+  `can_view` tinyint(1) NOT NULL default '1',
+  `can_edit` tinyint(1) NOT NULL default '0',
+  UNIQUE KEY `ndx_uniq_combo` (`article_id`,`permission_level`),
+  KEY `permission_level` (`permission_level`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='Specifies if specific permission-level may view/edit the art';
+
+-- 
+-- Dumping data for table `help_art_to_role`
+-- 
+
+INSERT INTO `help_art_to_role` (`article_id`, `permission_level`, `can_view`, `can_edit`) VALUES 
+(15, 1, 0, 0),
+(15, 0, 0, 0),
+(14, 3, 1, 0),
+(14, 2, 1, 0),
+(13, 3, 1, 0),
+(13, 2, 1, 0),
+(13, 1, 0, 0),
+(13, 0, 0, 0),
+(6, 3, 1, 0),
+(6, 2, 1, 0),
+(12, 0, 0, 0),
+(12, 1, 0, 0),
+(12, 2, 1, 0),
+(12, 3, 1, 0),
+(6, 1, 1, 0),
+(6, 0, 1, 0),
+(14, 0, 0, 0),
+(5, 3, 1, 0),
+(5, 2, 1, 0),
+(5, 1, 0, 0),
+(5, 0, 0, 0),
+(14, 1, 0, 0),
+(11, 0, 0, 0),
+(11, 1, 0, 0),
+(11, 2, 1, 0),
+(11, 3, 1, 0),
+(15, 2, 1, 0),
+(15, 3, 1, 0),
+(16, 0, 0, 0),
+(16, 1, 0, 0),
+(16, 2, 1, 0),
+(16, 3, 1, 0),
+(17, 0, 0, 0),
+(17, 1, 0, 0),
+(17, 2, 1, 0),
+(17, 3, 1, 0),
+(18, 0, 0, 0),
+(18, 1, 0, 0),
+(18, 2, 1, 0),
+(18, 3, 1, 0),
+(19, 0, 0, 0),
+(19, 1, 0, 0),
+(19, 2, 1, 0),
+(19, 3, 1, 0),
+(20, 0, 0, 0),
+(20, 1, 0, 0),
+(20, 2, 1, 0),
+(20, 3, 1, 0),
+(21, 0, 1, 0),
+(21, 1, 1, 0),
+(21, 2, 1, 0),
+(21, 3, 1, 0),
+(22, 0, 1, 0),
+(22, 1, 1, 0),
+(22, 2, 1, 0),
+(22, 3, 1, 0),
+(23, 0, 0, 0),
+(23, 1, 0, 0),
+(23, 2, 1, 0),
+(23, 3, 1, 0),
+(40, 0, 1, 0),
+(40, 1, 1, 0),
+(40, 2, 1, 0),
+(40, 3, 1, 0),
+(25, 0, 0, 0),
+(25, 1, 0, 0),
+(25, 2, 1, 0),
+(25, 3, 1, 0),
+(26, 0, 0, 0),
+(26, 1, 0, 0),
+(26, 2, 1, 0),
+(26, 3, 1, 0),
+(27, 0, 1, 0),
+(27, 1, 1, 0),
+(27, 2, 1, 0),
+(27, 3, 1, 0),
+(28, 0, 0, 0),
+(28, 1, 0, 0),
+(28, 2, 1, 0),
+(28, 3, 1, 0),
+(29, 0, 0, 0),
+(29, 1, 0, 0),
+(29, 2, 1, 0),
+(29, 3, 1, 0),
+(30, 0, 0, 0),
+(30, 1, 0, 0),
+(30, 2, 1, 0),
+(30, 3, 1, 0),
+(31, 0, 0, 0),
+(31, 1, 0, 0),
+(31, 2, 1, 0),
+(31, 3, 1, 0),
+(32, 0, 0, 0),
+(32, 1, 0, 0),
+(32, 2, 1, 0),
+(32, 3, 1, 0),
+(33, 0, 0, 0),
+(33, 1, 0, 0),
+(33, 2, 1, 0),
+(33, 3, 1, 0),
+(34, 0, 0, 0),
+(34, 1, 0, 0),
+(34, 2, 1, 0),
+(34, 3, 1, 0),
+(35, 0, 0, 0),
+(35, 1, 0, 0),
+(35, 2, 1, 0),
+(35, 3, 1, 0),
+(36, 0, 0, 0),
+(36, 1, 0, 0),
+(36, 2, 1, 0),
+(36, 3, 1, 0),
+(38, 0, 0, 0),
+(38, 1, 0, 0),
+(38, 2, 1, 0),
+(38, 3, 1, 0),
+(39, 0, 0, 0),
+(39, 1, 0, 0),
+(39, 2, 1, 0),
+(39, 3, 1, 0),
+(41, 0, 0, 0),
+(41, 1, 0, 0),
+(41, 2, 1, 0),
+(41, 3, 1, 0);
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `help_articles`
+-- 
+
+DROP TABLE IF EXISTS `help_articles`;
+CREATE TABLE IF NOT EXISTS `help_articles` (
+  `id` int(8) unsigned NOT NULL auto_increment,
+  `category_id` int(8) unsigned default NULL,
+  `title` varchar(100) default NULL,
+  `body` text,
+  `date_created` date default NULL,
+  `date_modified` date default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `category_id` (`category_id`),
+  FULLTEXT KEY `body` (`body`),
+  FULLTEXT KEY `ft_title_body` (`title`,`body`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=42 ;
+
+-- 
+-- Dumping data for table `help_articles`
+-- 
+
+INSERT INTO `help_articles` (`id`, `category_id`, `title`, `body`, `date_created`, `date_modified`) VALUES 
+(12, 3, 'Managing Instructors', 'Instructors have full ownership of their classes and may reactivate old classes, create new classes, and edit every aspect of the class and its associated reserve materials.<p>\r\n\r\nA class can have as many instructors as are necessary. This functionality is especially suited to team teaching situations. Each instructor has full access to the class to add and edit materials as well as all other class functions.<p>\r\n\r\n<b>To add an instructor to a class</b>:<br>\r\n1.  From the â€œMy Coursesâ€ tab, click on the class you wish to edit.<br>\r\n2.  On the "Edit Class" screen, click on the "Edit" link to the right of â€œInstructor(s).â€ On the next screen, current instructors are listed on the right, and you may choose a new instructor by searching for either Last Name or Username in the box on the left. <br>\r\n3.  In the drop-down menu, choose the instructor you would like to add and click "Add Instructor".<p>\r\n \r\n<b>To remove an instructor</b>: 	<br>\r\nCheck the box next to the name of the instructor you wish to remove (on the right side of the screen) and click "Remove Instructor."<p>\r\nIf you do not see the instructor you are looking for in the drop-down menu, they are not yet in the system. Please contact your Reserves Desk staff to add them to the list of instructors. (woodruff.reserves@gmail.com)', '2006-11-30', '2006-11-30'),
+(5, 4, 'Library Reserves Staff', 'Put contact information for reserves staff at your library/libraries here.', '2006-06-03', '2006-12-15'),
+(6, 4, 'IT Help Desk', 'Put contact information for your technical help desk (usually campus IT, if users contact campus IT for help with passwords, etc.)', '2006-06-04', '2006-12-15'),
+(11, 6, 'About Viewing Statistics', 'From the â€œView Statisticsâ€ tab, you have the option to look at the â€œItem View Log for a class.â€  When you click on this link, it will take you to a list of your classes.  Select the class you wish to view the statistics for and click â€œContinue.â€<p>\r\n	\r\nThis screen will show you a list of the reserve items in the class that have been viewed (a student has clicked on the link to open that reserve item).  On the right-hand side, there are two columns: â€œTotal Hitsâ€ and â€œUnique Hits.â€<p>\r\n\r\nâ€œTotal Hitsâ€ tells you how many times that particular item has been opened.  â€œUnique Hitsâ€ tells you the number of individual students who have opened the item.  If a student has opened the item more than once, your â€œTotal Hitsâ€ column will be greater than your â€œUnique Hitsâ€ column.', '2006-11-30', '2006-11-30'),
+(13, 3, 'Managing Proxies', 'Proxies are "assistants" to the class for the duration of the current semester or until they are removed by the instructor. They may do everything an instructor can do within a given class, except for create other proxies. Proxies only have access to the course or courses to which they are specifically assigned by an instructor or by Reserves staff.  You may have as many proxies as you like for any given class.<p>\r\n	\r\n<b>To add a Proxy</b>:<br>\r\n1.  From the â€œMy Coursesâ€ tab, click on the class you wish to edit.<br>\r\n2.  On the "Edit Class" screen, click on the "Edit" link next to â€œProxies.â€ On the next screen, current proxies are listed on the right.  You may search a list of all users in the system in the box on the left, using either Last Name or Username.<br>\r\n3.  The drop-down menu will fill with the names of users matching your search.<br>\r\n4.  Choose a name in the drop-down menu and click "Add Proxy"<p>\r\n\r\n<b>To remove a proxy</b>: <br>\r\n1.  Check the box next to the name of the proxy you wish to remove (on the right side of the screen) and click "Remove Selected Proxies."<p>\r\n\r\nA person must have logged into ReservesDirect at least once to be available to be made a proxy. If the name of the person you are looking for does not appear in your search results, please ask the person to log into the system.', '2006-11-30', '2006-11-30'),
+(14, 3, 'Managing Users', 'The Manage Users tab allows you to do three things: manage your own user profile (name and email address); and add or delete proxies from your classes. Clicking on either the "Add Proxy" or "Delete Proxy" links on this page will take you to a screen that asks you to choose one of your current classes. You will then be taken to the Add/Remove proxy screen. For more about how to use this function, consult the "Managing Proxies" article.', '2006-11-30', '2006-11-30'),
+(15, 2, 'Adding New Materials', 'There are two ways you can add new materials to a class.<p>\r\n\r\n--From the Edit Class page, click on the Ã¯Â¿Â½add new materialsÃ¯Â¿Â½ link above the reserves list for the class.<br>\r\n--From the Add a Reserve tab, select the class you want to add the reserve to and click Ã¯Â¿Â½continueÃ¯Â¿Â½.<p>\r\n	\r\nEither option will take you to the same screen.  From here, you can add a reserve by searching for the item, uploading a document, adding a URL, or faxing a document.  For details on how to use these options, click the appropriate link in the Ã¯Â¿Â½Follow-UpÃ¯Â¿Â½ help section.;', '2006-11-30', '2006-12-15'),
+(16, 2, 'Adding a URL', 'You can also add a URL to your reserves list, which links the reserve list for your class to an item located on the web.  This feature is often used for items such as newspaper articles, scholarly articles on sites like JSTOR, or music and videos associated with a web address.<p>\r\n	\r\nTo add a URL to your reserves list, choose the â€œAdd a URLâ€ link from the main â€œAdding New Materialsâ€ page.  Then simply type (or cut & paste) the web address from the address bar of your browser into the â€œURLâ€ box.<p>\r\n\r\n<b>Describing Your File</b><br>\r\nYou have a number of options for describing your file. The most basic descriptors are document title and author (title is required for display to students in the class). Title will display most prominently to students in the class; the other fields will appear below the title. When describing your documents, try to be as thorough as possible so that students can identify materials and cite them if necessary.<p>\r\n\r\nIf you are linking to one of multiple chapters from a book, it is generally best to put the chapter or movement title in the "Title" field and use the remaining fields to describe the main work that the selection is taken from.<p>\r\n\r\nThe various fields, such as Volume/Edition, can be used for different purposes depending on the type of document you are linking to (book chapter, journal article, musical work, etc.). The fields will accept whatever text you enter into them.<p>\r\n\r\nOnce you have finished describing your file, click â€œSave URL.â€  The URL will now appear as a reserve item in your class.  When a student clicks on the title of the item in the reserves list, she will be taken to the linked URL page.<p>\r\n\r\n\r\n<b>Copyright</b><br>\r\nReservesDirect operates under the Fair Use provision of United States copyright law.  By clicking â€œSave Documentâ€ you acknowledge that you have read the libraryâ€™s copyright notice and certify that to the best of your knowledge your use of the document falls within those guidelines.  Please be responsible in observing fair use when posting copyrighted materials. If you have questions about copyright and the materials you would like to use for your class, please contact the reserves staff at your library and consult your library''s copyright policy.<p>\r\n\r\n<u>It is always preferable to link to a journal article rather than downloading it to your computer and then uploading it to the Reserves Direct system.</u>  If you need assistance creating a link to an article or other item, please contact the reserves staff at your library.  (woodruff.reserves@gmail.com)', '2006-11-30', '2006-11-30'),
+(17, 2, 'Faxing a Document', 'On the "Add Reserve" tab, when you click on the option to "Fax a Document", you will see a screen that gives you instructions for sending a fax to the ReservesDirect server. You do not have to go to this page first before you fax in a document; you can simply send faxes to 404-727-9089. The server will automatically convert your fax to an Adobe PDF and place it in a holding queue so that you can "claim" it and add it to one of your classes.<p>\r\n\r\n<b>Number of Faxed Pages & File Size</b><br>\r\nPlease limit your faxes to 25 sheets; faxes exceeding 25 will be split into separate files.<p>\r\n\r\n<b>Claiming Your Fax</b><br>\r\nYou must â€œclaimâ€ your fax once it has been transmitted to the system.  Faxed documents will remain available in the "claim" queue until midnight of the day that they are faxed in. At midnight all faxed documents are deleted.<p>\r\n\r\nTo view the fax queue, click on the button that says "After your fax has finished transmitting, click here." This page displays all faxes that are currently waiting to be claimed. <p>\r\n\r\nYou can identify your fax by the number you faxed it from as well as the time stamp; you may also click the "preview" button to view your document.<p>\r\n\r\nCheck the box next to your document and click the "Continue" button.<p>\r\n\r\n<b>Describing Your File</b><br>\r\nYou have a number of options for describing your file. The most basic descriptors are title and author (title is required for display to students in the class). Title will display most prominently to students in the class; the other fields will appear below the title. When describing your documents, try to be as thorough as possible so that students can identify materials and cite them if necessary.<p>\r\n \r\nIf you are faxing more than one chapter from a book, it is generally best to put the chapter or movement title in the "Title" field and use the remaining fields to describe the main work that the selection is taken from.<p>\r\n\r\nThe various fields, such as Volume/Edition, can be used for different purposes depending on the type of document you are faxing (book chapter, journal article, musical work, etc.). The fields will accept whatever text you enter into them.<p>\r\n\r\n<b>Copyright</b><br>\r\nReservesDirect operates under the Fair Use provision of United States copyright law.  By clicking â€œSave Documentâ€ you acknowledge that you have read the libraryâ€™s copyright notice and certify that to the best of your knowledge your use of the document falls within those guidelines.  Please be responsible in observing fair use when posting copyrighted materials. If you have questions about copyright and the materials you would like to use for your class, please contact the reserves staff at your library and consult your library''s copyright policy.  (woodruff.reserves@gmail.com)<p>\r\n\r\n<u>Always include the original copyright notice and publication information for all articles and book chapters that you fax to the system.</u>  We recommend copying the title page and the copyright page from the front of a book or article.<p>\r\n\r\n<b>Availability of Materials</b><br>\r\nFaxed documents are converted to PDF and placed in the "claim" queue as soon as they are received by the server; by the time your fax machine prints a confirmation sheet, your document should be available to claim in ReservesDirect.<p>\r\n\r\nYour document will not be available to students until you claim it.<br>\r\nDocuments are available to students immediately upon being claimed by you.', '2006-11-30', '2006-11-30'),
+(18, 2, 'Uploading a Document', 'At the Upload a Document screen, you will see a form you must fill out with the citation information for the item you wish to upload.  Required fields are Document Title and File, but we encourage instructors to add as much bibliographic information as possible.  On this screen you can also write a note that will be appended to this item anytime it appears in the reserve list for the class.<p>\r\n\r\n	\r\n<b>Select a File</b><br>\r\nSelecting a file to upload is much like attaching a file to an email. To select a file, simply click on the "Browse" button next to the "File" field in the upload form. This will open a file browser window on your computer. Navigate to the file you wish to upload and select it. This will automatically fill in the file path on the upload form.<p>\r\n\r\n<b>File Type and Size</b><br>\r\nYou may upload any file type to ReservesDirect. The most common file types currently in use are Adobe Acrobat (PDF), Word (.doc), Excel (.xls), and PowerPoint (.ppt). You may also upload other popular files such as JPEG, TIFF, and mP3, as well as SPSS data sets and much more.<p>\r\n\r\nIf you would like to put sound or video on reserve, please make use of our streaming media services. For audio, contact the Helibrun Music and Media Library, genmus@libcat1.cc.emory.edu. For video, contact Andy Ditzler, aditzle@emory.edu.<p>\r\n\r\nWhen uploading PDFs, we recommend keeping file size to about 2 megabytes (2 MB)--or about 25 clear, clean sheets--to optimize downloading and printing times.<p>\r\n\r\nReservesDirect will accept files up to 10 megabytes (10 MB) in size.<p>\r\n\r\n<b>Copyright</b><br>\r\nReservesDirect operates under the Fair Use provision of United States copyright law.  By clicking â€œSave Documentâ€ you acknowledge that you have read the libraryâ€™s copyright notice and certify that to the best of your knowledge your use of the document falls within those guidelines.  Please be responsible in observing fair use when posting copyrighted materials. If you have questions about copyright and the materials you would like to use for your class, please contact the reserves staff at your library and consult your library''s copyright policy.  (woodruff.reserves@gmail.com)\r\n<p>\r\n\r\n<u>Always include the original copyright notice and publication information for all articles and book chapters that you upload to the system.</u>  We recommend copying the title page and the copyright page from the front of a book or article.<p>\r\n\r\n<b>Describing Your File</b><br>\r\nYou have a number of options for describing your file. The most basic descriptors are title and author (title is required for display to students in the class). Title will display most prominently to students in the class; the other fields will appear below the title. When describing your documents, try to be as thorough as possible so that students can identify materials and cite them if necessary.<p>\r\n \r\nIf you are uploading more than one chapter from a book, it is generally best to put the chapter or movement title in the "Title" field and use the remaining fields to describe the main work that the selection is taken from.<p>\r\n\r\nThe various fields, such as Volume/Edition, can be used for different purposes depending on the type of document you are uploading (book chapter, journal article, musical work, etc.). The fields will accept whatever text you enter into them.<p>\r\n\r\n<b>Availability of Materials</b><br>\r\nUploaded materials are available to your students as soon as you click "Save Document" and receive a confirmation that the upload was successful.<p>\r\n\r\nFor information on how to manipulate your reserve items once they are uploaded (for example, sorting materials or hiding them from student view for a period of time), see the topics under "Editing a Class".', '2006-11-30', '2006-11-30'),
+(19, 2, 'Searching for an Item', 'ReservesDirect has an Archive of over 70,000 items that have been digitized since electronic reserves began in 1999. The bulk of the content you will find here is articles and book chapters in PDF format, but the Archive also contains a good deal of streaming audio as well as documents in a variety of formats. You may search the entire Archive for materials suitable for your class.<p>\r\n\r\n	\r\n<b>You may search for an item in 3 ways.  You may search for Archived Materials, by Instructor, or through EUCLID.</b><p>\r\n\r\nSearching the Archived Materials will show you reserves that have previously been posted to the Reserves Direct system by other instructors, which you can add directly to your class.  You can search for these materials by title or by author by using the drop-down menu.  The author/title search is a keyword search that will return materials that have your search terms anywhere in the author or title.  You may view the reserve item by clicking on it.  If your search returns more than 20 results, navigate multiple pages of results by using the "Next | Previous" links.<p>\r\n\r\nSearching for materials by instructor will show you all the reserves that instructor has previously posted to the system.  Selecting an instructorâ€™s name from the drop-down menu will take you to a list of their previous reserve materials, which you can then add directly to your class.  You may view the reserve item by clicking on it.  If your search returns more than 20 results, navigate multiple pages of results by using the "Next | Previous" links.<p>\r\n\r\nTo add an item to your class, click the check-box next to the item.  When you have selected all the items you wish to add to your class, click â€œAdd Selected Materials.â€  <b>Digital items</b> that you add to your class are immediately available for use by students, as long as the class is active for the current semester. <b>Physical materials</b> that you request by searching the archive generate a request that gets sent to Reserves staff for processing. Requests will show a status of "In Process" until the item has been retrieved by staff and successfully added to your class. Please allow time for staff to retrieve the item from the shelves and add it to your class. Some items may take longer to obtain if they must be recalled from another patron. If you have questions about the availability of an item, please contact Reserves staff at your library.<p>\r\n\r\nYou can also search for materials through EUCLID by clicking on the link at the bottom of the screen.  This will take you directly to the EUCLID system.<p>\r\n\r\nOnce you have located the item you wish to place on reserve, click the â€œRequestâ€ button at the bottom of the screen.  You will then be prompted to enter your Emory ID number.  At the following screen, click on â€œWoodruff Reserveâ€”Instructor Use Only.â€  Fill out the form on the next screen, including whether you would like the item to be placed on physical reserve at the reserve desk in the library and/or if you would like it to be placed on electronic reserve in the Reserves Direct system.  Then click â€œSubmit Request.â€', '2006-11-30', '2006-11-30'),
+(20, 2, 'Copying Materials to Another Class', 'From the â€œEdit Classâ€ page that appears when you click on the name of one of your classes, you can select reserve items to copy to another class.<p>\r\n	\r\nSelect the items you wish to copy by checking the box to the right of the item(s).  When you have finished selecting the materials to be copied, click the box that says â€œCopy Selected to Another Class.â€<p>\r\n\r\nOn the next page, choose the class into which you wish to copy the materials by selecting the bullet to the left of the class name.  Then click â€œContinue.â€<p>\r\n\r\nThe reserve items should then appear in the new class exactly as they appeared in the class from which you copied them.', '2006-11-30', '2006-12-04'),
+(21, 2, 'Copyright Policy', 'ReservesDirect operates under the Fair Use provision of United States copyright law. <b>Please be responsible in observing fair use when posting copyrighted materials.</b> If you have questions about copyright and the materials you would like to use for your class, please contact the reserves staff at your library and consult your library''s copyright policy. (woodruff.reserves@gmail.com)<p>\r\n\r\n<u>Always include the original copyright notice and publication information for all articles and book chapters that you add to the system.</u>  We recommend copying the title page and the copyright page from the front of a book or article.<p>\r\n	\r\nNB: It is always better to link to an article in a database (e.g. â€“ JSTOR, EBSCO, etc.) than to download it to your computer and re-upload it to the system.  If you need assistance creating a stable link to an article for your class, please contact the reserves staff.<p>\r\n\r\nFind out more about Fair Use \r\n<a href=http://web.library.emory.edu/services/circulation/reserves/copyright.html>here.</a>', '2006-11-30', '2006-11-30'),
+(22, 5, 'Working with the My Courses tab/list', 'The "My Courses" tab is the main control screen for setting up your classes and managing your reserves lists. The â€œMy Coursesâ€ tab automatically displays all of the classes for which you are the instructor or proxy and any classes in which you are currently enrolled.  You can switch between viewing classes you are teaching and classes in which you are enrolled by clicking on the tabs.  You can also click on the circles next to each semester in the â€œYou are teaching:â€ tab to view your classes for that semester.<p>\r\n\r\nIn the â€œYou are enrolled in:â€ tab, you can join a class or leave a class by clicking on the appropriate option in the upper right-hand corner.<p>\r\n	\r\nIn the â€œYou are teaching:â€ tab, the icon next to each class identifies its current status in the system.  A pencil icon means that the class is active (students can enroll in the class and view the reserves).  A triangle/exclamation point icon means that the class has been created by the registrar but is not yet active in the system (students cannot enroll in the class or view the reserves).  An unavailable icon means that the course has been cancelled by the registrar.<p>\r\n\r\nThe right-hand column next to a class identifies its enrollment status.  If a class is listed as OPEN, students may look up the class and join it (in the Reserves Direct system onlyâ€”not through the registrar).  If the class is listed as MODERATED, students may request to be added to the class, but must be approved by the instructor or proxy before gaining access to it.  If the class is listed as CLOSED, students may not join the class and may not request to be added.<p>\r\n\r\nClicking on the name of a class in the â€œYou are teaching:â€ tab will redirect you to the Edit Class page.  Clicking on the name of a class in the â€œYou are enrolled in:â€ list will take you to the reserves list for that class.', '2006-11-30', '2006-11-30'),
+(23, 5, 'Editing a Class', 'Clicking on the name of a class in the â€œYou are teaching:â€ tab will redirect you to the Edit Class page.  This screen shows you all the materials you have placed on reserve for the class.  This is the main screen you will use to edit, add, and remove materials and information pertaining to the class.  You can also view enrollment for the class by clicking on the â€œEnrollmentâ€ tab.', '2006-11-30', '2006-11-30'),
+(25, 5, 'Creating a New Class', 'Creating a new class to add reserves to is a quick and easy process.<p>\r\n \r\n1.  Simply click on the "Create New Class" link.<br>\r\n2.  Choose the Department of the course from the drop-down menu and fill in the course number, section, and course name as they appear in OPUS.<br>\r\n3.  Select the semester you will be teaching the course (you may choose the current semester, next semester, or either of the 2 following semesters).<br>\r\n4.  Click "Create Course.<p>\r\n\r\nYour course has been established and you are now ready to begin adding materials. Follow the links provided to begin adding materials or just click on the "Add a Reserve" tab.', '2006-11-30', '2006-11-30'),
+(26, 5, 'Reactivating a Class', 'At the end of each semester, all classes in ReservesDirect are archived for future use. You can view a list of all your past classes by clicking on the "Reactivate Class" link on the "My Courses" tab.<p>\r\n\r\n1.  To see what the reserve list for any of your courses was click on the "preview" link.<br> \r\n2.  After determining which class you would like to reactivate, select the bullet to the left of it and click â€œContinue.â€<br>\r\n3.  Select the name of the class you will be teaching in the current or upcoming semester.  If the class name does not appear, click the â€œCreate New Classâ€ link.<br>\r\n4.  On the next screen, by default, all of the boxes next to reserve items will be checked.  If the box next to an item is checked, it will reactivate with the class.  De-select any materials you do not want imported from the last time the class was taught.<p>\r\n\r\nYour class will now be set up to become active on the first day of the semester you specified with all imported class materials appearing as they did the last time you taught the class. Requests to add physical items that are in the reserve list will be sent to Reserves staff to process. Please allow some time for physical materials to be retrieved from the shelves or recalled from other patrons who may have the materials checked out.', '2006-11-30', '2006-11-30'),
+(27, 5, 'Joining or Leaving a Class', '<b>Joining Classes</b><br> \r\nTo join a class, simply click on the "Join a Class" link on the right-hand side of the â€œYou are enrolled in:â€ screen under the â€œMy Coursesâ€ tab. Lookup your class by instructor or department.  When searching by instructor name, use the drop-down list to find instructor names matching your search.  The search results screen will display all classes active for the current semester. Find your class and select the bullet to the left of the class name.  You may preview classes by clicking on the â€œpreviewâ€ link on the right-hand side of the class name.  When you have selected your class, click â€œContinue.â€  If the class enrollment status is Open, it will appear immediately in the â€œYou are enrolled in:â€ list.  If the class enrollment is Moderated, the class will appear as pending approval in the â€œYou are enrolled in:â€ list.<p>\r\n\r\n<b>Leaving Classes</b><br> \r\nTo leave class you are enrolled in, just click on "Leave a Class" from the â€œYou are Enrolled in:â€ screen under the â€œMy Coursesâ€ tab.  Select the bullet to the left of the class you would like to leave.  Then click â€œContinue.â€ You may not leave any classes for which you are the instructor or proxy. These will automatically disappear from your list after the class expiration date.', '2006-11-30', '2006-11-30'),
+(28, 5, 'Previewing a Class & Previewing Student View', 'Anytime you reactivate a class, export a class, or add a reserve, you have the option to preview the classes in the list by clicking on the â€œpreviewâ€ link to the right of the class.  Doing so will open a new window that shows you the reserve list for that class.<p>\r\n	\r\nTo preview the student view for a class you are teaching, select that class from the â€œMy Coursesâ€ list and then click the link in the upper right-hand corner that says â€œPreview Student View.â€  A new window will open that shows you the reserve list for that class as the students in the class will see it.', '2006-11-30', '2006-11-30'),
+(29, 5, 'Editing Cross-Listings', 'You may crosslist classes under multiple course names and numbers to reflect the crosslistings that appear in OPUS. For example, ILA 135 may be crosslisted with ARTH 110.<p>\r\n\r\nTo create a crosslisting, click on the course you wish to edit from the â€œMy Coursesâ€ tab if one of the crosslisted classes already exists in ReservesDirect. If none of the crosslisted classes exist yet, first create a class and then select the class you just created from the â€œMy Coursesâ€ tab.<p>\r\n\r\nOn the "Edit Class" screen you will see a list of all current Crosslistings for the class.<p>\r\n\r\nClick on the â€œEditâ€ link next to â€œCrosslistingsâ€ to create a new crosslisting (or delete an old one).<p>\r\n\r\nThis screen will show you the primary listing for the class and all current crosslistings under the "Class Title and Crosslistings" box, where you may edit the title and course number/section of existing crosslistings.<p>\r\n\r\n<b>To add a new crosslisting</b>:<br>	\r\n1.  Select the Department of the crosslisting from the drop-down menu in the "Add New Crosslisting" box and enter the number, section, and title of the crosslisting.<br> \r\n2.  Click on "Add Crosslisting"\r\nThe crosslisting will immediately be available for students to add to their list of classes.<p>\r\n\r\nNote: You may not delete a crosslisting if any students have added it to their list of classes. If you try to do so, an error message will appear informing you that students are currently "enrolled" in the class.', '2006-11-30', '2006-11-30'),
+(30, 5, 'About Class Enrollment', 'To manage your class enrollment, click on the â€œManage Class Enrollmentâ€ link under the â€œMy Coursesâ€ tab.  Then select the class you wish to manage.  Alternatively, you may select a class from the â€œMy Coursesâ€ home and then click on the â€œEnrollmentâ€ tab located next to the â€œCourse Materialsâ€ tab.<p>\r\n	\r\nOn the â€œEnrollmentâ€ screen you can adjust the enrollment status of the class.  If a class is listed as OPEN, students may look up the class and join it (in the Reserves Direct system onlyâ€”not through the registrar).  If the class is listed as MODERATED, students may request to be added to the class, but must be approved by the instructor or proxy before gaining access to it.  If the class is listed as CLOSED, students may not join the class and may not request to be added.<p>\r\n\r\nTo add a student to the class (to give a student access to the reserves list for that class) simply type either the studentâ€™s name or Emory username into the box.  The box will produce a list of auto-completed names as you type; you may select the name from the drop-down list once you have located the student you wish to add.  Then click â€œAdd Student to Roll.â€  The student should immediately gain access to the class.<p>\r\n\r\nIf a student has requested to be added to the class, a notice will appear next to the â€œEnrollmentâ€ tab for that class that says â€œ! students requesting to join class !â€   At the â€œEnrollmentâ€ tab, you may approve or deny students to join the class.  You can approve or deny them individually or all at once by clicking the appropriate link.<p>\r\n\r\nYou may also remove students from the class by clicking the â€œremoveâ€ link next to their names under the â€œCurrently enrolled in this classâ€ list on the â€œEnrollmentâ€ tab.  If a student was automatically added to the class by the registrar, you cannot remove them from the class in Reserves Direct.', '2006-11-30', '2006-11-30'),
+(31, 5, 'Exporting a Class', 'You may export your reserves list for any of your classes to Blackboard, Learnlink, or to a personal web page. Exporting your reserve list involves pasting a piece of code into the Blackboard class or page where you want your reserves list to appear. This creates a live feed of the list into your Blackboard class (through RSS), which is updated automatically. Any changes that are made to your list in ReservesDirect appear instantly in Blackboard.<p>\r\n\r\n<b>To export your class from the Manage Classes tab:</b><br>\r\n1.  Click on "Export Class" under the â€œMy Coursesâ€ tab.  (Alternatively, if you are in the â€œEdit Classâ€ view, you can click the link in the upper right-hand corner that says â€œExport Readings to Courseware.â€)  Select where you would like to export your reserves to (Blackboard, Learnlink, or a personal web page).<br> \r\n2.  Follow the on-screen instructions.', '2006-11-30', '2006-11-30'),
+(32, 5, 'Exporting a Class to Spreadsheet', 'To export a class to spreadsheet, simply click on the name of the class from the â€œMy Coursesâ€ tab.  Then click on the link in the upper right-hand side of the page that says â€œExport Class to Spreadsheet.â€  A window will pop up asking whether you want to open or save the file.  Choose which one you want to do and the file will appear on your computer.', '2006-11-30', '2006-11-30'),
+(33, 5, 'Editing Materials', 'FIX THIS ARTICLE FROM STAGING SITE <p>\r\n\r\nAfter you add an item to your class, you may edit all of the information associated with the item (author, title, etc.) and add notes to the item that will display to students in the class. Your reserves list is your to edit as you wish. The changes that you make', '2006-11-30', '2006-12-15'),
+(34, 5, 'Sorting the Main List', 'You may sort the items in your reserve list by title, author, or by a custom order of your choosing, such as syllabus order. You may also add headings to further divide your class into syllabus order or subject/topic area.<p>\r\n\r\n<b>To sort by author or title</b>:<br>\r\n1.  From the â€œMy Coursesâ€ tab, select the class you wish to sort.  Then click on the "Sort Main List" link just above the reserve list.<br>\r\n2.  On the sort screen, click on "title" or "author" in the "Sort By" box. The list will automatically sort by title or author.<br>\r\n3.  Click "Save Order" to save the new order.<p>\r\n\r\n<b>To sort materials in a custom order</b>:<br>\r\n1.  Go to the sort screen as described in step 1 above.<br>\r\n2.  On the right side of your readings, you will see boxes with numbers inside of them. These are the "sort order" your readings appear in.<br> \r\n3.  To change the position of a reading, simply type the new position number into the text box and hit the "Tab" key or click in a new box. The order number of all of the readings will automatically update to reflect the change.<br>\r\n4.  Continue assigning numbers to the readings. If you make an error and would like to put the readings back in their original positions, you may do so by clicking "Reset to Saved Order."<br>\r\n5.  When you are finished, click "Save Order."<p>\r\n\r\n<b>Sorting headings</b>:<br>\r\n1.  Headings show up in the reserve list as a divider with text in it. To position your heading where you want it to appear (for instance, above all the Week 1 readings), click on the "sort" link. You may use the custom sort numbers (described above) to position the heading wherever you want.<br>\r\n2.  If you have added reserve items to a heading, they will automatically be moved with their associated heading whenever you rearrange the sort order of the heading.  To rearrange the sort order of items within a heading, click on the stacked-paper â€œSortâ€ icon next to the heading and sort the items as described above.', '2006-11-30', '2006-12-04'),
+(35, 5, 'Adding Headings', 'Headings help organize your list of materials into topics or weeks. Headings can stand alone, or you can add items to them.  You can use any heading you want that you think would be useful to your students in identifying a group of readings that belong together, e.g. "Week 1" or "Byzantium".<p>  \r\n	\r\nTo add a heading to your reserve list for a class, select that class from the â€œYou are Teaching:â€ list in the â€œMy Coursesâ€ tab and click on the link that says â€œAdd New Heading.â€  Type the name of the heading into the box and click â€œSave Heading.â€<p>\r\n\r\nTo add an item to a heading (like you would to a folder), go to the Edit Class screen, check the box next to the items to add to the heading, and click â€œEdit Selected.â€  On the â€œEdit Multiple Reservesâ€ screen, select which heading to add the materials to and click the "Submit" button.  Those items will then appear under the heading you have chosen.  When sorting the main list, any files that are listed under a separate heading will act like â€œfilesâ€ within the â€œfolderâ€ of the heading.<p>\r\n\r\nYou may edit an existing heading by selecting the check box next to it or by clicking the pencil icon next to it.  You may also add a note to headings in the same way you can add a note to reserve items.  For example, you could add a note that says â€œAll of the readings for this week are required.â€  You may continue adding as many headings as you like and positioning them in your list of materials.  For information on positioning headings in the reserve list, consult the â€œSorting the Main Listâ€ help article.', '2006-11-30', '2006-11-30'),
+(36, 5, 'Hiding Items from Student View', 'You can "hide" items from student view and have them automatically appear to the whole class on a given date. For example, if you had a number of take-home tests for the class and only wanted the students to have access to them during the week of the test, you could upload all of the tests at once and set dates for each one to appear to the students. You can also hide readings or labs until the week they will be covered in class if you do not want students to work ahead. By default, all items have an Activation Date of the first day of the semester.<p>\r\n\r\n<b>To hide an item</b>:<br>	\r\n1.  From the Ã¯Â¿Â½My CoursesÃ¯Â¿Â½ tab, click on the class you wish to edit.<br>\r\n2.  This will take you to the "Edit Class" screen, where you will see a list of all your reserve items. Check the box(es) next to the item(s) you wish to hide and click Ã¯Â¿Â½Edit Selected.Ã¯Â¿Â½<br> \r\n3.  Enter the date you want the item to appear to students in the "Activation Date" Ã¯Â¿Â½From:Ã¯Â¿Â½ field in the format YYYY-MM-D. This date must fall during the current semester.  Enter the date you want the item to disappear in the Ã¯Â¿Â½To:Ã¯Â¿Â½ field.  Clicking the Ã¯Â¿Â½Reset DatesÃ¯Â¿Â½ link will reset the dates to the start and end of the semester during which that class takes place.''', '2006-11-30', '2006-12-15'),
+(38, 5, 'Deleting Materials', 'From the Ã¯Â¿Â½Edit ClassÃ¯Â¿Â½ page that appears when you click on the name of one of your classes, you can select reserve items to delete.<p>\r\n	\r\nSelect the items you wish to delete by checking the box to the right of the item(s).  When you have finished selecting the materials to be deleted, click the box that says Ã¯Â¿Â½Delete Selected.Ã¯Â¿Â½<p>\r\n\r\nThe reserve items will then be permanently deleted from the class and will not appear in the reserve list.', '2006-11-30', '2006-12-13'),
+(39, 5, 'Highlighting Reserve Links', 'To highlight reserve links in a class, select that class from the â€œYou are Teaching:â€ list in the â€œMy Coursesâ€ tab and click on the link that says â€œHighlight Reserve Links.â€  All of the links to your reserve items will then be highlighted in yellow.  You may use this function to help locate the URL for items in order to copy & paste them into an email, Blackboard, etc.', '2006-11-30', '2006-12-04'),
+(40, 4, 'Contact the Reserves Desk', 'Put your main reserves contact point information here (listserv, phone, etc.)', '2006-12-06', '2006-12-15'),
+(41, 5, 'Editing Multiple Items', 'If you wish to edit multiple reserve items at the same time, use the check-box option and choose all of the reserve items you wish to edit. Editing multiple items at the same time means that whatever values you enter into their information fields will appear identical for each of the individual items. When editing multiple items, you are only able to edit the following fields: Status, Active Dates, Heading, and Note.', '2006-12-12', '2006-12-13');
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `help_cat_to_role`
+-- 
+
+DROP TABLE IF EXISTS `help_cat_to_role`;
+CREATE TABLE IF NOT EXISTS `help_cat_to_role` (
+  `category_id` int(8) unsigned default NULL,
+  `permission_level` tinyint(2) unsigned default NULL,
+  `can_view` tinyint(1) NOT NULL default '0',
+  `can_edit` tinyint(1) NOT NULL default '0',
+  UNIQUE KEY `ndx_uniq_combo` (`category_id`,`permission_level`),
+  KEY `category_id` (`permission_level`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='Specifies if specific permission-level may view/edit the art';
+
+-- 
+-- Dumping data for table `help_cat_to_role`
+-- 
+
+INSERT INTO `help_cat_to_role` (`category_id`, `permission_level`, `can_view`, `can_edit`) VALUES 
+(3, 1, 0, 0),
+(3, 2, 1, 0),
+(3, 3, 1, 0),
+(3, 0, 0, 0),
+(4, 0, 1, 0),
+(4, 1, 1, 0),
+(4, 2, 1, 0),
+(4, 3, 1, 0),
+(1, 0, 1, 0),
+(1, 1, 1, 0),
+(1, 2, 1, 0),
+(1, 3, 1, 0),
+(5, 0, 1, 0),
+(5, 1, 1, 0),
+(5, 2, 1, 0),
+(5, 3, 1, 0),
+(2, 0, 1, 0),
+(2, 1, 1, 0),
+(2, 2, 1, 0),
+(2, 3, 1, 0),
+(6, 0, 0, 0),
+(6, 1, 0, 0),
+(6, 2, 1, 0),
+(6, 3, 1, 0);
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `help_categories`
+-- 
+
+DROP TABLE IF EXISTS `help_categories`;
+CREATE TABLE IF NOT EXISTS `help_categories` (
+  `id` smallint(4) unsigned NOT NULL auto_increment,
+  `title` varchar(100) default NULL,
+  `description` tinytext,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=7 ;
+
+-- 
+-- Dumping data for table `help_categories`
+-- 
+
+INSERT INTO `help_categories` (`id`, `title`, `description`) VALUES 
+(1, 'Tutorials', 'Tutorials'),
+(2, 'Adding Materials', 'Instructions on how to add reserve materials to courses.'),
+(3, 'Managing Users', 'Managing your user profile & managing proxies.'),
+(4, 'Contacts', 'Articles about how to contact staff for help with the system.'),
+(5, 'Managing Courses', 'An overview of the "My Courses" tab options and how to manage individual courses.'),
+(6, 'Viewing Statistics', 'About viewing statistics for a course.');
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `hidden_readings`
---
+-- 
 
 DROP TABLE IF EXISTS `hidden_readings`;
-CREATE TABLE `hidden_readings` (
+CREATE TABLE IF NOT EXISTS `hidden_readings` (
   `hidden_id` int(20) NOT NULL auto_increment,
   `user_id` int(11) NOT NULL default '0',
   `reserve_id` bigint(20) NOT NULL default '0',
   PRIMARY KEY  (`hidden_id`),
   UNIQUE KEY `unique_constraint` (`user_id`,`reserve_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
+-- 
+-- Dumping data for table `hidden_readings`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `ils_requests`
---
+-- 
 
 DROP TABLE IF EXISTS `ils_requests`;
-CREATE TABLE `ils_requests` (
+CREATE TABLE IF NOT EXISTS `ils_requests` (
   `request_id` int(8) unsigned NOT NULL auto_increment,
   `date_added` date default NULL,
   `ils_request_id` varchar(16) default NULL,
@@ -192,40 +624,57 @@ CREATE TABLE `ils_requests` (
   `ils_course` varchar(150) default NULL,
   `requested_loan_period` varchar(16) default NULL,
   PRIMARY KEY  (`request_id`),
-  UNIQUE KEY `ils_request_id` (`ils_request_id`),
-  UNIQUE KEY `ils_control_key` (`ils_control_key`)
+  UNIQUE KEY `ils_request_id` (`ils_request_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
+
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `inst_loan_periods`
---
+-- 
 
 DROP TABLE IF EXISTS `inst_loan_periods`;
-CREATE TABLE `inst_loan_periods` (
+CREATE TABLE IF NOT EXISTS `inst_loan_periods` (
   `loan_period_id` bigint(20) NOT NULL auto_increment,
   `loan_period` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`loan_period_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
+-- 
+-- Dumping data for table `inst_loan_periods`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `inst_loan_periods_libraries`
---
+-- 
 
 DROP TABLE IF EXISTS `inst_loan_periods_libraries`;
-CREATE TABLE `inst_loan_periods_libraries` (
+CREATE TABLE IF NOT EXISTS `inst_loan_periods_libraries` (
   `id` bigint(20) NOT NULL auto_increment,
   `library_id` bigint(20) NOT NULL default '0',
   `loan_period_id` bigint(20) NOT NULL default '0',
   `default` set('true','false') NOT NULL default 'false',
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
+-- 
+-- Dumping data for table `inst_loan_periods_libraries`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `instructor_attributes`
---
+-- 
 
 DROP TABLE IF EXISTS `instructor_attributes`;
-CREATE TABLE `instructor_attributes` (
+CREATE TABLE IF NOT EXISTS `instructor_attributes` (
   `instructor_attribute_id` int(11) NOT NULL auto_increment,
   `user_id` int(11) NOT NULL default '0',
   `ils_user_id` varchar(50) default NULL,
@@ -233,14 +682,21 @@ CREATE TABLE `instructor_attributes` (
   `organizational_status` varchar(25) default NULL,
   PRIMARY KEY  (`instructor_attribute_id`),
   KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
+-- 
+-- Dumping data for table `instructor_attributes`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `item_upload_log`
---
+-- 
 
 DROP TABLE IF EXISTS `item_upload_log`;
-CREATE TABLE `item_upload_log` (
+CREATE TABLE IF NOT EXISTS `item_upload_log` (
   `id` bigint(20) NOT NULL auto_increment,
   `user_id` int(11) NOT NULL default '0',
   `course_instance_id` bigint(20) NOT NULL default '0',
@@ -249,14 +705,21 @@ CREATE TABLE `item_upload_log` (
   `filesize` varchar(10) NOT NULL default '',
   `ipaddr` varchar(15) NOT NULL default '',
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
+-- 
+-- Dumping data for table `item_upload_log`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `items`
---
+-- 
 
 DROP TABLE IF EXISTS `items`;
-CREATE TABLE `items` (
+CREATE TABLE IF NOT EXISTS `items` (
   `item_id` bigint(20) NOT NULL auto_increment,
   `title` varchar(255) default NULL,
   `author` varchar(255) default NULL,
@@ -276,9 +739,6 @@ CREATE TABLE `items` (
   `item_group` varchar(25) NOT NULL default '0',
   `item_type` set('ITEM','HEADING') NOT NULL default 'ITEM',
   `item_icon` varchar(255) default NULL,
-  `ISBN` varchar(13) default NULL,
-  `ISSN` varchar(8) default NULL,
-  `OCLC` varchar(9) default NULL,
   `old_id` int(11) NOT NULL default '0',
   PRIMARY KEY  (`item_id`),
   KEY `private_user_id` (`private_user_id`),
@@ -296,14 +756,21 @@ CREATE TABLE `items` (
   KEY `ndx_url` (`url`(255)),
   KEY `ndx_author` (`author`),
   KEY `ndx_volume_title` (`volume_title`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
+-- 
+-- Dumping data for table `items`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `libraries`
---
+-- 
 
 DROP TABLE IF EXISTS `libraries`;
-CREATE TABLE `libraries` (
+CREATE TABLE IF NOT EXISTS `libraries` (
   `library_id` int(11) NOT NULL auto_increment,
   `name` varchar(100) NOT NULL default '',
   `nickname` varchar(15) NOT NULL default '',
@@ -315,14 +782,54 @@ CREATE TABLE `libraries` (
   `multimedia_library_id` int(11) NOT NULL default '0',
   `copyright_library_id` int(11) default NULL,
   PRIMARY KEY  (`library_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
+INSERT INTO `libraries` VALUES (1,'Test Library','test','TEST','TEST','http://www.example.edu','library@example.edu',1,1,1);
+
+
+-- 
+-- Dumping data for table `libraries`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `mimetypes`
+-- 
+
+DROP TABLE IF EXISTS `mimetypes`;
+CREATE TABLE IF NOT EXISTS `mimetypes` (
+  `mimetype_id` int(11) NOT NULL auto_increment,
+  `mimetype` varchar(100) NOT NULL default '',
+  `helper_app_url` text,
+  `helper_app_name` text,
+  `helper_app_icon` text,
+  `file_extentions` varchar(255) NOT NULL default '',
+  PRIMARY KEY  (`mimetype_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
+
+-- 
+-- Dumping data for table `mimetypes`
+-- 
+
+INSERT INTO `mimetypes` (`mimetype_id`, `mimetype`, `helper_app_url`, `helper_app_name`, `helper_app_icon`, `file_extentions`) VALUES 
+(1, 'application/pdf', 'http://www.adobe.com/products/acrobat/readstep2.html', 'Adobe Acrobat Reader', 'images/doc_type_icons/doctype-pdf.gif', 'pdf'),
+(2, 'audio/x-pn-realaudio', 'http://www.real.com/', 'RealPlayer', 'images/doc_type_icons/doctype-sound.gif', 'ram'),
+(3, 'video/quicktime', 'http://www.apple.com/quicktime/', 'Quicktime Player', 'images/doc_type_icons/doctype-movie.gif', 'mov'),
+(4, 'application/msword', 'http://office.microsoft.com/Assistance/9798/viewerscvt.aspx', 'Microsoft Word', 'images/doc_type_icons/doctype-text.gif', 'doc'),
+(5, 'application/vnd.ms-excel', 'http://office.microsoft.com/Assistance/9798/viewerscvt.aspx', 'Microsoft Excel', 'images/doc_type_icons/doctype-text.gif', 'xcl'),
+(6, 'application/vnd.ms-powerpoint', 'http://office.microsoft.com/Assistance/9798/viewerscvt.aspx', 'Microsoft Powerpoint', 'images/doc_type_icons/doctype-text.gif', 'ppt'),
+(7, 'text/html', NULL, NULL, 'images/doc_type_icons/doctype-clear.gif', '');
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `news`
---
+-- 
 
 DROP TABLE IF EXISTS `news`;
-CREATE TABLE `news` (
+CREATE TABLE IF NOT EXISTS `news` (
   `news_id` bigint(20) NOT NULL auto_increment,
   `news_text` text NOT NULL COMMENT 'Text which will be displayed on all pages',
   `font_class` varchar(50) NOT NULL default '' COMMENT 'css class of text',
@@ -334,25 +841,39 @@ CREATE TABLE `news` (
   KEY `permission_level` (`permission_level`),
   KEY `begin_time` (`begin_time`),
   KEY `end_time` (`end_time`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
+-- 
+-- Dumping data for table `news`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `not_trained`
---
+-- 
 
 DROP TABLE IF EXISTS `not_trained`;
-CREATE TABLE `not_trained` (
+CREATE TABLE IF NOT EXISTS `not_trained` (
   `user_id` int(11) NOT NULL default '0',
   `permission_level` int(11) NOT NULL default '0',
   PRIMARY KEY  (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
+-- 
+-- Dumping data for table `not_trained`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `notes`
---
+-- 
 
 DROP TABLE IF EXISTS `notes`;
-CREATE TABLE `notes` (
+CREATE TABLE IF NOT EXISTS `notes` (
   `note_id` bigint(20) NOT NULL auto_increment,
   `type` varchar(25) NOT NULL default '',
   `target_id` bigint(20) NOT NULL default '0',
@@ -362,14 +883,46 @@ CREATE TABLE `notes` (
   KEY `type` (`type`),
   KEY `target` (`target_table`,`target_id`),
   KEY `ndx_note` (`note`(255))
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+-- 
+-- Dumping data for table `notes`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `permissions_levels`
+-- 
+
+DROP TABLE IF EXISTS `permissions_levels`;
+CREATE TABLE IF NOT EXISTS `permissions_levels` (
+  `permission_id` int(11) NOT NULL default '0',
+  `label` varchar(25) NOT NULL default '',
+  PRIMARY KEY  (`permission_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
+-- 
+-- Dumping data for table `permissions_levels`
+-- 
+
+INSERT INTO `permissions_levels` (`permission_id`, `label`) VALUES 
+(0, 'student'),
+(1, 'custodian'),
+(2, 'proxy'),
+(3, 'instructor'),
+(4, 'staff'),
+(5, 'admin');
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `physical_copies`
---
+-- 
 
 DROP TABLE IF EXISTS `physical_copies`;
-CREATE TABLE `physical_copies` (
+CREATE TABLE IF NOT EXISTS `physical_copies` (
   `physical_copy_id` int(11) NOT NULL auto_increment,
   `reserve_id` bigint(20) NOT NULL default '0',
   `item_id` bigint(20) NOT NULL default '0',
@@ -386,54 +939,78 @@ CREATE TABLE `physical_copies` (
   KEY `barcode` (`barcode`),
   KEY `item_type` (`item_type`),
   KEY `owner_user_id` (`owner_user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
--- Table structure for table `proxied_hosts`
---
+-- 
+-- Dumping data for table `physical_copies`
+-- 
 
-DROP TABLE IF EXISTS `proxied_hosts`;
-CREATE TABLE `proxied_hosts` (
-  `id` int(11) NOT NULL auto_increment COMMENT 'primary key',
-  `proxy_id` int(11) NOT NULL default '0' COMMENT 'foreign key to proxy table',
-  `domain` varchar(255) NOT NULL default '' COMMENT 'host domain',
-  `partial_match` binary(1) NOT NULL default '0' COMMENT 'if 0 require exact match against domain',
-  PRIMARY KEY  (`id`),
-  UNIQUE KEY `unique_domain` (`domain`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='list of host to be proxied';
 
---
--- Table structure for table `proxies`
---
+-- --------------------------------------------------------
 
-DROP TABLE IF EXISTS `proxies`;
-CREATE TABLE `proxies` (
-  `id` int(11) NOT NULL auto_increment COMMENT 'primary key',
-  `name` varchar(50) NOT NULL default '' COMMENT 'display name',
-  `prefix` varchar(255) NOT NULL default '' COMMENT 'url prefix',
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='proxies';
+-- 
+-- Table structure for table `reports`
+-- 
 
---
+DROP TABLE IF EXISTS `reports`;
+CREATE TABLE IF NOT EXISTS `reports` (
+  `report_id` bigint(20) NOT NULL auto_increment,
+  `title` varchar(255) NOT NULL default '',
+  `param_group` set('term','department','class','term_lib','term_dates') default NULL,
+  `sql` text NOT NULL,
+  `parameters` varchar(255) default NULL,
+  `min_permissions` int(11) NOT NULL default '4',
+  `sort_order` int(11) NOT NULL default '0',
+  `cached` tinyint(1) NOT NULL default '1' COMMENT 'boolean: 1 of 0',
+  `cache_refresh_delay` int(4) NOT NULL default '6' COMMENT 'measured in hours',
+  PRIMARY KEY  (`report_id`),
+  KEY `min_permissions` (`min_permissions`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=10 ;
+
+-- 
+-- Dumping data for table `reports`
+-- 
+
+INSERT INTO `reports` (`report_id`, `title`, `param_group`, `sql`, `parameters`, `min_permissions`, `sort_order`, `cached`, `cache_refresh_delay`) VALUES 
+(1, 'Items Added by Role', 'term', 'SELECT concat( t.term_name, '' '', t.term_year ) AS ''Term'', pl.label AS ''Role'', count( distinct eia.item_id ) AS ''Items Added''\r\nFROM electronic_item_audit AS eia\r\nJOIN reserves AS r ON r.item_id = eia.item_id\r\nJOIN course_instances AS ci ON ci.course_instance_id = r.course_instance_id\r\nJOIN terms AS t ON ci.term = t.term_name\r\nAND ci.year = t.term_year\r\nJOIN users AS u ON eia.added_by = u.user_id\r\nJOIN permissions_levels AS pl ON u.dflt_permission_level = pl.permission_id\r\nWHERE t.term_id IN (!)\r\nGROUP BY Term, Role', 'term_id', 4, 2, 0, 0),
+(2, 'Totals: Items And Reserves', NULL, 'SELECT \r\n	i.item_group AS ''Item Type'',\r\n	COUNT(DISTINCT i.item_id) AS ''Total Items'',\r\n	COUNT(DISTINCT r.reserve_id) AS ''Total Reserves''\r\nFROM reserves AS r\r\n	JOIN items AS i ON i.item_id = r.item_id\r\nGROUP BY i.item_group', NULL, 4, 0, 1, 6),
+(3, 'Totals: Courses', NULL, 'SELECT\r\n	COUNT(DISTINCT primary_course_alias_id) AS ''Total Number of Courses''\r\nFROM course_instances', NULL, 4, 0, 1, 6),
+(4, 'Totals: Users', NULL, 'SELECT\r\n	pl.label AS ''User Role'',\r\n	COUNT(DISTINCT u.user_id) AS ''User Count''\r\nFROM users AS u \r\n	JOIN permissions_levels AS pl ON pl.permission_id = u.dflt_permission_level\r\nGROUP BY pl.label', NULL, 4, 0, 1, 6),
+(5, 'Item View Log for a class', 'class', 'SELECT\r\n	i.title as ''Title'',\r\n	COUNT(uvl.user_id) as ''Total Hits'',\r\n	COUNT(DISTINCT uvl.user_id) as ''Unique Hits''\r\nFROM course_instances AS ci\r\n	JOIN reserves AS r ON r.course_instance_id = ci.course_instance_id\r\n	JOIN items AS i ON i.item_id = r.item_id\r\n	LEFT JOIN user_view_log AS uvl ON uvl.reserve_id = r.reserve_id\r\nWHERE ci.course_instance_id = !\r\nGROUP BY r.reserve_id\r\nORDER BY Title', 'ci', 3, 2, 0, 0),
+(6, 'Global: Courses And Users', 'term_lib', 'SELECT\r\n	CONCAT(t.term_name, '' '', t.term_year) as Term,\r\n	l.name AS Library,\r\n	d.name AS Department,\r\n	COUNT(DISTINCT ci.course_instance_id) AS Courses,\r\n	COUNT(DISTINCT a_i.user_id) AS Instructors,\r\n	COUNT(DISTINCT a_p.user_id) AS Proxies,\r\n	COUNT(DISTINCT a_s.user_id) AS Students\r\nFROM terms AS t\r\n	JOIN course_instances AS ci ON (ci.term = t.term_name AND ci.year = t.term_year)\r\n	JOIN course_aliases AS ca ON ca.course_alias_id = ci.primary_course_alias_id\r\n	LEFT JOIN access AS a_i ON a_i.alias_id = ca.course_alias_id AND a_i.permission_level = 3\r\n	LEFT JOIN access AS a_p ON a_p.alias_id = ca.course_alias_id AND a_p.permission_level = 2\r\n	LEFT JOIN access AS a_s ON a_s.alias_id = ca.course_alias_id AND a_s.permission_level = 0\r\n	JOIN courses AS c ON ca.course_id = c.course_id\r\n	JOIN departments AS d ON d.department_id = c.department_id\r\n	JOIN libraries AS l ON l.library_id = d.library_id\r\nWHERE t.term_id IN (!)\r\n	AND l.library_id IN (!)\r\n	AND d.status IS NULL	\r\nGROUP BY\r\n	t.term_year,\r\n	t.term_name,\r\n	l.library_id,\r\n	d.department_id\r\nORDER BY\r\n	t.term_year,\r\n	t.term_name,\r\n	l.name,\r\n	d.name	', 'term_id,library_id', 4, 1, 1, 6),
+(7, 'Global: Items And Reserves', 'term_lib', 'SELECT\r\n	CONCAT(t.term_name, '' '', t.term_year) as Term,\r\n	l.name AS Library,\r\n	d.name AS Department,\r\n	i.item_group AS ''Item Type'',\r\n	COUNT(DISTINCT r.item_id) AS ''Utilized Items'',\r\n	COUNT(DISTINCT r.reserve_id) AS ''Available Reserves'',\r\n	COUNT(DISTINCT uvl.reserve_id) AS ''Opened Reserves''\r\nFROM terms AS t\r\n	JOIN course_instances AS ci ON (ci.term = t.term_name AND ci.year = t.term_year)\r\n	JOIN reserves AS r ON r.course_instance_id = ci.course_instance_id\r\n	JOIN items AS i ON i.item_id = r.item_id\r\n	LEFT JOIN user_view_log AS uvl ON uvl.reserve_id = r.reserve_id\r\n	\r\n	JOIN course_aliases AS ca ON ca.course_alias_id = ci.primary_course_alias_id\r\n	JOIN courses AS c ON c.course_id = ca.course_id\r\n	JOIN departments AS d ON d.department_id = c.department_id\r\n	JOIN libraries AS l ON l.library_id = d.library_id\r\nWHERE t.term_id IN (!)\r\n	AND l.library_id IN (!)\r\n	AND d.status IS NULL\r\nGROUP BY\r\n	t.term_year,\r\n	t.term_name,\r\n	l.library_id,\r\n	d.department_id,\r\n	i.item_group\r\nORDER BY\r\n	t.term_year,\r\n	t.term_name,\r\n	l.name,\r\n	d.name,\r\n	i.item_group', 'term_id,library_id', 4, 1, 1, 6),
+(8, 'Global: Upload Activity', 'term', 'SELECT\r\n	CONCAT(t.term_name, '' '', t.term_year) as Term,\r\n	CONCAT(u.last_name, '', '', u.first_name) AS User,\r\n	pl.label AS Role,		\r\n	COUNT(DISTINCT aud.item_id) AS ''Items Added''\r\nFROM terms AS t\r\n	JOIN electronic_item_audit AS aud ON (aud.date_added BETWEEN t.begin_date AND t.end_date)\r\n	JOIN users AS u ON u.user_id = aud.added_by\r\n	JOIN permissions_levels AS pl ON pl.permission_id = u.dflt_permission_level\r\nWHERE t.term_id IN (!)\r\nGROUP BY\r\n	t.term_year,\r\n	t.term_name,\r\n	u.user_id\r\nORDER BY\r\n	t.term_year,\r\n	t.term_name,\r\n	''Items Added'' DESC', 'term_id', 4, 1, 0, 0),
+(9, 'Item View Log for a class by date', 'class', 'SELECT\r\n	i.title as ''Title'',\r\n	DATE(uvl.timestamp_viewed) AS ''Date'',\r\n	COUNT(uvl.user_id) as ''Total Hits'',\r\n	COUNT(DISTINCT uvl.user_id) as ''Unique Hits''\r\nFROM course_instances AS ci\r\n	JOIN reserves AS r ON r.course_instance_id = ci.course_instance_id\r\n	JOIN items AS i ON i.item_id = r.item_id\r\n	JOIN user_view_log AS uvl ON uvl.reserve_id = r.reserve_id\r\nWHERE ci.course_instance_id = !\r\nGROUP BY r.reserve_id, ''Date''\r\nORDER BY Title, ''Date''', 'ci', 5, 2, 0, 0);
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `reports_cache`
---
+-- 
 
 DROP TABLE IF EXISTS `reports_cache`;
-CREATE TABLE `reports_cache` (
+CREATE TABLE IF NOT EXISTS `reports_cache` (
   `report_cache_id` bigint(20) NOT NULL auto_increment,
   `report_id` bigint(20) default NULL COMMENT 'foreign key -- `reports`',
   `params_cache` text,
   `report_cache` longtext,
   `last_modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (`report_cache_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
+-- 
+-- Dumping data for table `reports_cache`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `requests`
---
+-- 
 
 DROP TABLE IF EXISTS `requests`;
-CREATE TABLE `requests` (
+CREATE TABLE IF NOT EXISTS `requests` (
   `request_id` bigint(20) NOT NULL auto_increment,
   `reserve_id` int(11) NOT NULL default '0',
   `item_id` bigint(20) NOT NULL default '0',
@@ -451,14 +1028,21 @@ CREATE TABLE `requests` (
   KEY `priority` (`priority`),
   KEY `course_instance_id` (`course_instance_id`),
   KEY `reserve_id` (`reserve_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
+-- 
+-- Dumping data for table `requests`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `reserves`
---
+-- 
 
 DROP TABLE IF EXISTS `reserves`;
-CREATE TABLE `reserves` (
+CREATE TABLE IF NOT EXISTS `reserves` (
   `reserve_id` bigint(20) NOT NULL auto_increment,
   `course_instance_id` bigint(20) NOT NULL default '0',
   `item_id` bigint(20) NOT NULL default '0',
@@ -476,54 +1060,80 @@ CREATE TABLE `reserves` (
   KEY `item_id` (`item_id`),
   KEY `reserves_date_range_idx` (`activation_date`,`expiration`),
   KEY `status` (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
+-- 
+-- Dumping data for table `reserves`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `skins`
---
+-- 
 
 DROP TABLE IF EXISTS `skins`;
-CREATE TABLE `skins` (
+CREATE TABLE IF NOT EXISTS `skins` (
   `id` int(11) NOT NULL auto_increment,
   `skin_name` varchar(20) NOT NULL default '',
   `skin_stylesheet` text NOT NULL,
   `default_selected` set('yes','no') NOT NULL default 'no',
   PRIMARY KEY  (`id`),
   UNIQUE KEY `skin_name` (`skin_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
 
-INSERT INTO `skins` (`id`, `skin_name`, `skin_stylesheet`, `default_selected`) VALUES (1,'default','css/ReservesStyles.css','yes');
+-- 
+-- Dumping data for table `skins`
+-- 
 
---
+INSERT INTO `skins` (`id`, `skin_name`, `skin_stylesheet`, `default_selected`) VALUES 
+(1, 'general', 'css/ReservesStyles.css', 'yes'),
+(2, 'bus', 'css/ReservesStyles-bus.css', 'no');
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `special_users`
---
+-- 
 
 DROP TABLE IF EXISTS `special_users`;
-CREATE TABLE `special_users` (
+CREATE TABLE IF NOT EXISTS `special_users` (
   `user_id` int(11) NOT NULL default '0',
   `password` varchar(75) NOT NULL default '',
   `expiration` date default NULL,
   PRIMARY KEY  (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
+
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `special_users_audit`
---
+-- 
 
 DROP TABLE IF EXISTS `special_users_audit`;
-CREATE TABLE `special_users_audit` (
+CREATE TABLE IF NOT EXISTS `special_users_audit` (
   `user_id` bigint(20) NOT NULL default '0',
   `creator_user_id` bigint(20) NOT NULL default '0',
   `date_created` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   `email_sent_to` varchar(255) default NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
---
+-- 
+-- Dumping data for table `special_users_audit`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `staff_libraries`
---
+-- 
 
 DROP TABLE IF EXISTS `staff_libraries`;
-CREATE TABLE `staff_libraries` (
+CREATE TABLE IF NOT EXISTS `staff_libraries` (
   `staff_library_id` int(11) NOT NULL auto_increment,
   `user_id` int(11) NOT NULL default '0',
   `library_id` int(11) NOT NULL default '0',
@@ -531,14 +1141,48 @@ CREATE TABLE `staff_libraries` (
   PRIMARY KEY  (`staff_library_id`),
   KEY `user_id` (`user_id`),
   KEY `library_id` (`library_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
+-- 
+-- Dumping data for table `staff_libraries`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `terms`
+-- 
+
+DROP TABLE IF EXISTS `terms`;
+CREATE TABLE IF NOT EXISTS `terms` (
+  `term_id` int(11) NOT NULL auto_increment,
+  `sort_order` int(11) NOT NULL default '0',
+  `term_name` varchar(100) NOT NULL default '',
+  `term_year` varchar(4) NOT NULL default '',
+  `begin_date` date NOT NULL default '0000-00-00',
+  `end_date` date NOT NULL default '0000-00-00',
+  PRIMARY KEY  (`term_id`),
+  KEY `sort_order` (`sort_order`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+
+-- 
+-- Dumping data for table `terms`
+-- 
+
+INSERT INTO `terms` (`term_id`, `sort_order`, `term_name`, `term_year`, `begin_date`, `end_date`) VALUES 
+(1, 1, 'FALL', '2004', '2004-08-26', '2004-12-18'),
+(2, 2, 'SPRING', '2005', '2005-01-01', '2005-05-31'),
+(3, 3, 'SUMMER', '2005', '2005-05-15', '2005-08-16');
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `user_view_log`
---
+-- 
 
 DROP TABLE IF EXISTS `user_view_log`;
-CREATE TABLE `user_view_log` (
+CREATE TABLE IF NOT EXISTS `user_view_log` (
   `id` bigint(20) NOT NULL auto_increment,
   `user_id` int(11) NOT NULL default '0',
   `reserve_id` bigint(20) NOT NULL default '0',
@@ -546,14 +1190,21 @@ CREATE TABLE `user_view_log` (
   PRIMARY KEY  (`id`),
   KEY `user_id` (`user_id`),
   KEY `reserve_id` (`reserve_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
---
+-- 
+-- Dumping data for table `user_view_log`
+-- 
+
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `users`
---
+-- 
 
 DROP TABLE IF EXISTS `users`;
-CREATE TABLE `users` (
+CREATE TABLE IF NOT EXISTS `users` (
   `user_id` int(11) NOT NULL auto_increment,
   `username` varchar(50) NOT NULL default '',
   `first_name` varchar(50) default NULL,
@@ -569,271 +1220,4 @@ CREATE TABLE `users` (
   KEY `old_id` (`old_id`),
   KEY `old_user_id` (`old_user_id`),
   KEY `last_name` (`last_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-
-
---
--- Table structure for table `mimetypes`
---
-
-DROP TABLE IF EXISTS `mimetypes`;
-CREATE TABLE `mimetypes` (
-  `mimetype_id` int(11) NOT NULL auto_increment,
-  `mimetype` varchar(100) NOT NULL default '',
-  `helper_app_url` text,
-  `helper_app_name` text,
-  `helper_app_icon` text,
-  `file_extentions` varchar(255) NOT NULL default '',
-  PRIMARY KEY  (`mimetype_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `mimetypes`
---
-
-
-/*!40000 ALTER TABLE `mimetypes` DISABLE KEYS */;
-LOCK TABLES `mimetypes` WRITE;
-INSERT INTO `mimetypes` (`mimetype_id`, `mimetype`, `helper_app_url`, `helper_app_name`, `helper_app_icon`, `file_extentions`) VALUES (1,'application/pdf','http://www.adobe.com/products/acrobat/readstep2.html','Adobe Acrobat Reader','images/doc_type_icons/doctype-pdf.gif','pdf'),(2,'audio/x-pn-realaudio','http://www.real.com/','RealPlayer','images/doc_type_icons/doctype-sound.gif','ram'),(3,'video/quicktime','http://www.apple.com/quicktime/','Quicktime Player','images/doc_type_icons/doctype-movie.gif','mov'),(4,'application/msword','http://office.microsoft.com/Assistance/9798/viewerscvt.aspx','Microsoft Word','images/doc_type_icons/doctype-text.gif','doc'),(5,'application/vnd.ms-excel','http://office.microsoft.com/Assistance/9798/viewerscvt.aspx','Microsoft Excel','images/doc_type_icons/doctype-text.gif','xcl'),(6,'application/vnd.ms-powerpoint','http://office.microsoft.com/Assistance/9798/viewerscvt.aspx','Microsoft Powerpoint','images/doc_type_icons/doctype-text.gif','ppt'),(7,'text/html',NULL,'Link','images/doc_type_icons/doctype-link.gif','');
-UNLOCK TABLES;
-/*!40000 ALTER TABLE `mimetypes` ENABLE KEYS */;
-
---
--- Table structure for table `help_art_tags`
---
-
-DROP TABLE IF EXISTS `help_art_tags`;
-CREATE TABLE `help_art_tags` (
-  `article_id` int(8) unsigned default NULL,
-  `tag` varchar(50) default NULL,
-  `user_id` int(11) unsigned default NULL,
-  UNIQUE KEY `ndx_uniq_combo` (`article_id`,`tag`,`user_id`),
-  KEY `user_id` (`user_id`),
-  FULLTEXT KEY `tag` (`tag`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `help_art_tags`
---
-
-
-/*!40000 ALTER TABLE `help_art_tags` DISABLE KEYS */;
-LOCK TABLES `help_art_tags` WRITE;
-INSERT INTO `help_art_tags` (`article_id`, `tag`, `user_id`) VALUES (5,'email',1073),(5,'phone',1073),(5,'requests',13139),(6,'phone',1073),(6,'website',1073),(11,'statistics',4048),(12,'instructor',4048),(13,'proxies',4048),(14,'users',4048),(15,'add',4048),(15,'materials',4048),(15,'new',4048),(16,'links',1073),(16,'url',4048),(17,'fax',4048),(18,'upload',4048),(19,'search',4048),(20,'copy',4048),(21,'copyright',4048),(33,'editing',4048),(40,'contact',1073),(40,'email',1073),(40,'help',1073);
-UNLOCK TABLES;
-/*!40000 ALTER TABLE `help_art_tags` ENABLE KEYS */;
-
---
--- Table structure for table `help_cat_to_role`
---
-
-DROP TABLE IF EXISTS `help_cat_to_role`;
-CREATE TABLE `help_cat_to_role` (
-  `category_id` int(8) unsigned default NULL,
-  `permission_level` tinyint(2) unsigned default NULL,
-  `can_view` tinyint(1) NOT NULL default '0',
-  `can_edit` tinyint(1) NOT NULL default '0',
-  UNIQUE KEY `ndx_uniq_combo` (`category_id`,`permission_level`),
-  KEY `category_id` (`permission_level`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='Specifies if specific permission-level may view/edit the art';
-
---
--- Dumping data for table `help_cat_to_role`
---
-
-
-/*!40000 ALTER TABLE `help_cat_to_role` DISABLE KEYS */;
-LOCK TABLES `help_cat_to_role` WRITE;
-INSERT INTO `help_cat_to_role` (`category_id`, `permission_level`, `can_view`, `can_edit`) VALUES (3,1,0,0),(3,2,1,0),(3,3,1,0),(3,0,0,0),(4,0,1,0),(4,1,1,0),(4,2,1,0),(4,3,1,0),(1,0,1,0),(1,1,1,0),(1,2,1,0),(1,3,1,0),(5,0,1,0),(5,1,1,0),(5,2,1,0),(5,3,1,0),(2,0,1,0),(2,1,1,0),(2,2,1,0),(2,3,1,0),(6,0,0,0),(6,1,0,0),(6,2,1,0),(6,3,1,0);
-UNLOCK TABLES;
-/*!40000 ALTER TABLE `help_cat_to_role` ENABLE KEYS */;
-
---
--- Table structure for table `help_art_to_art`
---
-
-DROP TABLE IF EXISTS `help_art_to_art`;
-CREATE TABLE `help_art_to_art` (
-  `article1_id` int(8) unsigned default NULL,
-  `article2_id` int(8) unsigned default NULL,
-  `relation_2to1` enum('child','sibling') default NULL,
-  UNIQUE KEY `ndx_uniq_combo` (`article1_id`,`article2_id`),
-  KEY `article2_id` (`article2_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='In child relationship, article1 is always parent';
-
---
--- Dumping data for table `help_art_to_art`
---
-
-
-/*!40000 ALTER TABLE `help_art_to_art` DISABLE KEYS */;
-LOCK TABLES `help_art_to_art` WRITE;
-INSERT INTO `help_art_to_art` (`article1_id`, `article2_id`, `relation_2to1`) VALUES (1,2,'child'),(2,3,'sibling'),(1,4,'child'),(5,6,'sibling'),(15,20,'sibling'),(15,38,'sibling'),(15,33,'sibling'),(15,21,'sibling'),(15,28,'sibling'),(15,19,'child'),(15,17,'child'),(15,18,'child'),(15,16,'child'),(16,18,'sibling'),(16,19,'sibling'),(16,17,'sibling'),(17,18,'sibling'),(17,19,'sibling'),(18,19,'sibling'),(20,38,'sibling'),(20,33,'sibling'),(21,19,'sibling'),(21,16,'sibling'),(21,18,'sibling'),(21,17,'sibling'),(28,36,'sibling'),(36,35,'sibling'),(36,39,'sibling'),(36,34,'sibling'),(35,39,'sibling'),(35,34,'sibling'),(39,34,'sibling'),(33,38,'sibling'),(33,35,'child'),(23,38,'child'),(23,20,'child'),(23,33,'child'),(23,15,'child'),(23,39,'child'),(23,34,'child'),(23,35,'child'),(23,36,'child'),(23,30,'sibling'),(23,29,'sibling'),(23,12,'sibling'),(23,13,'sibling'),(13,12,'sibling'),(22,23,'child'),(22,25,'child'),(22,26,'child'),(22,31,'child'),(22,32,'child'),(22,30,'sibling'),(22,27,'sibling'),(27,30,'sibling'),(14,13,'child'),(14,12,'child'),(25,26,'sibling'),(25,31,'sibling'),(25,32,'sibling'),(26,31,'sibling'),(26,32,'sibling'),(31,32,'sibling'),(40,5,'sibling'),(41,33,'sibling'),(41,38,'sibling');
-UNLOCK TABLES;
-/*!40000 ALTER TABLE `help_art_to_art` ENABLE KEYS */;
-
---
--- Table structure for table `reports`
---
-
-DROP TABLE IF EXISTS `reports`;
-CREATE TABLE `reports` (
-  `report_id` bigint(20) NOT NULL auto_increment,
-  `title` varchar(255) NOT NULL default '',
-  `param_group` set('term','department','class','term_lib','term_dates') default NULL,
-  `sql` text NOT NULL,
-  `parameters` varchar(255) default NULL,
-  `min_permissions` int(11) NOT NULL default '4',
-  `sort_order` int(11) NOT NULL default '0',
-  `cached` tinyint(1) NOT NULL default '1' COMMENT 'boolean: 1 of 0',
-  `cache_refresh_delay` int(4) NOT NULL default '6' COMMENT 'measured in hours',
-  PRIMARY KEY  (`report_id`),
-  KEY `min_permissions` (`min_permissions`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `reports`
---
-
-
-/*!40000 ALTER TABLE `reports` DISABLE KEYS */;
-LOCK TABLES `reports` WRITE;
-INSERT INTO `reports` (`report_id`, `title`, `param_group`, `sql`, `parameters`, `min_permissions`, `sort_order`, `cached`, `cache_refresh_delay`) VALUES (1,'Items Added by Role','term','SELECT concat( t.term_name, \' \', t.term_year ) AS \'Term\', pl.label AS \'Role\', count( distinct eia.item_id ) AS \'Items Added\'\r\nFROM electronic_item_audit AS eia\r\nJOIN reserves AS r ON r.item_id = eia.item_id\r\nJOIN course_instances AS ci ON ci.course_instance_id = r.course_instance_id\r\nJOIN terms AS t ON ci.term = t.term_name\r\nAND ci.year = t.term_year\r\nJOIN users AS u ON eia.added_by = u.user_id\r\nJOIN permissions_levels AS pl ON u.dflt_permission_level = pl.permission_id\r\nWHERE t.term_id IN (!)\r\nGROUP BY Term, Role','term_id',4,2,0,0),(2,'Totals: Items And Reserves',NULL,'SELECT \r\n	i.item_group AS \'Item Type\',\r\n	COUNT(DISTINCT i.item_id) AS \'Total Items\',\r\n	COUNT(DISTINCT r.reserve_id) AS \'Total Reserves\'\r\nFROM reserves AS r\r\n	JOIN items AS i ON i.item_id = r.item_id\r\nGROUP BY i.item_group',NULL,4,0,1,6),(3,'Totals: Courses',NULL,'SELECT\r\n	COUNT(DISTINCT primary_course_alias_id) AS \'Total Number of Courses\'\r\nFROM course_instances',NULL,4,0,1,6),(4,'Totals: Users',NULL,'SELECT\r\n	pl.label AS \'User Role\',\r\n	COUNT(DISTINCT u.user_id) AS \'User Count\'\r\nFROM users AS u \r\n	JOIN permissions_levels AS pl ON pl.permission_id = u.dflt_permission_level\r\nGROUP BY pl.label',NULL,4,0,1,6),(6,'Global: Courses And Users','term_lib','SELECT\r\n	CONCAT(t.term_name, \' \', t.term_year) as Term,\r\n	l.name AS Library,\r\n	d.name AS Department,\r\n	COUNT(DISTINCT ci.course_instance_id) AS Courses,\r\n	COUNT(DISTINCT a_i.user_id) AS Instructors,\r\n	COUNT(DISTINCT a_p.user_id) AS Proxies,\r\n	COUNT(DISTINCT a_s.user_id) AS Students\r\nFROM terms AS t\r\n	JOIN course_instances AS ci ON (ci.term = t.term_name AND ci.year = t.term_year)\r\n	JOIN course_aliases AS ca ON ca.course_alias_id = ci.primary_course_alias_id\r\n	LEFT JOIN access AS a_i ON a_i.alias_id = ca.course_alias_id AND a_i.permission_level = 3\r\n	LEFT JOIN access AS a_p ON a_p.alias_id = ca.course_alias_id AND a_p.permission_level = 2\r\n	LEFT JOIN access AS a_s ON a_s.alias_id = ca.course_alias_id AND a_s.permission_level = 0\r\n	JOIN courses AS c ON ca.course_id = c.course_id\r\n	JOIN departments AS d ON d.department_id = c.department_id\r\n	JOIN libraries AS l ON l.library_id = d.library_id\r\nWHERE t.term_id IN (!)\r\n	AND l.library_id IN (!)\r\n	AND d.status IS NULL	\r\nGROUP BY\r\n	t.term_year,\r\n	t.term_name,\r\n	l.library_id,\r\n	d.department_id\r\nORDER BY\r\n	t.term_year,\r\n	t.term_name,\r\n	l.name,\r\n	d.name	','term_id,library_id',4,1,1,6),(7,'Global: Items And Reserves','term_lib','SELECT\r\n	CONCAT(t.term_name, \' \', t.term_year) as Term,\r\n	l.name AS Library,\r\n	d.name AS Department,\r\n	i.item_group AS \'Item Type\',\r\n	COUNT(DISTINCT r.item_id) AS \'Utilized Items\',\r\n	COUNT(DISTINCT r.reserve_id) AS \'Available Reserves\',\r\n	COUNT(DISTINCT uvl.reserve_id) AS \'Opened Reserves\'\r\nFROM terms AS t\r\n	JOIN course_instances AS ci ON (ci.term = t.term_name AND ci.year = t.term_year)\r\n	JOIN reserves AS r ON r.course_instance_id = ci.course_instance_id\r\n	JOIN items AS i ON i.item_id = r.item_id\r\n	LEFT JOIN user_view_log AS uvl ON uvl.reserve_id = r.reserve_id\r\n	\r\n	JOIN course_aliases AS ca ON ca.course_alias_id = ci.primary_course_alias_id\r\n	JOIN courses AS c ON c.course_id = ca.course_id\r\n	JOIN departments AS d ON d.department_id = c.department_id\r\n	JOIN libraries AS l ON l.library_id = d.library_id\r\nWHERE t.term_id IN (!)\r\n	AND l.library_id IN (!)\r\n	AND d.status IS NULL\r\nGROUP BY\r\n	t.term_year,\r\n	t.term_name,\r\n	l.library_id,\r\n	d.department_id,\r\n	i.item_group\r\nORDER BY\r\n	t.term_year,\r\n	t.term_name,\r\n	l.name,\r\n	d.name,\r\n	i.item_group','term_id,library_id',4,1,1,6),(8,'Global: Upload Activity','term','SELECT\r\n	CONCAT(t.term_name, \' \', t.term_year) as Term,\r\n	CONCAT(u.last_name, \', \', u.first_name) AS User,\r\n	pl.label AS Role,		\r\n	COUNT(DISTINCT aud.item_id) AS \'Items Added\'\r\nFROM terms AS t\r\n	JOIN electronic_item_audit AS aud ON (aud.date_added BETWEEN t.begin_date AND t.end_date)\r\n	JOIN users AS u ON u.user_id = aud.added_by\r\n	JOIN permissions_levels AS pl ON pl.permission_id = u.dflt_permission_level\r\nWHERE t.term_id IN (!)\r\nGROUP BY\r\n	t.term_year,\r\n	t.term_name,\r\n	u.user_id\r\nORDER BY\r\n	t.term_year,\r\n	t.term_name,\r\n	\'Items Added\' DESC','term_id',4,1,0,0),(9,'Item View Log for a class by date','class','SELECT\r\n	i.title as \'Title\',\r\n	DATE(uvl.timestamp_viewed) AS \'Date\',\r\n	COUNT(uvl.user_id) as \'Total Hits\',\r\n	COUNT(DISTINCT uvl.user_id) as \'Unique Hits\'\r\nFROM course_instances AS ci\r\n	JOIN reserves AS r ON r.course_instance_id = ci.course_instance_id\r\n	JOIN items AS i ON i.item_id = r.item_id\r\n	JOIN user_view_log AS uvl ON uvl.reserve_id = r.reserve_id\r\nWHERE ci.course_instance_id = !\r\nGROUP BY r.reserve_id, \'Date\'\r\nORDER BY Title, \'Date\'','ci',4,2,0,0),(10,'Courses with active reserves','term','SELECT concat( \'<a href=\"https%3A%2F%2Fereserves.library.emory.edu%2Freserves2%2Findex.php%3Fcmd%3DeditClass%26ci%3D\', ci.course_instance_id, \'\" target=\"new\">edit class</a>\' ) AS link, u.last_name, u.first_name, ca.course_name\r\nFROM course_instances AS ci\r\nJOIN course_aliases AS ca ON ca.course_alias_id = ci.primary_course_alias_id\r\nLEFT JOIN access AS a ON ca.course_alias_id = a.alias_id\r\nAND a.permission_level = 3\r\nLEFT JOIN users AS u ON a.user_id = u.user_id\r\nJOIN terms AS t on ci.term = t.term_name AND ci.year = t.term_year\r\nWHERE t.term_id in (!)\r\nAND EXISTS (\r\nSELECT course_instance_id\r\nFROM reserves WHERE course_instance_id = ci.course_instance_id\r\n) ','term_id',4,0,1,600),(11,'New Items','term_dates','SELECT\r\n	CASE WHEN (c.uniform_title IS NOT NULL AND c.uniform_title <> \'\') THEN CONCAT(d.abbreviation, \' \', c.course_number, \' - \',  c.uniform_title) ELSE CONCAT(d.abbreviation, \' \', c.course_number, \' - \',  ca.course_name) END AS \'Course\',\r\n	ci.status AS \'Course Status\',\r\n	CASE WHEN i.mimetype REGEXP(\'[0-9]\') THEN CONCAT(i.item_group, \' (\', m.file_extentions, \')\') ELSE CONCAT(i.item_group, \' (\', i.mimetype, \')\') END AS \'Item Type\',\r\n	i.title AS \'Document Title\',\r\n	i.volume_title AS \'Work Title\',\r\n	i.ISBN,\r\n	i.OCLC,\r\n	i.ISSN,\r\n	i.pages_times AS \'Pages/Times\',\r\n	pl.label AS \'Added By\',\r\n	i.creation_date AS \'Date Created\',\r\n	CASE WHEN i.private_user_id IS NOT NULL THEN CONCAT(u.first_name, \' \', u.last_name) ELSE \'n/a\' END AS \'Private Owner\',\r\n	r.reserve_id AS \'Reserve ID\',\r\n	i.item_id AS \'Item ID\'\r\nFROM items AS i\r\n	JOIN reserves AS r ON r.item_id = i.item_id\r\n	JOIN course_instances AS ci ON ci.course_instance_id = r.course_instance_id\r\n	JOIN course_aliases AS ca ON ca.course_alias_id = ci.primary_course_alias_id\r\n	JOIN courses AS c ON c.course_id = ca.course_id\r\n	JOIN departments AS d ON d.department_id = c.department_id\r\n	LEFT JOIN mimetypes AS m ON m.mimetype_id = i.mimetype\r\n	LEFT JOIN users AS u ON u.user_id = i.private_user_id\r\n	LEFT JOIN electronic_item_audit AS eia ON eia.item_id = i.item_id\r\n	LEFT JOIN users AS u2 ON u2.user_id = eia.added_by\r\n	LEFT JOIN permissions_levels AS pl ON pl.permission_id = u2.dflt_permission_level\r\nWHERE r.activation_date BETWEEN ? AND ?\r\n	AND r.reserve_id = (\r\n		SELECT MIN(r2.reserve_id)\r\n		FROM reserves AS r2\r\n		WHERE r2.item_id = r.item_id\r\n	)\r\nORDER BY Course ASC','begin_date,end_date',4,3,1,6),(12,'Re-activated Items','term_dates','SELECT\r\n	CASE WHEN (c.uniform_title IS NOT NULL AND c.uniform_title <> \'\') THEN CONCAT(d.abbreviation, \' \', c.course_number, \' - \',  c.uniform_title) ELSE CONCAT(d.abbreviation, \' \', c.course_number, \' - \',  ca.course_name) END AS \'Course\',\r\n	ci.status AS \'Course Status\',\r\n	CASE WHEN i.mimetype REGEXP(\'[0-9]\') THEN CONCAT(i.item_group, \' (\', m.file_extentions, \')\') ELSE CONCAT(i.item_group, \' (\', i.mimetype, \')\') END AS \'Item Type\',\r\n	i.title AS \'Document Title\',\r\n	i.volume_title AS \'Work Title\',\r\n	i.ISBN,\r\n	i.OCLC,\r\n	i.ISSN,\r\n	i.pages_times AS \'Pages/Times\',\r\n	pl.label AS \'Added By\',\r\n	i.creation_date AS \'Date Created\',\r\n	CASE WHEN i.private_user_id IS NOT NULL THEN CONCAT(u.first_name, \' \', u.last_name) ELSE \'n/a\' END AS \'Private Owner\',\r\n	r.reserve_id AS \'Reserve ID\',\r\n	i.item_id AS \'Item ID\'\r\nFROM items AS i\r\n	JOIN reserves AS r ON r.item_id = i.item_id\r\n	JOIN course_instances AS ci ON ci.course_instance_id = r.course_instance_id\r\n	JOIN course_aliases AS ca ON ca.course_alias_id = ci.primary_course_alias_id\r\n	JOIN courses AS c ON c.course_id = ca.course_id\r\n	JOIN departments AS d ON d.department_id = c.department_id\r\n	LEFT JOIN mimetypes AS m ON m.mimetype_id = i.mimetype\r\n	LEFT JOIN users AS u ON u.user_id = i.private_user_id\r\n	LEFT JOIN electronic_item_audit AS eia ON eia.item_id = i.item_id\r\n	LEFT JOIN users AS u2 ON u2.user_id = eia.added_by\r\n	LEFT JOIN permissions_levels AS pl ON pl.permission_id = u2.dflt_permission_level\r\nWHERE r.activation_date BETWEEN ? AND ?\r\n	AND r.reserve_id <> (\r\n		SELECT MIN(r2.reserve_id)\r\n		FROM reserves AS r2\r\n		WHERE r2.item_id = r.item_id\r\n	)\r\nORDER BY Course ASC','begin_date,end_date',4,3,1,6),(13,'Item View Log','class','SELECT\r\n	i.title AS \'Title\',\r\n	COUNT(uvl.user_id) as \'Total Views\',\r\n	COUNT(DISTINCT uvl.user_id) as \'Total Students\'\r\nFROM course_instances AS ci\r\n	JOIN reserves AS r ON r.course_instance_id = ci.course_instance_id\r\n	JOIN items AS i ON i.item_id = r.item_id\r\n	LEFT JOIN user_view_log AS uvl ON uvl.reserve_id = r.reserve_id\r\nWHERE ci.course_instance_id = ! and i.item_type = \"ITEM\"\r\nGROUP BY r.reserve_id\r\nORDER BY i.title ASC','ci',4,3,0,0),(14,'Privately-owned Items','class','SELECT\r\n	i.title AS \'Document Title\',\r\n	i.volume_title AS \'Work Title\',\r\n	i.ISBN,\r\n	i.OCLC,\r\n	i.ISSN,\r\n	CASE WHEN i.mimetype REGEXP(\'[0-9]\') THEN CONCAT(i.item_group, \' (\', m.file_extentions, \')\') ELSE CONCAT(i.item_group, \' (\', i.mimetype, \')\') END AS \'Item Type\',\r\n	CONCAT(u.first_name, \' \', u.last_name) AS \'Private Owner\',\r\n	r.reserve_id AS \'Reserve ID\',\r\n	i.item_id AS \'Item ID\'\r\nFROM course_instances AS ci\r\n	JOIN reserves AS r ON r.course_instance_id = ci.course_instance_id\r\n	JOIN items AS i ON i.item_id = r.item_id\r\n	LEFT JOIN user_view_log AS uvl ON uvl.reserve_id = r.reserve_id\r\n	LEFT JOIN mimetypes AS m ON m.mimetype_id = i.mimetype\r\n	LEFT JOIN users AS u ON u.user_id = i.private_user_id\r\nWHERE ci.course_instance_id = !\r\n	AND i.private_user_id IS NOT NULL\r\nGROUP BY r.reserve_id\r\nORDER BY i.title ASC','ci',4,3,1,6),(15,'Daily Requests By Library','term_lib','\r\nSELECT l.nickname AS \'Library\', r.date_created AS \'Requested On\', count( i.item_id ) AS \'Num Items Requested\'\r\nFROM course_instances AS ci\r\nJOIN terms AS t ON ( ci.term = t.term_name\r\nAND ci.year = t.term_year )\r\nJOIN course_aliases AS ca ON ca.course_alias_id = ci.primary_course_alias_id\r\nJOIN courses AS c ON ca.course_id = c.course_id\r\nJOIN departments AS d ON d.department_id = c.department_id\r\nJOIN libraries AS l ON d.library_id = l.library_id\r\nJOIN reserves AS r ON ci.course_instance_id = r.course_instance_id\r\nJOIN items AS i ON r.item_id = i.item_id\r\nWHERE i.item_group <> \'ELECTRONIC\'\r\n    AND t.term_id IN (!)\r\n	AND l.library_id IN (!)\r\n	AND d.status IS NULL AND i.item_type = \'ITEM\'	\r\nGROUP BY l.nickname, r.date_created','term_id, library_id',4,0,1,6),(17,'Classes Needing Review','term','SELECT DISTINCT concat( \'<a href=\"index.php%3Fcmd%3DeditClass%26ci%3D\', ci.course_instance_id, \'\" target=\"new\">edit class</a>\' ) AS link, u.last_name, u.first_name, ca.course_name\r\nFROM course_instances AS ci\r\nJOIN course_aliases AS ca ON ca.course_alias_id = ci.primary_course_alias_id\r\nLEFT JOIN access AS a ON ca.course_alias_id = a.alias_id\r\nAND a.permission_level = 3\r\nLEFT JOIN users AS u ON a.user_id = u.user_id\r\nJOIN terms AS t on ci.term = t.term_name AND ci.year = t.term_year\r\nWHERE t.term_id in (!)\r\nAND ci.reviewed_date IS NULL\r\nAND EXISTS (\r\nSELECT course_instance_id\r\nFROM reserves WHERE course_instance_id = ci.course_instance_id\r\n) ','term_id',4,17,1,6),(18,'Reserves View Log','class','(\r\nSELECT course_aliases.course_instance_id FROM access JOIN course_aliases ON course_aliases.course_alias_id = access.alias_id\r\nJOIN course_instances ON course_aliases.course_instance_id = course_instances.course_instance_id \r\nJOIN terms ON course_instances.term = terms.term_name AND course_instances.year = terms.term_year\r\nWHERE access.user_id = ! AND terms.term_id = !','ci',3,0,1,6);
-UNLOCK TABLES;
-/*!40000 ALTER TABLE `reports` ENABLE KEYS */;
-
---
--- Table structure for table `help_art_to_role`
---
-
-DROP TABLE IF EXISTS `help_art_to_role`;
-CREATE TABLE `help_art_to_role` (
-  `article_id` int(8) unsigned default NULL,
-  `permission_level` tinyint(2) unsigned default NULL,
-  `can_view` tinyint(1) NOT NULL default '1',
-  `can_edit` tinyint(1) NOT NULL default '0',
-  UNIQUE KEY `ndx_uniq_combo` (`article_id`,`permission_level`),
-  KEY `permission_level` (`permission_level`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='Specifies if specific permission-level may view/edit the art';
-
---
--- Dumping data for table `help_art_to_role`
---
-
-
-/*!40000 ALTER TABLE `help_art_to_role` DISABLE KEYS */;
-LOCK TABLES `help_art_to_role` WRITE;
-INSERT INTO `help_art_to_role` (`article_id`, `permission_level`, `can_view`, `can_edit`) VALUES (15,1,0,0),(15,0,0,0),(14,3,1,0),(14,2,1,0),(13,3,1,0),(13,2,1,0),(13,1,0,0),(13,0,0,0),(6,3,1,0),(6,2,1,0),(12,0,0,0),(12,1,0,0),(12,2,1,0),(12,3,1,0),(6,1,1,0),(6,0,1,0),(14,0,0,0),(5,3,1,0),(5,2,1,0),(5,1,0,0),(5,0,0,0),(14,1,0,0),(11,0,0,0),(11,1,0,0),(11,2,1,0),(11,3,1,0),(15,2,1,0),(15,3,1,0),(16,0,0,0),(16,1,0,0),(16,2,1,0),(16,3,1,0),(17,0,0,0),(17,1,0,0),(17,2,1,0),(17,3,1,0),(18,0,0,0),(18,1,0,0),(18,2,1,0),(18,3,1,0),(19,0,0,0),(19,1,0,0),(19,2,1,0),(19,3,1,0),(20,0,0,0),(20,1,0,0),(20,2,1,0),(20,3,1,0),(21,0,1,0),(21,1,1,0),(21,2,1,0),(21,3,1,0),(22,0,1,0),(22,1,1,0),(22,2,1,0),(22,3,1,0),(23,0,0,0),(23,1,0,0),(23,2,1,0),(23,3,1,0),(40,0,1,0),(40,1,1,0),(40,2,1,0),(40,3,1,0),(25,0,0,0),(25,1,0,0),(25,2,1,0),(25,3,1,0),(26,0,0,0),(26,1,0,0),(26,2,1,0),(26,3,1,0),(27,0,1,0),(27,1,1,0),(27,2,1,0),(27,3,1,0),(28,0,0,0),(28,1,0,0),(28,2,1,0),(28,3,1,0),(29,0,0,0),(29,1,0,0),(29,2,1,0),(29,3,1,0),(30,0,0,0),(30,1,0,0),(30,2,1,0),(30,3,1,0),(31,0,0,0),(31,1,0,0),(31,2,1,0),(31,3,1,0),(32,0,0,0),(32,1,0,0),(32,2,1,0),(32,3,1,0),(33,0,0,0),(33,1,0,0),(33,2,1,0),(33,3,1,0),(34,0,0,0),(34,1,0,0),(34,2,1,0),(34,3,1,0),(35,0,0,0),(35,1,0,0),(35,2,1,0),(35,3,1,0),(36,0,0,0),(36,1,0,0),(36,2,1,0),(36,3,1,0),(38,0,0,0),(38,1,0,0),(38,2,1,0),(38,3,1,0),(39,0,0,0),(39,1,0,0),(39,2,1,0),(39,3,1,0),(41,0,0,0),(41,1,0,0),(41,2,1,0),(41,3,1,0);
-UNLOCK TABLES;
-/*!40000 ALTER TABLE `help_art_to_role` ENABLE KEYS */;
-
---
--- Table structure for table `permissions_levels`
---
-
-DROP TABLE IF EXISTS `permissions_levels`;
-CREATE TABLE `permissions_levels` (
-  `permission_id` int(11) NOT NULL default '0',
-  `label` varchar(25) NOT NULL default '',
-  PRIMARY KEY  (`permission_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `permissions_levels`
---
-
-
-/*!40000 ALTER TABLE `permissions_levels` DISABLE KEYS */;
-LOCK TABLES `permissions_levels` WRITE;
-INSERT INTO `permissions_levels` (`permission_id`, `label`) VALUES (0,'student'),(1,'custodian'),(2,'proxy'),(3,'instructor'),(4,'staff'),(5,'admin');
-UNLOCK TABLES;
-/*!40000 ALTER TABLE `permissions_levels` ENABLE KEYS */;
-
---
--- Table structure for table `help_categories`
---
-
-DROP TABLE IF EXISTS `help_categories`;
-CREATE TABLE `help_categories` (
-  `id` smallint(4) unsigned NOT NULL auto_increment,
-  `title` varchar(100) default NULL,
-  `description` tinytext,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `help_categories`
---
-
-
-/*!40000 ALTER TABLE `help_categories` DISABLE KEYS */;
-LOCK TABLES `help_categories` WRITE;
-INSERT INTO `help_categories` (`id`, `title`, `description`) VALUES (1,'Tutorials','Tutorials'),(2,'Adding Materials','Instructions on how to add reserve materials to courses.'),(3,'Managing Users','Managing your user profile & managing proxies.'),(4,'Contacts','Articles about how to contact staff for help with the system.'),(5,'Managing Courses','An overview of the \"My Courses\" tab options and how to manage individual courses.'),(6,'Viewing Statistics','About viewing statistics for a course.');
-UNLOCK TABLES;
-/*!40000 ALTER TABLE `help_categories` ENABLE KEYS */;
-
---
--- Table structure for table `terms`
---
-
-DROP TABLE IF EXISTS `terms`;
-CREATE TABLE `terms` (
-  `term_id` int(11) NOT NULL auto_increment,
-  `sort_order` int(11) NOT NULL default '0',
-  `term_name` varchar(100) NOT NULL default '',
-  `term_year` varchar(4) NOT NULL default '',
-  `begin_date` date NOT NULL default '0000-00-00',
-  `end_date` date NOT NULL default '0000-00-00',
-  PRIMARY KEY  (`term_id`),
-  KEY `sort_order` (`sort_order`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `terms`
---
-
-
-/*!40000 ALTER TABLE `terms` DISABLE KEYS */;
-LOCK TABLES `terms` WRITE;
-INSERT INTO `terms` (`term_id`, `sort_order`, `term_name`, `term_year`, `begin_date`, `end_date`) VALUES (1,1,'Fall','2004','2004-08-26','2004-12-18'),(2,2,'Spring','2005','2005-01-01','2005-05-31'),(3,3,'Summer','2005','2005-05-15','2005-08-16'),(4,4,'Fall','2005','2005-08-15','2005-12-31'),(6,6,'Spring','2006','2006-01-01','2006-05-16'),(7,7,'Summer','2006','2006-05-17','2006-08-16'),(8,8,'Fall','2006','2006-08-17','2006-12-31'),(9,9,'Spring','2007','2007-01-01','2007-05-16'),(10,10,'Summer','2007','2007-05-17','2007-08-16'),(11,11,'Fall','2007','2007-08-17','2007-12-31'),(12,12,'Spring','2008','2008-01-01','2008-05-16'),(13,13,'Summer','2008','2008-05-17','2008-08-16'),(14,14,'Fall','2008','2008-08-17','2008-12-31');
-UNLOCK TABLES;
-/*!40000 ALTER TABLE `terms` ENABLE KEYS */;
-
---
--- Table structure for table `help_articles`
---
-
-DROP TABLE IF EXISTS `help_articles`;
-CREATE TABLE `help_articles` (
-  `id` int(8) unsigned NOT NULL auto_increment,
-  `category_id` int(8) unsigned default NULL,
-  `title` varchar(100) default NULL,
-  `body` text,
-  `date_created` date default NULL,
-  `date_modified` date default NULL,
-  PRIMARY KEY  (`id`),
-  KEY `category_id` (`category_id`),
-  FULLTEXT KEY `body` (`body`),
-  FULLTEXT KEY `ft_title_body` (`title`,`body`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
---
--- Dumping data for table `help_articles`
---
-
-
-/*!40000 ALTER TABLE `help_articles` DISABLE KEYS */;
-LOCK TABLES `help_articles` WRITE;
-INSERT INTO `help_articles` (`id`, `category_id`, `title`, `body`, `date_created`, `date_modified`) VALUES (12,3,'Managing Instructors','Instructors have full ownership of their classes and may reactivate old classes, create new classes, and edit every aspect of the class and its associated reserve materials.<p>\r\n\r\nA class can have as many instructors as are necessary. This functionality is especially suited to team teaching situations. Each instructor has full access to the class to add and edit materials as well as all other class functions.<p>\r\n\r\n<b>To add an instructor to a class</b>:<br>\r\n1.  From the “My Courses” tab, click on the class you wish to edit.<br>\r\n2.  On the \"Edit Class\" screen, click on the \"Edit\" link to the right of “Instructor(s).” On the next screen, current instructors are listed on the right, and you may choose a new instructor by searching for either Last Name or Username in the box on the left. <br>\r\n3.  In the drop-down menu, choose the instructor you would like to add and click \"Add Instructor\".<p>\r\n \r\n<b>To remove an instructor</b>: 	<br>\r\nCheck the box next to the name of the instructor you wish to remove (on the right side of the screen) and click \"Remove Instructor.\"<p>\r\nIf you do not see the instructor you are looking for in the drop-down menu, they are not yet in the system. Please contact your Reserves Desk staff to add them to the list of instructors. (woodruff.reserves@gmail.com)','2006-11-30','2006-11-30'),(5,4,'Library Reserves Staff','ReservesDirect is a university-wide system used by all schools and departments. Each school and department has a designated library to provide assistance with setting up classes and managing your items.\r\n\r\n<p><strong>Emory College and Graduate School of Arts and Sciences:</strong><br>\r\neLearning and Reserves Services, Woodruff Library.<br>\r\n<a href=\"mailto:genrsrv@libcat1.cc.emory.edu\">genrsrv@libcat1.cc.emory.edu</a><br>\r\nTony Agnew, 404-727-2230, tagnew@emory.edu<br>\r\n<p><strong>Candler School of Theology:</strong><br>\r\nPitts Theology Library<br>\r\nNatalie Williams, natalie.williams@emory.edu\r\n</p>\r\n\r\n<p><strong>Chemistry Department:</strong><br>\r\nChemistry Library<br>\r\nBill Mason, 404-727-7658, wfmason@emory.edu\r\n</p>\r\n\r\n<p><strong>Music and Film Departments:</strong><br>\r\nHeilbrun Music and Media Library<br>\r\nColin Bragg, 404-727-1649, cbragg@emory.edu\r\n</p>\r\n\r\n<p><strong>Oxford College:</strong><br>\r\nHoke O\'Kelley Memorial Library<br>\r\nAndrea Heisel, 770-784-3881, andrea.heisel@emory.edu\r\n</p>\r\n\r\n<p><strong>Goizueta Business School:</strong><br>\r\nBusiness Library<br>\r\nMarilyn Pahr, 404-727-2979, mpahr@emory.edu\r\n</p>\r\n\r\n<p><strong>Health Sciences Center schools:</strong><br>\r\nWoodruff Health Sciences Center Library<br>\r\nGeorge Marshall, 404-727-5817, george.marshall@emory.edu\r\n</p>\r\n\r\n<p><strong>School of Law:</strong><br>\r\nMacmillan Law Library<br>\r\nFelicity Walsh, 404-727-8211, fwalsh@law.emory.edu\r\n</p>\r\n\r\n<p><strong>Health Sciences Center schools:</strong><br>\r\nWoodruff Health Sciences Center Library<br>\r\nGeorge Marshall, 404-727-5817, george.marshall@emory.edu\r\n</p>','2006-06-03','2007-07-09'),(6,4,'AAIT Help Desk','The AAIT Help Desk can assist with password or account problems, as well as Blackboard issues. To contact the Help Desk, call x7-7777 or visit the Help Desk web site at <a href=\"http://it.emory.edu/helpdesk.cfm\">http://it.emory.edu/helpdesk.cfm</a>','2006-06-04','2006-06-04'),(11,6,'About Viewing Statistics','From the “View Statistics” tab, you have the option to look at the “Item View Log for a class.”  When you click on this link, it will take you to a list of your classes.  Select the class you wish to view the statistics for and click “Continue.”<p>\r\n	\r\nThis screen will show you a list of the reserve items in the class that have been viewed (a student has clicked on the link to open that reserve item).  On the right-hand side, there are two columns: “Total Hits” and “Unique Hits.”<p>\r\n\r\n“Total Hits” tells you how many times that particular item has been opened.  “Unique Hits” tells you the number of individual students who have opened the item.  If a student has opened the item more than once, your “Total Hits” column will be greater than your “Unique Hits” column.','2006-11-30','2006-11-30'),(13,3,'Managing Proxies','Proxies are \"assistants\" to the class for the duration of the current semester or until they are removed by the instructor. They may do everything an instructor can do within a given class, except for create other proxies. Proxies only have access to the course or courses to which they are specifically assigned by an instructor or by Reserves staff.  You may have as many proxies as you like for any given class.<p>\r\n	\r\n<b>To add a Proxy</b>:<br>\r\n1.  From the “My Courses” tab, click on the class you wish to edit.<br>\r\n2.  On the \"Edit Class\" screen, click on the \"Edit\" link next to “Proxies.” On the next screen, current proxies are listed on the right.  You may search a list of all users in the system in the box on the left, using either Last Name or Username.<br>\r\n3.  The drop-down menu will fill with the names of users matching your search.<br>\r\n4.  Choose a name in the drop-down menu and click \"Add Proxy\"<p>\r\n\r\n<b>To remove a proxy</b>: <br>\r\n1.  Check the box next to the name of the proxy you wish to remove (on the right side of the screen) and click \"Remove Selected Proxies.\"<p>\r\n\r\nA person must have logged into ReservesDirect at least once to be available to be made a proxy. If the name of the person you are looking for does not appear in your search results, please ask the person to log into the system.','2006-11-30','2006-11-30'),(14,3,'Managing Users','The Manage Users tab allows you to do three things: manage your own user profile (name and email address); and add or delete proxies from your classes. Clicking on either the \"Add Proxy\" or \"Delete Proxy\" links on this page will take you to a screen that asks you to choose one of your current classes. You will then be taken to the Add/Remove proxy screen. For more about how to use this function, consult the \"Managing Proxies\" article.','2006-11-30','2006-11-30'),(15,2,'Adding New Materials','There are two ways you can add new materials to a class.<p>\r\n\r\n--From the Edit Class page, click on the “add new materials” link above the reserves list for the class.<br>\r\n--From the Add a Reserve tab, select the class you want to add the reserve to and click “continue”.<p>\r\n	\r\nEither option will take you to the same screen.  From here, you can add a reserve by searching for the item, uploading a document, adding a URL, or faxing a document.  For details on how to use these options, click the appropriate link in the “Follow-Up” help section.','2006-11-30','2006-12-13'),(16,2,'Adding a URL','You can also add a URL to your reserves list, which links the reserve list for your class to an item located on the web.  This feature is often used for items such as newspaper articles, scholarly articles on sites like JSTOR, or music and videos associated with a web address.<p>\r\n	\r\nTo add a URL to your reserves list, choose the “Add a URL” link from the main “Adding New Materials” page.  Then simply type (or cut & paste) the web address from the address bar of your browser into the “URL” box.<p>\r\n\r\n<b>Describing Your File</b><br>\r\nYou have a number of options for describing your file. The most basic descriptors are document title and author (title is required for display to students in the class). Title will display most prominently to students in the class; the other fields will appear below the title. When describing your documents, try to be as thorough as possible so that students can identify materials and cite them if necessary.<p>\r\n\r\nIf you are linking to one of multiple chapters from a book, it is generally best to put the chapter or movement title in the \"Title\" field and use the remaining fields to describe the main work that the selection is taken from.<p>\r\n\r\nThe various fields, such as Volume/Edition, can be used for different purposes depending on the type of document you are linking to (book chapter, journal article, musical work, etc.). The fields will accept whatever text you enter into them.<p>\r\n\r\nOnce you have finished describing your file, click “Save URL.”  The URL will now appear as a reserve item in your class.  When a student clicks on the title of the item in the reserves list, she will be taken to the linked URL page.<p>\r\n\r\n\r\n<b>Copyright</b><br>\r\nReservesDirect operates under the Fair Use provision of United States copyright law.  By clicking “Save Document” you acknowledge that you have read the library’s copyright notice and certify that to the best of your knowledge your use of the document falls within those guidelines.  Please be responsible in observing fair use when posting copyrighted materials. If you have questions about copyright and the materials you would like to use for your class, please contact the reserves staff at your library and consult your library\'s copyright policy.<p>\r\n\r\n<u>It is always preferable to link to a journal article rather than downloading it to your computer and then uploading it to the Reserves Direct system.</u>  If you need assistance creating a link to an article or other item, please contact the reserves staff at your library.  (woodruff.reserves@gmail.com)','2006-11-30','2006-11-30'),(17,2,'Faxing a Document','On the \"Add Reserve\" tab, when you click on the option to \"Fax a Document\", you will see a screen that gives you instructions for sending a fax to the ReservesDirect server. You do not have to go to this page first before you fax in a document; you can simply send faxes to 404-727-9089. The server will automatically convert your fax to an Adobe PDF and place it in a holding queue so that you can \"claim\" it and add it to one of your classes.<p>\r\n\r\n<b>Number of Faxed Pages & File Size</b><br>\r\nPlease limit your faxes to 25 sheets; faxes exceeding 25 will be split into separate files.<p>\r\n\r\n<b>Claiming Your Fax</b><br>\r\nYou must “claim” your fax once it has been transmitted to the system.  Faxed documents will remain available in the \"claim\" queue until midnight of the day that they are faxed in. At midnight all faxed documents are deleted.<p>\r\n\r\nTo view the fax queue, click on the button that says \"After your fax has finished transmitting, click here.\" This page displays all faxes that are currently waiting to be claimed. <p>\r\n\r\nYou can identify your fax by the number you faxed it from as well as the time stamp; you may also click the \"preview\" button to view your document.<p>\r\n\r\nCheck the box next to your document and click the \"Continue\" button.<p>\r\n\r\n<b>Describing Your File</b><br>\r\nYou have a number of options for describing your file. The most basic descriptors are title and author (title is required for display to students in the class). Title will display most prominently to students in the class; the other fields will appear below the title. When describing your documents, try to be as thorough as possible so that students can identify materials and cite them if necessary.<p>\r\n \r\nIf you are faxing more than one chapter from a book, it is generally best to put the chapter or movement title in the \"Title\" field and use the remaining fields to describe the main work that the selection is taken from.<p>\r\n\r\nThe various fields, such as Volume/Edition, can be used for different purposes depending on the type of document you are faxing (book chapter, journal article, musical work, etc.). The fields will accept whatever text you enter into them.<p>\r\n\r\n<b>Copyright</b><br>\r\nReservesDirect operates under the Fair Use provision of United States copyright law.  By clicking “Save Document” you acknowledge that you have read the library’s copyright notice and certify that to the best of your knowledge your use of the document falls within those guidelines.  Please be responsible in observing fair use when posting copyrighted materials. If you have questions about copyright and the materials you would like to use for your class, please contact the reserves staff at your library and consult your library\'s copyright policy.  (woodruff.reserves@gmail.com)<p>\r\n\r\n<u>Always include the original copyright notice and publication information for all articles and book chapters that you fax to the system.</u>  We recommend copying the title page and the copyright page from the front of a book or article.<p>\r\n\r\n<b>Availability of Materials</b><br>\r\nFaxed documents are converted to PDF and placed in the \"claim\" queue as soon as they are received by the server; by the time your fax machine prints a confirmation sheet, your document should be available to claim in ReservesDirect.<p>\r\n\r\nYour document will not be available to students until you claim it.<br>\r\nDocuments are available to students immediately upon being claimed by you.','2006-11-30','2006-11-30'),(18,2,'Uploading a Document','At the Upload a Document screen, you will see a form you must fill out with the citation information for the item you wish to upload.  Required fields are Document Title and File, but we encourage instructors to add as much bibliographic information as possible.  On this screen you can also write a note that will be appended to this item anytime it appears in the reserve list for the class.<p>\r\n\r\n	\r\n<b>Select a File</b><br>\r\nSelecting a file to upload is much like attaching a file to an email. To select a file, simply click on the \"Browse\" button next to the \"File\" field in the upload form. This will open a file browser window on your computer. Navigate to the file you wish to upload and select it. This will automatically fill in the file path on the upload form.<p>\r\n\r\n<b>File Type and Size</b><br>\r\nYou may upload any file type to ReservesDirect. The most common file types currently in use are Adobe Acrobat (PDF), Word (.doc), Excel (.xls), and PowerPoint (.ppt). You may also upload other popular files such as JPEG, TIFF, and mP3, as well as SPSS data sets and much more.<p>\r\n\r\nIf you would like to put sound or video on reserve, please make use of our streaming media services. For audio, contact the Helibrun Music and Media Library, genmus@libcat1.cc.emory.edu. For video, contact Andy Ditzler, aditzle@emory.edu.<p>\r\n\r\nWhen uploading PDFs, we recommend keeping file size to about 2 megabytes (2 MB)--or about 25 clear, clean sheets--to optimize downloading and printing times.<p>\r\n\r\nReservesDirect will accept files up to 10 megabytes (10 MB) in size.<p>\r\n\r\n<b>Copyright</b><br>\r\nReservesDirect operates under the Fair Use provision of United States copyright law.  By clicking “Save Document” you acknowledge that you have read the library’s copyright notice and certify that to the best of your knowledge your use of the document falls within those guidelines.  Please be responsible in observing fair use when posting copyrighted materials. If you have questions about copyright and the materials you would like to use for your class, please contact the reserves staff at your library and consult your library\'s copyright policy.  (woodruff.reserves@gmail.com)\r\n<p>\r\n\r\n<u>Always include the original copyright notice and publication information for all articles and book chapters that you upload to the system.</u>  We recommend copying the title page and the copyright page from the front of a book or article.<p>\r\n\r\n<b>Describing Your File</b><br>\r\nYou have a number of options for describing your file. The most basic descriptors are title and author (title is required for display to students in the class). Title will display most prominently to students in the class; the other fields will appear below the title. When describing your documents, try to be as thorough as possible so that students can identify materials and cite them if necessary.<p>\r\n \r\nIf you are uploading more than one chapter from a book, it is generally best to put the chapter or movement title in the \"Title\" field and use the remaining fields to describe the main work that the selection is taken from.<p>\r\n\r\nThe various fields, such as Volume/Edition, can be used for different purposes depending on the type of document you are uploading (book chapter, journal article, musical work, etc.). The fields will accept whatever text you enter into them.<p>\r\n\r\n<b>Availability of Materials</b><br>\r\nUploaded materials are available to your students as soon as you click \"Save Document\" and receive a confirmation that the upload was successful.<p>\r\n\r\nFor information on how to manipulate your reserve items once they are uploaded (for example, sorting materials or hiding them from student view for a period of time), see the topics under \"Editing a Class\".','2006-11-30','2006-11-30'),(19,2,'Searching for an Item','ReservesDirect has an Archive of over 70,000 items that have been digitized since electronic reserves began in 1999. The bulk of the content you will find here is articles and book chapters in PDF format, but the Archive also contains a good deal of streaming audio as well as documents in a variety of formats. You may search the entire Archive for materials suitable for your class.<p>\r\n\r\n	\r\n<b>You may search for an item in 3 ways.  You may search for Archived Materials, by Instructor, or through EUCLID.</b><p>\r\n\r\nSearching the Archived Materials will show you reserves that have previously been posted to the Reserves Direct system by other instructors, which you can add directly to your class.  You can search for these materials by title or by author by using the drop-down menu.  The author/title search is a keyword search that will return materials that have your search terms anywhere in the author or title.  You may view the reserve item by clicking on it.  If your search returns more than 20 results, navigate multiple pages of results by using the \"Next | Previous\" links.<p>\r\n\r\nSearching for materials by instructor will show you all the reserves that instructor has previously posted to the system.  Selecting an instructor’s name from the drop-down menu will take you to a list of their previous reserve materials, which you can then add directly to your class.  You may view the reserve item by clicking on it.  If your search returns more than 20 results, navigate multiple pages of results by using the \"Next | Previous\" links.<p>\r\n\r\nTo add an item to your class, click the check-box next to the item.  When you have selected all the items you wish to add to your class, click “Add Selected Materials.”  <b>Digital items</b> that you add to your class are immediately available for use by students, as long as the class is active for the current semester. <b>Physical materials</b> that you request by searching the archive generate a request that gets sent to Reserves staff for processing. Requests will show a status of \"In Process\" until the item has been retrieved by staff and successfully added to your class. Please allow time for staff to retrieve the item from the shelves and add it to your class. Some items may take longer to obtain if they must be recalled from another patron. If you have questions about the availability of an item, please contact Reserves staff at your library.<p>\r\n\r\nYou can also search for materials through EUCLID by clicking on the link at the bottom of the screen.  This will take you directly to the EUCLID system.<p>\r\n\r\nOnce you have located the item you wish to place on reserve, click the “Request” button at the bottom of the screen.  You will then be prompted to enter your Emory ID number.  At the following screen, click on “Woodruff Reserve—Instructor Use Only.”  Fill out the form on the next screen, including whether you would like the item to be placed on physical reserve at the reserve desk in the library and/or if you would like it to be placed on electronic reserve in the Reserves Direct system.  Then click “Submit Request.”','2006-11-30','2006-11-30'),(20,2,'Copying Materials to Another Class','From the “Edit Class” page that appears when you click on the name of one of your classes, you can select reserve items to copy to another class.<p>\r\n	\r\nSelect the items you wish to copy by checking the box to the right of the item(s).  When you have finished selecting the materials to be copied, click the box that says “Copy Selected to Another Class.”<p>\r\n\r\nOn the next page, choose the class into which you wish to copy the materials by selecting the bullet to the left of the class name.  Then click “Continue.”<p>\r\n\r\nThe reserve items should then appear in the new class exactly as they appeared in the class from which you copied them.','2006-11-30','2006-12-04'),(21,2,'Copyright Policy','ReservesDirect operates under the Fair Use provision of United States copyright law. <b>Please be responsible in observing fair use when posting copyrighted materials.</b> If you have questions about copyright and the materials you would like to use for your class, please contact the reserves staff at your library and consult your library\'s copyright policy. (woodruff.reserves@gmail.com)<p>\r\n\r\n<u>Always include the original copyright notice and publication information for all articles and book chapters that you add to the system.</u>  We recommend copying the title page and the copyright page from the front of a book or article.<p>\r\n	\r\nNB: It is always better to link to an article in a database (e.g. – JSTOR, EBSCO, etc.) than to download it to your computer and re-upload it to the system.  If you need assistance creating a stable link to an article for your class, please contact the reserves staff.<p>\r\n\r\nFind out more about Fair Use \r\n<a href=http://web.library.emory.edu/services/circulation/reserves/copyright.html>here.</a>','2006-11-30','2006-11-30'),(22,5,'Working with the My Courses tab/list','The \"My Courses\" tab is the main control screen for setting up your classes and managing your reserves lists. The “My Courses” tab automatically displays all of the classes for which you are the instructor or proxy and any classes in which you are currently enrolled.  You can switch between viewing classes you are teaching and classes in which you are enrolled by clicking on the tabs.  You can also click on the circles next to each semester in the “You are teaching:” tab to view your classes for that semester.<p>\r\n\r\nIn the “You are enrolled in:” tab, you can join a class or leave a class by clicking on the appropriate option in the upper right-hand corner.<p>\r\n	\r\nIn the “You are teaching:” tab, the icon next to each class identifies its current status in the system.  A pencil icon means that the class is active (students can enroll in the class and view the reserves).  A triangle/exclamation point icon means that the class has been created by the registrar but is not yet active in the system (students cannot enroll in the class or view the reserves).  An unavailable icon means that the course has been cancelled by the registrar.<p>\r\n\r\nThe right-hand column next to a class identifies its enrollment status.  If a class is listed as OPEN, students may look up the class and join it (in the Reserves Direct system only—not through the registrar).  If the class is listed as MODERATED, students may request to be added to the class, but must be approved by the instructor or proxy before gaining access to it.  If the class is listed as CLOSED, students may not join the class and may not request to be added.<p>\r\n\r\nClicking on the name of a class in the “You are teaching:” tab will redirect you to the Edit Class page.  Clicking on the name of a class in the “You are enrolled in:” list will take you to the reserves list for that class.','2006-11-30','2006-11-30'),(23,5,'Editing a Class','Clicking on the name of a class in the “You are teaching:” tab will redirect you to the Edit Class page.  This screen shows you all the materials you have placed on reserve for the class.  This is the main screen you will use to edit, add, and remove materials and information pertaining to the class.  You can also view enrollment for the class by clicking on the “Enrollment” tab.','2006-11-30','2006-11-30'),(25,5,'Creating a New Class','Creating a new class to add reserves to is a quick and easy process.<p>\r\n \r\n1.  Simply click on the \"Create New Class\" link.<br>\r\n2.  Choose the Department of the course from the drop-down menu and fill in the course number, section, and course name as they appear in OPUS.<br>\r\n3.  Select the semester you will be teaching the course (you may choose the current semester, next semester, or either of the 2 following semesters).<br>\r\n4.  Click \"Create Course.<p>\r\n\r\nYour course has been established and you are now ready to begin adding materials. Follow the links provided to begin adding materials or just click on the \"Add a Reserve\" tab.','2006-11-30','2006-11-30'),(26,5,'Reactivating a Class','At the end of each semester, all classes in ReservesDirect are archived for future use. You can view a list of all your past classes by clicking on the \"Reactivate Class\" link on the \"My Courses\" tab.<p>\r\n\r\n1.  To see what the reserve list for any of your courses was click on the \"preview\" link.<br> \r\n2.  After determining which class you would like to reactivate, select the bullet to the left of it and click “Continue.”<br>\r\n3.  Select the name of the class you will be teaching in the current or upcoming semester.  If the class name does not appear, click the “Create New Class” link.<br>\r\n4.  On the next screen, by default, all of the boxes next to reserve items will be checked.  If the box next to an item is checked, it will reactivate with the class.  De-select any materials you do not want imported from the last time the class was taught.<p>\r\n\r\nYour class will now be set up to become active on the first day of the semester you specified with all imported class materials appearing as they did the last time you taught the class. Requests to add physical items that are in the reserve list will be sent to Reserves staff to process. Please allow some time for physical materials to be retrieved from the shelves or recalled from other patrons who may have the materials checked out.','2006-11-30','2006-11-30'),(27,5,'Joining or Leaving a Class','<b>Joining Classes</b><br> \r\nTo join a class, simply click on the \"Join a Class\" link on the right-hand side of the “You are enrolled in:” screen under the “My Courses” tab. Lookup your class by instructor or department.  When searching by instructor name, use the drop-down list to find instructor names matching your search.  The search results screen will display all classes active for the current semester. Find your class and select the bullet to the left of the class name.  You may preview classes by clicking on the “preview” link on the right-hand side of the class name.  When you have selected your class, click “Continue.”  If the class enrollment status is Open, it will appear immediately in the “You are enrolled in:” list.  If the class enrollment is Moderated, the class will appear as pending approval in the “You are enrolled in:” list.<p>\r\n\r\n<b>Leaving Classes</b><br> \r\nTo leave class you are enrolled in, just click on \"Leave a Class\" from the “You are Enrolled in:” screen under the “My Courses” tab.  Select the bullet to the left of the class you would like to leave.  Then click “Continue.” You may not leave any classes for which you are the instructor or proxy. These will automatically disappear from your list after the class expiration date.','2006-11-30','2006-11-30'),(28,5,'Previewing a Class & Previewing Student View','Anytime you reactivate a class, export a class, or add a reserve, you have the option to preview the classes in the list by clicking on the “preview” link to the right of the class.  Doing so will open a new window that shows you the reserve list for that class.<p>\r\n	\r\nTo preview the student view for a class you are teaching, select that class from the “My Courses” list and then click the link in the upper right-hand corner that says “Preview Student View.”  A new window will open that shows you the reserve list for that class as the students in the class will see it.','2006-11-30','2006-11-30'),(29,5,'Editing Cross-Listings','You may crosslist classes under multiple course names and numbers to reflect the crosslistings that appear in OPUS. For example, ILA 135 may be crosslisted with ARTH 110.<p>\r\n\r\nTo create a crosslisting, click on the course you wish to edit from the “My Courses” tab if one of the crosslisted classes already exists in ReservesDirect. If none of the crosslisted classes exist yet, first create a class and then select the class you just created from the “My Courses” tab.<p>\r\n\r\nOn the \"Edit Class\" screen you will see a list of all current Crosslistings for the class.<p>\r\n\r\nClick on the “Edit” link next to “Crosslistings” to create a new crosslisting (or delete an old one).<p>\r\n\r\nThis screen will show you the primary listing for the class and all current crosslistings under the \"Class Title and Crosslistings\" box, where you may edit the title and course number/section of existing crosslistings.<p>\r\n\r\n<b>To add a new crosslisting</b>:<br>	\r\n1.  Select the Department of the crosslisting from the drop-down menu in the \"Add New Crosslisting\" box and enter the number, section, and title of the crosslisting.<br> \r\n2.  Click on \"Add Crosslisting\"\r\nThe crosslisting will immediately be available for students to add to their list of classes.<p>\r\n\r\nNote: You may not delete a crosslisting if any students have added it to their list of classes. If you try to do so, an error message will appear informing you that students are currently \"enrolled\" in the class.','2006-11-30','2006-11-30'),(30,5,'About Class Enrollment','To manage your class enrollment, click on the “Manage Class Enrollment” link under the “My Courses” tab.  Then select the class you wish to manage.  Alternatively, you may select a class from the “My Courses” home and then click on the “Enrollment” tab located next to the “Course Materials” tab.<p>\r\n	\r\nOn the “Enrollment” screen you can adjust the enrollment status of the class.  If a class is listed as OPEN, students may look up the class and join it (in the Reserves Direct system only—not through the registrar).  If the class is listed as MODERATED, students may request to be added to the class, but must be approved by the instructor or proxy before gaining access to it.  If the class is listed as CLOSED, students may not join the class and may not request to be added.<p>\r\n\r\nTo add a student to the class (to give a student access to the reserves list for that class) simply type either the student’s name or Emory username into the box.  The box will produce a list of auto-completed names as you type; you may select the name from the drop-down list once you have located the student you wish to add.  Then click “Add Student to Roll.”  The student should immediately gain access to the class.<p>\r\n\r\nIf a student has requested to be added to the class, a notice will appear next to the “Enrollment” tab for that class that says “! students requesting to join class !”   At the “Enrollment” tab, you may approve or deny students to join the class.  You can approve or deny them individually or all at once by clicking the appropriate link.<p>\r\n\r\nYou may also remove students from the class by clicking the “remove” link next to their names under the “Currently enrolled in this class” list on the “Enrollment” tab.  If a student was automatically added to the class by the registrar, you cannot remove them from the class in Reserves Direct.','2006-11-30','2006-11-30'),(31,5,'Exporting a Class','You may export your reserves list for any of your classes to Blackboard, Learnlink, or to a personal web page. Exporting your reserve list involves pasting a piece of code into the Blackboard class or page where you want your reserves list to appear. This creates a live feed of the list into your Blackboard class (through RSS), which is updated automatically. Any changes that are made to your list in ReservesDirect appear instantly in Blackboard.<p>\r\n\r\n<b>To export your class from the Manage Classes tab:</b><br>\r\n1.  Click on \"Export Class\" under the “My Courses” tab.  (Alternatively, if you are in the “Edit Class” view, you can click the link in the upper right-hand corner that says “Export Readings to Courseware.”)  Select where you would like to export your reserves to (Blackboard, Learnlink, or a personal web page).<br> \r\n2.  Follow the on-screen instructions.','2006-11-30','2006-11-30'),(32,5,'Exporting a Class to Spreadsheet','To export a class to spreadsheet, simply click on the name of the class from the “My Courses” tab.  Then click on the link in the upper right-hand side of the page that says “Export Class to Spreadsheet.”  A window will pop up asking whether you want to open or save the file.  Choose which one you want to do and the file will appear on your computer.','2006-11-30','2006-11-30'),(33,5,'Editing Materials','After you add an item to your class, you may edit all of the information associated with the item (author, title, etc.) and add notes to the item that will display to students in the class. Your reserve list is yours to edit as you wish. The changes that you make will not affect any other instructor\'s class, even if they are using the same items. When the class is over, your reserve list will be archived just as it appears at the end of the semester. When you reactivate the class the next time you teach it, your reserve items and notes will appear exactly as you left them.<p>\r\n\r\n<b>Editing Item Information</b><br>\r\nThere are two options that allow you to edit materials from the reserve list.  You can either click on the pencil icon to the right of the item, or you can select the check-box to the right of the item and then click “Edit Selected” at the bottom of the page.  This will take you to the \"Edit Item\" screen, where you have access to all the fields you can use to identify the item to students, including title, author, performer, and other standard citation information.<p>\r\n\r\nWhen editing an individual item, you may edit all of the fields associated with that item.  In addition to the standard descriptive fields, you can also change its Status, Active Dates, Current Heading, Document Type Icon, and Item Source, as well as add or edit a Note.<p>\r\n\r\nSome fields may have been filled in when the item was created, others may be blank. All of the information in these fields will display to your students, so it is best to describe each item in the fullest way so that students will be able to find and identify items quickly and easily.<p>\r\n\r\n<b>To edit item information</b>:<br> \r\n1.  Edit the text that is in the box or enter new text. <br>\r\n2.  Click \"Save Changes\". Your changes will appear immediately and display to you on the \"Edit Class\" screen.<p>\r\n\r\nIf an item’s status is listed as Active, it will appear to the students in the class.  If it is Inactive, it will not appear to students.  An item is Active during the period of its Active Dates.  By default, this is set to the length of the semester for the class, but you may change these dates by adjusting the Active Dates boxes.<p>\r\n\r\nIf you have created Headings for your reserve list, you can change the heading under which an item appears by selecting it from the drop-down list.<p>\r\n\r\nYou may change the icon that appears next to the reserve item by selecting from the “Document Type Icon” drop-down list.<p>\r\n\r\nIf you wish to upload a new document or change the URL of a document, you may do so by selecting the appropriate bullet and filling in the information box that appears.<p>\r\n\r\nIn addition to editing information about your reserve items, you may add notes that display to students in the class. For example, you may wish to tell students to \"Read this item before the second class meeting\" or to \"Skim the first ten pages of this reading but take careful notes on the last five pages.\"<p>\r\n\r\n<b>To add a note</b>:<br>\r\n1.  Click on the \"Add Note\" button near the bottom of the \"Edit Item\" screen.<br>\r\n2.  In the pop-up window, enter the text of the note you wish to add. NOTE: If you have a pop-up blocker enabled, you must either disable it or add ereerves.library.emory.edu as an \"allowed\" site in your browser preferences.<br>\r\n3.  Click the \"Add Note\" button in the pop-up window. Your note will appear on the \"Edit Item\" screen.<br>\r\n4.  Click \"Save Changes\" on the \"Edit Item\" screen. Your note will appear immediately to students.','2006-11-30','2006-12-13'),(41,5,'Editing Multiple Items','If you wish to edit multiple reserve items at the same time, use the check-box option and choose all of the reserve items you wish to edit, then click the \"Edit Selected\" button at the bottom of the list of readings.  <p>\r\n\r\nNote that if you select the checkbox for a heading and then click \"Edit Selected\", you will be editing all items that are contained within that heading. <p>\r\n\r\nEditing multiple items at the same time means that whatever values you enter into their information fields will appear identical for each of the individual items.  When editing multiple items, you are only able to edit the following fields: Status, Active Dates, Heading, and Note.<p>\r\n\r\n<b>To Edit Multiple Items</b><br/>\r\n1. On the Edit Multiple Items screen, select the checkbox next to the field you want to change (for example, to change the dates for all items you are editing, select the check box next to the \"Active Dates\" field). Selecting the checkbox will make the field editable. <br>\r\n2. Set the values for the field (in this example, pick the new dates you want readings to be available).<br>\r\n3. Click the \"Submit Selected Changes\" box.','2006-12-13','2006-12-13'),(34,5,'Sorting the Main List','You may sort the items in your reserve list by title, author, or by a custom order of your choosing, such as syllabus order. You may also add headings to further divide your class into syllabus order or subject/topic area.<p>\r\n\r\n<b>To sort by author or title</b>:<br>\r\n1.  From the “My Courses” tab, select the class you wish to sort.  Then click on the \"Sort Main List\" link just above the reserve list.<br>\r\n2.  On the sort screen, click on \"title\" or \"author\" in the \"Sort By\" box. The list will automatically sort by title or author.<br>\r\n3.  Click \"Save Order\" to save the new order.<p>\r\n\r\n<b>To sort materials in a custom order</b>:<br>\r\n1.  Go to the sort screen as described in step 1 above.<br>\r\n2.  On the right side of your readings, you will see boxes with numbers inside of them. These are the \"sort order\" your readings appear in.<br> \r\n3.  To change the position of a reading, simply type the new position number into the text box and hit the \"Tab\" key or click in a new box. The order number of all of the readings will automatically update to reflect the change.<br>\r\n4.  Continue assigning numbers to the readings. If you make an error and would like to put the readings back in their original positions, you may do so by clicking \"Reset to Saved Order.\"<br>\r\n5.  When you are finished, click \"Save Order.\"<p>\r\n\r\n<b>Sorting headings</b>:<br>\r\n1.  Headings show up in the reserve list as a divider with text in it. To position your heading where you want it to appear (for instance, above all the Week 1 readings), click on the \"sort\" link. You may use the custom sort numbers (described above) to position the heading wherever you want.<br>\r\n2.  If you have added reserve items to a heading, they will automatically be moved with their associated heading whenever you rearrange the sort order of the heading.  To rearrange the sort order of items within a heading, click on the stacked-paper “Sort” icon next to the heading and sort the items as described above.','2006-11-30','2006-12-04'),(35,5,'Adding Headings','Headings help organize your list of materials into topics or weeks. Headings can stand alone, or you can add items to them.  You can use any heading you want that you think would be useful to your students in identifying a group of readings that belong together, e.g. \"Week 1\" or \"Byzantium\".<p>  \r\n	\r\nTo add a heading to your reserve list for a class, select that class from the “You are Teaching:” list in the “My Courses” tab and click on the link that says “Add New Heading.”  Type the name of the heading into the box and click “Save Heading.”<p>\r\n\r\nTo add an item to a heading (like you would to a folder), go to the Edit Class screen, check the box next to the items to add to the heading, and click “Edit Selected.”  On the “Edit Multiple Reserves” screen, select which heading to add the materials to and click the \"Submit\" button.  Those items will then appear under the heading you have chosen.  When sorting the main list, any files that are listed under a separate heading will act like “files” within the “folder” of the heading.<p>\r\n\r\nYou may edit an existing heading by selecting the check box next to it or by clicking the pencil icon next to it.  You may also add a note to headings in the same way you can add a note to reserve items.  For example, you could add a note that says “All of the readings for this week are required.”  You may continue adding as many headings as you like and positioning them in your list of materials.  For information on positioning headings in the reserve list, consult the “Sorting the Main List” help article.','2006-11-30','2006-11-30'),(36,5,'Hiding Items from Student View','You can \"hide\" items from student view and have them automatically appear to the whole class on a given date. For example, if you had a number of take-home tests for the class and only wanted the students to have access to them during the week of the test, you could upload all of the tests at once and set dates for each one to appear to the students. You can also hide readings or labs until the week they will be covered in class if you do not want students to work ahead. By default, all items have an Activation Date of the first day of the semester.<p>\r\n\r\n<b>To hide an item</b>:<br>	\r\n1.  From the “My Courses” tab, click on the class you wish to edit.<br>\r\n2.  This will take you to the \"Edit Class\" screen, where you will see a list of all your reserve items. Check the box(es) next to the item(s) you wish to hide and click “Edit Selected.”<br> \r\n3.  Enter the date you want the item to appear to students in the \"Activation Date\" “From:” field in the format YYYY-MM-D. This date must fall during the current semester.  Enter the date you want the item to disappear in the “To:” field.  Clicking the “Reset Dates” link will reset the dates to the start and end of the semester during which that class takes place.','2006-11-30','2006-12-15'),(38,5,'Deleting Materials','From the “Edit Class” page that appears when you click on the name of one of your classes, you can select reserve items to delete.<p>\r\n	\r\nSelect the items you wish to delete by checking the box to the right of the item(s).  When you have finished selecting the materials to be deleted, click the box that says “Delete Selected.”<p>\r\n\r\nThe reserve items will then be permanently deleted from the class and will not appear in the reserve list.','2006-11-30','2006-11-30'),(39,5,'Highlighting Reserve Links','To highlight reserve links in a class, select that class from the “You are Teaching:” list in the “My Courses” tab and click on the link that says “Highlight Reserve Links.”  All of the links to your reserve items will then be highlighted in yellow.  You may use this function to help locate the URL for items in order to copy & paste them into an email, Blackboard, etc.','2006-11-30','2006-12-04'),(40,2,'Contact the Reserves Desk','For questions or assistance using ReservesDirect, please send email to genrsrv@libcat1.cc.emory.edu','2006-12-06','2007-06-27');
-UNLOCK TABLES;
-/*!40000 ALTER TABLE `help_articles` ENABLE KEYS */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
