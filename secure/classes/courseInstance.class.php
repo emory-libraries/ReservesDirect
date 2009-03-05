@@ -142,12 +142,12 @@ class courseInstance
 
 		$row = $rs->fetchRow();
 			$this->primaryCourseAliasID	= $row[0];
-			$this->term					= $row[1];
+			$this->term					= strtoupper($row[1]);
 			$this->year					= $row[2];
 			$this->activationDate		= $row[3];
 			$this->expirationDate		= $row[4];
-			$this->status				= $row[5];
-			$this->enrollment			= $row[6];
+			$this->status				= strtoupper($row[5]);
+			$this->enrollment			= strtoupper($row[6]);
 			$this->reviewedOn			= $row[7];
 			$this->reviewedBy			= $row[8];
 	}

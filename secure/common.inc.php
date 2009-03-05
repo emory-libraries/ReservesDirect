@@ -230,19 +230,18 @@ function common_getStatusStyleTag($status)
 		break;
 
 		case 'INACTIVE':
+		case 'UNAVAILABLE':
 			$statusTag = 'inactive';
 		break;
 
 		case 'IN PROCESS':
 		case 'HIDDEN':
-		case 'RUSH':
-		case 'PULLED':
-		case 'CHECKED OUT':
+		case 'SEARCHING STACKS':
 		case 'RECALLED':
 		case 'PURCHASING':
-		case 'REQUESTED':
-		case 'MISSING':
-		case 'AWAITING REVIEW':
+		case 'RESPONSE NEEDED':
+		case 'SCANNING':
+		case 'COPYRIGHT REVIEW':
 			$statusTag = 'inprocess';
 		break;
 		

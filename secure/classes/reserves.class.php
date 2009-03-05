@@ -438,6 +438,12 @@ class reserve extends Notes {
 		{
 			global $g_dbConn;
 	
+			if (strtoupper($status) == 'DENIED_ALL')
+			{
+				$this->item->setStatus('DENIED');
+				$status = "DENIED"; //denied all is not a valid reserve status and is used to indicate denial at the item level.  Change to denied to update reserve
+			}
+			
 			switch ($g_dbConn->phptype)
 			{
 				default: //'mysql'

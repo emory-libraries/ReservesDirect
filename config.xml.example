@@ -41,6 +41,16 @@ http://www.reservesdirect.org/
         <debug>true</debug>
     </database>
     
+    <test_database comment="This information is required to run automated tests.  Testing is destructive of data and requires an indepentent database">
+        <dbtype>mysql</dbtype>
+        <username comment="Max length is 16 characters">CHANGEME</username>
+        <pwd>CHANGEME</pwd>
+        <host>localhost</host>
+        <dbname>CHANGEME</dbname>
+        <ssl>true</ssl>
+        <debug>true</debug>
+    </test_database>    
+    
     <ils>
     	<class_name>RD_Ils_EuclidTest</class_name><!-- Class returned by init ILS -->
     	<view_path></view_path>

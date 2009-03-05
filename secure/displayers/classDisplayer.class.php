@@ -956,7 +956,7 @@ class classDisplayer extends baseDisplayer {
 		echo "	<tr><td colspan=\"3\">&nbsp;</td></tr>\n";
 		echo "	<tr><td colspan=\"3\"><strong>To Remove a Proxy:</strong><br>\n";
 		echo "			<ol><li>Under the \"Current Proxies\" list, check the box next to the name of the proxy you wish to remove.</li>\n";
-		echo "				<li>Click the \"Delete Proxy\" button.</li>\n";
+		echo "				<li>Click the \"Remove Selected Proxy\" button.</li>\n";
 		echo "			</ol>\n";
 		echo "		</td></tr>\n";
 		echo "	<tr><td colspan=\"3\">&nbsp;</td></tr>\n";

@@ -628,21 +628,19 @@ class reservesManager
 								$reserve->destroy();
 							}
 
-							if (isset($_REQUEST['copyright_deny_class']))
+							if (isset($_REQUEST['copyright_deny_class']) || isset($_REQUEST['copyright_deny_all_classes']))
 							{
-								//flag for this class only
 								//physical items cant be denied copyright	
-								if (!($reserve->item->isPhysicalItem() || $reserve->getStatus() == 'IN PROCESS')) {
+								if (!$reserve->item->isPhysicalItem()) {
 									$reserve->setStatus('DENIED');
 								}
-							}
-							
-							if (isset($_REQUEST['copyright_deny_all_classes']))
-							{
-								//flag item and disable all usage
-								//physical items cant be denied copyright	
-								if (!($reserve->item->isPhysicalItem() || $reserve->getStatus() == 'IN PROCESS')) {
-									$reserve->item->setStatus('DENIED');
+								
+								//if request exists and is not processed set as processed
+								$request = new request();
+								$request->getRequestByReserveID($reserve_id);
+								if (is_null($request->processedDate))
+								{
+									$request->setDateProcessed(date('Y-m-d'));
 								}
 							}
 							

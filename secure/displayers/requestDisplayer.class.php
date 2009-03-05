@@ -48,7 +48,7 @@ class requestDisplayer extends noteDisplayer {
 						
 						ajax_transport(url, notice);
 				  }
-			  </script>
+			 </script>
 		\n";
 		
 		
@@ -59,20 +59,41 @@ class requestDisplayer extends noteDisplayer {
 
 		echo "	<form action=\"index.php?cmd=displayRequest\" method=\"POST\">\n";
 		echo "	<tr><td valign=\"top\">\n";
-		echo "		<font color=\"#666666\"><strong>View Requests for </strong></font>\n";
+		echo "		<font color=\"#666666\"><strong>Filter Unprocessed Requests: </strong></font>\n";
+		echo "			<br/>\n";
+		echo "			<div style='margin-left: 10px; margin-top: 5px;'>\n";
 		echo "			<select name=\"unit\">\n";
-		echo "				<option value=\"all\">Show All Requests</option>\n";
+		echo "				<option value=\"all\">All Libraries</option>\n";
 
 		$currentUnit = isset($request['unit']) ? $request['unit'] : $user->getStaffLibrary();
 		foreach ($libList as $lib)
 		{
 			$lib_select = ($currentUnit == $lib->getLibraryID()) ? " selected " : "";
-			echo "				<option $lib_select value=\"" . $lib->getLibraryID() . "\">" . $lib->getLibraryNickname() . "</option>\n";
+			echo "				<option $lib_select value=\"" . $lib->getLibraryID() . "\">" . strtoupper($lib->getLibraryNickname()) . "</option>\n";
 		}
 		echo "			</select>\n";
+		echo "			</div>\n";
+
+		echo "			<div style='margin-left: 10px;'>\n";	
+
+		$filter = (!isset($request['filter_status'])) ? "INPROCESS" : str_replace(' ', '', strtoupper($request['filter_status']));
+		$$filter = ' SELECTED ';	
+		echo "			<select name='filter_status'>\n";
+		echo "				<option {$INPROCESS} value='IN PROCESS'>IN PROCESS</option>\n";
+		echo "				<option {$COPYRIGHTREVIEW} value='COPYRIGHT REVIEW'>COPYRIGHT REVIEW</option>\n";
+		echo "				<option {$PURCHASING} value='PURCHASING'>PURCHASING</option>\n";
+		echo "				<option {$RECALLED} value='RECALLED'>RECALLED</option>\n";
+		echo "				<option {$RESPONSENEEDED} value='RESPONSE NEEDED'>RESPONSE NEEDED</option>\n";
+		echo "				<option {$SCANNING} value='SCANNING'>SCANNING</option>\n";		
+		echo "				<option {$SEARCHINGSTACKS} value='SEARCHING STACKS'>SEARCHING STACKS</option>\n";
+		echo "				<option {$UNAVAILABLE} value='UNAVAILABLE'>UNAVAILABLE</option>\n";
+		echo "				<option {$ALL} value=\"all\">All Unprocessed Requests</option>\n";		
+		echo "			</select>\n";			
+						
 		echo "			<input type=\"submit\" value=\"Go\">\n";
+		echo "			</div>\n";
 		echo "		</td>\n";
-		echo "		<td bgcolor=\"#CCCCCC\" class=\"borders\"><span class=\"strong\">";
+		echo "		<td bgcolor=\"#CCCCCC\" class=\"borders\"><span class=\"strong\" style='margin-left: 5px;'>";
 		echo "			Sort by:</span> ";
 		echo "				[ <a href=\"index.php?cmd=". $request['cmd'] . "&unit=". $request['unit'] ."&sort=date\" class=\"editlinks\">Date/ID# </a>] ";
 		echo "				[ <a href=\"index.php?cmd=". $request['cmd'] . "&unit=". $request['unit'] ."&sort=class\" class=\"editlinks\">Class</a> ] ";
@@ -92,10 +113,12 @@ class requestDisplayer extends noteDisplayer {
 		echo "	</td>\n";
 		echo "</tr>\n";		
 
-		if (is_array($requestList) && !empty($requestList))
+		if (count($requestList) > 0)
+		{
 			requestDisplayer::displayRequestList($requestList);
-		else 
-			echo "<tr><td>No Request to process for this unit.</td></tr>";
+		} else {
+			echo "<tr><td>No " . $request['filter_status'] . " Request to process for this unit.</td></tr>";
+		}
 
 
 		echo " 			</table>\n";
@@ -111,7 +134,28 @@ class requestDisplayer extends noteDisplayer {
 
 	function printSelectedRequest($requestList, $libList, $request, $user, $msg="")
 	{
-
+		echo "<script language='JavaScript1.2'>
+				  var jsFunctions = new basicAJAX();				  
+				  function markAsPulled(request_ids, notice)
+				  {
+					var status = 'SEARCHING STACKS';
+					var u   = 'AJAX_functions.php?f=updateRequestStatus';
+					var qs  
+					var url
+									  
+				  	for(var i=0;i<request_ids.length;i++)				  		
+				  	{				  			
+				  		qs  = 'request_id=' + request_ids[i] + '&status=' + status;
+				  		url = u + '&rf=' + jsFunctions.base64_encode(qs);
+						
+						ajax_transport(url, notice);				  			
+				  	}
+				  }
+			  </script>
+		\n";
+		
+		
+		
 		echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
 		
 
@@ -130,6 +174,10 @@ class requestDisplayer extends noteDisplayer {
 		echo "	<tr>\n";
 		echo "		<td align=\"right\"><input type=\"button\" value=\"Print\" onClick=\"window.print();\"></td>\n";
 		echo "	</tr>\n";
+
+		echo "	<tr>\n";
+		echo "		<td align=\"right\"><div id=\"marked_indicator\" style='display: inline;'><img width='16px' height='16px' src='images/spacer.gif' /></div><input type=\"button\" value=\"Mark All As PULLED\" onClick=\"markAsPulled(new Array(". $requestList->id_list() ."), 'marked_indicator');\"></td>\n";
+		echo "	</tr>\n";		
 		
 		
 		if (!is_null($msg) && $msg != "")
@@ -140,7 +188,7 @@ class requestDisplayer extends noteDisplayer {
 		echo "	</tr>\n";
 
 		echo "</table>\n";		
-		if (!empty($requestList))
+		if (count($requestList) > 0)
 			requestDisplayer::displayRequestList($requestList, "true");
 		else 
 			echo "<p style=\"text-align: center\">No Request selected for printing.</p>";
@@ -217,7 +265,7 @@ class requestDisplayer extends noteDisplayer {
 			
 			echo "					      <tr>\n";
 			echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Title:</td>\n";
-			echo "					        <td align=\"left\" valign=\"top\">". $item->getTitle() ."</td>\n";
+			echo "					        <td align=\"left\" valign=\"top\"><a href=\"index.php?cmd=editItem&reserveID={$r->reserveID}\">". $item->getTitle() ."</a></td>\n";
 			echo "					      </tr>\n";
 			
 			echo "					      <tr>\n";
@@ -319,17 +367,17 @@ class requestDisplayer extends noteDisplayer {
 				echo "							<br/>\n";							
 				//echo "							<p>\n";
 				echo "								<div id='notice_{$r->requestID}' style='display: inline;'><img width='16px' height='16px' src='images/spacer.gif' /></div>\n";
-				echo "								<select name='{$r->requestID}_status' onChange='setRequestStatus(this, {$r->requestID}, \"notice_{$r->requestID}\");'>\n";
+				echo "								<select name='{$r->requestID}_status' onChange='setRequestStatus(this, {$r->requestID}, \"notice_{$r->requestID}\");'>\n";				
 				echo "									<option {$INPROCESS} value='IN PROCESS'>IN PROCESS</option>\n";
-				//echo "									<option {$DENIED} value='DENIED'>COPYRIGHT DENIED</option>\n";
-				echo "									<option {$RUSH} value='RUSH'>RUSH</option>\n";
-				echo "									<option {$PULLED} value='PULLED'>PULLED</option>\n";
-				echo "									<option {$CHECKEDOUT} value='CHECKED OUT'>CHECKED OUT</option>\n";
-				echo "									<option {$RECALLED} value='RECALLED'>RECALLED</option>\n";
-				echo "									<option {$MISSING} value='MISSING'>MISSING</option>\n";
+				echo "									<option {$COPYRIGHTREVIEW} value='COPYRIGHT REVIEW'>COPYRIGHT REVIEW</option>\n";
 				echo "									<option {$PURCHASING} value='PURCHASING'>PURCHASING</option>\n";
-				echo "									<option {$REQUESTED} value='REQUESTED'>REQUESTED</option>\n";
-				echo "									<option {$AWAITINGREVIEW} value='AWAITING REVIEW'>AWAITING REVIEW</option>\n";
+				echo "									<option {$RECALLED} value='RECALLED'>RECALLED</option>\n";
+				echo "									<option {$RESPONSENEEDED} value='RESPONSE NEEDED'>RESPONSE NEEDED</option>\n";
+				echo "									<option {$SCANNING} value='SCANNING'>SCANNING</option>\n";		
+				echo "									<option {$SEARCHINGSTACKS} value='SEARCHING STACKS'>SEARCHING STACKS</option>\n";
+				echo "									<option {$UNAVAILABLE} value='UNAVAILABLE'>UNAVAILABLE</option>\n";				
+				echo "									<option {$DENIED} value='DENIED' style=\"color: rgb(255, 0, 0);\">DENY COPYRIGHT</option>\n";
+				echo "									<option {$DENIEDALL} value='DENIED_ALL' style=\"color: rgb(255, 0, 0);\">DENY COPYRIGHT FOR ALL</option>\n";
 				echo "								</select>\n";				
 				//echo "							</p>\n";											
 				

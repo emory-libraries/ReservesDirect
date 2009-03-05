@@ -27,6 +27,7 @@ http://www.reservesdirect.org/
 *******************************************************************************/
 require_once("secure/interface/instructor.class.php");
 require_once("secure/classes/request.class.php");
+require_once("secure/classes/requestCollection.class.php");
 require_once("secure/classes/courseInstance.class.php");
 require_once("secure/common.inc.php");
 
@@ -184,11 +185,11 @@ class staff extends instructor
 	}
 
 	/**
-	* @return void
+	* @return requestCollection
 	* @param unit default=all unit to get reserves for
 	* @desc get all unprocessed requests
 	*/
-	function getRequests($unit='all', $sort=null)
+	function getRequests($unit='all', $status="all", $sort=null)
 	{
 		global $g_dbConn, $g_permission;
 
@@ -196,11 +197,12 @@ class staff extends instructor
 		{
 			default: //'mysql'
 
-			$sql = "SELECT DISTINCT r.request_id, d.abbreviation, c.course_number, u.last_name "
+			$sql = "SELECT DISTINCT r.request_id, d.abbreviation, c.course_number, u.last_name, res.status "
 				.  "FROM requests AS r "
 				.  	"JOIN items AS i ON r.item_id = i.item_id AND r.date_processed IS NULL "
-				.  	"JOIN course_instances AS ci ON r.course_instance_id = ci.course_instance_id "
-				.  	"JOIN course_aliases AS ca ON ci.primary_course_alias_id = ca.course_alias_id "
+				.	"JOIN reserves AS res ON r.reserve_id = res.reserve_id "
+				.	"JOIN course_instances AS ci ON r.course_instance_id = ci.course_instance_id "
+				.	"JOIN course_aliases AS ca ON ci.primary_course_alias_id = ca.course_alias_id "
 				.  	"JOIN courses AS c ON ca.course_id = c.course_id "
 				.  	"JOIN departments AS d ON c.department_id = d.department_id AND d.status IS NULL "
 				.  	"JOIN libraries AS l ON d.library_id = l.library_id "
@@ -218,9 +220,9 @@ class staff extends instructor
 					 .  		"WHEN i.item_group = 'MULTIMEDIA' THEN l.multimedia_library_id = $unit "
 					 .	"END "
 				;
-			}
+			}		
 			
-			$sql .= "GROUP BY r.request_id ";
+			if ($status != 'all'){	$sql .= " AND res.status = '$status' ";	}
 			
 			switch ($sort)
 			{
@@ -241,17 +243,21 @@ class staff extends instructor
 		$rs = $g_dbConn->query($sql);
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
-		$tmpArray = array();
+		$tmpArray = new requestCollection();
 		while ($row = $rs->fetchRow())
 		{
 			$tmpRequest = new request($row[0]);
 				$tmpRequest->getRequestedItem();
+				$tmpRequest->requestedItem->getPhysicalCopy();
+				
 				$tmpRequest->getRequestingUser();
 				$tmpRequest->getReserve();
+				
 				$tmpRequest->getCourseInstance();
 				$tmpRequest->courseInstance->getPrimaryCourse();
+				$tmpRequest->courseInstance->getCrossListings();				
+				$tmpRequest->courseInstance->getInstructors();
 				$tmpRequest->courseInstance->getCrossListings();
-				//$tmpRequest->getHoldings();
 			$tmpArray[] = $tmpRequest;
 		}
 		return $tmpArray;
@@ -320,7 +326,7 @@ class staff extends instructor
 			$row = $rs->fetchRow();
 			return $row[0];
 		} else {
-			return null;
+			return 1;  //default to first Library
 		}
 	}
 

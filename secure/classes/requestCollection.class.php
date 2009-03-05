@@ -49,6 +49,16 @@ class requestCollection extends ArrayObject
 		
 		usort($this, array("requestCollection", $call_back));		
 	}
+	
+	public function id_list()
+	{
+		$rv = "";
+		foreach ($this as $r)
+		{
+			$rv .= $r->getRequestID() . ",";
+		}
+		return rtrim($rv, ","); //strip trailing ,
+	}
 		
 	private static function _sort_by_call_number($a, $b)
 	{

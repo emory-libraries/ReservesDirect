@@ -107,17 +107,18 @@ class requestManager
 
 				$loc  = "process request";
 
-				$unit = (!isset($request['unit']) || $request['unit'] == "") ? $user->getStaffLibrary() : $request['unit'];
-                $unit = (!isset($unit) || $unit == "") ? 1 : $unit;
+				$unit = (empty($request['unit'])) ? $user->getStaffLibrary() : $request['unit'];
+                
+                $filter_status = (!isset($request['filter_status'])) ? "IN PROCESS" : $request['filter_status'];
 				
-				$requestList = $user->getRequests($unit, $request['sort']);				
+				$requestList = $user->getRequests($unit, $filter_status, $request['sort']);				
 							
-				for($i=0;$i<count($requestList);$i++)
-				{
-					$requestList[$i]->requestedItem->getPhysicalCopy();
-					$requestList[$i]->courseInstance->getInstructors();
-					$requestList[$i]->courseInstance->getCrossListings();								
-				}
+//				for($i=0;$i<count($requestList);$i++)
+//				{
+//					$requestList[$i]->requestedItem->getPhysicalCopy();
+//					$requestList[$i]->courseInstance->getInstructors();
+//					$requestList[$i]->courseInstance->getCrossListings();								
+//				}
 
 				$this->displayFunction = 'displayAllRequest';
 				$this->argList = array($requestList, $user->getLibraries(), $request, $user);

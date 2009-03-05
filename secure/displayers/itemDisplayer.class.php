@@ -236,10 +236,10 @@ class itemDisplayer extends noteDisplayer {
             <?php endif; ?>
 <?php else: ?>
 	<?php	if (($reserve->getStatus() != 'DENIED' && $reserve->getStatus() != 'DENIED ALL') || $u->getRole() >= $g_permission['staff']): ?>				
-		<?php	if($reserve->getStatus()=='IN PROCESS'): ?>
+		<?php	if(!in_array($reserve->getStatus(), array('ACTIVE', 'INACTIVE', 'DENIED', 'DENIED ALL'))): ?>
 	
 				<div>
-					<strong>Current Status:</strong>&nbsp;<span class="inProcess">IN PROCESS</span>
+					<strong>Current Status:</strong>&nbsp;<span class="inProcess"><?= $reserve->getStatus() ?></span>
 					<br />
 					Please contact your Reserves staff to inquire about the status of this reserve.
 					<input type="hidden" name="reserve_status" value="IN PROCESS" />

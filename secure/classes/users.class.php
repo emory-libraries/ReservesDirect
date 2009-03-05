@@ -106,6 +106,8 @@ class users
 	function getUsersByLastName($lastName, $role=null)
 	{
 		global $g_dbConn;
+		
+		if (empty($role)) { $role = null; }
 
 		switch ($g_dbConn->phptype)
 		{

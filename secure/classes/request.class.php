@@ -28,7 +28,7 @@ http://www.reservesdirect.org/
 *******************************************************************************/
 
 require_once("secure/classes/item.class.php");
-require_once('secure/classes/notes.class.php');
+require_once("secure/classes/notes.class.php");
 require_once("secure/classes/user.class.php");
 require_once("lib/RD/Ils.php");
 
@@ -470,6 +470,18 @@ class request extends Notes
 		if (!isset($this->reserve) || is_null($this->reserve))
 			$this->getReserve();
 		
+		if (strtoupper($status) == "DENIED" || strtoupper($status) == 'DENIED_ALL')
+		{
+			$this->setDateProcessed(date("Y-m-d"));			
+		} else {
+			//clear setDateProcessed incase we are correcting a user error
+			$this->setDateProcessed(NULL);
+			$this->getReserve();
+			$this->reserve->getItem();
+			$this->reserve->item->setStatus('ACTIVE');
+		}
+		
+			
 		$this->reserve->setStatus($status);
 		
 		return $this->reserve->getStatus() == $status;	

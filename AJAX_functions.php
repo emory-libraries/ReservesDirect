@@ -105,7 +105,7 @@ http://www.reservesdirect.org/
 			$min_role = is_int($_REQUEST['role']) ? $_REQUEST['role'] : 0;
 			
 			$usersObj = new users();
-			$usersObj->search(null, $qry, $role);
+			$usersObj->search(null, $qry, $min_role);
 			
 			$returnValue = xmlHead();
 			
