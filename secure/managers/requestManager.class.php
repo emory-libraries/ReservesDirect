@@ -465,7 +465,7 @@ class requestManager
 			//query ILS
 			//$zQry = new zQuery($qryValue, $qryField);
 			$zQry = RD_Ils::initILS();
-			$search_results = $zQry->search($qryValue, $qryField)->to_a();
+			$search_results = $zQry->search($qryField, $qryValue)->to_a();
 		
 			//if still do not have an initialized item object
 			//try one more time by control key pulled from ILS
