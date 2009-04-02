@@ -28,6 +28,9 @@ ReservesDirect is located at: http://www.reservesdirect.org/
 
 header("Content-Type: text/tab-separated-values");
 header("Content-Disposition: attachment; filename=\"reservesData.tsv\"");
+header("Cache-Control: no-cache");
+header("Pragma: no-cache");
+header("Expires: -1");
 
 
 $dataSet = unserialize(base64_decode($_POST['dataSet']));

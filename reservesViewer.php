@@ -38,7 +38,11 @@ http://www.reservesdirect.org/
 	//require_once("secure/session.inc.php");	
 	
 	header("Cache-control: private");	//send some headers
-    header("Pragma: public");
+        header("Pragma: public");
+        header("Cache-Control: no-cache");
+        header("Pragma: no-cache");
+        header("Expires: -1");
+
 	
 	//authenticate user
 	//if user is valid, then initializes global user object as $u
