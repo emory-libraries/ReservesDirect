@@ -1423,6 +1423,9 @@ class classDisplayer extends baseDisplayer {
 		}
 		$proxy_ci_array = $tmp;
 		
+		//default to current term if no classes exist for the current term default to last term in list this could be a past term			
+		$instructor_select_term = (array_key_exists($termsObj->getCurrentTerm()->getTermID(), $instructor_ci_array)) ? $termsObj->getCurrentTerm()->getTermID() : end(array_keys($instructor_ci_array)); 		
+		$proxy_select_term = (array_key_exists($termsObj->getCurrentTerm()->getTermID(), $proxy_ci_array)) ? $termsObj->getCurrentTerm()->getTermID() : end(array_keys($proxy_ci_array)); 		
 		//this will hold the jscript calls to select the initial tab view
 		//it will be run after everything is rendered
 		$onload_jscript = '';
@@ -1430,7 +1433,7 @@ class classDisplayer extends baseDisplayer {
 			$onload_jscript .= "showBlock('proxy_tab', 'proxy_block');\n";
 			//add call to preselect the first term sub-block
 			$keys = array_keys($proxy_ci_array);
-			$onload_jscript .= "showTermBlock('proxy_block_".$keys[0]."');\n";
+			$onload_jscript .= "showTermBlock('proxy_block_$proxy_select_term');\n";
 		}
 		if(!empty($student_CIs)) {	//show student on top
 			$onload_jscript .= "showBlock('student_tab', 'student_block');\n";
@@ -1438,7 +1441,7 @@ class classDisplayer extends baseDisplayer {
 		if($u->getDefaultRole() >= $g_permission['instructor']) {	//show instructor on top
 			$onload_jscript .= "showBlock('instructor_tab', 'instructor_block');\n";
 			$keys = array_keys($instructor_ci_array);		
-			$onload_jscript .= "showTermBlock('instructor_block_".$keys[0]."');\n";
+			$onload_jscript .= "showTermBlock('instructor_block_$instructor_select_term');\n";
 		}
 		if(empty($onload_jscript)) {	//hide everything
 			$onload_jscript = "showBlock('student_tab', 'student_block');\n";
@@ -1530,16 +1533,13 @@ class classDisplayer extends baseDisplayer {
 					<div style="float:left;">
 <?php
 			//show a radio choices for terms, to act as a filter for class list display
-			//pre-select first option
-			$select_option = true;
+
 			foreach(array_keys($instructor_ci_array) as $term_id):
 				$term = new term($term_id);
-				$select = ($select_option) ? 'checked="true"' : '';
+				$select = ($instructor_select_term == $term_id) ? 'checked="true"' : '';
 ?>
 							<input type="radio" name="instructor_term_block" onclick="showTermBlock('instructor_block_<?=$term_id?>');" <?=$select?> /><?=$term->getTermName().' '.$term->getTermYear()?>&nbsp;
 <?php		
-				//stop pre-selecting
-				$select_option = false;
 			endforeach;
 ?>
 					</div>
@@ -1698,16 +1698,12 @@ class classDisplayer extends baseDisplayer {
 				<div style="padding:4px;" class="head">
 <?php
 			//show a radio choices for terms, to act as a filter for class list display
-			//pre-select first option
-			$select_option = true;
 			foreach(array_keys($proxy_ci_array) as $term_id):
 				$term = new term($term_id);
-				$select = ($select_option) ? 'checked="true"' : '';
+				$select = ($proxy_select_term == $term_id) ? 'checked="true"' : '';
 ?>
 							<input type="radio" name="proxy_term_block" onclick="showTermBlock('proxy_block_<?=$term_id?>');" <?=$select?> /><?=$term->getTermName().' '.$term->getTermYear()?>&nbsp;
 <?php		
-				//stop pre-selecting
-				$select_option = false;
 			endforeach;
 ?>
 				</div>

@@ -372,11 +372,11 @@ class reserveItem extends item
 				$d = date("Y-m-d"); //get current date
 		}
 		$mimeType = (!is_null($mimeType)) ? $mimeType : "text/html";
-		$rs = $g_dbConn->query($sql1, array($mimeType));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		
+		$mimeTypeID = $g_dbConn->getOne($sql1, array($mimeType));
+		if (DB::isError($mimeTypeID)) { trigger_error($mimeTypeID->getMessage(), E_USER_ERROR); }
 
-		$this->mimeTypeID = null;
-		while ($row = $rs->fetchRow()) { $this->mimeTypeID = $row[0]; }
+		$this->mimeTypeID = $mimeTypeID;
 
 		$rs = $g_dbConn->query($sql, array($this->mimeTypeID, $d, $this->itemID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
@@ -393,22 +393,13 @@ class reserveItem extends item
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql1 = "SELECT mimetype_id FROM mimetypes WHERE  file_extentions = ?";
-
-				$sql = "UPDATE items SET mimetype = ?, last_modified = ? WHERE item_id = !";
-				$d = date("Y-m-d"); //get current date
+				$sql1 = "SELECT m.mimetype FROM mimetypes AS m JOIN mimetype_extensions AS me ON m.mimetype_id = me.mimetype_id WHERE file_extension = ?";
 		}
 
-		$rs = $g_dbConn->query($sql1, array($ext));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		$mimetype = $g_dbConn->getOne($sql1, array($ext));
+		if (DB::isError($mimetype)) { trigger_error($mimetype->getMessage(), E_USER_ERROR); }
 
-		$this->mimeTypeID = null;
-		while ($row = $rs->fetchRow()) { $this->mimeTypeID = $row[0]; }
-
-		$rs = $g_dbConn->query($sql, array($this->mimeTypeID, $d, $this->itemID));
-		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-
-		$this->lastModDate = $d;
+		$this->setMimeType($mimetype);
 	}
 	
 	function setDocTypeIcon($docTypeIcon)

@@ -702,7 +702,7 @@ table.displaylist td{
 	vertical-align: top;
 	display: block;
 	left: 0;
-	width:250px;
+	width:200px;
 	float: left;
 }
 .footerContentCenter {
@@ -710,7 +710,7 @@ table.displaylist td{
 	vertical-align: top;
 	display: block;
 	margin-right:200px;
-	margin-left:250px;
+	margin-left:200px;
 	float: none;
 	text-align:center;
 }
@@ -718,7 +718,7 @@ table.displaylist td{
 	text-align: right;
 	vertical-align: top;
 	display: block;
-	width:200px;
+	width:250px;
 	float: right;
 	right: 0px;
 }

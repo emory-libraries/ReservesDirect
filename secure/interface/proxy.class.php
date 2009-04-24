@@ -166,7 +166,7 @@ class proxy extends student
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT DISTINCT mimetype_id, helper_app_name, helper_app_icon, file_extentions "
+				$sql = "SELECT DISTINCT mimetype_id, helper_app_name, helper_app_icon "
 				.	   "FROM mimetypes "
 				.	   "ORDER BY mimetype_id ASC"	
 				;
@@ -179,8 +179,7 @@ class proxy extends student
 
 		$tmpArray = array();
 		
-		//$tmpArray[0] = array ('mimetype_id' => null, 'helper_app_name' => 'Default', 'helper_app_icon' => 'images/doc_type_icons/doctype-clear.gif', 'file_extensions' => null);
-		$tmpArray[0] = array ('mimetype_id' => null, 'helper_app_name' => 'Default', 'helper_app_icon' => null, 'file_extensions' => null);
+		$tmpArray[0] = array ('mimetype_id' => null, 'helper_app_name' => 'Default', 'helper_app_icon' => null);
 		
 		while($row = $rs->fetchRow(DB_FETCHMODE_ASSOC))
 		{
