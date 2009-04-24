@@ -33,8 +33,8 @@
 
 	//open connection
 	$g_dbConn = DB::connect($dsn, $options);
-	if (DB::isError($g_dbConn)) { trigger_error($g_dbConn->getMessage(), E_USER_ERROR); }
-    
+	if (DB::isError($g_dbConn)) { trigger_error($g_dbConn->getMessage(), E_USER_ERROR); }	
+	
     //first find the current term
     $today = date("Y-m-d");
     $sql_term = "SELECT begin_date, end_date FROM terms WHERE begin_date < ? order by sort_order DESC LIMIT 1";
@@ -166,5 +166,23 @@
 	$rs = $g_dbConn->query($update_pdf);
 	
 	$g_dbConn->query("UPDATE items set pages_times = NULL, ISBN = NULL, ISSN = NULL, OCLC = NULL");
-  
+
+	//strip titles and authors from items
+	$item_sql[] = "UPDATE items set author='Author, John J.' WHERE author is not null";
+	$item_sql[] = "UPDATE items set title ='Sample PDF' WHERE item_type = 'ITEM' AND (item_group = 'ELECTRONIC' OR item_group = 0) AND mimetype = 1";
+	$item_sql[] = "UPDATE items set title ='Audio Sample' WHERE item_type = 'ITEM' AND (item_group = 'ELECTRONIC' OR item_group = 0) AND mimetype = 2";
+	$item_sql[] = "UPDATE items set title ='Sample Video' WHERE item_type = 'ITEM' AND (item_group = 'ELECTRONIC' OR item_group = 0) AND mimetype = 3";
+	$item_sql[] = "UPDATE items set title ='MS Word Sample' WHERE item_type = 'ITEM' AND (item_group = 'ELECTRONIC' OR item_group = 0) AND mimetype = 4";
+	$item_sql[] = "UPDATE items set title ='MS Excel Sample' WHERE item_type = 'ITEM' AND (item_group = 'ELECTRONIC' OR item_group = 0) AND mimetype = 5";
+	$item_sql[] = "UPDATE items set title ='MS PowerPoint Sample' WHERE item_type = 'ITEM' AND (item_group = 'ELECTRONIC' OR item_group = 0) AND mimetype = 6";
+	$item_sql[] = "UPDATE items set title ='External Link' WHERE item_type = 'ITEM' AND (item_group = 'ELECTRONIC' OR item_group = 0) AND mimetype = 7";
+	
+	$item_sql[] = "UPDATE items set title ='Monograph Sample' WHERE item_type = 'ITEM' AND item_group = 'MONOGRAPH'";
+	$item_sql[] = "UPDATE items set title ='Multimedia Sample' WHERE item_type = 'ITEM' AND item_group ='MULTIMEDIA'";
+
+	foreach ($item_sql as $sql)
+	{
+		$g_dbConn->query($sql);
+		echo "$sql\n";
+	}
 ?>
