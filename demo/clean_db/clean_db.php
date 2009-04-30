@@ -165,7 +165,7 @@
 	$update_pdf = "UPDATE items set url='http://www.reservesdirect.org/demo/data/DisplayDisabled.pdf' WHERE url IS NOT NULL";
 	$rs = $g_dbConn->query($update_pdf);
 	
-	$g_dbConn->query("UPDATE items set pages_times = NULL, ISBN = NULL, ISSN = NULL, OCLC = NULL");
+	$g_dbConn->query("UPDATE items set pages_times = NULL, ISBN = NULL, ISSN = NULL, OCLC = NULL, volume_title = NULL, volume_edition = NULL, source = NULL");
 
 	//strip titles and authors from items
 	$item_sql[] = "UPDATE items set author='Author, John J.' WHERE author is not null";
@@ -185,4 +185,6 @@
 		$g_dbConn->query($sql);
 		echo "$sql\n";
 	}
+	
+	$g_dbConn->query("UPDATE notes SET note = 'Sample Note'");
 ?>
