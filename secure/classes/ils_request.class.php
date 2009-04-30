@@ -91,7 +91,7 @@ class ILS_Request {
 		}
 		
 		//most control keys in DB have 'ocm' prefix, but the ils keys have 'o' prefix
-		$control_key = eregi_replace('ocm', 'o', trim($control_key));
+		$control_key = eregi_replace('oc[mn]', 'o', trim($control_key));
 		
 		$sql = "SELECT request_id
 				FROM ils_requests WHERE ils_control_key = ?";
