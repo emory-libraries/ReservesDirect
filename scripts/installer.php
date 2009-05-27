@@ -405,8 +405,22 @@ Please visit http://reservesdirect.org for more information.
 	function setup_config() {
 		//set path of default config file
 		$default_xmlConfig = RD_ROOT.'config.xml.example';
-		//sets $xmlConfig to path of actual config xml file
-		require_once(RD_ROOT.'config_loc.inc.php');
+		
+		//sets $xmlConfig to path of actual config xml file		
+		//if file location is set by the user attempt to load the directed file otherwise load the default
+		if (!is_null($_REQUEST['config_loc']) && is_readable($_REQUEST['config_loc']))
+		{
+			if (simplexml_load_file($_REQUEST['config_loc']))
+			{
+				$xmlConfig = $_REQUEST['config_loc'];
+			} else {
+				$xmlConfig = null;
+			}
+		}
+		
+		if (is_null($xmlConfig)) {
+			require_once(RD_ROOT.'config_loc.inc.php');
+		}
 		
 		//check to see if there is already a config file at specified location		
 		if(is_readable($xmlConfig)) {
@@ -462,8 +476,13 @@ Please visit http://reservesdirect.org for more information.
 			<form method="post">
 				<input type="hidden" name="step" value="two" />
 							
-				<h3>Configuration file location:</h3>					
-				<input type="text" size="40" name="config_loc" value="/path/to/secure-location/" /> <small><i>ex: /etc/reservesdirect/</i></small>
+				<h3>Configuration file location:</h3>	
+				
+				<?  //if the config file is the example file prompt for new file 
+					$config_loc_value = ($config_path == $default_xmlConfig) ? "/path/to/secure-location/" : $config_path; 
+				?>
+							
+				<input type="text" size="40" name="config_loc" value="<?= $config_loc_value ?>" /> <small><i>ex: /etc/reservesdirect/</i></small>
 				<br />
 				<small>
 					This should be the path of the directory where you want to save the ReservesDirect configuration file.  It is strongly recommended to place the configuration file outside of the document root of the web application.
@@ -767,13 +786,14 @@ Please visit http://reservesdirect.org for more information.
 		
 		foreach($_REQUEST['xml'] as $node_xpath=>$node_value) {
 			$node = $xpath->query($node_xpath)->item(0);
+			$node_value = htmlentities($node_value);
 			if(!is_null($node) && ($node_value != $node->nodeValue)) {
 				//trim the new value
 				$node->nodeValue = trim($node_value);
 			}
 		}
 		
-		return $config->saveXML();
+		return $config->saveXML($config->documentElement); //passing root node forces utf-8
 	}
 	
 	
@@ -851,7 +871,7 @@ Please visit http://reservesdirect.org for more information.
 		<br />
 		The installer was unable to save the configuration data.  Please save the following data in an XML file.  Do not forget to edit <tt>config_loc.inc.php</tt> file in the ReservesDirect directory to specify the configuration location.
 		<br />
-		<textarea rows="10" cols="100" wrap="off"><?php echo $config_xml_string; ?></textarea>
+		<textarea rows="10" cols="100" wrap="off"><?php echo htmlentities($config_xml_string); ?></textarea>
 <?php				
 		}
 	}
