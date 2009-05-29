@@ -35,19 +35,18 @@ http://www.reservesdirect.org/
 	include("statusCodes.php");	
     
 	//set up error-handling/debugging, skins, etc.
-	//require_once("secure/session.inc.php");	
-	
-	header("Cache-control: private");	//send some headers
-        header("Pragma: public");
-        header("Cache-Control: no-cache");
-        header("Pragma: no-cache");
-        header("Expires: -1");
-
+	require_once("secure/session.inc.php");	
 	
 	//authenticate user
 	//if user is valid, then initializes global user object as $u
 	//else shows login page
-	require_once('secure/auth.inc.php');
+	require_once('secure/auth.inc.php');	
+	
+	header("Cache-control: private");	//send some headers
+    header("Pragma: public");
+    header("Cache-Control: no-cache");
+    header("Pragma: no-cache");
+    header("Expires: -1");	
 	
 	//get the reserve/item
 	//When previewing items we do not have a reserve_id and must use the item_id to view the URL
@@ -97,8 +96,13 @@ http://www.reservesdirect.org/
                 $filename = $author . $title . $item->itemID . $ext;
 
 				//serve the doc			
-				header('Content-Type: '.$item->getMimeType());
-				header('Content-Disposition: inline; filename="'.$filename.'"');
+				$mimetype = $item->getMimeType();
+				header('Content-Type: '.$mimetype);
+				if ($mimetype == 'audio/x-pn-realaudio') {
+					header('Content-Disposition: attachment; filename="'.$filename.'"');
+				} else {
+					header('Content-Disposition: inline; filename="'.$filename.'"');
+				}
 				fpassthru($stream);
 				fclose($stream);	//close file
 			}
@@ -107,7 +111,6 @@ http://www.reservesdirect.org/
 			}
 		}
 		else {	//item is on remote server -- redirect	
-			//echo 'Location: '.proxyHost::proxyURL($url, $u->getUsername());exit;			
 			header('Location: '.proxyHost::proxyURL($url, $u->getUsername()));
 		}
 	}
