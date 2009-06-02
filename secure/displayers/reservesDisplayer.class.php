@@ -556,7 +556,7 @@ function displaySearchItemMenu($ci)
 				//show notes
 				self::displayNotes($itemNotes);
 	            
-	        	if ($item->getItemGroup() != "ELECTRONIC" && !is_null($loan_periods)) 
+	        	if ($item->isPhysicalItem() && !is_null($loan_periods)) 
 			    {
 			    	echo "<br>\n";
 			    	echo "<b>Requested Loan Period:<b> ";

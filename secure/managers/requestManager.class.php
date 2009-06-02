@@ -29,7 +29,6 @@ require_once("secure/common.inc.php");
 require_once("secure/classes/itemAudit.class.php");
 require_once("secure/classes/ils_request.class.php");
 require_once("secure/classes/users.class.php");
-//require_once("secure/classes/zQuery.class.php");
 require_once("secure/displayers/requestDisplayer.class.php");
 require_once("secure/classes/note.class.php");
 
@@ -423,42 +422,64 @@ class requestManager
 	 * @return array
 	 */
 	function searchItem($cmd) {
+		global $alertMsg;
+		
 		//create a blank array with all the needed indeces
 		$item_data = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'volume_title'=>'', 'source'=>'', 'controlKey'=>'', 'selected_owner'=>null, 'physicalCopy'=>null, 'OCLC'=>'', 'ISSN'=>'', 'ISBN'=>'', 'item_group'=>null, 'notes'=>null, 'home_library'=>null, 'url'=>'', 'is_local_file'=>false);
 				
 		//decide if item info can be prefilled
-		$item = new reserveItem();
+		$item_id = null;
+		if (!is_null($_REQUEST['item_id'])) {
+			$item_id = $_REQUEST['item_id'];
+		} elseif (!is_null($_REQUEST['reserve_id'])) {
+			$reserve = new reserve($_REQUEST['reserve_id']);
+			$item_id = $reserve->getItem();			
+		} elseif (!is_null($_REQUEST['request_id'])) {
+			$request = new request($_REQUEST['request_id']);
+			$item_id = $request->requestedItem->getItemID();
+		}
+		
+		$item = new reserveItem($item_id);
 		$qryField = $qryValue = null;
 		
-		if(!empty($_REQUEST['searchTerm'])) {	//search info specified
-			//save the search parameters for querying DB/ILS
-			$qryField = $_REQUEST['searchField'];
-			$qryValue = $_REQUEST['searchTerm'];
-			
-			//init a new item
-			if($qryField == 'barcode') {	//get by barcode
+		if(!empty($_REQUEST['searchField']) && is_null($item->itemID)) {	//search info specified			
+			//find item in local DB by barcode or control key
+			if($_REQUEST['searchField'] == 'barcode') {	//get by barcode
 				$phys_item = new physicalCopy();
-				if($phys_item->getByBarcode($qryValue)) {
+				if($phys_item->getByBarcode($_REQUEST['searchTerm'])) {
 					$item->getItemByID($phys_item->getItemID());
 				}
 			}
 			else {	//get by local control
-				$item->getItemByLocalControl($qryValue);
+				$item->getItemByLocalControl($_REQUEST['searchTerm']);
 			}					
 		}
-		elseif(!empty($_REQUEST['request_id'])) {	//processing request, get info out of DB
+		
+		if(!empty($_REQUEST['request_id'])) {	//processing request, get info out of DB
 			$request = new request();
 			if($request->getRequestByID($_REQUEST['request_id'])) {
 				//init reserveItem object
-				$request->getRequestedItem();
-				$item = $request->requestedItem;
+				$request->getRequestedItem();				
 				
-				//set search parameters
-				$qryField = 'control';
-				$qryValue = $item->getLocalControlKey();
+				//alert if returned is different than item attached to request
+				if (!is_null($item->itemID) && $item != $request->requestedItem)
+				{
+					$alertMsg = "This search has matched a different item from that requested. Before continueing please verify you are processing \"{$item->getTitle()}\".  If this is not correct please stop and contact your local admin.";
+				}				
+				
 			}
-		}
+		} 
 		
+		//if item controlKey is set use it to search ILS otherwise use form values
+		if (!is_null($item) && $item->getLocalControlKey() <> "")
+		{
+		 	//set search parameters
+			$qryField = 'control';
+			$qryValue = $item->getLocalControlKey();
+		} else {
+			$qryField = $_REQUEST['searchField'];
+			$qryValue = $_REQUEST['searchTerm'];
+		}
 		//if searching for a physical item, then there may be an ILS record
 		//this should return an indexed array, which may be populated w/ data
 		if(($cmd=='addPhysicalItem') && !empty($qryValue)) {
@@ -495,12 +516,7 @@ class requestManager
 		$item_data['times_pages'] = ($item->getPagesTimes() <> "") ? $item->getPagesTimes() : $search_results['times_pages'];
 		$item_data['source'] = ($item->getSource() <> "") ? $item->getSource() : $search_results['source'];
 		$item_data['controlKey'] = ($item->getLocalControlKey() <> "") ? $item->getLocalControlKey() : $search_results['controlKey'];
-		
-		if (ereg('oc[mn][0-9]+', $query)) //oclc items will be 
-		{
-			$item_data['OCLC'] = ($item->getOCLC() <> "") ? $item->getOCLC() : $search_results['OCLC'];
-		}
-		
+		$item_data['OCLC'] = ($item->getOCLC() <> "") ? $item->getOCLC() : $search_results['OCLC'];		
 		$item_data['ISSN'] = ($item->getISSN() <> "") ? $item->getISSN() : $search_results['ISSN'];
 		$item_data['ISBN'] = ($item->getISBN() <> "") ? $item->getISBN() : $search_results['ISBN'];
 		$item_data['item_group'] = $item->getItemGroup();
@@ -535,16 +551,13 @@ class requestManager
 		//determine if editing item or creating new
 		//get a valid object in either case
 		$item = new reserveItem();
-		if(empty($_REQUEST['item_id']) || !$item->getItemByID($_REQUEST['item_id'])) {	//If missing item_id or it is invalid
-			//try to get item by local_control_key
-			if(empty($_REQUEST['local_control_key']) || !$item->getItemByLocalControl($_REQUEST['local_control_key'])) {	//no key, or it is invalid
-				//have to create item
-				$item->createNewItem();	
-				//audit the action
-				$itemAudit = new itemAudit();
-				$itemAudit->createNewItemAudit($item->getItemID(),$u->getUserID());
-				unset($itemAudit);					
-			}	//else object has been initialized successfully						
+		if(empty($_REQUEST['item_id']) || !$item->getItemByID($_REQUEST['item_id'])) {	//If missing item_id or it is invalid			
+			//have to create item
+			$item->createNewItem();	
+			//audit the action
+			$itemAudit = new itemAudit();
+			$itemAudit->createNewItemAudit($item->getItemID(),$u->getUserID());
+			unset($itemAudit);								
 		}	//else object has been initialized successfully
 		
 		//add/edit data

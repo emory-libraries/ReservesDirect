@@ -133,7 +133,7 @@ class requestDisplayer extends noteDisplayer {
 	}
 
 	function printSelectedRequest($requestList, $libList, $request, $user, $msg="")
-	{
+	{		
 		echo "<script language='JavaScript1.2'>
 				  var jsFunctions = new basicAJAX();				  
 				  function markAsPulled(request_ids, notice)
@@ -198,6 +198,8 @@ class requestDisplayer extends noteDisplayer {
 	
 	function displayRequestList($requestList, $printView=null)
 	{	
+		global $g_catalogName;
+		
 		echo "	<tr><td colspan=\"2\">&nbsp;</td></tr>\n";
 
 		echo "	<tr>\n";
@@ -253,6 +255,14 @@ class requestDisplayer extends noteDisplayer {
 			echo "					        <td valign=\"top\" colspan=\"2\">". $ci->displayTerm() ."</td>\n";
 			echo "					      </tr>\n";
 
+			if ($item->isPhysicalItem() && $item->getLocalControlKey() == '')
+			{
+				echo "					      <tr>\n";
+				echo "					        <td align=\"right\" valign=\"top\" class=\"strong\"></td>\n";
+				echo "					        <td align=\"left\" valign=\"top\"><font color='red'>This item is not properly linked to $g_catalogName.  Please edit this item and update the barcode.</font></td>\n";
+				echo "					      </tr>\n";
+			}
+				
 			echo "					      <tr>\n";
 			echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Instructors:</td>\n";
 			echo "					        <td align=\"left\" valign=\"top\">". $ci->displayInstructors(true) ."</td>\n";
@@ -262,7 +272,7 @@ class requestDisplayer extends noteDisplayer {
 			echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Author:</td>\n";
 			echo "					        <td align=\"left\" valign=\"top\">". $item->getAuthor() ."</td>\n";
 			echo "					      </tr>\n";			
-			
+
 			echo "					      <tr>\n";
 			echo "					        <td align=\"right\" valign=\"top\" class=\"strong\">Title:</td>\n";
 			echo "					        <td align=\"left\" valign=\"top\"><a href=\"index.php?cmd=editItem&reserveID={$r->reserveID}\">". $item->getTitle() ."</a></td>\n";
@@ -398,7 +408,7 @@ class requestDisplayer extends noteDisplayer {
 	
 	
 	function addItem($cmd, $item_data, $hidden_fields=null) {
-		global $u, $g_permission, $g_notetype;
+		global $u, $g_permission, $g_notetype, $g_catalogName;
 		
 		//for ease-of-use, define helper vars for determining digital/physical items
 		$isPhysical = ($cmd=='addPhysicalItem') ? true : false;
@@ -729,6 +739,13 @@ class requestDisplayer extends noteDisplayer {
 ?>
 
 		<br />
+		
+		<? if ($isPhysical && empty($item_data['controlKey']) && !empty($item_data['item_id'])) { ?>
+			<div id="alertMsg" class="failedText">
+				This item is not properly linked to <?= $g_catalogName ?>.  Please update the <?= $g_catalogName ?> Control Number.
+			</div>
+		<? } ?>		
+		
 		<div class="headingCell1" style="width:25%; text-align:center;">Item Details</div>
 		
 		<table width="100%" border="0" cellpadding="3" cellspacing="0" class="borders">
@@ -835,26 +852,18 @@ class requestDisplayer extends noteDisplayer {
 				<td><input name="OCLC" maxlength="9" size="15" value="<?=$item_data['OCLC']?>" type="text"></td>
 			</tr>
 			<tr id="man_local_control_row" align="left" valign="middle">
-				<td class="strong" align="right" bgcolor="#cccccc">Barcode / Alternate ID:</td>
-				<td><input id="man_local_control_input" name="local_control_key" size="15" value="" type="text"></td>
+				<td class="strong" align="right" bgcolor="#cccccc">
+				<?php	if($isPhysical): ?>
+					<?= $g_catalogName ?> Control Number:
+				<?php else: ?>
+					Barcode / Alternate ID:
+				<?php endif; ?>
+				</td>
+				<td><input type="text" name="local_control_key" value="<?=$item_data['controlKey']?>" /></td>
 			</tr>			
 
-<?php	
-		if($isPhysical):
-			//show control # for physical items 
-			if(!empty($item_data['controlKey'])):
-?>
-			<tr id="nonman_local_control_row" align="left" valign="middle">
-				<td class="strong" align="right" bgcolor="#cccccc">Control Number:</td>
-				<td>
-					<?=$item_data['controlKey']?>
-					<input id="nonman_local_control_input" type="hidden" name="local_control_key" value="<?=$item_data['controlKey']?>" />
-				</td>
-			</tr>
 			
-<?php		
-			endif;
-			
+<?php
 			//show reserve-desk/home-library select box
 			if(!empty($libraries)):
 ?>

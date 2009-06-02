@@ -169,12 +169,10 @@ class itemManager
 							if(isset($_REQUEST['barcode'])) $item->physicalCopy->setBarcode($_REQUEST['barcode']);
 							if(isset($_REQUEST['call_num'])) $item->physicalCopy->setCallNumber($_REQUEST['call_num']);							
 						}
-					}
-					else {	//digital item
-						//store created barcodes as `local-control-key` for digital items
+						
 						if(!empty($_REQUEST['local_control_key'])) {
 							$item->setLocalControlKey($_REQUEST['local_control_key']);
-						}
+						}						
 					}
 					
 					//personal copies

@@ -412,7 +412,7 @@ class searchDisplayer extends baseDisplayer {
 			$rowClass = ($i % 2) ? "evenRow" : "oddRow";
 			
 			echo "<input type=\"hidden\" name=\"itemSelect[]\" value=\"" . $item->getItemID() . "\">\n";
-			if ($item->getItemGroup() <> 'ELECTRONIC')
+			if ($item->isPhysicalItem())
 				echo "<input type=\"hidden\" name=\"requestItem[]\" value=\"" . $item->getItemID() . "\">\n";
 			else
 				echo "<input type=\"hidden\" name=\"reserveItem[]\" value=\"" . $item->getItemID() . "\">\n";

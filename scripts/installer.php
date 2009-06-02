@@ -295,7 +295,7 @@ Please visit http://reservesdirect.org for more information.
 			$password = !empty($_REQUEST['rd_admin_pass']) ? $_REQUEST['rd_admin_pass'] : 'pFdA5gn35';	//could be a true random pass, but this is good enough
 			
 			//insert admin user record
-			$sql = "INSERT INTO `users` (`user_id`, `username`, `first_name`, `last_name`, `email`, `dflt_permission_level`, `last_login`, `old_id`, `old_user_id`) VALUES (1, '{$username}', 'ReservesDirect', 'Administrator', NULL, 5, '0000-00-00', NULL, NULL)";
+			$sql = "INSERT INTO `users` (`user_id`, `username`, `first_name`, `last_name`, `email`, `dflt_permission_level`, `last_login`) VALUES (1, '{$username}', 'ReservesDirect', 'Administrator', NULL, 5, '0000-00-00')";
 			$rs = $g_dbConn->query($sql);
 			if(DB::isError($rs)) {
 				print_step3_error('Could not create admin user record: '.$rs->getMessage());

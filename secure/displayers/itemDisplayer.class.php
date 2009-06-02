@@ -295,7 +295,7 @@ class itemDisplayer extends noteDisplayer {
 	* @desc Displays the edit-item-item-details block
 	*/	
 	function displayEditItemItemDetails($item) {
-		global $u, $g_permission;
+		global $u, $g_permission, $g_catalogName;
 				
 		//private user
 		if( !is_null($item->getPrivateUserID()) ) {
@@ -332,7 +332,7 @@ class itemDisplayer extends noteDisplayer {
 			}
 		//-->
 		</script>
-		
+				
 		<div class="headingCell1">ITEM DETAILS</div>
 		<div id="item_details" style="padding:8px 8px 12px 8px;">
 			<table border="0" cellpadding="2" cellspacing="0">		
@@ -414,10 +414,13 @@ class itemDisplayer extends noteDisplayer {
                 <tr><td align="right">ISSN:</td><td><input type="text" size="15" maxlength="8"  value="<?= $item->getISSN() ?>" name="ISSN" /></td></tr>
 
 <?php	
-		//show barcode for digital items only
-		//physical item barcodes are shown by displayEditItemSource()
-		if(!$item->isPhysicalItem()):
+		if($item->isPhysicalItem()):
 ?>
+				<tr>
+					<td align="right"><?= $g_catalogName ?> Control Number:</td>
+					<td><input type="text" name="local_control_key" size="15" value="<?=$item->getLocalControlKey();?>" /></td>
+				</tr>
+<?php   else: ?>
 				<tr>
 					<td align="right">Barcode:</td>
 					<td><input type="text" name="local_control_key" size="15" value="<?=$item->getLocalControlKey();?>" /></td>
@@ -981,23 +984,7 @@ class itemDisplayer extends noteDisplayer {
 	 * @desc Displays form for editing item information (optionally: reserve information)
 	 */
 	function displayEditItem($item, $reserve=null, $dub_array=null) {
-		global $u, $g_permission;
-		
-//		if(is_null($reserve) && !empty($_REQUEST['reserveID'])) {	//editing item+reserve
-//			//get reserve
-//			$reserve = new reserve($_REQUEST['reserveID']);
-//			//get item
-//			$item = new reserveItem($reserve->getItemID());
-//			
-//			//init a courseInstance to show location				
-//			$ci = new courseInstance($reserve->getCourseInstanceID());
-//		}
-//		elseif(is_null($item) && !empty($_REQUEST['itemID'])) {	//editing item only
-//			$item = new reserveItem($_REQUEST['itemID']);
-//		}
-//		else {	//no IDs set, error
-//			break;
-//		}				
+		global $u, $g_permission;						
 		
 		//determine if editing a reserve
 		if(!empty($reserve) && ($reserve instanceof reserve)) {
