@@ -42,11 +42,9 @@ http://www.reservesdirect.org/
 	//else shows login page
 	require_once('secure/auth.inc.php');	
 	
-	header("Cache-control: private");	//send some headers
-    header("Pragma: public");
-    header("Cache-Control: no-cache");
-    header("Pragma: no-cache");
-    header("Expires: -1");	
+	header("Cache-Control: public"); // DON'T CHANGE THESE
+	header("Pragma: public"); // SERIOUSLY DON'T
+	header("Expires: -1");	
 	
 	//get the reserve/item
 	//When previewing items we do not have a reserve_id and must use the item_id to view the URL
