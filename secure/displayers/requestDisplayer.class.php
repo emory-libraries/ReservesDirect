@@ -851,7 +851,7 @@ class requestDisplayer extends noteDisplayer {
 				<td class="strong" align="right" bgcolor="#cccccc">OCLC:</td>
 				<td><input name="OCLC" maxlength="9" size="15" value="<?=$item_data['OCLC']?>" type="text"></td>
 			</tr>
-			<tr id="man_local_control_row" align="left" valign="middle">
+			<tr align="left" valign="middle">
 				<td class="strong" align="right" bgcolor="#cccccc">
 				<?php	if($isPhysical): ?>
 					<?= $g_catalogName ?> Control Number:
@@ -890,6 +890,7 @@ class requestDisplayer extends noteDisplayer {
 				$item_group_select['monograph'] = ' checked="true"';
 			}
 ?>
+<?php	if($isPhysical):	//auto-set item-group for electronic items ?>		
 			<tr align="left" valign="top">
 				<td align="right" bgcolor="#CCCCCC" class="strong">Item Type:</td>
 				<td>
@@ -897,8 +898,7 @@ class requestDisplayer extends noteDisplayer {
 					&nbsp;<input type="radio" name="item_group" value="MULTIMEDIA"<?=$item_group_select['multimedia']?> /> Multimedia
 				</td>
 			</tr>
-			
-<?php	elseif($isDigital):	//auto-set item-group for electronic items ?>		
+<?php	else : ?>			
 	
 			<input type="hidden" name="item_group" value="ELECTRONIC" />
 			
