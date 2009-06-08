@@ -20,6 +20,10 @@ echo "remove duplicate reserves ..."
 /usr/local/bin/php remove_duplicate_reserves.php > remove_duplicate_reserves.out
 echo "done"
 
+echo "remove duplicate notes ..."
+/usr/local/bin/php remove_duplicate_notes.php > remove_duplicate_notes.out
+echo "done"
+
 echo "creating new indexes ..."
 /usr/local/bin/php new_reserves_ndx.php
 echo "done"
