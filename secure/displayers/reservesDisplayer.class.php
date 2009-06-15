@@ -1309,7 +1309,7 @@ function displayCustomSort(&$ci, &$reserves) {
 								
 								<?php if ($u->getRole() >= $g_permission['staff']): ?>
 									<br/><input type="radio" name="reserve_status" id="reserve_status_denied" value="DENIED" <?=$reserve_status_denied?> />&nbsp;<span class="copyright_denied">DENY ACCESS FOR THIS CLASS ONLY</span>
-									<br/><input type="radio" name="reserve_status" id="item_status_denied"    value="DENY ALL" <?=$item_status_denied?> />&nbsp;<span class="copyright_denied">DENY ACCESS FOR ALL CLASSES</span> 	
+									<br/><input type="radio" name="reserve_status" id="item_status_denied"    value="DENIED_ALL" <?=$item_status_denied?> />&nbsp;<span class="copyright_denied">DENY ACCESS FOR ALL CLASSES</span>
 								<?php 	endif; ?>								
 								
 								<p><small>If you are editing headings, changes will also affect all reserves in those headings.</small></p>

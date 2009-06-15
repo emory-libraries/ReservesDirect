@@ -630,16 +630,20 @@ class reservesManager
 
 							if (isset($_REQUEST['copyright_deny_class']) || isset($_REQUEST['copyright_deny_all_classes']))
 							{
-								//physical items cant be denied copyright	
+								//physical items cant be denied copyright
 								if (!$reserve->item->isPhysicalItem()) {
-									$reserve->setStatus('DENIED');
+                                    if (isset($_REQUEST['copyright_deny_all_classes']))
+                                        $reserve->item->setStatus('DENIED');
+                                    else
+                                        $reserve->setStatus('DENIED');
 								}
 								
 								//if request exists and is not processed set as processed
 								$request = new request();
 								$request->getRequestByReserveID($reserve_id);
-								if (is_null($request->processedDate))
+								if (!is_null($request->requestID) && is_null($request->processedDate))
 								{
+                                    //do not attempt to set if Request was not found by reserveID
 									$request->setDateProcessed(date('Y-m-d'));
 								}
 							}
