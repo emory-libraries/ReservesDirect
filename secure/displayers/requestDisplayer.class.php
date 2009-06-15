@@ -140,8 +140,8 @@ class requestDisplayer extends noteDisplayer {
 				  {
 					var status = 'SEARCHING STACKS';
 					var u   = 'AJAX_functions.php?f=updateRequestStatus';
-					var qs  
-					var url
+					var qs;
+					var url;
 									  
 				  	for(var i=0;i<request_ids.length;i++)				  		
 				  	{				  			
@@ -176,7 +176,7 @@ class requestDisplayer extends noteDisplayer {
 		echo "	</tr>\n";
 
 		echo "	<tr>\n";
-		echo "		<td align=\"right\"><div id=\"marked_indicator\" style='display: inline;'><img width='16px' height='16px' src='images/spacer.gif' /></div><input type=\"button\" value=\"Mark All As PULLED\" onClick=\"markAsPulled(new Array(". $requestList->id_list() ."), 'marked_indicator');\"></td>\n";
+		echo "		<td align=\"right\"><div id=\"marked_indicator\" style='display: inline;'><img width='16px' height='16px' src='images/spacer.gif' /></div><input type=\"button\" value=\"Mark All As PULLED\" onClick=\"markAsPulled([". $requestList->id_list() ."], 'marked_indicator');\"></td>\n";
 		echo "	</tr>\n";		
 		
 		

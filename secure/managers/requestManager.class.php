@@ -436,6 +436,7 @@ class requestManager
 			$item_id = $reserve->getItem();			
 		} elseif (!is_null($_REQUEST['request_id'])) {
 			$request = new request($_REQUEST['request_id']);
+            $request->getRequestedItem();
 			$item_id = $request->requestedItem->getItemID();
 		}
 		
