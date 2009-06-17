@@ -1,13 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 2.9.1.1-Debian-1
+-- version 2.7.0-pl2
 -- http://www.phpmyadmin.net
 -- 
 -- Host: localhost
--- Generation Time: Dec 15, 2006 at 01:38 PM
--- Server version: 5.0.30
--- PHP Version: 5.2.0-7
+-- Generation Time: Jun 17, 2009 at 04:41 PM
+-- Server version: 4.1.16
+-- PHP Version: 5.2.3
 -- 
--- Database: `reserves_empty`
+-- Database: `reserves`
 -- 
 
 -- --------------------------------------------------------
@@ -16,24 +16,20 @@
 -- Table structure for table `access`
 -- 
 
-DROP TABLE IF EXISTS `access`;
-CREATE TABLE IF NOT EXISTS `access` (
-  `access_id` int(20) NOT NULL auto_increment,
-  `user_id` int(11) NOT NULL default '0',
-  `alias_id` int(20) NOT NULL default '0',
-  `permission_level` int(11) NOT NULL default '0',
-  `enrollment_status` set('AUTOFEED','APPROVED','PENDING','DENIED') NOT NULL default 'PENDING',
-  `autofeed_run_indicator` varchar(20) default NULL,
-  PRIMARY KEY  (`access_id`),
-  UNIQUE KEY `user_ca` (`user_id`,`alias_id`),
-  KEY `alias_id` (`alias_id`),
-  KEY `permission_level` (`permission_level`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- 
--- Dumping data for table `access`
--- 
-
+DROP TABLE IF EXISTS access;
+CREATE TABLE IF NOT EXISTS access (
+  access_id int(20) NOT NULL auto_increment,
+  user_id int(11) NOT NULL default '0',
+  alias_id int(20) NOT NULL default '0',
+  permission_level int(11) NOT NULL default '0',
+  enrollment_status set('AUTOFEED','APPROVED','PENDING','DENIED') NOT NULL default 'PENDING',
+  autofeed_run_indicator varchar(20) default NULL,
+  PRIMARY KEY  (access_id),
+  UNIQUE KEY user_ca (user_id,alias_id),
+  KEY alias_id (alias_id),
+  KEY permission_level (permission_level),
+  KEY user_id_ndx (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -41,19 +37,14 @@ CREATE TABLE IF NOT EXISTS `access` (
 -- Table structure for table `circ_rules`
 -- 
 
-DROP TABLE IF EXISTS `circ_rules`;
-CREATE TABLE IF NOT EXISTS `circ_rules` (
-  `id` int(11) NOT NULL auto_increment,
-  `circ_rule` varchar(50) NOT NULL default '',
-  `alt_circ_rule` varchar(50) NOT NULL default '',
-  `default_selected` set('yes','no') NOT NULL default 'no',
-  PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- 
--- Dumping data for table `circ_rules`
--- 
-
+DROP TABLE IF EXISTS circ_rules;
+CREATE TABLE IF NOT EXISTS circ_rules (
+  id int(11) NOT NULL auto_increment,
+  circ_rule varchar(50) NOT NULL default '',
+  alt_circ_rule varchar(50) NOT NULL default '',
+  default_selected set('yes','no') NOT NULL default 'no',
+  PRIMARY KEY  (id)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -61,25 +52,21 @@ CREATE TABLE IF NOT EXISTS `circ_rules` (
 -- Table structure for table `course_aliases`
 -- 
 
-DROP TABLE IF EXISTS `course_aliases`;
-CREATE TABLE IF NOT EXISTS `course_aliases` (
-  `course_alias_id` bigint(20) NOT NULL auto_increment,
-  `course_id` int(11) default NULL,
-  `course_instance_id` bigint(20) default NULL,
-  `course_name` text,
-  `section` varchar(8) default NULL,
-  `registrar_key` varchar(255) default NULL,
-  PRIMARY KEY  (`course_alias_id`),
-  UNIQUE KEY `registrar_key` (`registrar_key`),
-  KEY `course_id` (`course_id`),
-  KEY `course_instance_id` (`course_instance_id`),
-  KEY `course_name` (`course_name`(255))
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- 
--- Dumping data for table `course_aliases`
--- 
-
+DROP TABLE IF EXISTS course_aliases;
+CREATE TABLE IF NOT EXISTS course_aliases (
+  course_alias_id bigint(20) NOT NULL auto_increment,
+  course_id int(11) default NULL,
+  course_instance_id bigint(20) default NULL,
+  course_name text,
+  section varchar(8) default NULL,
+  registrar_key varchar(255) default NULL,
+  override_feed tinyint(1) NOT NULL default '0',
+  PRIMARY KEY  (course_alias_id),
+  UNIQUE KEY registrar_key (registrar_key),
+  KEY course_id (course_id),
+  KEY course_instance_id (course_instance_id),
+  KEY course_name (course_name(255))
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -87,28 +74,26 @@ CREATE TABLE IF NOT EXISTS `course_aliases` (
 -- Table structure for table `course_instances`
 -- 
 
-DROP TABLE IF EXISTS `course_instances`;
-CREATE TABLE IF NOT EXISTS `course_instances` (
-  `course_instance_id` bigint(20) NOT NULL auto_increment,
-  `primary_course_alias_id` bigint(20) default NULL,
-  `term` varchar(12) NOT NULL default '',
+DROP TABLE IF EXISTS course_instances;
+CREATE TABLE IF NOT EXISTS course_instances (
+  course_instance_id bigint(20) NOT NULL auto_increment,
+  primary_course_alias_id bigint(20) default NULL,
+  term varchar(12) NOT NULL default '',
   `year` int(11) NOT NULL default '0',
-  `activation_date` date NOT NULL default '0000-00-00',
-  `expiration_date` date NOT NULL default '0000-00-00',
+  activation_date date NOT NULL default '0000-00-00',
+  expiration_date date NOT NULL default '0000-00-00',
   `status` set('ACTIVE','INACTIVE','IN PROGRESS','AUTOFEED','CANCELED') NOT NULL default '',
-  `enrollment` set('OPEN','MODERATED','CLOSED') NOT NULL default 'OPEN',
-  PRIMARY KEY  (`course_instance_id`),
-  KEY `primary_course_alias_id` (`primary_course_alias_id`),
-  KEY `term_year_idx` (`term`,`year`),
+  enrollment set('OPEN','MODERATED','CLOSED') NOT NULL default 'OPEN',
+  reviewed_date date default NULL COMMENT 'reviewed by staff for copyright compliance',
+  reviewed_by int(11) default NULL COMMENT 'reviewed by staff for copyright compliance',
+  PRIMARY KEY  (course_instance_id),
+  KEY primary_course_alias_id (primary_course_alias_id),
+  KEY term_year_idx (term,`year`),
   KEY `status` (`status`),
-  KEY `enrollment` (`enrollment`),
-  KEY `ci_date_range_idx` (`activation_date`,`expiration_date`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- 
--- Dumping data for table `course_instances`
--- 
-
+  KEY enrollment (enrollment),
+  KEY activation_date_ndx (activation_date),
+  KEY expiration_date_ndx (expiration_date)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -116,24 +101,19 @@ CREATE TABLE IF NOT EXISTS `course_instances` (
 -- Table structure for table `courses`
 -- 
 
-DROP TABLE IF EXISTS `courses`;
-CREATE TABLE IF NOT EXISTS `courses` (
-  `course_id` int(11) NOT NULL auto_increment,
-  `department_id` int(11) NOT NULL default '0',
-  `course_number` varchar(10) default NULL,
-  `uniform_title` text NOT NULL,
-  `old_id` int(11) default NULL,
-  PRIMARY KEY  (`course_id`),
-  KEY `department_id` (`department_id`),
-  KEY `old_id` (`old_id`),
-  KEY `course_number` (`course_number`),
-  KEY `uniform_title` (`uniform_title`(255))
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- 
--- Dumping data for table `courses`
--- 
-
+DROP TABLE IF EXISTS courses;
+CREATE TABLE IF NOT EXISTS courses (
+  course_id int(11) NOT NULL auto_increment,
+  department_id int(11) NOT NULL default '0',
+  course_number varchar(10) default NULL,
+  uniform_title text NOT NULL,
+  old_id int(11) default NULL,
+  PRIMARY KEY  (course_id),
+  KEY department_id (department_id),
+  KEY old_id (old_id),
+  KEY course_number (course_number),
+  KEY uniform_title (uniform_title(255))
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -141,22 +121,17 @@ CREATE TABLE IF NOT EXISTS `courses` (
 -- Table structure for table `departments`
 -- 
 
-DROP TABLE IF EXISTS `departments`;
-CREATE TABLE IF NOT EXISTS `departments` (
-  `department_id` int(11) NOT NULL auto_increment,
-  `abbreviation` varchar(8) default NULL,
-  `name` text,
-  `library_id` int(11) NOT NULL default '0',
+DROP TABLE IF EXISTS departments;
+CREATE TABLE IF NOT EXISTS departments (
+  department_id int(11) NOT NULL auto_increment,
+  abbreviation varchar(8) default NULL,
+  name text,
+  library_id int(11) NOT NULL default '1',
   `status` int(5) default NULL,
-  PRIMARY KEY  (`department_id`),
-  KEY `library_id` (`library_id`),
-  KEY `abbr_index` (`abbreviation`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- 
--- Dumping data for table `departments`
--- 
-
+  PRIMARY KEY  (department_id),
+  KEY library_id (library_id),
+  KEY abbr_index (abbreviation)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -164,22 +139,17 @@ CREATE TABLE IF NOT EXISTS `departments` (
 -- Table structure for table `electronic_item_audit`
 -- 
 
-DROP TABLE IF EXISTS `electronic_item_audit`;
-CREATE TABLE IF NOT EXISTS `electronic_item_audit` (
-  `audit_id` int(20) NOT NULL auto_increment,
-  `item_id` bigint(20) NOT NULL default '0',
-  `date_added` date NOT NULL default '0000-00-00',
-  `added_by` int(11) NOT NULL default '0',
-  `date_reviewed` date default NULL,
-  `reviewed_by` int(11) default NULL,
-  PRIMARY KEY  (`audit_id`),
-  KEY `item_id` (`item_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- 
--- Dumping data for table `electronic_item_audit`
--- 
-
+DROP TABLE IF EXISTS electronic_item_audit;
+CREATE TABLE IF NOT EXISTS electronic_item_audit (
+  audit_id int(20) NOT NULL auto_increment,
+  item_id bigint(20) NOT NULL default '0',
+  date_added date NOT NULL default '0000-00-00',
+  added_by int(11) NOT NULL default '0',
+  date_reviewed date default NULL,
+  reviewed_by int(11) default NULL,
+  PRIMARY KEY  (audit_id),
+  KEY item_id (item_id)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -187,14 +157,14 @@ CREATE TABLE IF NOT EXISTS `electronic_item_audit` (
 -- Table structure for table `help_art_tags`
 -- 
 
-DROP TABLE IF EXISTS `help_art_tags`;
-CREATE TABLE IF NOT EXISTS `help_art_tags` (
-  `article_id` int(8) unsigned default NULL,
-  `tag` varchar(50) default NULL,
-  `user_id` int(11) unsigned default NULL,
-  UNIQUE KEY `ndx_uniq_combo` (`article_id`,`tag`,`user_id`),
-  KEY `user_id` (`user_id`),
-  FULLTEXT KEY `tag` (`tag`)
+DROP TABLE IF EXISTS help_art_tags;
+CREATE TABLE IF NOT EXISTS help_art_tags (
+  article_id int(8) unsigned default NULL,
+  tag varchar(50) default NULL,
+  user_id int(11) unsigned default NULL,
+  UNIQUE KEY ndx_uniq_combo (article_id,tag,user_id),
+  KEY user_id (user_id),
+  FULLTEXT KEY tag (tag)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- 
@@ -231,13 +201,13 @@ INSERT INTO `help_art_tags` (`article_id`, `tag`, `user_id`) VALUES
 -- Table structure for table `help_art_to_art`
 -- 
 
-DROP TABLE IF EXISTS `help_art_to_art`;
-CREATE TABLE IF NOT EXISTS `help_art_to_art` (
-  `article1_id` int(8) unsigned default NULL,
-  `article2_id` int(8) unsigned default NULL,
-  `relation_2to1` enum('child','sibling') default NULL,
-  UNIQUE KEY `ndx_uniq_combo` (`article1_id`,`article2_id`),
-  KEY `article2_id` (`article2_id`)
+DROP TABLE IF EXISTS help_art_to_art;
+CREATE TABLE IF NOT EXISTS help_art_to_art (
+  article1_id int(8) unsigned default NULL,
+  article2_id int(8) unsigned default NULL,
+  relation_2to1 enum('child','sibling') default NULL,
+  UNIQUE KEY ndx_uniq_combo (article1_id,article2_id),
+  KEY article2_id (article2_id)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='In child relationship, article1 is always parent';
 
 -- 
@@ -318,14 +288,14 @@ INSERT INTO `help_art_to_art` (`article1_id`, `article2_id`, `relation_2to1`) VA
 -- Table structure for table `help_art_to_role`
 -- 
 
-DROP TABLE IF EXISTS `help_art_to_role`;
-CREATE TABLE IF NOT EXISTS `help_art_to_role` (
-  `article_id` int(8) unsigned default NULL,
-  `permission_level` tinyint(2) unsigned default NULL,
-  `can_view` tinyint(1) NOT NULL default '1',
-  `can_edit` tinyint(1) NOT NULL default '0',
-  UNIQUE KEY `ndx_uniq_combo` (`article_id`,`permission_level`),
-  KEY `permission_level` (`permission_level`)
+DROP TABLE IF EXISTS help_art_to_role;
+CREATE TABLE IF NOT EXISTS help_art_to_role (
+  article_id int(8) unsigned default NULL,
+  permission_level tinyint(2) unsigned default NULL,
+  can_view tinyint(1) NOT NULL default '1',
+  can_edit tinyint(1) NOT NULL default '0',
+  UNIQUE KEY ndx_uniq_combo (article_id,permission_level),
+  KEY permission_level (permission_level)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='Specifies if specific permission-level may view/edit the art';
 
 -- 
@@ -464,19 +434,19 @@ INSERT INTO `help_art_to_role` (`article_id`, `permission_level`, `can_view`, `c
 -- Table structure for table `help_articles`
 -- 
 
-DROP TABLE IF EXISTS `help_articles`;
-CREATE TABLE IF NOT EXISTS `help_articles` (
-  `id` int(8) unsigned NOT NULL auto_increment,
-  `category_id` int(8) unsigned default NULL,
-  `title` varchar(100) default NULL,
-  `body` text,
-  `date_created` date default NULL,
-  `date_modified` date default NULL,
-  PRIMARY KEY  (`id`),
-  KEY `category_id` (`category_id`),
-  FULLTEXT KEY `body` (`body`),
-  FULLTEXT KEY `ft_title_body` (`title`,`body`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=42 ;
+DROP TABLE IF EXISTS help_articles;
+CREATE TABLE IF NOT EXISTS help_articles (
+  id int(8) unsigned NOT NULL auto_increment,
+  category_id int(8) unsigned default NULL,
+  title varchar(100) default NULL,
+  body text,
+  date_created date default NULL,
+  date_modified date default NULL,
+  PRIMARY KEY  (id),
+  KEY category_id (category_id),
+  FULLTEXT KEY body (body),
+  FULLTEXT KEY ft_title_body (title,body)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- 
 -- Dumping data for table `help_articles`
@@ -521,14 +491,14 @@ INSERT INTO `help_articles` (`id`, `category_id`, `title`, `body`, `date_created
 -- Table structure for table `help_cat_to_role`
 -- 
 
-DROP TABLE IF EXISTS `help_cat_to_role`;
-CREATE TABLE IF NOT EXISTS `help_cat_to_role` (
-  `category_id` int(8) unsigned default NULL,
-  `permission_level` tinyint(2) unsigned default NULL,
-  `can_view` tinyint(1) NOT NULL default '0',
-  `can_edit` tinyint(1) NOT NULL default '0',
-  UNIQUE KEY `ndx_uniq_combo` (`category_id`,`permission_level`),
-  KEY `category_id` (`permission_level`)
+DROP TABLE IF EXISTS help_cat_to_role;
+CREATE TABLE IF NOT EXISTS help_cat_to_role (
+  category_id int(8) unsigned default NULL,
+  permission_level tinyint(2) unsigned default NULL,
+  can_view tinyint(1) NOT NULL default '0',
+  can_edit tinyint(1) NOT NULL default '0',
+  UNIQUE KEY ndx_uniq_combo (category_id,permission_level),
+  KEY category_id (permission_level)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='Specifies if specific permission-level may view/edit the art';
 
 -- 
@@ -567,13 +537,13 @@ INSERT INTO `help_cat_to_role` (`category_id`, `permission_level`, `can_view`, `
 -- Table structure for table `help_categories`
 -- 
 
-DROP TABLE IF EXISTS `help_categories`;
-CREATE TABLE IF NOT EXISTS `help_categories` (
-  `id` smallint(4) unsigned NOT NULL auto_increment,
-  `title` varchar(100) default NULL,
-  `description` tinytext,
-  PRIMARY KEY  (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=7 ;
+DROP TABLE IF EXISTS help_categories;
+CREATE TABLE IF NOT EXISTS help_categories (
+  id smallint(4) unsigned NOT NULL auto_increment,
+  title varchar(100) default NULL,
+  description tinytext,
+  PRIMARY KEY  (id)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- 
 -- Dumping data for table `help_categories`
@@ -593,19 +563,14 @@ INSERT INTO `help_categories` (`id`, `title`, `description`) VALUES
 -- Table structure for table `hidden_readings`
 -- 
 
-DROP TABLE IF EXISTS `hidden_readings`;
-CREATE TABLE IF NOT EXISTS `hidden_readings` (
-  `hidden_id` int(20) NOT NULL auto_increment,
-  `user_id` int(11) NOT NULL default '0',
-  `reserve_id` bigint(20) NOT NULL default '0',
-  PRIMARY KEY  (`hidden_id`),
-  UNIQUE KEY `unique_constraint` (`user_id`,`reserve_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- 
--- Dumping data for table `hidden_readings`
--- 
-
+DROP TABLE IF EXISTS hidden_readings;
+CREATE TABLE IF NOT EXISTS hidden_readings (
+  hidden_id int(20) NOT NULL auto_increment,
+  user_id int(11) NOT NULL default '0',
+  reserve_id bigint(20) NOT NULL default '0',
+  PRIMARY KEY  (hidden_id),
+  UNIQUE KEY unique_constraint (user_id,reserve_id)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -613,21 +578,20 @@ CREATE TABLE IF NOT EXISTS `hidden_readings` (
 -- Table structure for table `ils_requests`
 -- 
 
-DROP TABLE IF EXISTS `ils_requests`;
-CREATE TABLE IF NOT EXISTS `ils_requests` (
-  `request_id` int(8) unsigned NOT NULL auto_increment,
-  `date_added` date default NULL,
-  `ils_request_id` varchar(16) default NULL,
-  `ils_control_key` varchar(16) default NULL,
-  `user_net_id` varchar(16) default NULL,
-  `user_ils_id` varchar(16) default NULL,
-  `ils_course` varchar(150) default NULL,
-  `requested_loan_period` varchar(16) default NULL,
-  PRIMARY KEY  (`request_id`),
-  UNIQUE KEY `ils_request_id` (`ils_request_id`)
+DROP TABLE IF EXISTS ils_requests;
+CREATE TABLE IF NOT EXISTS ils_requests (
+  request_id int(8) unsigned NOT NULL auto_increment,
+  date_added date default NULL,
+  ils_request_id varchar(16) default NULL,
+  ils_control_key varchar(16) default NULL,
+  user_net_id varchar(16) default NULL,
+  user_ils_id varchar(16) default NULL,
+  ils_course varchar(150) default NULL,
+  requested_loan_period varchar(16) default NULL,
+  PRIMARY KEY  (request_id),
+  UNIQUE KEY ils_request_id (ils_request_id),
+  UNIQUE KEY ils_control_key (ils_control_key)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-
 
 -- --------------------------------------------------------
 
@@ -635,17 +599,12 @@ CREATE TABLE IF NOT EXISTS `ils_requests` (
 -- Table structure for table `inst_loan_periods`
 -- 
 
-DROP TABLE IF EXISTS `inst_loan_periods`;
-CREATE TABLE IF NOT EXISTS `inst_loan_periods` (
-  `loan_period_id` bigint(20) NOT NULL auto_increment,
-  `loan_period` varchar(255) NOT NULL default '',
-  PRIMARY KEY  (`loan_period_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- 
--- Dumping data for table `inst_loan_periods`
--- 
-
+DROP TABLE IF EXISTS inst_loan_periods;
+CREATE TABLE IF NOT EXISTS inst_loan_periods (
+  loan_period_id bigint(20) NOT NULL auto_increment,
+  loan_period varchar(255) NOT NULL default '',
+  PRIMARY KEY  (loan_period_id)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -653,19 +612,17 @@ CREATE TABLE IF NOT EXISTS `inst_loan_periods` (
 -- Table structure for table `inst_loan_periods_libraries`
 -- 
 
-DROP TABLE IF EXISTS `inst_loan_periods_libraries`;
-CREATE TABLE IF NOT EXISTS `inst_loan_periods_libraries` (
-  `id` bigint(20) NOT NULL auto_increment,
-  `library_id` bigint(20) NOT NULL default '0',
-  `loan_period_id` bigint(20) NOT NULL default '0',
+DROP TABLE IF EXISTS inst_loan_periods_libraries;
+CREATE TABLE IF NOT EXISTS inst_loan_periods_libraries (
+  id bigint(20) NOT NULL auto_increment,
+  library_id bigint(20) NOT NULL default '0',
+  loan_period_id bigint(20) NOT NULL default '0',
   `default` set('true','false') NOT NULL default 'false',
-  PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- 
--- Dumping data for table `inst_loan_periods_libraries`
--- 
-
+  PRIMARY KEY  (id),
+  UNIQUE KEY unique_library_loan_period (library_id,loan_period_id),
+  KEY library_id_ndx (library_id),
+  KEY loan_period_id_ndx (loan_period_id)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -673,21 +630,16 @@ CREATE TABLE IF NOT EXISTS `inst_loan_periods_libraries` (
 -- Table structure for table `instructor_attributes`
 -- 
 
-DROP TABLE IF EXISTS `instructor_attributes`;
-CREATE TABLE IF NOT EXISTS `instructor_attributes` (
-  `instructor_attribute_id` int(11) NOT NULL auto_increment,
-  `user_id` int(11) NOT NULL default '0',
-  `ils_user_id` varchar(50) default NULL,
-  `ils_name` varchar(75) default NULL,
-  `organizational_status` varchar(25) default NULL,
-  PRIMARY KEY  (`instructor_attribute_id`),
-  KEY `user_id` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- 
--- Dumping data for table `instructor_attributes`
--- 
-
+DROP TABLE IF EXISTS instructor_attributes;
+CREATE TABLE IF NOT EXISTS instructor_attributes (
+  instructor_attribute_id int(11) NOT NULL auto_increment,
+  user_id int(11) NOT NULL default '0',
+  ils_user_id varchar(50) default NULL,
+  ils_name varchar(75) default NULL,
+  organizational_status varchar(25) default NULL,
+  PRIMARY KEY  (instructor_attribute_id),
+  KEY user_id (user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -695,22 +647,20 @@ CREATE TABLE IF NOT EXISTS `instructor_attributes` (
 -- Table structure for table `item_upload_log`
 -- 
 
-DROP TABLE IF EXISTS `item_upload_log`;
-CREATE TABLE IF NOT EXISTS `item_upload_log` (
-  `id` bigint(20) NOT NULL auto_increment,
-  `user_id` int(11) NOT NULL default '0',
-  `course_instance_id` bigint(20) NOT NULL default '0',
-  `item_id` bigint(20) NOT NULL default '0',
-  `timestamp_uploaded` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `filesize` varchar(10) NOT NULL default '',
-  `ipaddr` varchar(15) NOT NULL default '',
-  PRIMARY KEY  (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- 
--- Dumping data for table `item_upload_log`
--- 
-
+DROP TABLE IF EXISTS item_upload_log;
+CREATE TABLE IF NOT EXISTS item_upload_log (
+  id bigint(20) NOT NULL auto_increment,
+  user_id int(11) NOT NULL default '0',
+  course_instance_id bigint(20) NOT NULL default '0',
+  item_id bigint(20) NOT NULL default '0',
+  timestamp_uploaded timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  filesize varchar(10) NOT NULL default '',
+  ipaddr varchar(15) NOT NULL default '',
+  PRIMARY KEY  (id),
+  KEY user_id_ndx (user_id),
+  KEY course_instance_id_ndx (course_instance_id),
+  KEY item_id_ndx (item_id)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -718,50 +668,47 @@ CREATE TABLE IF NOT EXISTS `item_upload_log` (
 -- Table structure for table `items`
 -- 
 
-DROP TABLE IF EXISTS `items`;
-CREATE TABLE IF NOT EXISTS `items` (
-  `item_id` bigint(20) NOT NULL auto_increment,
-  `title` varchar(255) default NULL,
-  `author` varchar(255) default NULL,
-  `source` varchar(255) default NULL,
-  `volume_title` varchar(255) default NULL,
-  `content_notes` varchar(255) default NULL,
-  `volume_edition` varchar(255) default NULL,
-  `pages_times` varchar(255) default NULL,
-  `performer` varchar(255) default NULL,
-  `local_control_key` varchar(30) default NULL,
-  `creation_date` date NOT NULL default '0000-00-00',
-  `last_modified` date NOT NULL default '0000-00-00',
-  `url` text,
-  `mimetype` varchar(100) default 'text/html',
-  `home_library` int(11) NOT NULL default '0',
-  `private_user_id` int(11) default NULL,
-  `item_group` varchar(25) NOT NULL default '0',
-  `item_type` set('ITEM','HEADING') NOT NULL default 'ITEM',
-  `item_icon` varchar(255) default NULL,
-  `old_id` int(11) NOT NULL default '0',
-  PRIMARY KEY  (`item_id`),
-  KEY `private_user_id` (`private_user_id`),
-  KEY `home_library` (`home_library`),
-  KEY `mimetype` (`mimetype`),
-  KEY `item_group` (`item_group`),
-  KEY `old_id` (`old_id`),
-  KEY `controlKey` (`local_control_key`),
-  KEY `ndx_title` (`title`),
-  KEY `ndx_source` (`source`),
-  KEY `ndx_content_notes` (`content_notes`),
-  KEY `ndx_volume_edition` (`volume_edition`),
-  KEY `ndx_pages_times` (`pages_times`),
-  KEY `ndx_performer` (`performer`),
-  KEY `ndx_url` (`url`(255)),
-  KEY `ndx_author` (`author`),
-  KEY `ndx_volume_title` (`volume_title`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- 
--- Dumping data for table `items`
--- 
-
+DROP TABLE IF EXISTS items;
+CREATE TABLE IF NOT EXISTS items (
+  item_id bigint(20) NOT NULL auto_increment,
+  title varchar(255) default NULL,
+  author varchar(255) default NULL,
+  source varchar(255) default NULL,
+  volume_title varchar(255) default NULL,
+  content_notes varchar(255) default NULL,
+  volume_edition varchar(255) default NULL,
+  pages_times varchar(255) default NULL,
+  performer varchar(255) default NULL,
+  local_control_key varchar(30) default NULL,
+  creation_date date NOT NULL default '0000-00-00',
+  last_modified date NOT NULL default '0000-00-00',
+  url text,
+  mimetype tinyint(4) NOT NULL default '7',
+  home_library int(11) NOT NULL default '0',
+  private_user_id int(11) default NULL,
+  item_group set('MONOGRAPH','MULTIMEDIA','ELECTRONIC','HEADING') NOT NULL default '',
+  item_type set('ITEM','HEADING') NOT NULL default 'ITEM',
+  item_icon varchar(255) default NULL,
+  ISBN varchar(13) default NULL,
+  ISSN varchar(8) default NULL,
+  OCLC varchar(9) default NULL,
+  `status` set('ACTIVE','DENIED') NOT NULL default 'ACTIVE',
+  PRIMARY KEY  (item_id),
+  KEY private_user_id (private_user_id),
+  KEY home_library (home_library),
+  KEY mimetype (mimetype),
+  KEY item_group (item_group),
+  KEY controlKey (local_control_key),
+  KEY ndx_title (title),
+  KEY ndx_source (source),
+  KEY ndx_content_notes (content_notes),
+  KEY ndx_volume_edition (volume_edition),
+  KEY ndx_pages_times (pages_times),
+  KEY ndx_performer (performer),
+  KEY ndx_url (url(255)),
+  KEY ndx_author (author),
+  KEY ndx_volume_title (volume_title)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -769,28 +716,58 @@ CREATE TABLE IF NOT EXISTS `items` (
 -- Table structure for table `libraries`
 -- 
 
-DROP TABLE IF EXISTS `libraries`;
-CREATE TABLE IF NOT EXISTS `libraries` (
-  `library_id` int(11) NOT NULL auto_increment,
-  `name` varchar(100) NOT NULL default '',
-  `nickname` varchar(15) NOT NULL default '',
-  `ils_prefix` varchar(10) NOT NULL default '',
-  `reserve_desk` varchar(50) NOT NULL default '',
-  `url` text,
-  `contact_email` varchar(255) default NULL,
-  `monograph_library_id` int(11) NOT NULL default '0',
-  `multimedia_library_id` int(11) NOT NULL default '0',
-  `copyright_library_id` int(11) default NULL,
-  PRIMARY KEY  (`library_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+DROP TABLE IF EXISTS libraries;
+CREATE TABLE IF NOT EXISTS libraries (
+  library_id int(11) NOT NULL auto_increment,
+  name varchar(100) NOT NULL default '',
+  nickname varchar(15) NOT NULL default '',
+  ils_prefix varchar(10) NOT NULL default '',
+  reserve_desk varchar(50) NOT NULL default '',
+  url text,
+  contact_email varchar(255) default NULL,
+  monograph_library_id int(11) NOT NULL default '0',
+  multimedia_library_id int(11) NOT NULL default '0',
+  copyright_library_id int(11) default NULL,
+  PRIMARY KEY  (library_id),
+  KEY monograph_library_id_ndx (monograph_library_id),
+  KEY multimedia_library_id_ndx (multimedia_library_id),
+  KEY copyright_library_id_ndx (copyright_library_id)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
-INSERT INTO `libraries` VALUES (1,'Test Library','test','TEST','TEST','http://www.example.edu','library@example.edu',1,1,1);
-
+-- --------------------------------------------------------
 
 -- 
--- Dumping data for table `libraries`
+-- Table structure for table `mimetype_extensions`
 -- 
 
+DROP TABLE IF EXISTS mimetype_extensions;
+CREATE TABLE IF NOT EXISTS mimetype_extensions (
+  id int(11) NOT NULL auto_increment COMMENT 'primary key',
+  mimetype_id int(11) NOT NULL default '0' COMMENT 'foreign key to mimetypes table',
+  file_extension varchar(5) NOT NULL default '' COMMENT 'file extension',
+  PRIMARY KEY  (id),
+  UNIQUE KEY file_extension (file_extension),
+  KEY mimetype_id (mimetype_id)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COMMENT='allow storage of mulitple file extensions for each mimetype';
+
+-- 
+-- Dumping data for table `mimetype_extensions`
+-- 
+
+INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (1, 1, 'pdf');
+INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (2, 2, 'ram');
+INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (3, 3, 'mov');
+INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (4, 4, 'doc');
+INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (5, 5, 'xcl');
+INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (6, 6, 'ppt');
+INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (7, 7, '');
+INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (8, 4, 'docx');
+INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (9, 5, 'xlsx');
+INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (10, 6, 'pptx');
+INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (11, 6, 'ppsx');
+INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (12, 7, 'html');
+INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (13, 7, 'htm');
+INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (14, 7, 'xhtml');
 
 -- --------------------------------------------------------
 
@@ -798,29 +775,27 @@ INSERT INTO `libraries` VALUES (1,'Test Library','test','TEST','TEST','http://ww
 -- Table structure for table `mimetypes`
 -- 
 
-DROP TABLE IF EXISTS `mimetypes`;
-CREATE TABLE IF NOT EXISTS `mimetypes` (
-  `mimetype_id` int(11) NOT NULL auto_increment,
-  `mimetype` varchar(100) NOT NULL default '',
-  `helper_app_url` text,
-  `helper_app_name` text,
-  `helper_app_icon` text,
-  `file_extentions` varchar(255) NOT NULL default '',
-  PRIMARY KEY  (`mimetype_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
+DROP TABLE IF EXISTS mimetypes;
+CREATE TABLE IF NOT EXISTS mimetypes (
+  mimetype_id int(11) NOT NULL auto_increment,
+  mimetype varchar(100) NOT NULL default '',
+  helper_app_url text,
+  helper_app_name text,
+  helper_app_icon text,
+  PRIMARY KEY  (mimetype_id)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- 
 -- Dumping data for table `mimetypes`
 -- 
 
-INSERT INTO `mimetypes` (`mimetype_id`, `mimetype`, `helper_app_url`, `helper_app_name`, `helper_app_icon`, `file_extentions`) VALUES 
-(1, 'application/pdf', 'http://www.adobe.com/products/acrobat/readstep2.html', 'Adobe Acrobat Reader', 'images/doc_type_icons/doctype-pdf.gif', 'pdf'),
-(2, 'audio/x-pn-realaudio', 'http://www.real.com/', 'RealPlayer', 'images/doc_type_icons/doctype-sound.gif', 'ram'),
-(3, 'video/quicktime', 'http://www.apple.com/quicktime/', 'Quicktime Player', 'images/doc_type_icons/doctype-movie.gif', 'mov'),
-(4, 'application/msword', 'http://office.microsoft.com/Assistance/9798/viewerscvt.aspx', 'Microsoft Word', 'images/doc_type_icons/doctype-text.gif', 'doc'),
-(5, 'application/vnd.ms-excel', 'http://office.microsoft.com/Assistance/9798/viewerscvt.aspx', 'Microsoft Excel', 'images/doc_type_icons/doctype-text.gif', 'xcl'),
-(6, 'application/vnd.ms-powerpoint', 'http://office.microsoft.com/Assistance/9798/viewerscvt.aspx', 'Microsoft Powerpoint', 'images/doc_type_icons/doctype-text.gif', 'ppt'),
-(7, 'text/html', NULL, NULL, 'images/doc_type_icons/doctype-clear.gif', '');
+INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (1, 'application/pdf', 'http://www.adobe.com/products/acrobat/readstep2.html', 'Adobe Acrobat Reader', 'images/doc_type_icons/doctype-pdf.gif');
+INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (2, 'audio/x-pn-realaudio', 'http://www.real.com/', 'RealPlayer', 'images/doc_type_icons/doctype-sound.gif');
+INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (3, 'video/quicktime', 'http://www.apple.com/quicktime/', 'Quicktime Player', 'images/doc_type_icons/doctype-movie.gif');
+INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (4, 'application/msword', 'http://office.microsoft.com/Assistance/9798/viewerscvt.aspx', 'Microsoft Word', 'images/doc_type_icons/doctype-text.gif');
+INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (5, 'application/vnd.ms-excel', 'http://office.microsoft.com/Assistance/9798/viewerscvt.aspx', 'Microsoft Excel', 'images/doc_type_icons/doctype-text.gif');
+INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (6, 'application/vnd.ms-powerpoint', 'http://office.microsoft.com/Assistance/9798/viewerscvt.aspx', 'Microsoft Powerpoint', 'images/doc_type_icons/doctype-text.gif');
+INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (7, 'text/html', NULL, 'Link', 'images/doc_type_icons/doctype-link.gif');
 
 -- --------------------------------------------------------
 
@@ -828,25 +803,20 @@ INSERT INTO `mimetypes` (`mimetype_id`, `mimetype`, `helper_app_url`, `helper_ap
 -- Table structure for table `news`
 -- 
 
-DROP TABLE IF EXISTS `news`;
-CREATE TABLE IF NOT EXISTS `news` (
-  `news_id` bigint(20) NOT NULL auto_increment,
-  `news_text` text NOT NULL COMMENT 'Text which will be displayed on all pages',
-  `font_class` varchar(50) NOT NULL default '' COMMENT 'css class of text',
-  `permission_level` set('0','1','2','3','4','5') default '',
-  `begin_time` datetime default NULL,
-  `end_time` datetime default NULL,
-  `sort_order` int(11) NOT NULL default '0',
-  PRIMARY KEY  (`news_id`),
-  KEY `permission_level` (`permission_level`),
-  KEY `begin_time` (`begin_time`),
-  KEY `end_time` (`end_time`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- 
--- Dumping data for table `news`
--- 
-
+DROP TABLE IF EXISTS news;
+CREATE TABLE IF NOT EXISTS news (
+  news_id bigint(20) NOT NULL auto_increment,
+  news_text text NOT NULL COMMENT 'Text which will be displayed on all pages',
+  font_class varchar(50) NOT NULL default '' COMMENT 'css class of text',
+  permission_level set('0','1','2','3','4','5') default '',
+  begin_time datetime default NULL,
+  end_time datetime default NULL,
+  sort_order int(11) NOT NULL default '0',
+  PRIMARY KEY  (news_id),
+  KEY permission_level (permission_level),
+  KEY begin_time (begin_time),
+  KEY end_time (end_time)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -854,17 +824,12 @@ CREATE TABLE IF NOT EXISTS `news` (
 -- Table structure for table `not_trained`
 -- 
 
-DROP TABLE IF EXISTS `not_trained`;
-CREATE TABLE IF NOT EXISTS `not_trained` (
-  `user_id` int(11) NOT NULL default '0',
-  `permission_level` int(11) NOT NULL default '0',
-  PRIMARY KEY  (`user_id`)
+DROP TABLE IF EXISTS not_trained;
+CREATE TABLE IF NOT EXISTS not_trained (
+  user_id int(11) NOT NULL default '0',
+  permission_level int(11) NOT NULL default '0',
+  PRIMARY KEY  (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- 
--- Dumping data for table `not_trained`
--- 
-
 
 -- --------------------------------------------------------
 
@@ -872,23 +837,18 @@ CREATE TABLE IF NOT EXISTS `not_trained` (
 -- Table structure for table `notes`
 -- 
 
-DROP TABLE IF EXISTS `notes`;
-CREATE TABLE IF NOT EXISTS `notes` (
-  `note_id` bigint(20) NOT NULL auto_increment,
+DROP TABLE IF EXISTS notes;
+CREATE TABLE IF NOT EXISTS notes (
+  note_id bigint(20) NOT NULL auto_increment,
   `type` varchar(25) NOT NULL default '',
-  `target_id` bigint(20) NOT NULL default '0',
-  `note` text NOT NULL,
-  `target_table` varchar(50) NOT NULL default '',
-  PRIMARY KEY  (`note_id`),
+  target_id bigint(20) NOT NULL default '0',
+  note text NOT NULL,
+  target_table varchar(50) NOT NULL default '',
+  PRIMARY KEY  (note_id),
   KEY `type` (`type`),
-  KEY `target` (`target_table`,`target_id`),
-  KEY `ndx_note` (`note`(255))
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- 
--- Dumping data for table `notes`
--- 
-
+  KEY target (target_table,target_id),
+  KEY ndx_note (note(255))
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -896,11 +856,11 @@ CREATE TABLE IF NOT EXISTS `notes` (
 -- Table structure for table `permissions_levels`
 -- 
 
-DROP TABLE IF EXISTS `permissions_levels`;
-CREATE TABLE IF NOT EXISTS `permissions_levels` (
-  `permission_id` int(11) NOT NULL default '0',
-  `label` varchar(25) NOT NULL default '',
-  PRIMARY KEY  (`permission_id`)
+DROP TABLE IF EXISTS permissions_levels;
+CREATE TABLE IF NOT EXISTS permissions_levels (
+  permission_id int(11) NOT NULL default '0',
+  label varchar(25) NOT NULL default '',
+  PRIMARY KEY  (permission_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- 
@@ -921,30 +881,55 @@ INSERT INTO `permissions_levels` (`permission_id`, `label`) VALUES
 -- Table structure for table `physical_copies`
 -- 
 
-DROP TABLE IF EXISTS `physical_copies`;
-CREATE TABLE IF NOT EXISTS `physical_copies` (
-  `physical_copy_id` int(11) NOT NULL auto_increment,
-  `reserve_id` bigint(20) NOT NULL default '0',
-  `item_id` bigint(20) NOT NULL default '0',
+DROP TABLE IF EXISTS physical_copies;
+CREATE TABLE IF NOT EXISTS physical_copies (
+  physical_copy_id int(11) NOT NULL auto_increment,
+  reserve_id bigint(20) NOT NULL default '0',
+  item_id bigint(20) NOT NULL default '0',
   `status` varchar(30) NOT NULL default '',
-  `call_number` text,
-  `barcode` varchar(15) default NULL,
-  `owning_library` varchar(15) NOT NULL default '0',
-  `item_type` varchar(30) default NULL,
-  `owner_user_id` int(11) default NULL,
-  PRIMARY KEY  (`physical_copy_id`),
-  KEY `reserves_id` (`reserve_id`),
-  KEY `item_id` (`item_id`),
+  call_number text,
+  barcode varchar(15) default NULL,
+  owning_library varchar(15) NOT NULL default '0',
+  item_type varchar(30) default NULL,
+  owner_user_id int(11) default NULL,
+  PRIMARY KEY  (physical_copy_id),
+  KEY reserves_id (reserve_id),
+  KEY item_id (item_id),
   KEY `status` (`status`),
-  KEY `barcode` (`barcode`),
-  KEY `item_type` (`item_type`),
-  KEY `owner_user_id` (`owner_user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+  KEY barcode (barcode),
+  KEY item_type (item_type),
+  KEY owner_user_id (owner_user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
 
 -- 
--- Dumping data for table `physical_copies`
+-- Table structure for table `proxied_hosts`
 -- 
 
+DROP TABLE IF EXISTS proxied_hosts;
+CREATE TABLE IF NOT EXISTS proxied_hosts (
+  id int(11) NOT NULL auto_increment COMMENT 'primary key',
+  proxy_id int(11) NOT NULL default '0' COMMENT 'foreign key to proxy table',
+  domain varchar(255) NOT NULL default '' COMMENT 'host domain',
+  partial_match binary(1) NOT NULL default '0' COMMENT 'if 0 require exact match against domain',
+  PRIMARY KEY  (id),
+  UNIQUE KEY unique_domain (domain)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='list of host to be proxied';
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `proxies`
+-- 
+
+DROP TABLE IF EXISTS proxies;
+CREATE TABLE IF NOT EXISTS proxies (
+  id int(11) NOT NULL auto_increment COMMENT 'primary key',
+  name varchar(50) NOT NULL default '' COMMENT 'display name',
+  prefix varchar(255) NOT NULL default '' COMMENT 'url prefix',
+  PRIMARY KEY  (id)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='proxies';
 
 -- --------------------------------------------------------
 
@@ -952,35 +937,20 @@ CREATE TABLE IF NOT EXISTS `physical_copies` (
 -- Table structure for table `reports`
 -- 
 
-DROP TABLE IF EXISTS `reports`;
-CREATE TABLE IF NOT EXISTS `reports` (
-  `report_id` bigint(20) NOT NULL auto_increment,
-  `title` varchar(255) NOT NULL default '',
-  `param_group` set('term','department','class','term_lib','term_dates') default NULL,
+DROP TABLE IF EXISTS reports;
+CREATE TABLE IF NOT EXISTS reports (
+  report_id bigint(20) NOT NULL auto_increment,
+  title varchar(255) NOT NULL default '',
+  param_group set('term','department','class','term_lib','term_dates') default NULL,
   `sql` text NOT NULL,
-  `parameters` varchar(255) default NULL,
-  `min_permissions` int(11) NOT NULL default '4',
-  `sort_order` int(11) NOT NULL default '0',
-  `cached` tinyint(1) NOT NULL default '1' COMMENT 'boolean: 1 of 0',
-  `cache_refresh_delay` int(4) NOT NULL default '6' COMMENT 'measured in hours',
-  PRIMARY KEY  (`report_id`),
-  KEY `min_permissions` (`min_permissions`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=10 ;
-
--- 
--- Dumping data for table `reports`
--- 
-
-INSERT INTO `reports` (`report_id`, `title`, `param_group`, `sql`, `parameters`, `min_permissions`, `sort_order`, `cached`, `cache_refresh_delay`) VALUES 
-(1, 'Items Added by Role', 'term', 'SELECT concat( t.term_name, '' '', t.term_year ) AS ''Term'', pl.label AS ''Role'', count( distinct eia.item_id ) AS ''Items Added''\r\nFROM electronic_item_audit AS eia\r\nJOIN reserves AS r ON r.item_id = eia.item_id\r\nJOIN course_instances AS ci ON ci.course_instance_id = r.course_instance_id\r\nJOIN terms AS t ON ci.term = t.term_name\r\nAND ci.year = t.term_year\r\nJOIN users AS u ON eia.added_by = u.user_id\r\nJOIN permissions_levels AS pl ON u.dflt_permission_level = pl.permission_id\r\nWHERE t.term_id IN (!)\r\nGROUP BY Term, Role', 'term_id', 4, 2, 0, 0),
-(2, 'Totals: Items And Reserves', NULL, 'SELECT \r\n	i.item_group AS ''Item Type'',\r\n	COUNT(DISTINCT i.item_id) AS ''Total Items'',\r\n	COUNT(DISTINCT r.reserve_id) AS ''Total Reserves''\r\nFROM reserves AS r\r\n	JOIN items AS i ON i.item_id = r.item_id\r\nGROUP BY i.item_group', NULL, 4, 0, 1, 6),
-(3, 'Totals: Courses', NULL, 'SELECT\r\n	COUNT(DISTINCT primary_course_alias_id) AS ''Total Number of Courses''\r\nFROM course_instances', NULL, 4, 0, 1, 6),
-(4, 'Totals: Users', NULL, 'SELECT\r\n	pl.label AS ''User Role'',\r\n	COUNT(DISTINCT u.user_id) AS ''User Count''\r\nFROM users AS u \r\n	JOIN permissions_levels AS pl ON pl.permission_id = u.dflt_permission_level\r\nGROUP BY pl.label', NULL, 4, 0, 1, 6),
-(5, 'Item View Log for a class', 'class', 'SELECT\r\n	i.title as ''Title'',\r\n	COUNT(uvl.user_id) as ''Total Hits'',\r\n	COUNT(DISTINCT uvl.user_id) as ''Unique Hits''\r\nFROM course_instances AS ci\r\n	JOIN reserves AS r ON r.course_instance_id = ci.course_instance_id\r\n	JOIN items AS i ON i.item_id = r.item_id\r\n	LEFT JOIN user_view_log AS uvl ON uvl.reserve_id = r.reserve_id\r\nWHERE ci.course_instance_id = !\r\nGROUP BY r.reserve_id\r\nORDER BY Title', 'ci', 3, 2, 0, 0),
-(6, 'Global: Courses And Users', 'term_lib', 'SELECT\r\n	CONCAT(t.term_name, '' '', t.term_year) as Term,\r\n	l.name AS Library,\r\n	d.name AS Department,\r\n	COUNT(DISTINCT ci.course_instance_id) AS Courses,\r\n	COUNT(DISTINCT a_i.user_id) AS Instructors,\r\n	COUNT(DISTINCT a_p.user_id) AS Proxies,\r\n	COUNT(DISTINCT a_s.user_id) AS Students\r\nFROM terms AS t\r\n	JOIN course_instances AS ci ON (ci.term = t.term_name AND ci.year = t.term_year)\r\n	JOIN course_aliases AS ca ON ca.course_alias_id = ci.primary_course_alias_id\r\n	LEFT JOIN access AS a_i ON a_i.alias_id = ca.course_alias_id AND a_i.permission_level = 3\r\n	LEFT JOIN access AS a_p ON a_p.alias_id = ca.course_alias_id AND a_p.permission_level = 2\r\n	LEFT JOIN access AS a_s ON a_s.alias_id = ca.course_alias_id AND a_s.permission_level = 0\r\n	JOIN courses AS c ON ca.course_id = c.course_id\r\n	JOIN departments AS d ON d.department_id = c.department_id\r\n	JOIN libraries AS l ON l.library_id = d.library_id\r\nWHERE t.term_id IN (!)\r\n	AND l.library_id IN (!)\r\n	AND d.status IS NULL	\r\nGROUP BY\r\n	t.term_year,\r\n	t.term_name,\r\n	l.library_id,\r\n	d.department_id\r\nORDER BY\r\n	t.term_year,\r\n	t.term_name,\r\n	l.name,\r\n	d.name	', 'term_id,library_id', 4, 1, 1, 6),
-(7, 'Global: Items And Reserves', 'term_lib', 'SELECT\r\n	CONCAT(t.term_name, '' '', t.term_year) as Term,\r\n	l.name AS Library,\r\n	d.name AS Department,\r\n	i.item_group AS ''Item Type'',\r\n	COUNT(DISTINCT r.item_id) AS ''Utilized Items'',\r\n	COUNT(DISTINCT r.reserve_id) AS ''Available Reserves'',\r\n	COUNT(DISTINCT uvl.reserve_id) AS ''Opened Reserves''\r\nFROM terms AS t\r\n	JOIN course_instances AS ci ON (ci.term = t.term_name AND ci.year = t.term_year)\r\n	JOIN reserves AS r ON r.course_instance_id = ci.course_instance_id\r\n	JOIN items AS i ON i.item_id = r.item_id\r\n	LEFT JOIN user_view_log AS uvl ON uvl.reserve_id = r.reserve_id\r\n	\r\n	JOIN course_aliases AS ca ON ca.course_alias_id = ci.primary_course_alias_id\r\n	JOIN courses AS c ON c.course_id = ca.course_id\r\n	JOIN departments AS d ON d.department_id = c.department_id\r\n	JOIN libraries AS l ON l.library_id = d.library_id\r\nWHERE t.term_id IN (!)\r\n	AND l.library_id IN (!)\r\n	AND d.status IS NULL\r\nGROUP BY\r\n	t.term_year,\r\n	t.term_name,\r\n	l.library_id,\r\n	d.department_id,\r\n	i.item_group\r\nORDER BY\r\n	t.term_year,\r\n	t.term_name,\r\n	l.name,\r\n	d.name,\r\n	i.item_group', 'term_id,library_id', 4, 1, 1, 6),
-(8, 'Global: Upload Activity', 'term', 'SELECT\r\n	CONCAT(t.term_name, '' '', t.term_year) as Term,\r\n	CONCAT(u.last_name, '', '', u.first_name) AS User,\r\n	pl.label AS Role,		\r\n	COUNT(DISTINCT aud.item_id) AS ''Items Added''\r\nFROM terms AS t\r\n	JOIN electronic_item_audit AS aud ON (aud.date_added BETWEEN t.begin_date AND t.end_date)\r\n	JOIN users AS u ON u.user_id = aud.added_by\r\n	JOIN permissions_levels AS pl ON pl.permission_id = u.dflt_permission_level\r\nWHERE t.term_id IN (!)\r\nGROUP BY\r\n	t.term_year,\r\n	t.term_name,\r\n	u.user_id\r\nORDER BY\r\n	t.term_year,\r\n	t.term_name,\r\n	''Items Added'' DESC', 'term_id', 4, 1, 0, 0),
-(9, 'Item View Log for a class by date', 'class', 'SELECT\r\n	i.title as ''Title'',\r\n	DATE(uvl.timestamp_viewed) AS ''Date'',\r\n	COUNT(uvl.user_id) as ''Total Hits'',\r\n	COUNT(DISTINCT uvl.user_id) as ''Unique Hits''\r\nFROM course_instances AS ci\r\n	JOIN reserves AS r ON r.course_instance_id = ci.course_instance_id\r\n	JOIN items AS i ON i.item_id = r.item_id\r\n	JOIN user_view_log AS uvl ON uvl.reserve_id = r.reserve_id\r\nWHERE ci.course_instance_id = !\r\nGROUP BY r.reserve_id, ''Date''\r\nORDER BY Title, ''Date''', 'ci', 5, 2, 0, 0);
+  parameters varchar(255) default NULL,
+  min_permissions int(11) NOT NULL default '4',
+  sort_order int(11) NOT NULL default '0',
+  cached tinyint(1) NOT NULL default '1' COMMENT 'boolean: 1 of 0',
+  cache_refresh_delay int(4) NOT NULL default '6' COMMENT 'measured in hours',
+  PRIMARY KEY  (report_id),
+  KEY min_permissions (min_permissions)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -988,20 +958,15 @@ INSERT INTO `reports` (`report_id`, `title`, `param_group`, `sql`, `parameters`,
 -- Table structure for table `reports_cache`
 -- 
 
-DROP TABLE IF EXISTS `reports_cache`;
-CREATE TABLE IF NOT EXISTS `reports_cache` (
-  `report_cache_id` bigint(20) NOT NULL auto_increment,
-  `report_id` bigint(20) default NULL COMMENT 'foreign key -- `reports`',
-  `params_cache` text,
-  `report_cache` longtext,
-  `last_modified` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`report_cache_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- 
--- Dumping data for table `reports_cache`
--- 
-
+DROP TABLE IF EXISTS reports_cache;
+CREATE TABLE IF NOT EXISTS reports_cache (
+  report_cache_id bigint(20) NOT NULL auto_increment,
+  report_id bigint(20) default NULL COMMENT 'foreign key -- `reports`',
+  params_cache text,
+  report_cache longtext,
+  last_modified timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  PRIMARY KEY  (report_cache_id)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -1009,31 +974,28 @@ CREATE TABLE IF NOT EXISTS `reports_cache` (
 -- Table structure for table `requests`
 -- 
 
-DROP TABLE IF EXISTS `requests`;
-CREATE TABLE IF NOT EXISTS `requests` (
-  `request_id` bigint(20) NOT NULL auto_increment,
-  `reserve_id` int(11) NOT NULL default '0',
-  `item_id` bigint(20) NOT NULL default '0',
-  `user_id` int(11) NOT NULL default '0',
-  `date_requested` date NOT NULL default '0000-00-00',
-  `date_processed` date default NULL,
-  `date_desired` date default NULL,
-  `priority` int(11) default NULL,
-  `course_instance_id` bigint(20) NOT NULL default '0',
-  PRIMARY KEY  (`request_id`),
-  KEY `item_id` (`item_id`),
-  KEY `user_id` (`user_id`),
-  KEY `date_requested` (`date_requested`),
-  KEY `date_desired` (`date_desired`),
-  KEY `priority` (`priority`),
-  KEY `course_instance_id` (`course_instance_id`),
-  KEY `reserve_id` (`reserve_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- 
--- Dumping data for table `requests`
--- 
-
+DROP TABLE IF EXISTS requests;
+CREATE TABLE IF NOT EXISTS requests (
+  request_id bigint(20) NOT NULL auto_increment,
+  reserve_id int(11) NOT NULL default '0',
+  item_id bigint(20) NOT NULL default '0',
+  user_id int(11) NOT NULL default '0',
+  date_requested date NOT NULL default '0000-00-00',
+  date_processed date default NULL,
+  date_desired date default NULL,
+  priority int(11) default NULL,
+  course_instance_id bigint(20) NOT NULL default '0',
+  max_enrollment int(11) default NULL COMMENT 'max enrollment as specified by instructor',
+  `type` set('PHYSICAL','SCAN') NOT NULL default 'PHYSICAL',
+  PRIMARY KEY  (request_id),
+  KEY item_id (item_id),
+  KEY user_id (user_id),
+  KEY date_requested (date_requested),
+  KEY date_desired (date_desired),
+  KEY priority (priority),
+  KEY course_instance_id (course_instance_id),
+  KEY reserve_id (reserve_id)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -1041,31 +1003,26 @@ CREATE TABLE IF NOT EXISTS `requests` (
 -- Table structure for table `reserves`
 -- 
 
-DROP TABLE IF EXISTS `reserves`;
-CREATE TABLE IF NOT EXISTS `reserves` (
-  `reserve_id` bigint(20) NOT NULL auto_increment,
-  `course_instance_id` bigint(20) NOT NULL default '0',
-  `item_id` bigint(20) NOT NULL default '0',
-  `activation_date` date NOT NULL default '0000-00-00',
-  `expiration` date NOT NULL default '0000-00-00',
-  `status` set('ACTIVE','INACTIVE','IN PROCESS') NOT NULL default 'ACTIVE',
-  `sort_order` int(11) NOT NULL default '0',
-  `date_created` date NOT NULL default '0000-00-00',
-  `last_modified` date NOT NULL default '0000-00-00',
-  `requested_loan_period` varchar(255) default NULL,
-  `parent_id` bigint(20) default NULL,
-  PRIMARY KEY  (`reserve_id`),
-  UNIQUE KEY `unique_constraint` (`course_instance_id`,`item_id`),
-  KEY `reserves_sort_ci_idx` (`course_instance_id`,`sort_order`),
-  KEY `item_id` (`item_id`),
-  KEY `reserves_date_range_idx` (`activation_date`,`expiration`),
+DROP TABLE IF EXISTS reserves;
+CREATE TABLE IF NOT EXISTS reserves (
+  reserve_id bigint(20) NOT NULL auto_increment,
+  course_instance_id bigint(20) NOT NULL default '0',
+  item_id bigint(20) NOT NULL default '0',
+  activation_date date NOT NULL default '0000-00-00',
+  expiration date NOT NULL default '0000-00-00',
+  `status` set('ACTIVE','INACTIVE','IN PROCESS','DENIED','SEARCHING STACKS','UNAVAILABLE','RECALLED','PURCHASING','RESPONSE NEEDED','SCANNING','COPYRIGHT REVIEW') NOT NULL default 'ACTIVE',
+  sort_order int(11) NOT NULL default '0',
+  date_created date NOT NULL default '0000-00-00',
+  last_modified date NOT NULL default '0000-00-00',
+  requested_loan_period varchar(255) default NULL,
+  parent_id bigint(20) default NULL,
+  PRIMARY KEY  (reserve_id),
+  UNIQUE KEY unique_constraint (course_instance_id,item_id),
+  KEY reserves_sort_ci_idx (course_instance_id,sort_order),
+  KEY item_id (item_id),
+  KEY reserves_date_range_idx (activation_date,expiration),
   KEY `status` (`status`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- 
--- Dumping data for table `reserves`
--- 
-
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -1073,23 +1030,22 @@ CREATE TABLE IF NOT EXISTS `reserves` (
 -- Table structure for table `skins`
 -- 
 
-DROP TABLE IF EXISTS `skins`;
-CREATE TABLE IF NOT EXISTS `skins` (
-  `id` int(11) NOT NULL auto_increment,
-  `skin_name` varchar(20) NOT NULL default '',
-  `skin_stylesheet` text NOT NULL,
-  `default_selected` set('yes','no') NOT NULL default 'no',
-  PRIMARY KEY  (`id`),
-  UNIQUE KEY `skin_name` (`skin_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=3 ;
+DROP TABLE IF EXISTS skins;
+CREATE TABLE IF NOT EXISTS skins (
+  id int(11) NOT NULL auto_increment,
+  skin_name varchar(20) NOT NULL default '',
+  skin_stylesheet text NOT NULL,
+  default_selected set('yes','no') NOT NULL default 'no',
+  PRIMARY KEY  (id),
+  UNIQUE KEY skin_name (skin_name)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- 
 -- Dumping data for table `skins`
 -- 
 
 INSERT INTO `skins` (`id`, `skin_name`, `skin_stylesheet`, `default_selected`) VALUES 
-(1, 'general', 'css/ReservesStyles.css', 'yes'),
-(2, 'bus', 'css/ReservesStyles-bus.css', 'no');
+(1, 'general', 'css/ReservesStyles.css', 'yes');
 
 -- --------------------------------------------------------
 
@@ -1097,15 +1053,13 @@ INSERT INTO `skins` (`id`, `skin_name`, `skin_stylesheet`, `default_selected`) V
 -- Table structure for table `special_users`
 -- 
 
-DROP TABLE IF EXISTS `special_users`;
-CREATE TABLE IF NOT EXISTS `special_users` (
-  `user_id` int(11) NOT NULL default '0',
+DROP TABLE IF EXISTS special_users;
+CREATE TABLE IF NOT EXISTS special_users (
+  user_id int(11) NOT NULL default '0',
   `password` varchar(75) NOT NULL default '',
-  `expiration` date default NULL,
-  PRIMARY KEY  (`user_id`)
+  expiration date default NULL,
+  PRIMARY KEY  (user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
-
 
 -- --------------------------------------------------------
 
@@ -1113,18 +1067,13 @@ CREATE TABLE IF NOT EXISTS `special_users` (
 -- Table structure for table `special_users_audit`
 -- 
 
-DROP TABLE IF EXISTS `special_users_audit`;
-CREATE TABLE IF NOT EXISTS `special_users_audit` (
-  `user_id` bigint(20) NOT NULL default '0',
-  `creator_user_id` bigint(20) NOT NULL default '0',
-  `date_created` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `email_sent_to` varchar(255) default NULL
+DROP TABLE IF EXISTS special_users_audit;
+CREATE TABLE IF NOT EXISTS special_users_audit (
+  user_id bigint(20) NOT NULL default '0',
+  creator_user_id bigint(20) NOT NULL default '0',
+  date_created timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  email_sent_to varchar(255) default NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- 
--- Dumping data for table `special_users_audit`
--- 
-
 
 -- --------------------------------------------------------
 
@@ -1132,21 +1081,16 @@ CREATE TABLE IF NOT EXISTS `special_users_audit` (
 -- Table structure for table `staff_libraries`
 -- 
 
-DROP TABLE IF EXISTS `staff_libraries`;
-CREATE TABLE IF NOT EXISTS `staff_libraries` (
-  `staff_library_id` int(11) NOT NULL auto_increment,
-  `user_id` int(11) NOT NULL default '0',
-  `library_id` int(11) NOT NULL default '0',
-  `permission_level_id` int(11) NOT NULL default '0',
-  PRIMARY KEY  (`staff_library_id`),
-  KEY `user_id` (`user_id`),
-  KEY `library_id` (`library_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- 
--- Dumping data for table `staff_libraries`
--- 
-
+DROP TABLE IF EXISTS staff_libraries;
+CREATE TABLE IF NOT EXISTS staff_libraries (
+  staff_library_id int(11) NOT NULL auto_increment,
+  user_id int(11) NOT NULL default '0',
+  library_id int(11) NOT NULL default '0',
+  permission_level_id int(11) NOT NULL default '0',
+  PRIMARY KEY  (staff_library_id),
+  KEY user_id (user_id),
+  KEY library_id (library_id)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -1154,26 +1098,26 @@ CREATE TABLE IF NOT EXISTS `staff_libraries` (
 -- Table structure for table `terms`
 -- 
 
-DROP TABLE IF EXISTS `terms`;
-CREATE TABLE IF NOT EXISTS `terms` (
-  `term_id` int(11) NOT NULL auto_increment,
-  `sort_order` int(11) NOT NULL default '0',
-  `term_name` varchar(100) NOT NULL default '',
-  `term_year` varchar(4) NOT NULL default '',
-  `begin_date` date NOT NULL default '0000-00-00',
-  `end_date` date NOT NULL default '0000-00-00',
-  PRIMARY KEY  (`term_id`),
-  KEY `sort_order` (`sort_order`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+DROP TABLE IF EXISTS terms;
+CREATE TABLE IF NOT EXISTS terms (
+  term_id int(11) NOT NULL auto_increment,
+  sort_order int(11) NOT NULL default '0',
+  term_name varchar(100) NOT NULL default '',
+  term_year varchar(4) NOT NULL default '',
+  begin_date date NOT NULL default '0000-00-00',
+  end_date date NOT NULL default '0000-00-00',
+  PRIMARY KEY  (term_id),
+  KEY sort_order (sort_order)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- 
 -- Dumping data for table `terms`
 -- 
 
 INSERT INTO `terms` (`term_id`, `sort_order`, `term_name`, `term_year`, `begin_date`, `end_date`) VALUES 
-(1, 1, 'FALL', '2004', '2004-08-26', '2004-12-18'),
-(2, 2, 'SPRING', '2005', '2005-01-01', '2005-05-31'),
-(3, 3, 'SUMMER', '2005', '2005-05-15', '2005-08-16');
+(1, 1, 'FALL', '2009', '2009-08-26', '2009-12-18'),
+(2, 2, 'SPRING', '2010', '2010-01-01', '2010-05-31'),
+(3, 3, 'SUMMER', '2010', '2010-05-15', '2010-08-16');
 
 -- --------------------------------------------------------
 
@@ -1181,21 +1125,16 @@ INSERT INTO `terms` (`term_id`, `sort_order`, `term_name`, `term_year`, `begin_d
 -- Table structure for table `user_view_log`
 -- 
 
-DROP TABLE IF EXISTS `user_view_log`;
-CREATE TABLE IF NOT EXISTS `user_view_log` (
-  `id` bigint(20) NOT NULL auto_increment,
-  `user_id` int(11) NOT NULL default '0',
-  `reserve_id` bigint(20) NOT NULL default '0',
-  `timestamp_viewed` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`id`),
-  KEY `user_id` (`user_id`),
-  KEY `reserve_id` (`reserve_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- 
--- Dumping data for table `user_view_log`
--- 
-
+DROP TABLE IF EXISTS user_view_log;
+CREATE TABLE IF NOT EXISTS user_view_log (
+  id bigint(20) NOT NULL auto_increment,
+  user_id int(11) NOT NULL default '0',
+  reserve_id bigint(20) NOT NULL default '0',
+  timestamp_viewed timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
+  PRIMARY KEY  (id),
+  KEY user_id (user_id),
+  KEY reserve_id (reserve_id)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -1203,21 +1142,23 @@ CREATE TABLE IF NOT EXISTS `user_view_log` (
 -- Table structure for table `users`
 -- 
 
-DROP TABLE IF EXISTS `users`;
-CREATE TABLE IF NOT EXISTS `users` (
-  `user_id` int(11) NOT NULL auto_increment,
-  `username` varchar(50) NOT NULL default '',
-  `first_name` varchar(50) default NULL,
-  `last_name` varchar(50) default NULL,
-  `email` varchar(75) default NULL,
-  `dflt_permission_level` int(11) NOT NULL default '0',
-  `last_login` date NOT NULL default '0000-00-00',
-  `old_id` int(11) default NULL,
-  `old_user_id` int(11) default NULL,
-  PRIMARY KEY  (`user_id`),
-  UNIQUE KEY `username` (`username`),
-  KEY `max_permission_level` (`dflt_permission_level`),
-  KEY `old_id` (`old_id`),
-  KEY `old_user_id` (`old_user_id`),
-  KEY `last_name` (`last_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+DROP TABLE IF EXISTS users;
+CREATE TABLE IF NOT EXISTS users (
+  user_id int(11) NOT NULL auto_increment,
+  username varchar(50) NOT NULL default '',
+  first_name varchar(50) default NULL,
+  last_name varchar(50) default NULL,
+  email varchar(75) default NULL,
+  external_user_key varchar(50) default NULL COMMENT 'Can be used to link users to external systems',
+  dflt_permission_level int(11) NOT NULL default '0',
+  last_login date NOT NULL default '0000-00-00',
+  old_id int(11) default NULL,
+  old_user_id int(11) default NULL,
+  PRIMARY KEY  (user_id),
+  UNIQUE KEY username (username),
+  UNIQUE KEY external_user_key (external_user_key),
+  KEY max_permission_level (dflt_permission_level),
+  KEY old_id (old_id),
+  KEY old_user_id (old_user_id),
+  KEY last_name (last_name)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
