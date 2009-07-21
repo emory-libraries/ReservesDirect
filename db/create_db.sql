@@ -735,6 +735,9 @@ CREATE TABLE IF NOT EXISTS libraries (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
+INSERT INTO libraries( library_id, name, nickname, ils_prefix, reserve_desk, url, contact_email, monograph_library_id, multimedia_library_id )
+VALUES (1, 'Change Me', 'Change Me', '', '', '', '', 1, 1 );
+
 
 -- 
 -- Table structure for table `mimetype_extensions`
