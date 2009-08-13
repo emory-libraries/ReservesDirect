@@ -60,12 +60,6 @@ require_once("secure/session.inc.php");
 //if user is valid, then initializes global user object as $u
 //else shows login page
 
-//*******************************************************
-//$_SESSION['debug'] = 'debug';
-//$_SESSION['username'] = 'jbwhite';
-//$_SESSION['userclass'] = 'admin';
-//*******************************************************
-
 require_once('secure/auth.inc.php');
 
 //read cmd

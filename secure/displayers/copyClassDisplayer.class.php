@@ -53,7 +53,18 @@ class copyClassDisplayer extends baseDisplayer {
 		
 		//begin display
 ?>
-		<span class="helperText">The following readings will be imported from <u><?=$src_ci->course->displayCourseNo()?> - <?=$src_ci->course->getName()?></u> to <u><?=$dst_ci->course->displayCourseNo()?> - <?=$dst_ci->course->getName()?></u>. Please de-select any readings you do <u>not</u> want to import before continuing.</span>
+        <div class="helperText">
+            Select readings to import from <u><?=$src_ci->course->displayCourseNo()?> -
+            <?=$src_ci->course->getName()?> <?= $src_ci->displayTerm() ?></u> to <u><?=$dst_ci->course->displayCourseNo()?> -
+            <?=$dst_ci->course->getName()?> <?= $dst_ci->displayTerm() ?></u>.
+        </div>
+        <div class="noticeBox">
+            <div class="noticeImg"></div>
+            <div class="noticeText">
+                Please note there are costs associated with processing physical items and uploaded materials.
+                Help us reduce costs by limiting non-required readings and linking to external resources whenever possible.
+            </div>
+        </div>
 		<p />
 
 		<script language="javascript">
@@ -87,7 +98,7 @@ class copyClassDisplayer extends baseDisplayer {
 						<ul>
 <?php			
 				foreach($instructors as $instr):
-					if($u->getUserID()==$instr->getUserID()) {
+					if($u->getUserID() == $instr->getUserID()) {
 						continue;	//skip the instructor doing the importing
 					}
 ?>
@@ -116,7 +127,11 @@ class copyClassDisplayer extends baseDisplayer {
 				<br />
 <?php	endif; ?>
 
-				<div style="float:right; text-align:right;"><a href="javascript:checkAll2(document.forms.reservesListForm, 1)">check all</a> | <a href="javascript:checkAll2(document.forms.reservesListForm, 0)">uncheck all</a></div>
+				<div style="float:right; text-align:right;">
+                    <?php if ($u->getRole() >= $g_permission['staff']): ?>
+                        <a href="javascript:checkAll2(document.forms.reservesListForm, 1)">check all</a> | <a href="javascript:checkAll2(document.forms.reservesListForm, 0)">uncheck all</a>
+                    <?php endif; ?>
+                </div>
 				<div class="headingCell1" style="width:33%;">Reserves List</div>
 				<div style="clear:both;"></div>
 					<ul style="list-style:none; padding-left:0px; margin:0px;">
@@ -178,7 +193,7 @@ class copyClassDisplayer extends baseDisplayer {
 ?>
 				<div class="<?=$rowStyle?>">
 					<div class="checkBox-right">
-						<input type="checkbox" checked="true" name="selected_reserves[]" value="<?=$reserve->getReserveID()?>" />
+						<input type="checkbox" name="selected_reserves[]" value="<?=$reserve->getReserveID()?>" />
 					</div>
 					<?php self::displayReserveInfo($reserve, 'class="metaBlock-wide"'); ?>
 					<!-- hack to clear floats-->		

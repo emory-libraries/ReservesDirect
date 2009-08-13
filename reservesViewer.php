@@ -55,6 +55,12 @@ http://www.reservesdirect.org/
 		if($reserve->getItemForUser($u)) {	//make sure this user should be allowed access to the reserve
 			$item =& $reserve->item;	//grab the item for info
 		}
+
+        if ($reserve->getStatus() == 'DENIED'
+            || ($u->getRole() < $g_permission['proxy'] && $reserve->getStatus() != 'ACTIVE'))
+        {
+            sendStatusCode('403');
+        }
 	
 		//since a reserve was requested, track the views
 		if($u->getRole() < $g_permission['instructor']) {	//only count student views
@@ -67,6 +73,11 @@ http://www.reservesdirect.org/
 	
 	//if we have an item object, then we try to serve the doc
 	if($item instanceof reserveItem) {
+        if ($item->getStatus() == 'DENIED')
+        {
+            sendStatusCode('403');
+        }
+
 		$url = $item->getURL();	//grab the url
         if ($url == FALSE) {        	
             sendStatusCode('404');

@@ -772,7 +772,7 @@ or from the admin tab. */
 #displayMsg .notice {
 	padding:5px;
 	border:1px dashed #003300;
-	background-color:CCFFCC;
+	background-color:#CCFFCC;
 	color:#003300;
 }
 
@@ -846,6 +846,33 @@ itemMetaPre defines how some prefixes to metadata information appear, for exampl
 		font-weight: bold; 
 		color: #000099
 }
+
+.noticeBox {
+        background-color: #FFFF99;
+        border-bottom: 1px solid #000000;
+        border-right: 1px solid #000000;
+        border-left: 1px solid #000000;
+        border-top: 1px solid #000000;
+        margin-top:10px;
+        padding:10px;
+        clear: both;
+        height: 58px;
+}
+.noticeText {
+		font-size: small;
+		font-weight: bold;
+		color: #000000;
+}
+.noticeImg {
+	background-image: url('../images/copyrightwarningsign.png');
+    background-position: 10px 0 left top;
+	background-repeat: no-repeat;
+	height: 58px;
+    width: 58px;
+    float: left;
+    margin-right: 5px;
+}
+
 .courseTitle {
 	font-size: large;
 	font-weight: bold;
