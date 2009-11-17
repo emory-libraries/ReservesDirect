@@ -29,7 +29,7 @@ http://www.reservesdirect.org/
 	require_once("secure/common.inc.php");
 	require_once("secure/classes/reserves.class.php");
 	require_once("secure/classes/reserveItem.class.php");
-	require_once("secure/classes/proxyHost.class.php");
+	#require_once("secure/classes/proxyHost.class.php");
 	require_once("secure/classes/user.class.php");
 	require_once("secure/classes/skins.class.php");
 	include("statusCodes.php");	
@@ -120,7 +120,9 @@ http://www.reservesdirect.org/
 			}
 		}
 		else {	//item is on remote server -- redirect	
-			header('Location: '.proxyHost::proxyURL($url, $u->getUsername()));
+			#header('Location: '.proxyHost::proxyURL($url, $u->getUsername()));
+            # removed call to proxyHost so that url does not get any extra processing.
+			header('Location: '.$url);
 		}
 	}
 	else {	//no item, assume that no ID was specified
