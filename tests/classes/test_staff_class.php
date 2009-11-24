@@ -26,37 +26,42 @@ class TestStaffClass extends UnitTest {
     	$s = new staff('nobody1');
     	
     	$r_list = $s->getRequests();
-    	$this->assertEqual(count($r_list), 4, "Test with no parmeters returned incorrect count");
-    	$sort = array($r_list[0]->getRequestID(), 
-    				  $r_list[1]->getRequestID(), 
-    				  $r_list[2]->getRequestID(), 
-    				  $r_list[3]->getRequestID())
-    	;
-    	$this->assertEqual($sort, array(5776, 5777, 6247, 7130), "Test with no parmeters returned results in incorrect order");
-    	
+    	$this->assertEqual(count($r_list), 4, "Test with no parmeters returned incorrect count; should be 4, got " . count($r_list));
+	if (count($r_list)) {
+	  $sort = array($r_list[0]->getRequestID(), 
+			$r_list[1]->getRequestID(), 
+			$r_list[2]->getRequestID(), 
+			$r_list[3]->getRequestID())
+	    ;
+	  $this->assertEqual($sort, array(5776, 5777, 6247, 7130), "Test with no parmeters returned results in incorrect order");
+	}
     	$r_list = $s->getRequests(1);
-    	$this->assertEqual(count($r_list), 3, "Test for unit 1 returned incorrect count");
+    	$this->assertEqual(count($r_list), 3, "Test for unit 1 returned incorrect count; should be 3, got " . count($r_list));
+	if (count($r_list)) {
     	$sort = array($r_list[0]->getRequestID(), 
     				  $r_list[1]->getRequestID(),  
     				  $r_list[2]->getRequestID())
     	;    	
     	$this->assertEqual($sort, array(5776, 5777, 7130), "Test for unit 1 returned results in incorrect order");
-    				  
+	}		  
     	$r_list = $s->getRequests('all', 'In Process');
-    	$this->assertEqual(count($r_list), 2, "Test for all In Process returned incorrect count");
+    	$this->assertEqual(count($r_list), 2, "Test for all In Process returned incorrect count; should be 2, got " . count($r_list));
+	if (count($r_list)) {
     	$sort = array($r_list[0]->getRequestID(), 
     				  $r_list[1]->getRequestID())  
     	;    	    	
     	$this->assertEqual($sort, array(6247, 7130), "Test for all In Process returned results in incorrect order");
-    	
+    	}
     	$r_list = $s->getRequests('all', 'all', 'class');
-    	$this->assertEqual(count($r_list), 4, "Test all units all status sorted by class returned incorrect count");
-    	$sort = array($r_list[0]->getRequestID(), 
-    				  $r_list[1]->getRequestID(), 
-    				  $r_list[2]->getRequestID(), 
-    				  $r_list[3]->getRequestID())
-    	;
-    	$this->assertEqual($sort, array(7130, 6247, 5777, 5776), "Test all units all status sorted by class returned results in incorrect order");    	
+    	$this->assertEqual(count($r_list), 4, "Test all units all status sorted by class returned incorrect count; should be 4, got " . count($r_list));
+    	if (count($r_list)) {
+	  $sort = array($r_list[0]->getRequestID(), 
+			$r_list[1]->getRequestID(), 
+			$r_list[2]->getRequestID(), 
+			$r_list[3]->getRequestID())
+	    ;
+	  $this->assertEqual($sort, array(7130, 6247, 5777, 5776), "Test all units all status sorted by class returned results in incorrect order");
+	}
     }
 
 }
