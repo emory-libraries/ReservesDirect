@@ -14,7 +14,7 @@ class ClassGroupTest extends GroupTest {
 	if (is_dir($dir)) {
 	    if ($dh = opendir($dir)) {
 	        while (($file = readdir($dh)) !== false) {
-	        	if (filetype($dir . $file) == 'file' )
+		  if (filetype($dir . $file) == 'file' && preg_match("/.php$/", $file))
 	        	{
 	            	$this->addTestFile("$dir$file");	            
 	        	}
