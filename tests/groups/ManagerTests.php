@@ -1,8 +1,8 @@
 <?php
-require_once("../bootstrap.php");
+require_once("../bootstrap.inc.php");
 
-require_once(SIMPLE_TEST . 'unit_tester.php');
-require_once(SIMPLE_TEST . 'reporter.php');
+require_once("../" . SIMPLE_TEST . "unit_tester.php");
+require_once("../" . SIMPLE_TEST . "reporter.php");
 
 class ManagerTest extends GroupTest {
   function ManagerTest() {
