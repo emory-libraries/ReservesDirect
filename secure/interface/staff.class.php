@@ -231,7 +231,7 @@ class staff extends instructor
 				break;
 				
 				case "class":
-					$sql .= " ORDER BY d.abbreviation, c.course_number";
+					$sql .= " ORDER BY d.abbreviation, c.course_number, r.request_id";
 				break;
 				
 				case "date":

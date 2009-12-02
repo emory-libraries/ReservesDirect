@@ -60,7 +60,7 @@ class TestStaffClass extends UnitTest {
 			$r_list[2]->getRequestID(), 
 			$r_list[3]->getRequestID())
 	    ;
-	  $this->assertEqual($sort, array(7130, 6247, 5777, 5776), "Test all units all status sorted by class returned results in incorrect order");
+	  $this->assertEqual($sort, array(7130, 6247, 5776, 5777), "Test all units all status sorted by class returned results in incorrect order");
 	}
     }
 
