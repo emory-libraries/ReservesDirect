@@ -692,6 +692,7 @@ CREATE TABLE IF NOT EXISTS items (
   ISBN varchar(13) default NULL,
   ISSN varchar(8) default NULL,
   OCLC varchar(9) default NULL,
+  material_type varchar(25) default NULL,	
   `status` set('ACTIVE','DENIED') NOT NULL default 'ACTIVE',
   PRIMARY KEY  (item_id),
   KEY private_user_id (private_user_id),
