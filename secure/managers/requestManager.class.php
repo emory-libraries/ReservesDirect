@@ -577,6 +577,9 @@ class requestManager
 		if(isset($_REQUEST['OCLC'])) $item->setOCLC($_REQUEST['OCLC']);
 		//this will be an ILS-assigned key for physical items, or a manually-entered barcode for electronic items
 		if(isset($_REQUEST['local_control_key'])) $item->setLocalControlKey($_REQUEST['local_control_key']);
+
+		if(isset($_REQUEST['material_type'])) $item->setMaterialType($_REQUEST['material_type'],
+									     $_REQUEST['material_type_other']);
 		
 		//check personal item owner
 		if(($_REQUEST['personal_item'] == 'yes') && ($_REQUEST['personal_item_owner'] == 'new') && !empty($_REQUEST['selected_owner']) ) {
