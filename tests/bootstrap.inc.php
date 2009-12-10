@@ -26,11 +26,13 @@ http://www.reservesdirect.org/
 
 *******************************************************************************/
 	//set include path to allow RD files to load
-	set_include_path(get_include_path().":".realpath(dirname(__FILE__))."/../");
+	set_include_path(get_include_path().":". realpath(dirname(__FILE__)) . "/../");
 
 	require_once("DB.php");
 	require_once("secure/common.inc.php");
-	
+	require_once("UnitTest.php");
+//	require_once('scripts/installer.php');		// for function to parse create_db.sql
+
 	//sets $xmlConfig to path of config.xml file
 	require_once(realpath(dirname(__FILE__) . "/../config_loc.inc.php"));
 	if (!is_readable($xmlConfig)) { trigger_error("Could not read configure xml file path=$xmlConfig", E_USER_ERROR); }
@@ -71,10 +73,10 @@ http://www.reservesdirect.org/
 //        'searchpw'	=> (string)$configure->ldap->searchPassword,
 //        'error'		=> NULL
 //    );
-    
-	//open connection
-	$g_dbConn = DB::connect($dsn, $options);
-	if (DB::isError($g_dbConn)) { trigger_error($g_dbConn->getMessage(), E_USER_ERROR); }
+
+// create test db
+createDB($dsn, $options);
+
 
 //	$g_error_log			= (string)$configure->error_log;
 //	$g_errorEmail		 	= (string)$configure->errorEmail;
@@ -147,5 +149,45 @@ http://www.reservesdirect.org/
     
 	if (! defined('SIMPLE_TEST')) {
 	    define('SIMPLE_TEST', 'simpletest/');
-	}    
+	}
+
+
+
+/**
+ * create new test database & set up for testing
+ */
+function createDB($dsn, $options) {
+  global $g_dbConn;
+  
+  // copy connection info & remove db name param
+  $dsn_nodb = $dsn;
+  unset($dsn_nodb['database']);
+
+  // open connection to db host
+  $g_dbConn = DB::connect($dsn_nodb, $options);
+  if (DB::isError($g_dbConn)) { trigger_error($g_dbConn->getMessage(), E_USER_ERROR); }
+  $queries = array("DROP DATABASE IF EXISTS `{$dsn['database']}`",
+		   "CREATE DATABASE `{$dsn['database']}`");
+  foreach ($queries as $sql) {
+    $rs = $g_dbConn->query($sql);
+    if(DB::isError($rs)) {
+      print_step3_error('Problem executing query: '.$rs->getMessage());
+      die(-1);
+    }
+  }
+
+  //open connection to newly created db
+  $g_dbConn = DB::connect($dsn, $options);
+  if (DB::isError($g_dbConn)) { trigger_error($g_dbConn->getMessage(), E_USER_ERROR); }
+
+
+  // initialize with create db used by installer script
+  UnitTest::loadDB("../../db/create_db.sql");
+  // clear out unwanted stuff
+  UnitTest::loadDB('../fixtures/truncateTables.sql');
+}
+
+
 ?>
+
+

@@ -34,36 +34,37 @@ require_once(SIMPLE_TEST . 'reporter.php');
 
 require_once("bootstrap.inc.php");
 
-class UnitTest extends UnitTestCase
-{
-
-	/**
-	 * @return void
-	 * @param string sql file path
-	 * @desc reads sqlFile and executes each statement against the database
-	**/
-	protected function loadDB($sqlFile)
-	{
-		global $g_dbConn;	
-		
-		//strip comments
-		$file_contents = preg_replace("/^--.*/m", "", file_get_contents($sqlFile));
-		
-		//
-		//	PEAR::DB query does not like multiple statements
-		//		splitting sqlFile on ;\n should break out statements which can be executed individually
-		//
-		$pattern = "/;\n/";
-		$sql_statements = preg_split($pattern, $file_contents);		
-		
-		foreach ($sql_statements as $sql)
-		{
-			if (!empty($sql)) $rs = $g_dbConn->query($sql);
-		}
-		
-		if (DB::isError($rs)) {
-			echo ("ERROR loading Fixture  " . $rs->getMessage() . "<BR>"); 
-		}
-		
-	}	
+class UnitTest extends UnitTestCase {
+  
+  /**
+   * @return void
+   * @param string sql file path
+   * @desc reads sqlFile and executes each statement against the database
+   * note: made static so it can be used in bootstrap for db setup
+   */
+  public static function loadDB($sqlFile)
+  {
+    global $g_dbConn;	
+    
+    //strip comments
+    $file_contents = preg_replace("/^--.*/m", "", file_get_contents($sqlFile));
+    
+    //
+    //	PEAR::DB query does not like multiple statements
+    //		splitting sqlFile on ;\n should break out statements which can be executed individually
+    //
+    $pattern = "/;\n/";
+    $sql_statements = preg_split($pattern, $file_contents);		
+    
+    foreach ($sql_statements as $sql)
+      {
+	if (!empty($sql)) $rs = $g_dbConn->query($sql);
+      }
+    
+    if (DB::isError($rs)) {
+      echo ("ERROR loading Fixture  " . $rs->getMessage() . "<BR>"); 
+    }
+    
+  }
+  
 }
