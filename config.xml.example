@@ -74,7 +74,9 @@ http://www.reservesdirect.org/
         <ldapDomain comment="domain that holds ldap user accounts">CHANGEME.example.edu</ldapDomain>
         <ldapPort comment="'636' if connecting securely (ldaps), otherwise '389'">CHANGEME</ldapPort>
         <ldapVersion comment="ldap version, usually '3'">3</ldapVersion>
-        <baseDistinguishedName>CHANGEME</baseDistinguishedName>
+        <baseDistinguishedName comment="base for user search in ldap double bind">CHANGEME</baseDistinguishedName>
+	<searchDistinguishedName comment="initial bind dn for ldap double bind">CHANGEME</searchDistinguishedName>
+	<searchPassword comment="initial bind password for ldap double bind">CHANGEME</searchDistinguishedName>
         <userAttributes comment="attributes, if available, used to seed new user profile in RD">
             <canonicalName comment="user's id (used to bind/authenticate)">CHANGEME</canonicalName>
             <email comment="email address (optional)">CHANGEME</email>
