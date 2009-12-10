@@ -50,7 +50,9 @@ class reserveItem extends item
 	
 	private $ISSN;
 	private $ISBN;
-	private $OCLC;	
+	private $OCLC;
+	
+	private $material_type;
 	
 	function reserveItem($itemID=NULL)
 	{
@@ -76,7 +78,7 @@ class reserveItem extends item
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT item_id, title, item_group, last_modified, creation_date, item_type, author, source, volume_edition, pages_times, performer, local_control_key, url, mimeType, home_library, private_user_id, volume_title, item_icon, ISBN, ISSN, OCLC, status
+				$sql = "SELECT item_id, title, item_group, last_modified, creation_date, item_type, author, source, volume_edition, pages_times, performer, local_control_key, url, mimeType, home_library, private_user_id, volume_title, item_icon, ISBN, ISSN, OCLC, status, material_type
 						FROM items
 						WHERE item_id = !";
 		}
@@ -93,7 +95,7 @@ class reserveItem extends item
 				$this->itemType, $this->author, $this->source, $this->volumeEdition, $this->pagesTimes, 
 				$this->performer, $this->localControlKey, $this->URL, $this->mimeTypeID, 
 				$this->homeLibraryID, $this->privateUserID, $this->volumeTitle, $this->itemIcon, 
-				$this->ISBN, $this->ISSN, $this->OCLC, $this->status) 
+			     $this->ISBN, $this->ISSN, $this->OCLC, $this->status, $this->material_type) 
 			= $rs;
 				
 			//get the notes
@@ -605,7 +607,25 @@ class reserveItem extends item
 		$rs = $g_dbConn->query($sql, array($this->OCLC, $this->itemID));
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}		
-	
+
+	/**
+	 * @param string $type material type
+	 * @param string $other_detail material type detail, if type is 'other' (optional)
+	 * @desc Updates the item's material type in the DB
+	 */
+	function setMaterialType($type, $other_detail = "") {
+		global $g_dbConn;
+
+		$this->material_type = $type;
+		if ($type == "OTHER" && $other_detail != "")
+		  $this->material_type .= ":$other_detail";
+		switch ($g_dbConn->phptype) {
+			default: //'mysql'
+				$sql = "UPDATE items SET material_type = ? WHERE item_id = !";
+		}
+		$rs = $g_dbConn->query($sql, array($this->material_type, $this->itemID));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+	}
 
 	function getAuthor() { return htmlentities(stripslashes($this->author)); }
 	function getSource() { return htmlentities(stripslashes($this->source)); }
@@ -620,7 +640,9 @@ class reserveItem extends item
 	function getISSN() { return $this->ISSN; }
 	function getOCLC() { return $this->OCLC; }	
 	
-	function getStatus() { return $this->status; }	
+	function getStatus() { return $this->status; }
+
+	function getMaterialType() { return $this->material_type; }
 	
 	
 	function getMimeType()
