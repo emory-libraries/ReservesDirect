@@ -32,9 +32,21 @@ class TestReserveItemClass extends UnitTest {
 			 "material type set correctly in reserve item after db init; should be '$new_type', got '" . $item->getMaterialType() . "'");
 
       $item->setMaterialType("OTHER", "flower cuttings");
-      $this->assertEqual("OTHER:flower cuttings", $item->getMaterialtype(),
+      $this->assertEqual("OTHER:flower cuttings", $item->getMaterialtype('full'),
 			 "other material type set correctly in item; should be 'OTHER:flower cuttings', got '"
 			 . $item->getMaterialType() . "'");
+    }
+
+    function testGetMaterialType() {
+      $item = new reserveItem(19762);
+      $item->setMaterialType("OTHER", "flower cuttings");
+      $this->assertEqual("OTHER", $item->getMaterialType('base'),
+			 "base material type for OTHER:... should be 'OTHER', got '" .
+			 $item->getMaterialType('base') . "'");
+      $this->assertEqual("flower cuttings", $item->getMaterialType('detail'), 
+			 "detail material type for 'OTHER:flower cuttings' be 'flower cuttings', got '" .
+			 $item->getMaterialType('detail') . "'");
+      
     }
 
 }

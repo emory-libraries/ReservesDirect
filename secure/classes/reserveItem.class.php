@@ -642,7 +642,25 @@ class reserveItem extends item
 	
 	function getStatus() { return $this->status; }
 
-	function getMaterialType() { return $this->material_type; }
+	/**
+	 * return material type
+	 * @param string $mode optional, one of base, detail, or full (default is base); only differs for OTHER
+	 * @return string
+	 */
+	function getMaterialType($mode = 'base') {
+	  switch ($mode) {
+	  case 'detail':
+	    if ($pos = strpos($this->material_type, ':'))
+	      return substr($this->material_type, $pos+1, strlen
+			    ($this->material_type));
+	    else return "";
+	  case 'base':
+	    // if material type contains :, return string before that; otherwise, fall through
+	    if ($pos = strpos($this->material_type, ':')) return substr($this->material_type, 0, $pos);
+	  case 'full':
+	    return $this->material_type;
+	  }
+	}
 	
 	
 	function getMimeType()
