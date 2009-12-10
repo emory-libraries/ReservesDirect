@@ -13,7 +13,6 @@ class TestReserveItemClass extends UnitTest {
 	}
 	
     function testInitFromDB() {
-      //(19762, 'Anthropology as cultural critique : an experimental moment in the human sciences / George E. Marcus and Michael M.J. Fischer.', 'Marcus, George E.', 'Chicago :', '', '', '', '', '', 'ocm12614452', '2004-11-22', '2005-09-06', NULL, NULL, 1, NULL, 'MONOGRAPH', 'ITEM', NULL, NULL, NULL, NULL, 'ACTIVE'),
       $item = new reserveItem(19762);
       $this->assertPattern("/Anthropology as cultural critique/", $item->getTitle());
       $this->assertEqual("Marcus, George E.", $item->getAuthor());
