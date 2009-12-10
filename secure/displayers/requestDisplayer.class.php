@@ -418,6 +418,9 @@ class requestDisplayer extends noteDisplayer {
 		$doc_types = $isDigital ? $u->getAllDocTypeIcons() : null;
 		//get array of libraries (physical items only)
 		$libraries = $isPhysical ? $u->getLibraries() : null;
+		// get array of material types
+		$material_types = common_getMaterialTypes();
+		
 		
 		//private user
 		if(!empty($item_data['selected_owner'])) {
@@ -514,6 +517,16 @@ class requestDisplayer extends noteDisplayer {
 					document.getElementById('personal_item_owner_search').style.visibility = 'visible';
 				}	
 			}
+			//shows/hides text field for 'other' material type
+			function toggleOtherMaterialInput() {
+			  var material_type = document.getElementById('material_type');
+			  if (material_type.options[material_type.selectedIndex].value == "OTHER") {
+			    document.getElementById('material_type_other_block').style.display = 'inline';
+			  } else {
+			    document.getElementById('material_type_other_block').style.display = 'none';
+			  }
+			}	
+
 		</script>
 		
 		<form action="index.php" method="post" id="additem_form" name="additem_form"<?=$form_enctype?>>
@@ -749,6 +762,25 @@ class requestDisplayer extends noteDisplayer {
 		<div class="headingCell1" style="width:25%; text-align:center;">Item Details</div>
 		
 		<table width="100%" border="0" cellpadding="3" cellspacing="0" class="borders">
+		   <tr>
+		     <th width="20%" align="right" bgcolor="#CCCCCC" class="strong">
+  		       <span id="material_type_req_mark" style="color:#FF0000;">*</span>
+		       Type of Material:</th>
+		     <td>
+		   <select id="material_type" name="material_type" onChange="toggleOtherMaterialInput()">
+<?php 		foreach($material_types as $material_id => $material): ?>
+<?php		$selected = ($material_id == $item_data['material_type']) ? ' selected="selected"' : ''; ?>
+		     <option value="<?= $material_id ?>"<?= $selected ?>><?= $material ?></option>
+<?php		endforeach ?>
+		</select><? /* FIXME: detect other, fill in user material type other */ ?>
+	       <div id="material_type_other_block" style="display:none">
+  	         <input name="material_type_other"
+		  type="text" size="25" value="<?=$item_data['material_type_other']?>"/>
+		    <i>specify type of material</i>
+	       </div>
+		   </td>
+		   </tr>
+
 			<tr align="left" valign="top" id="personal_item_row">
 				<td width="20%" align="right" bgcolor="#CCCCCC" class="strong">
 					<span id="personal_req_mark" style="color:#FF0000;">*</span>
