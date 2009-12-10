@@ -147,6 +147,7 @@ class itemManager
 					
 					//set item data
 					$item->setTitle($_REQUEST['title']);
+					$item->setTitle($_REQUEST['title']);
 					$item->setAuthor($_REQUEST['author']);
 					$item->setPerformer($_REQUEST['performer']);
 					$item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
@@ -157,7 +158,12 @@ class itemManager
 					$item->setISBN($_REQUEST['ISBN']);
 					$item->setISSN($_REQUEST['ISSN']);
 					$item->setOCLC($_REQUEST['OCLC']);	
-					$item->setStatus($_REQUEST['item_status']);		
+					$item->setStatus($_REQUEST['item_status']);
+					
+					if(isset($_REQUEST['material_type']))
+					  $item->setMaterialType($_REQUEST['material_type'],
+								 $_REQUEST['material_type_other']);
+
 					
 					//physical item data
 					if($item->isPhysicalItem()) {
