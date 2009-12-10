@@ -4,9 +4,9 @@ require_once("../bootstrap.inc.php");
 require_once("../" . SIMPLE_TEST . "unit_tester.php");
 require_once("../" . SIMPLE_TEST . "reporter.php");
 
-class ManagerTest extends GroupTest {
-  function ManagerTest() {
-    $this->GroupTest('Controller tests');
+class ManagerGroupTest extends GroupTest {
+  function ManagerGroupTest() {
+    $this->GroupTest('Manager tests');
     
 	$dir = "../managers/";
 	
@@ -14,10 +14,9 @@ class ManagerTest extends GroupTest {
 	if (is_dir($dir)) {
 	    if ($dh = opendir($dir)) {
 	        while (($file = readdir($dh)) !== false) {
-	        	if (filetype($dir . $file) == 'file' )
-	        	{
-	            	$this->addTestFile("$dir$file");	            
-	        	}
+		  if (filetype($dir . $file) == 'file' && preg_match("/.php$/", $file)){
+		    $this->addTestFile("$dir$file");	            
+		  }
 	        }
 	        closedir($dh);
 	    }
@@ -27,7 +26,7 @@ class ManagerTest extends GroupTest {
 
 if (! defined('RUNNER')) {
   define('RUNNER', true);
-  $test = &new ManagerTest();
+  $test = &new ManagerGroupTest();
   $test->run(new HtmlReporter());
 }
 ?>
