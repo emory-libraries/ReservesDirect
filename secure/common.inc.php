@@ -291,4 +291,15 @@ function common_formatDate($d, $format)
 		} else return '';
 }
 
+
+function common_getMaterialTypes() {
+  return array("BOOK_PORTION" =>  "Portion of a Book",
+	       "JOURNAL_ARTICLE" => "Journal Article",
+	       "CONFERENCE_PAPER" => "Conference Paper",
+	       "COURSE_MATERIALS" => "Syllabus or Course Notes",
+	       "IMAGE" => "Image",
+	       "VIDEO" => "Movie",
+	       "AUDIO" => "Audio or Sound Recording",
+	       "OTHER" => "Other");
+}
 ?>
