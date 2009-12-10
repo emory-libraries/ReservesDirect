@@ -330,12 +330,41 @@ class itemDisplayer extends noteDisplayer {
 					document.getElementById('personal_item_owner_search').style.visibility = 'visible';
 				}	
 			}
+						//shows/hides text field for 'other' material type
+			function toggleOtherMaterialInput() {
+			  var material_type = document.getElementById('material_type');
+			  if (material_type.options[material_type.selectedIndex].value == "OTHER") {
+			    document.getElementById('material_type_other_block').style.display = 'inline';
+			  } else {
+			    document.getElementById('material_type_other_block').style.display = 'none';
+			  }
+			}	
 		//-->
 		</script>
 				
 		<div class="headingCell1">ITEM DETAILS</div>
 		<div id="item_details" style="padding:8px 8px 12px 8px;">
-			<table border="0" cellpadding="2" cellspacing="0">		
+		  <table border="0" cellpadding="2" cellspacing="0">
+		    <tr>
+		      <th align="right">
+ 		        <span id="material_type_req_mark" style="color:#FF0000;">*</span>
+		    	Type of Material:</th>
+		      <td>
+		    <select id="material_type" name="material_type" onChange="toggleOtherMaterialInput()">
+<?php   		foreach(common_getMaterialTypes() as $material_id => $material): ?>
+<?php	        	$selected = ($material_id == $item->getMaterialType()) ? ' selected="selected"' : ''; ?>
+		    <option value="<?= $material_id ?>"<?= $selected ?>><?= $material ?></option>
+		       <?php		endforeach ?>
+		       </select><? /* FIXME: detect other, fill in user material type other */ ?>
+		       <div id="material_type_other_block"
+		       style="display:<?= ($item->getMaterialType() == 'OTHER') ? 'inline' : 'none' ?>">
+		         <input name="material_type_other"
+		            type="text" size="25" value="<?=$item->getMaterialType('detail') ?>"/>
+		         <i>specify type of material</i>
+		       </div>
+		      </td>
+		   </tr>
+
 	    		<tr>
 	    			<td align="right">
 	    				<font color="#FF0000">*</font>&nbsp;Document Title:
