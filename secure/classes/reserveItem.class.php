@@ -47,6 +47,9 @@ class reserveItem extends item
 	public $physicalCopy;
 	public $itemIcon;
 	public $status;
+	public $publisher;
+	public $totalPagesTimes;
+	public $availability;
 	
 	private $ISSN;
 	private $ISBN;
@@ -78,7 +81,7 @@ class reserveItem extends item
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT item_id, title, item_group, last_modified, creation_date, item_type, author, source, volume_edition, pages_times, performer, local_control_key, url, mimeType, home_library, private_user_id, volume_title, item_icon, ISBN, ISSN, OCLC, status, material_type
+				$sql = "SELECT item_id, title, item_group, last_modified, creation_date, item_type, author, source, volume_edition, pages_times, performer, local_control_key, url, mimeType, home_library, private_user_id, volume_title, item_icon, ISBN, ISSN, OCLC, status, material_type, publisher, total_pages_time, availability
 						FROM items
 						WHERE item_id = !";
 		}
@@ -95,7 +98,8 @@ class reserveItem extends item
 				$this->itemType, $this->author, $this->source, $this->volumeEdition, $this->pagesTimes, 
 				$this->performer, $this->localControlKey, $this->URL, $this->mimeTypeID, 
 				$this->homeLibraryID, $this->privateUserID, $this->volumeTitle, $this->itemIcon, 
-			     $this->ISBN, $this->ISSN, $this->OCLC, $this->status, $this->material_type) 
+			     $this->ISBN, $this->ISSN, $this->OCLC, $this->status, $this->material_type,
+			     $this->publisher, $this->totalPagesTimes, $this->availability) 
 			= $rs;
 				
 			//get the notes
@@ -627,6 +631,54 @@ class reserveItem extends item
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 	}
 
+	
+	/**
+	 * set the item publisher in the db
+	 * @param string $pub publisher
+	 */
+	function setPublisher($pub) {
+		global $g_dbConn;
+		$this->publisher = $pub;
+		switch ($g_dbConn->phptype) {
+			default: //'mysql'
+				$sql = "UPDATE items SET publisher = ? WHERE item_id = !";
+		}
+		$rs = $g_dbConn->query($sql, array($this->publisher, $this->itemID));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+	}		
+	
+	/**
+	 * set total # of pages or time/duration for the work/volume
+	 * @param string $pagesTimes
+	 *
+	 */
+	function setTotalPagesTimes($pagesTimes) {
+	  global $g_dbConn;
+	  $this->totalPagesTimes = $pagesTimes;
+	  switch ($g_dbConn->phptype) {
+	  default: //'mysql'
+	    $sql = "UPDATE items SET total_pages_time = ? WHERE item_id = !";
+	  }
+	  $rs = $g_dbConn->query($sql, array($this->totalPagesTimes, $this->itemID));
+	  if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+	}
+
+	/**
+	 * set availability
+	 * @param int $availability
+	 */
+	function setAvailability($avail) {
+	  global $g_dbConn;
+	  $this->availability = $avail;
+	  switch ($g_dbConn->phptype) {
+	  default: //'mysql'
+	    $sql = "UPDATE items SET availability = ? WHERE item_id = !";
+	  }
+	  $rs = $g_dbConn->query($sql, array($this->availability, $this->itemID));
+	  if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+	}
+
+
 	function getAuthor() { return htmlentities(stripslashes($this->author)); }
 	function getSource() { return htmlentities(stripslashes($this->source)); }
 	function getVolumeTitle() { return htmlentities(stripslashes($this->volumeTitle)); }
@@ -642,6 +694,9 @@ class reserveItem extends item
 	
 	function getStatus() { return $this->status; }
 
+	function getPublisher() { return $this->publisher; }
+	function getTotalPagesTimes() { return $this->totalPagesTimes; }
+	function getAvailability() { return $this->availability; }
 	/**
 	 * return material type
 	 * @param string $mode optional, one of base, detail, or full (default is base); only differs for OTHER

@@ -39,6 +39,7 @@ class TestReserveItemClass extends UnitTest {
 
     function testGetMaterialType() {
       $item = new reserveItem(19762);
+
       $item->setMaterialType("OTHER", "flower cuttings");
       $this->assertEqual("OTHER", $item->getMaterialType('base'),
 			 "base material type for OTHER:... should be 'OTHER', got '" .
@@ -48,6 +49,53 @@ class TestReserveItemClass extends UnitTest {
 			 $item->getMaterialType('detail') . "'");
       
     }
+
+    function testSetPublisher() {
+      $item = new reserveItem(19762);
+      $pub = "Oxford Press";
+      $item->setPublisher($pub);
+      $this->assertEqual($pub, $item->getPublisher(),
+			 "publisher set correctly in reserve item; should be '$pub', got '"
+			 . $item->getPublisher() . "'");
+      $item = new reserveItem(19762);
+      $this->assertEqual($pub, $item->getPublisher(),
+			 "publisher set correctly in reserve item after db init; should be '$pub', got '" .
+			 $item->getPublisher() . "'");
+    }
+
+    function testSetTotalPagesTimes() {
+      $item = new reserveItem(19762);
+      $pages = "300";
+      $item->setTotalPagesTimes($pages);
+      $this->assertEqual($pages, $item->getTotalPagesTimes(),
+			 "total pages/times set correctly in reserve item; should be '$pages', got '"
+			 . $item->getTotalPagesTimes() . "'");
+      $item = new reserveItem(19762);
+      $this->assertEqual($pages, $item->getTotalPagesTimes(),
+			 "total pages/times set correctly in reserve item after db init; should be '$pages', got '" .
+			 $item->getTotalPagesTimes() . "'");
+    }
+
+    function testSetAvailability() {
+      $item = new reserveItem(19762);
+      $item->setAvailability(0);
+      $this->assertEqual(false, $item->getAvailability(),
+			 "availability set correctly in reserve item; should be false, got '"
+			 . $item->getAvailability() . "'");
+      $item = new reserveItem(19762);
+      $this->assertEqual(false, $item->getAvailability(),
+			 "availability set correctly in reserve item after db init; should be false, got '" .
+			 $item->getAvailability() . "'");
+      $item->setAvailability(1);
+      $this->assertEqual(true, $item->getAvailability(),
+			 "availability set correctly in reserve item; should be true, got '"
+			 . $item->getAvailability() . "'");
+      $item = new reserveItem(19762);
+      $this->assertEqual(1, $item->getAvailability(),
+			 "availability set correctly in reserve item after db init; should be true, got '" .
+			 $item->getAvailability() . "'");
+    }
+    
 
 }
 
