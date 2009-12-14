@@ -302,4 +302,86 @@ function common_getMaterialTypes() {
 	       "AUDIO" => "Audio or Sound Recording",
 	       "OTHER" => "Other");
 }
+
+/**
+ * per-material-type configuration for edit form - custom labels, which fields are required, etc.
+ * @return array associative array by material type with fields to be shown
+ */
+function common_materialTypesDetails($type) {
+  return array("BOOK_PORTION" => 
+	       array("title" => array("required" => true, "label" => "Title"),
+		     "work_title" => array("required" => true, "label" => "Book Title"), // example text?
+		     "edition" => array("label" => "Volume/Edition"),
+		     "author" => array("required" => true, "label" => "Author"),
+		     "publisher" => array("required" => true, "label" => "Publisher"),
+		     "year" => array("required" => true, "label" => "Year of Publication"),
+		     "times_pages" => array("required" => true, "label" => "Page ranges"), 	// example!
+		     "total_times_pages" => array("required" => true, "label" => "Total pages in book"),
+		     "isbn" => array("required" => true, "label" => "ISBN"),
+		     "availability" => array("required" => true, "label" => "Print status of book",
+					     "options" => array("Out of Print", "In Print")),
+		     ),
+	       "JOURNAL_ARTICLE" =>
+	       array("title" => array("required" => true, "label" => "Article Title"),
+		     "work_title" => array("required" => true, "label" => "Journal Title"),
+		     "edition" => array("required" => true, "label" => "Volume/Issue"),
+		     "author" => array("required" => true, "label" => "Author"),
+		     "year" => array("required" => true, "label" => "Year of Publication"),
+		     "times_pages" => array("required" => true, "label" => "Pages"), 	
+		     "issn" => array("required" => true, "label" => "ISSN"),
+		     ),
+	       "CONFERENCE_PAPER" =>
+	       array("title" => array("required" => true, "label" => "Paper Title"),
+		     "work_title" => array("required" => true, "label" => "Publication Title/Name of Conference"),
+		     "author" => array("required" => true, "label" => "Author"),
+		     "publisher" => array("label" => "Publisher"),
+		     "year" => array("required" => true, "label" => "Year of Publication"),
+		     "times_pages" => array("label" => "Pages"),
+		     ),
+	       "COURSE_MATERIALS" =>
+	       array("title" => array("required" => true, "label" => "Title"),
+		     "author" => array("label" => "Author"),
+		     "edition" => array("label" => "Semester"),
+		     "year" => array("label" => "Year"),
+		     ),
+	       "IMAGE" =>
+	       array("title" => array("required" => true, "label" => "Title"),
+		     "work_title" => array("label" => "Collection"),
+		     "author" => array("required" => true, "label" => "Creator"),
+		     ),
+	       "VIDEO" =>
+	       array("title" => array("required" => true, "label" => "Chapter/Scene Title"),
+		     "work_title" => array("required" => true, "label" => "Movie Title"),
+		     "edition" => array("label" => "Volume"),
+		     "author" => array("label" => "Director"),
+		     "publisher" => array("required" => true, "label" => "Studio"),
+		     "year" => array("required" => true, "label" => "Year Produced"),
+		     "times_pages" => array("required" => true, "label" => "Time of Portion Used"), 	// example!
+		     "total_times_pages" => array("required" => true, "label" => "Total Time of Movie"),
+		     "availability" => array("required" => true, "label" => "Availability of Movie",
+					     "options" => array("Commercially Unavailable",
+								"Commercially Available")),
+		     ),
+	       "AUDIO" =>
+	       array("title" => array("required" => true, "label" => "Song/Movement Title"),
+		     "work_title" => array("required" => true, "label" => "CD Title"),
+		     "author" => array("required" => true, "label" => "Artist/Composer"),
+		     // FIXME: performer field?
+		     "publisher" => array("required" => true, "label" => "Label"),
+		     "year" => array("required" => true, "label" => "Year Produced"),
+		     "times_pages" => array("required" => true, "label" => "Time of Portion Used"), 	// example!
+		     "total_times_pages" => array("required" => true, "label" => "Total Time of CD"),
+		     "isbn" => array("required" => true, "label" => "ISBN"),
+		     "availability" => array("required" => true, "label" => "Availability of CD",
+					     "options" => array("Commercially Unavailable",
+								"Commercially Available")),
+		     ),
+	       "OTHER" =>
+	       array("title" => array("required" => true, "label" => "Title"), 
+		     "author" => array("required" => true, "label" => "Author"),
+		     "year" => array("required" => true, "label" => "Year Created"),
+		     )
+	       );
+}
+
 ?>

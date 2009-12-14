@@ -517,16 +517,47 @@ class requestDisplayer extends noteDisplayer {
 					document.getElementById('personal_item_owner_search').style.visibility = 'visible';
 				}	
 			}
-			//shows/hides text field for 'other' material type
-			function toggleOtherMaterialInput() {
-			  var material_type = document.getElementById('material_type');
-			  if (material_type.options[material_type.selectedIndex].value == "OTHER") {
-			    document.getElementById('material_type_other_block').style.display = 'inline';
+
+			var materialType_details = <?= json_encode(common_materialTypesDetails()) ?>;
+			
+			//update form based on type of material
+			function typeOfMaterial() {
+			  var type = $('material_type').options[$('material_type').selectedIndex].value;
+			  var type_details = materialType_details[type];
+			  for (var field in type_details) {
+			    var tr = $(field);
+			    tr.show();
+			    if (type_details[field]["label"]) {
+			      tr.cells[0].innerHTML = type_details[field]["label"];
+			    }
+			    if (type_details[field]["required"]) {
+			      tr.className = "required";
+			    } else {
+			      tr.className = "";
+			    }
+			    if (type_details[field]["options"]) {
+			      $(field + "_option0").innerHTML = type_details[field]["options"][0];
+			      $(field + "_option1").innerHTML = type_details[field]["options"][1];
+			      
+			    }
+			  }
+			  var table = $('addItem');
+			  // hide all rows not listed in current type config
+			  for (var i = 0; i < table.rows.length; i++) {
+			    row = table.rows[i];
+			    if (row.id && ! type_details[row.id]) {
+			      // FIXME: should inputs be made inactive?
+			      $(row.id).hide();
+			    }
+			  }
+
+			  // show/hide type of material text input field for type 'OTHER'
+			  if (type == "OTHER") {
+			    $('material_type_other_block').style.display = 'inline';
 			  } else {
-			    document.getElementById('material_type_other_block').style.display = 'none';
+			    $('material_type_other_block').hide();
 			  }
 			}	
-
 		</script>
 		
 		<form action="index.php" method="post" id="additem_form" name="additem_form"<?=$form_enctype?>>
@@ -635,23 +666,59 @@ class requestDisplayer extends noteDisplayer {
 
 		<script type="text/javascript">
 			function checkForm(frm) {
-				var alertMsg = '';
-				if (frm.title.value == '') { alertMsg = alertMsg + 'Please enter a title.<br>';  }						
-		
-				if (frm.documentType[0].checked && frm.userFile.value == '')
-					alertMsg = alertMsg + 'File path is required.<br>'; 
-				
-				if (frm.documentType[1].checked && frm.url.value == '')
-					alertMsg = alertMsg + 'URL is required.<br>'; 							
-					
-				if (alertMsg == '') {
-					//submit form
-					return true;
-				} else {
-					document.getElementById('alertMsg').innerHTML = alertMsg;
-					//do not submit form
-					return false;
-				}
+			  // remove any 'incomplete' markings
+			  var table = $('addItem');
+			  for (var i = 0; i < table.rows.length; i++) {
+			    row = table.rows[i];
+			    if (row.cells[1]) {
+			      row.cells[1].className = "";
+			    }
+			  }
+
+			  var alertMsg = '';
+			  
+			  // one of file upload or url is required
+			  if (frm.documentType[0].checked && frm.userFile.value == '') {
+			    alertMsg = alertMsg + 'File path is required.<br/>';
+			    frm.userFile.className = 'incomplete';
+			  } 
+			  if (frm.documentType[1].checked && frm.url.value == '') {
+			    alertMsg = alertMsg + 'URL is required.<br/>';
+			    frm.url.className = 'incomplete';
+			  }
+			  // material type is now required
+			  if ($('material_type').options[$('material_type').selectedIndex].value == '') {
+			    alertMsg += 'Please select type of material.<br/>';
+			    frm.material_type.className = 'incomplete';
+			  } else {
+			    frm.material_type.className = '';
+			  }
+			  
+			  // check all required fields for current type of material
+			  var type = $('material_type').options[$('material_type').selectedIndex].value;
+			  var type_details = materialType_details[type];
+			  for (var field in type_details) {
+			    if (type_details[field]["required"]) {
+			      var tr = $(field);
+			      var inputs = tr.select('input[type="text"]');
+			      var radio_inputs = tr.select('input[type="radio"]');
+			      if ((inputs.length && inputs[0].getValue() == '') ||
+				  (radio_inputs.length && (! radio_inputs[0].checked)
+				   && (! radio_inputs[1].checked))) {
+				alertMsg += type_details[field]['label'] + ' is required.<br/>';
+				tr.cells[1].className = 'incomplete';
+			      }
+			    }
+			  }
+			  
+			  if (alertMsg == '') {
+			    //submit form
+			    return true;
+			  } else {
+			    $('alertMsg').innerHTML = alertMsg;
+			    //do not submit form
+			    return false;
+			  }
 			}
 		</script>
 		
@@ -767,7 +834,8 @@ class requestDisplayer extends noteDisplayer {
   		       <span id="material_type_req_mark" style="color:#FF0000;">*</span>
 		       Type of Material:</th>
 		     <td>
-		   <select id="material_type" name="material_type" onChange="toggleOtherMaterialInput()">
+		   <select id="material_type" name="material_type" onChange="typeOfMaterial()">
+		   <option value="">Choose one:</option>
 <?php 		foreach($material_types as $material_id => $material): ?>
 <?php		$selected = ($material_id == $item_data['material_type']) ? ' selected="selected"' : ''; ?>
 		     <option value="<?= $material_id ?>"<?= $selected ?>><?= $material ?></option>
@@ -824,46 +892,44 @@ class requestDisplayer extends noteDisplayer {
 					</div>
 				</td>
 			</tr>
-			<tr>
+			<tr id="title">
 			  <th><font color="#FF0000">*</font>Title:</th>
 			  <td align="left"><input name="title" type="text" size="50" value="<?=$item_data['title']?>"></td>
 			</tr>
-			<tr>
+			<tr id="author">
 			  <th><font color="#FF0000"></font>Author/Composer:</th>
 			  <td><input name="author" type="text" size="50" value="<?=$item_data['author']?>"></td>
 			</tr>
-			<tr>
-			  <th>Performer:</th>
-			  <td><input name="performer" type="text" size="50" value="<?=$item_data['performer']?>"></td>
-			</tr>
-			<tr>
+			<tr id="work_title">
 			  <th>Book/Journal/Work Title:</th>
 			  <td><input name="volume_title" type="text" size="50" value="<?=$item_data['volume_title']?>">
 			</td>
-			<tr>
-			  <th>Volume / Edition:</th>
+			<tr id="edition">
+			  <th>Volume/Edition:</th>
 			  <td><input name="volume_edition" type="text" size="50" value="<?=$item_data['edition']?>"></td>
 			</tr>
-			<tr>
+			<tr id="publisher">
+			   <th>Publisher:</th>
+			   <td><input name="publisher" type="text" size="50" value="<?=$item_data['publisher
+']?>"> </td>
+			</tr>
+			<tr id="year">
+			   <th>Source / Year:</th>
+			   <td><input name="source" type="text" size="50" value="<?=$item_data['source']?>"> </td>
+			</tr>
+			<tr id="performer">
+			  <th>Performer:</th>
+			  <td><input name="performer" type="text" size="50" value="<?=$item_data['performer']?>"></td>
+			<tr id="times_pages">
 			  <th>Pages/Times:</th>
 			  <td><input name="times_pages" type="text" size="50" value="<?=$item_data['times_pages']?>"></td>
 			  <? if ($isDigital): ?>
 			    <td><small>pp. 336-371 and pp. 399-442 (78 of 719)</small></td>
 			  <? endif ?>			       
 			</tr>
-			<tr>
+			<tr id="total_times_pages">
 			   <th>Total Pages/Times:</th>
 			   <td><input name="total_times_pages" type="text" size="50" value="<?=$item_data['total_times_pages']?>"></td>
-			</tr>
-			<tr>
-			   <th>Source / Year:</th>
-			   <td><input name="source" type="text" size="50" value="<?=$item_data['source']?>"> </td>
-			</tr>
-
-			 <tr>
-			   <th>Publisher:</th>
-			   <td><input name="publisher" type="text" size="50" value="<?=$item_data['publisher
-']?>"> </td>
 			</tr>
 
 
@@ -880,18 +946,25 @@ class requestDisplayer extends noteDisplayer {
 				</td>
 			</tr>		
 <?php	endif; ?>
-			<tr>
+			<tr id="isbn">
 			  <th>ISBN:</th>
 			  <td><input name="ISBN" size="15" maxlength="15" value="<?=$item_data['ISBN']?>" type="text"></td>
 			</tr>
-			<tr>
+			<tr id="issn">
 			  <th>ISSN:</th>
 			  <td><input name="ISSN" maxlength="15" size="15" value="<?=$item_data['ISSN']?>" type="text"></td>
 			</tr>
-			<tr>
+			<tr id="oclc">
 			   <th>OCLC:</th>
 			   <td><input name="OCLC" maxlength="9" size="15" value="<?=$item_data['OCLC']?>" type="text"></td>
 			</tr>
+			<tr id="availability">
+			  <th>Availability:</th>
+			  <td>
+			   <input type="radio" name="availability" value="0"> <span id="availability_option0">unavailable</span>
+			   <input type="radio" name="availability" value="1"> <span id="availability_option1">available</span>
+			</tr>
+
 			<tr>
 			   <th>
 				<?php	if($isPhysical): ?>

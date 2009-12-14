@@ -1323,6 +1323,12 @@ table#addItem td, table#addItem th {
 table#addItem tr { 
  vertical-align:middle;
 }
+/* FIXME: won't work in IE... -- use bg image? */
+table#addItem tr.required th:before {   
+ content:"* ";
+ color:red;
+}
+
 table#addItem th { 
  width: 20%;
  text-align:right;
@@ -1330,4 +1336,9 @@ table#addItem th {
 }
 table#addItem td { 
  text-align:left;
+}
+
+.incomplete  { 
+/* FIXME: better display option */ 
+ background-color:red;
 }
