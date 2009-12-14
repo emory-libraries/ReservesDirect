@@ -718,18 +718,18 @@ class requestDisplayer extends noteDisplayer {
 
 		<table width="100%" border="0" cellpadding="3" cellspacing="0" bgcolor="#CCCCCC" class="borders">
 			<tr>
-				<td align="left" colspan="2" valign="top"> <p class="strong">MATERIAL TYPE (Pick One):</p></td>
+				<td align="left" colspan="2" valign="top"> <p class="strong">Would you like to:</p></td>
 			</tr>
 			<tr>
 				<td align="left" valign="top">
-					<font color="#FF0000"><strong>*</strong></font><input type="radio" name="documentType" value="DOCUMENT" checked onClick="this.form.userFile.disabled = !this.checked; this.form.url.disabled = !this.checked;">&nbsp;<span class="strong">Upload &gt;&gt;</span>
+					<font color="#FF0000"><strong>*</strong></font><input type="radio" name="documentType" value="DOCUMENT" checked onClick="this.form.userFile.disabled = !this.checked; this.form.url.disabled = !this.checked;">&nbsp;<span class="strong">Upload an item &gt;&gt;</span>
 				</td>
 				<td align="left" valign="top"><input type="file" name="userFile" size="40"></td>
 			</tr>
 			<tr>
 				<td align="left" valign="top">
 					<font color="#FF0000"><strong>*</strong></font><input type="radio" name="documentType" value="URL" onClick="this.form.url.disabled = !this.checked; this.form.userFile.disabled = this.checked;">
-					<span class="strong">URL &gt;&gt;</span>
+					<span class="strong">Add a link &gt;&gt;</span>
 				</td>
 				<td align="left" valign="top">
 					<input name="url" type="text" size="50" DISABLED>
@@ -772,7 +772,7 @@ class requestDisplayer extends noteDisplayer {
 <?php		$selected = ($material_id == $item_data['material_type']) ? ' selected="selected"' : ''; ?>
 		     <option value="<?= $material_id ?>"<?= $selected ?>><?= $material ?></option>
 <?php		endforeach ?>
-		</select><? /* FIXME: detect other, fill in user material type other */ ?>
+		</select>
 	       <div id="material_type_other_block" style="display:none">
   	         <input name="material_type_other"
 		  type="text" size="25" value="<?=$item_data['material_type_other']?>"/>
@@ -856,6 +856,7 @@ class requestDisplayer extends noteDisplayer {
 				<td align="right" bgcolor="#CCCCCC"><span class="strong">Source / Year:</span></td>
 				<td align="left"><input name="source" type="text" size="50" value="<?=$item_data['source']?>"> </td>
 			</tr>
+
 
 <?php	if($isDigital && !empty($doc_types)):	//document icon/mime for digital items ?>
 			<tr valign="middle">
