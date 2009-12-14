@@ -575,6 +575,12 @@ class requestManager
 		if(isset($_REQUEST['ISBN'])) $item->setISBN($_REQUEST['ISBN']);
 		if(isset($_REQUEST['ISSN'])) $item->setISSN($_REQUEST['ISSN']);
 		if(isset($_REQUEST['OCLC'])) $item->setOCLC($_REQUEST['OCLC']);
+		
+		if(isset($_REQUEST['publisher'])) $item->setPublisher($_REQUEST['publisher']);
+		if(isset($_REQUEST['total_times_pages'])) $item->setTotalPagesTimes($_REQUEST['total_times_pages']);
+		if(isset($_REQUEST['availability'])) $item->setAvailability($_REQUEST['availability']);
+
+		
 		//this will be an ILS-assigned key for physical items, or a manually-entered barcode for electronic items
 		if(isset($_REQUEST['local_control_key'])) $item->setLocalControlKey($_REQUEST['local_control_key']);
 
