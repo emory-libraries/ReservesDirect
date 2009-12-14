@@ -761,9 +761,9 @@ class requestDisplayer extends noteDisplayer {
 		
 		<div class="headingCell1" style="width:25%; text-align:center;">Item Details</div>
 		
-		<table width="100%" border="0" cellpadding="3" cellspacing="0" class="borders">
+		<table id="addItem" class="borders">
 		   <tr>
-		     <th width="20%" align="right" bgcolor="#CCCCCC" class="strong">
+		     <th>
   		       <span id="material_type_req_mark" style="color:#FF0000;">*</span>
 		       Type of Material:</th>
 		     <td>
@@ -780,14 +780,12 @@ class requestDisplayer extends noteDisplayer {
 	       </div>
 		   </td>
 		   </tr>
-
-			<tr align="left" valign="top" id="personal_item_row">
-				<td width="20%" align="right" bgcolor="#CCCCCC" class="strong">
-					<span id="personal_req_mark" style="color:#FF0000;">*</span>
-					Personal Copy Owner:
-					<br />&nbsp;
-				</td>				
-				<td>
+		<tr id="personal_item_row">
+		  <th valign="top">
+		     <span id="personal_req_mark" style="color:#FF0000;">*</span>
+			Personal Copy Owner:<br/>&nbsp;
+  		  </th>				
+		  <td valign="top">
 <?php
 	$personal_item_choice = array('no'=>'', 'yes'=>'');
 	if(!empty($selected_owner_id)) {
@@ -826,73 +824,83 @@ class requestDisplayer extends noteDisplayer {
 					</div>
 				</td>
 			</tr>
-			<tr valign="middle">
-				<td  width="20%" align="right" bgcolor="#CCCCCC" class="strong"><font color="#FF0000"><strong>*</strong></font>Title:</td>
-				<td align="left"><input name="title" type="text" size="50" value="<?=$item_data['title']?>"></td>
+			<tr>
+			  <th><font color="#FF0000">*</font>Title:</th>
+			  <td align="left"><input name="title" type="text" size="50" value="<?=$item_data['title']?>"></td>
 			</tr>
-			<tr valign="middle">
-				<td align="right" bgcolor="#CCCCCC" class="strong"><font color="#FF0000"></font>Author/Composer:</td>
-				<td align="left"><input name="author" type="text" size="50" value="<?=$item_data['author']?>"></td>
+			<tr>
+			  <th><font color="#FF0000"></font>Author/Composer:</th>
+			  <td><input name="author" type="text" size="50" value="<?=$item_data['author']?>"></td>
 			</tr>
-			<tr valign="middle">
-				<td align="right" bgcolor="#CCCCCC"><span class="strong">Performer</span><span class="strong">:</span></td>
-				<td align="left"><input name="performer" type="text" size="50" value="<?=$item_data['performer']?>"></td>
+			<tr>
+			  <th>Performer:</th>
+			  <td><input name="performer" type="text" size="50" value="<?=$item_data['performer']?>"></td>
 			</tr>
-			<tr valign="middle">
-				<td align="right" bgcolor="#CCCCCC"><span class="strong">Book/Journal/Work Title:</span></td>
-				<td align="left"><input name="volume_title" type="text" size="50" value="<?=$item_data['volume_title']?>">
+			<tr>
+			  <th>Book/Journal/Work Title:</th>
+			  <td><input name="volume_title" type="text" size="50" value="<?=$item_data['volume_title']?>">
 			</td>
-			<tr valign="middle">
-				<td align="right" bgcolor="#CCCCCC"><div align="right"><span class="strong">Volume / Edition:</span>
-				</td>
-				<td align="left"><input name="volume_edition" type="text" size="50" value="<?=$item_data['edition']?>"></td>
+			<tr>
+			  <th>Volume / Edition:</th>
+			  <td><input name="volume_edition" type="text" size="50" value="<?=$item_data['edition']?>"></td>
 			</tr>
-			<tr valign="middle">
-				<td align="right" bgcolor="#CCCCCC"><span class="strong">Pages/Times:</span></td>
-				<td align="left"><input name="times_pages" type="text" size="50" value="<?=$item_data['times_pages']?>"></td>
-				<? if ($isDigital) { echo "<td><small>pp. 336-371 and pp. 399-442 (78 of 719)</small></td>"; } ?>
+			<tr>
+			  <th>Pages/Times:</th>
+			  <td><input name="times_pages" type="text" size="50" value="<?=$item_data['times_pages']?>"></td>
+			  <? if ($isDigital): ?>
+			    <td><small>pp. 336-371 and pp. 399-442 (78 of 719)</small></td>
+			  <? endif ?>			       
 			</tr>
-			<tr valign="middle">
-				<td align="right" bgcolor="#CCCCCC"><span class="strong">Source / Year:</span></td>
-				<td align="left"><input name="source" type="text" size="50" value="<?=$item_data['source']?>"> </td>
+			<tr>
+			   <th>Total Pages/Times:</th>
+			   <td><input name="total_times_pages" type="text" size="50" value="<?=$item_data['total_times_pages']?>"></td>
+			</tr>
+			<tr>
+			   <th>Source / Year:</th>
+			   <td><input name="source" type="text" size="50" value="<?=$item_data['source']?>"> </td>
+			</tr>
+
+			 <tr>
+			   <th>Publisher:</th>
+			   <td><input name="publisher" type="text" size="50" value="<?=$item_data['publisher
+']?>"> </td>
 			</tr>
 
 
 <?php	if($isDigital && !empty($doc_types)):	//document icon/mime for digital items ?>
-			<tr valign="middle">
-				<td align="right" bgcolor="#CCCCCC"><span class="strong">Document Type Icon:</span></td>
-				<td align="left">
-					<select name="selectedDocIcon" onChange="document.iconImg.src = this[this.selectedIndex].value;">
+			<tr>
+			   <th>Document Type Icon:</th>
+			   <td>
+			      <select name="selectedDocIcon" onChange="document.iconImg.src = this[this.selectedIndex].value;">
 <?php		foreach($doc_types as $doc_type_info): ?>
-						<option value="<?=$doc_type_info['helper_app_icon']?>"><?=$doc_type_info['helper_app_name']?></option>
+			    	<option value="<?=$doc_type_info['helper_app_icon']?>"><?=$doc_type_info['helper_app_name']?></option>
 <?php		endforeach; ?>
-					</select>
-					<img name="iconImg" width="24" height="20" border="0" src="images/doc_type_icons/doctype-clear.gif">
+			      </select>
+			      <img name="iconImg" width="24" height="20" border="0" src="images/doc_type_icons/doctype-clear.gif">
 				</td>
 			</tr>		
 <?php	endif; ?>
-
-			<tr align="left" valign="middle">
-				<td class="strong" align="right" bgcolor="#cccccc">ISBN:</td>
-				<td><input name="ISBN" size="15" maxlength="15" value="<?=$item_data['ISBN']?>" type="text"></td>
+			<tr>
+			  <th>ISBN:</th>
+			  <td><input name="ISBN" size="15" maxlength="15" value="<?=$item_data['ISBN']?>" type="text"></td>
 			</tr>
-			<tr align="left" valign="middle">
-				<td class="strong" align="right" bgcolor="#cccccc">ISSN:</td>
-				<td><input name="ISSN" maxlength="15" size="15" value="<?=$item_data['ISSN']?>" type="text"></td>
+			<tr>
+			  <th>ISSN:</th>
+			  <td><input name="ISSN" maxlength="15" size="15" value="<?=$item_data['ISSN']?>" type="text"></td>
 			</tr>
-			<tr align="left" valign="middle">
-				<td class="strong" align="right" bgcolor="#cccccc">OCLC:</td>
-				<td><input name="OCLC" maxlength="9" size="15" value="<?=$item_data['OCLC']?>" type="text"></td>
+			<tr>
+			   <th>OCLC:</th>
+			   <td><input name="OCLC" maxlength="9" size="15" value="<?=$item_data['OCLC']?>" type="text"></td>
 			</tr>
-			<tr align="left" valign="middle">
-				<td class="strong" align="right" bgcolor="#cccccc">
+			<tr>
+			   <th>
 				<?php	if($isPhysical): ?>
 					<?= $g_catalogName ?> Control Number:
 				<?php else: ?>
 					Barcode / Alternate ID:
 				<?php endif; ?>
-				</td>
-				<td><input type="text" name="local_control_key" value="<?=$item_data['controlKey']?>" /></td>
+			    </th>
+			    <td><input type="text" name="local_control_key" value="<?=$item_data['controlKey']?>" /></td>
 			</tr>			
 
 			
@@ -900,17 +908,16 @@ class requestDisplayer extends noteDisplayer {
 			//show reserve-desk/home-library select box
 			if(!empty($libraries)):
 ?>
-			<tr align="left" valign="top">
-				<td align="right" bgcolor="#CCCCCC" class="strong">Reserve Desk:</td>
-				<td>
-					<select name="home_library">				
-<?php			
-				foreach($libraries as $lib):
+			<tr>
+			  <th>Reserve Desk:</td>
+			  <td>
+			      <select name="home_library">				
+<?php				foreach($libraries as $lib):
 					$selected = ($lib->getLibraryID()==$item_data['home_library']) ? ' selected="selected"' : '';
 ?>
-						<option value="<?=$lib->getLibraryID()?>"<?=$selected?>><?=$lib->getLibrary()?></option>
-<?php			endforeach; ?>
-					</select>
+				<option value="<?=$lib->getLibraryID()?>"<?=$selected?>><?=$lib->getLibrary()?></option>
+<?php				endforeach; ?>
+			      </select>
 <?php
 			endif;
 			

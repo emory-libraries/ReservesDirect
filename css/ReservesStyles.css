@@ -1311,3 +1311,23 @@ a.help_user_tag:hover {
 	background-color:#FFFF00;
 }
 .help_error {}
+
+
+table#addItem { 
+ width: 100%;
+ cell-spacing:3px;
+}
+table#addItem td, table#addItem th { 
+ padding:3px; 
+}
+table#addItem tr { 
+ vertical-align:middle;
+}
+table#addItem th { 
+ width: 20%;
+ text-align:right;
+ background-color:#cccccc;
+}
+table#addItem td { 
+ text-align:left;
+}
