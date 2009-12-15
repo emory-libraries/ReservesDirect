@@ -689,9 +689,9 @@ class requestDisplayer extends noteDisplayer {
 			  // material type is now required
 			  if ($('material_type').options[$('material_type').selectedIndex].value == '') {
 			    alertMsg += 'Please select type of material.<br/>';
-			    frm.material_type.className = 'incomplete';
+			    frm.material_type.parentNode.className = 'incomplete';
 			  } else {
-			    frm.material_type.className = '';
+			    frm.material_type.parentNode.className = '';
 			  }
 			  
 			  // check all required fields for current type of material
