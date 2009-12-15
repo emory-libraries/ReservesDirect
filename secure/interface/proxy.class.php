@@ -158,17 +158,27 @@ class proxy extends student
 		*/
 	}
 
-	
-	function getAllDocTypeIcons()
-	{
+
+	/**
+	 * get document type information (mimetype, helper application, path to icon image)
+	 * @param string $sort optional sort; defaults to id, also recognizes 'name'
+	 * @return array
+	 */
+	function getAllDocTypeIcons($sort = "id") {
 		global $g_dbConn;
 
-		switch ($g_dbConn->phptype)
-		{
+		switch ($sort) {
+		case "name": $sort_field = "helper_app_name"; break;
+		case "id":
+		default:
+		  $sort_field = "mimetype_id";
+		}
+
+		switch ($g_dbConn->phptype) {
 			default: //'mysql'
 				$sql = "SELECT DISTINCT mimetype_id, helper_app_name, helper_app_icon "
-				.	   "FROM mimetypes "
-				.	   "ORDER BY mimetype_id ASC"	
+				  .	   "FROM mimetypes "
+				  .	   "ORDER BY $sort_field ASC"	
 				;
 
 		}
