@@ -341,127 +341,149 @@ class itemDisplayer extends noteDisplayer {
 			}	
 		//-->
 		</script>
+<script type="text/javascript">
+  var materialType_details = <?= json_encode(common_materialTypesDetails()) ?>;
+</script>
+<script type="text/javascript" src="secure/javascript/editItem.js"></script>		    
+
 				
 		<div class="headingCell1">ITEM DETAILS</div>
 		<div id="item_details" style="padding:8px 8px 12px 8px;">
-		  <table border="0" cellpadding="2" cellspacing="0">
-		    <tr>
-		      <th align="right">
- 		        <span id="material_type_req_mark" style="color:#FF0000;">*</span>
-		    	Type of Material:</th>
+		  <table class="editItem" border="0" cellpadding="2" cellspacing="0">
+		    <tr class="required">
+		      <th>Type of Material:</th>
 		      <td>
-		    <select id="material_type" name="material_type" onChange="toggleOtherMaterialInput()">
+    	 	      <select id="material_type" name="material_type" onChange="typeOfMaterial()">
 <?php   		foreach(common_getMaterialTypes() as $material_id => $material): ?>
 <?php	        	$selected = ($material_id == $item->getMaterialType()) ? ' selected="selected"' : ''; ?>
-		    <option value="<?= $material_id ?>"<?= $selected ?>><?= $material ?></option>
+		        <option value="<?= $material_id ?>"<?= $selected ?>><?= $material ?></option>
 		       <?php		endforeach ?>
-		       </select><? /* FIXME: detect other, fill in user material type other */ ?>
+		       </select>
 		       <div id="material_type_other_block"
 		       style="display:<?= ($item->getMaterialType() == 'OTHER') ? 'inline' : 'none' ?>">
-		         <input name="material_type_other"
+		         <input name="material_type_other" id="material_type_other"
 		            type="text" size="25" value="<?=$item->getMaterialType('detail') ?>"/>
 		         <i>specify type of material</i>
 		       </div>
 		      </td>
 		   </tr>
 
-	    		<tr>
-	    			<td align="right">
-	    				<font color="#FF0000">*</font>&nbsp;Document Title:
-	    			</td>
-	    			<td>
-	    				<input name="title" type="text" id="title" size="50" value="<?=$item->getTitle()?>">
-	    			</td>
-	    		</tr>
-	    		<tr>
-	    			<td align="right">
-	    				Author/Composer:
-	    			</td>
-	    			<td>
-	    				<input name="author" type="text" id="author" size="50" value="<?=$item->getAuthor()?>">
-	    			</td>
-	    		</tr>
-	    		<tr>
-	    			<td align="right">
-	    				Performer:
-	    			</td>
-	    			<td>
-	    				<input name="performer" type="text" id="performer" size="50" value="<?=$item->getPerformer()?>">
-	    			</td>
-	    		</tr>
-	    		<tr>
-	    			<td align="right">
-	    				Document Type Icon:
-	    			</td>
-	    			<td>
-	    				<select name="selectedDocIcon" onChange="document.iconImg.src = this[this.selectedIndex].value;">
+	    	   <tr id="title" class="required">
+	    	      <th>Document Title:</th>
+	    	      <td>
+		        <input name="title" type="text" id="title" size="50" value="<?=$item->getTitle()?>">
+		      </td>
+		   </tr>
+		   <tr id="author">
+	    	     <th>Author/Composer:</th>
+  		     <td>
+		       <input name="author" type="text" id="author" size="50" value="<?=$item->getAuthor()?>">
+		     </td>
+		   </tr>
+	    	   <tr id="work_title">
+		     <th>Book/Journal/Work Title:</th>
+		     <td>
+			<input name="volumeTitle" type="text" id="volumeTitle" size="50" value="<?=$item->getVolumeTitle()?>">
+		     </td>
+	    	   </tr>
+	    	   <tr id="edition">
+		     <th>Volume/Edition:</td>
+		     <td>
+			<input name="volumeEdition" type="text" id="volumeEdition" size="50" value="<?=$item->getVolumeEdition()?>">
+		     </td>
+		   </tr>
+		   <tr id="publisher">
+		     <th>Publisher:</th>
+		     <td><input name="publisher" type="text" size="50" value="<?=$item->getPublisher() ?>"> </td>
+		   </tr>
+	    	   <tr id="year">
+	    	     <th>Source/Year:</th>
+		     <td>
+			<input name="source" type="text" id="source" size="50" value="<?=$item->getSource()?>">
+		     </td>
+	    	   </tr>
+		   <tr id="performer">
+		     <th>Performer:</th>
+		     <td>
+		       <input name="performer" type="text" id="performer" size="50" value="<?=$item->getPerformer()?>">
+		     </td>
+		   </tr>
+		   <tr id="times_pages">
+		     <th>Pages/Time:</th>
+		     <td>
+		       <input name="pagesTimes" type="text" id="pagesTimes" size="50" value="<?=$item->getPagesTimes()?>">
+		     </td>
+		     <? if ($item->getItemGroup() == 'ELECTRONIC'): ?>
+		        <td><small>pp. 336-371 and pp. 399-442 (78 of 719)</small></td>
+		     <? endif ?>
+	    	   </tr>
+		   <tr id="total_times_pages">
+		     <th>Total Pages/Times:</th>
+		     <td><input name="total_times_pages" type="text" size="50" value="<?= $item->getTotalPagesTimes() ?>"></td>
+		   </tr>
+			   
+	    	   <tr>
+		     <th>Document Type Icon:</th>
+		     <td>
+		       <select name="selectedDocIcon" onChange="document.iconImg.src = this[this.selectedIndex].value;">
 <?php
 		foreach($u->getAllDocTypeIcons() as $icon):
 			$selected = ($item->getItemIcon() == $icon['helper_app_icon']) ? ' selected="selected"' : '';
 ?>
-							<option value="<?=$icon['helper_app_icon']?>"<?=$selected?>><?=$icon['helper_app_name']?></option>
+		         <option value="<?=$icon['helper_app_icon']?>"<?=$selected?>><?=$icon['helper_app_name']?></option>
 <?php	endforeach; ?>
-						</select>
-						<img name="iconImg" width="24" height="20" src="<?=$item->getItemIcon()?>" />
-	    			</td>
-	    		</tr>
-	    		<tr>
-	    			<td align="right">
-	    				Book/Journal/Work Title:
-	    			</td>
-	    			<td>
-	    				<input name="volumeTitle" type="text" id="volumeTitle" size="50" value="<?=$item->getVolumeTitle()?>">
-	    			</td>
-	    		</tr>
-	    		<tr>
-	    			<td align="right">
-	    				Volume/Edition:
-	    			</td>
-	    			<td>
-	    				<input name="volumeEdition" type="text" id="volumeEdition" size="50" value="<?=$item->getVolumeEdition()?>">
-	    			</td>
-	    		</tr>
-	    		<tr>
-	    			<td align="right">
-	    				Pages/Time
-	    			</td>
-	    			<td>
-	    				<input name="pagesTimes" type="text" id="pagesTimes" size="50" value="<?=$item->getPagesTimes()?>">
-	    			</td>
-	    			<? if ($item->getItemGroup() == 'ELECTRONIC') { echo "<td><small>pp. 336-371 and pp. 399-442 (78 of 719)</small></td>"; } ?>	    			
-	    		</tr>
-	    		<tr>
-	    			<td align="right">
-	    				Source/Year:
-	    			</td>
-	    			<td>
-	    				<input name="source" type="text" id="source" size="50" value="<?=$item->getSource()?>">
-	    			</td>
-	    		</tr>
-				<tr><td align="right">ISBN:</td><td><input type="text" size="15" maxlength="13" value="<?= $item->getISBN() ?>" name="ISBN" /></td></tr>
-                <tr><td align="right">OCLC:</td><td><input type="text" size="15" maxlength="9"  value="<?= $item->getOCLC() ?>" name="OCLC" /></td></tr>
-                <tr><td align="right">ISSN:</td><td><input type="text" size="15" maxlength="8"  value="<?= $item->getISSN() ?>" name="ISSN" /></td></tr>
+		       </select>
+		       <img name="iconImg" width="24" height="20" src="<?=$item->getItemIcon()?>" />
+		     </td>
+		   </tr>
+		   <tr id="isbn">
+		     <th>ISBN:</th>
+		     <td><input type="text" size="15" maxlength="13" value="<?= $item->getISBN() ?>" name="ISBN" /></td>
+		   </tr>
+                   <tr id="issn">
+		     <th>ISSN:</th>
+		     <td>
+		       <input type="text" size="15" maxlength="8"  value="<?= $item->getISSN() ?>" name="ISSN" />
+		     </td>
+		   </tr>
+                   <tr id="oclc">
+		     <th>OCLC:</th>
+		     <td>
+		       <input type="text" size="15" maxlength="9"  value="<?= $item->getOCLC() ?>" name="OCLC" />
+		     </td>
+		   </tr>
+			   
+		   <tr id="availability">
+		      <th>Availability:</th>
+		      <td>
+			   <? /* FIXME: set to checked accordingly! */ ?>
+		       <input type="radio" name="availability" value="0"> <span id="availability_option0">unavailable</span>
+		        <input type="radio" name="availability" value="1"> <span id="availability_option1">available</span>
+		       </td>
+		    </tr>
+
+			   
 
 <?php	
 		if($item->isPhysicalItem()):
 ?>
-				<tr>
-					<td align="right"><?= $g_catalogName ?> Control Number:</td>
-					<td><input type="text" name="local_control_key" size="15" value="<?=$item->getLocalControlKey();?>" /></td>
-				</tr>
+		  <tr>
+		     <th><?= $g_catalogName ?> Control Number:</th>
+		     <td><input type="text" name="local_control_key" size="15" value="<?=$item->getLocalControlKey();?>" /></td>
+		  </tr>
 <?php   else: ?>
-				<tr>
-					<td align="right">Barcode:</td>
-					<td><input type="text" name="local_control_key" size="15" value="<?=$item->getLocalControlKey();?>" /></td>
-				</tr>
+		   <tr id="barcode">
+		      <th>Barcode:</th>
+		      <td><input type="text" name="local_control_key" size="15" value="<?=$item->getLocalControlKey();?>" /></td>
+		   </tr>
 <?php	endif; ?>
 	    		
-<?php	
-		//only allow choosing personal-item owner to staff or better
+<? /* disabling person-item owner
+<?php		//only allow choosing personal-item owner to staff or better
 		if($u->getRole() >= $g_permission['staff']):
-?>
-
-				<tr id="personal_item_row" valign="top">
+		?>
+    
+    <tr id="personal_item_row" valign="top">
 					<td align="right">
 						Personal Copy Owner:
 					</td>
@@ -497,6 +519,7 @@ class itemDisplayer extends noteDisplayer {
 					</td>
 				</tr>
 <?php	endif; ?>
+end personal-item owner (disabled)   */ ?>
 			</table>
 		</div>
 		
@@ -506,6 +529,7 @@ class itemDisplayer extends noteDisplayer {
 ?>		
 		<script language="JavaScript">
 			//set up some fields on load
+		   <? /* personal-item owner stuff disabled 
 			if( document.getElementById('personal_item_owner_curr') != null ) {	//if there is already a private owner
 				//select current owner
 				document.getElementById('personal_item_owner_curr').checked = true;
@@ -515,7 +539,9 @@ class itemDisplayer extends noteDisplayer {
 			else {
 				//default to no private owner
 				togglePersonal(0);
-			}
+				} */ ?>
+		   // init form based on selected type of material
+		   typeOfMaterial();
 		</script>
 <?php
 		endif;
@@ -622,18 +648,16 @@ class itemDisplayer extends noteDisplayer {
 ?>
 		<script language="JavaScript">
 		//<!--
-			function submitForm() {
-				if(document.getElementById('item_form')) {
-					document.getElementById('item_form').submit();
-				}
-			}
-			
+		   function submitForm() {
+		     var form = document.getElementById('item_form');
+		     if(form && validateForm(form)) {
+		       document.getElementById('item_form').submit();
+		     }
+		   }
+
 			function validateForm(frm,physicalCopy) {			
 				var alertMsg = "";
 
-				if (frm.title.value == "")
-					alertMsg = alertMsg + "Title is required.<br>";
-				
 				if (physicalCopy) {
 					//make sure this physical copy is supposed to have a barcode
 					//	if it is, there will be an input element for it in the form
@@ -646,19 +670,25 @@ class itemDisplayer extends noteDisplayer {
 				else if((frm.documentType.value == "URL") && (frm.url.value == "")) {
 					alertMsg = alertMsg + "URL is required.<br />";
 				}
+
+				if (! physicalCopy) {
+				  alertMsg += checkMaterialTypes(frm);
+				}
 				
 				if (!alertMsg == "") { 
-					document.getElementById('alertMsg').innerHTML = alertMsg;
-					return false;
+				  document.getElementById('alertMsg').innerHTML = alertMsg;
+				  return false;
+				} else {
+				  return true;
 				}					
 			}
 		//-->
 		</script>
 		
 <?php	if($item->getItemGroup() == 'ELECTRONIC'): ?>
-		<form id="item_form" name="item_form" enctype="multipart/form-data" action="index.php?cmd=editItem" method="post" onSubmit="return validateForm(this,false);">		
+		<form id="item_form" name="item_form" enctype="multipart/form-data" action="index.php?cmd=editItem" method="post" onSubmit="return validateForm(this,false);">		>		
 <?php	else: ?>
-		<form id="item_form" name="item_form" action="index.php?cmd=editItem" method="post" onSubmit="return validateForm(this,true);">		
+		<form id="item_form" name="item_form" action="index.php?cmd=editItem" method="post" onSubmit="return validateForm(this,true);">
 <?php	endif; ?>
 
 			<input type="hidden" name="submit_edit_item_meta" value="submit" />
@@ -697,7 +727,7 @@ class itemDisplayer extends noteDisplayer {
 		<strong style="color:#FF0000;">*</strong> <span class="helperText">= required fields</span>
 		<p />
 		<div style="padding:10px; text-align:center;">
-			<input type="button" name="submit_edit_item_meta" value="Save Changes" onclick="javascript: submitForm();">
+		    <input type="button" name="submit_edit_item_meta" value="Save Changes" onclick="javascript: submitForm();"> <? /*			<input type="button" name="submit_edit_item_meta" value="Save Changes" onClick="return validateForm(this.form, <?= ($item->getItemGroup() == 'ELECTRONIC') ? 'false' : 'true' ?>);">*/ ?>
 		</div>
 <?php		
 	}

@@ -469,6 +469,7 @@ class requestDisplayer extends noteDisplayer {
 		$form_enctype = $isDigital ? ' enctype="multipart/form-data"' : '';
 ?>
 		<script type="text/javascript">
+<? /* personal-item owner stuff disabled 		   
 			//shows/hides personal item elements; marks them as required or not
 			function togglePersonal(enable, req) {
 				//show block or not?
@@ -517,48 +518,11 @@ class requestDisplayer extends noteDisplayer {
 					document.getElementById('personal_item_owner_search').style.visibility = 'visible';
 				}	
 			}
+ end personal item owner (disabled)   */ ?>
 
 			var materialType_details = <?= json_encode(common_materialTypesDetails()) ?>;
-			
-			//update form based on type of material
-			function typeOfMaterial() {
-			  var type = $('material_type').options[$('material_type').selectedIndex].value;
-			  var type_details = materialType_details[type];
-			  for (var field in type_details) {
-			    var tr = $(field);
-			    tr.show();
-			    if (type_details[field]["label"]) {
-			      tr.cells[0].innerHTML = type_details[field]["label"] + ":";
-			    }
-			    if (type_details[field]["required"]) {
-			      tr.className = "required";
-			    } else {
-			      tr.className = "";
-			    }
-			    if (type_details[field]["options"]) {
-			      $(field + "_option0").innerHTML = type_details[field]["options"][0];
-			      $(field + "_option1").innerHTML = type_details[field]["options"][1];
-			      
-			    }
-			  }
-			  var table = $('addItem');
-			  // hide all rows not listed in current type config
-			  for (var i = 0; i < table.rows.length; i++) {
-			    row = table.rows[i];
-			    if (row.id && ! type_details[row.id]) {
-			      // FIXME: should inputs be made inactive?
-			      $(row.id).hide();
-			    }
-			  }
-
-			  // show/hide type of material text input field for type 'OTHER'
-			  if (type == "OTHER") {
-			    $('material_type_other_block').style.display = 'inline';
-			  } else {
-			    $('material_type_other_block').hide();
-			  }
-			}	
 		</script>
+<script type="text/javascript" src="secure/javascript/editItem.js"></script>		    
 		
 		<form action="index.php" method="post" id="additem_form" name="additem_form"<?=$form_enctype?>>
 		
@@ -666,17 +630,7 @@ class requestDisplayer extends noteDisplayer {
 
 		<script type="text/javascript">
 			function checkForm(frm) {
-			  // remove any 'incomplete' markings
-			  var table = $('addItem');
-			  for (var i = 0; i < table.rows.length; i++) {
-			    row = table.rows[i];
-			    if (row.cells[1]) {
-			      row.cells[1].className = "";
-			    }
-			  }
-
 			  var alertMsg = '';
-			  
 			  // one of file upload or url is required
 			  if (frm.documentType[0].checked && frm.userFile.value == '') {
 			    alertMsg = alertMsg + 'File path is required.<br/>';
@@ -686,30 +640,8 @@ class requestDisplayer extends noteDisplayer {
 			    alertMsg = alertMsg + 'URL is required.<br/>';
 			    frm.url.className = 'incomplete';
 			  }
-			  // material type is now required
-			  if ($('material_type').options[$('material_type').selectedIndex].value == '') {
-			    alertMsg += 'Please select type of material.<br/>';
-			    frm.material_type.parentNode.className = 'incomplete';
-			  } else {
-			    frm.material_type.parentNode.className = '';
-			  }
-			  
-			  // check all required fields for current type of material
-			  var type = $('material_type').options[$('material_type').selectedIndex].value;
-			  var type_details = materialType_details[type];
-			  for (var field in type_details) {
-			    if (type_details[field]["required"]) {
-			      var tr = $(field);
-			      var inputs = tr.select('input[type="text"]');
-			      var radio_inputs = tr.select('input[type="radio"]');
-			      if ((inputs.length && inputs[0].getValue() == '') ||
-				  (radio_inputs.length && (! radio_inputs[0].checked)
-				   && (! radio_inputs[1].checked))) {
-				alertMsg += type_details[field]['label'] + ' is required.<br/>';
-				tr.cells[1].className = 'incomplete';
-			      }
-			    }
-			  }
+
+			  alertMsg += checkMaterialTypes(frm);
 			  
 			  if (alertMsg == '') {
 			    //submit form
@@ -833,11 +765,11 @@ class requestDisplayer extends noteDisplayer {
   
 		<div class="headingCell1" style="width:25%; text-align:center;">Item Details</div>
 		
-		<table id="addItem" class="borders">
+		<table id="addItem" class="borders editItem">
 		   <tr class="required">
 		     <th>Type of Material:</th>
 		     <td>
-		   <select id="material_type" name="material_type" onChange="typeOfMaterial()">
+    	 	      <select id="material_type" name="material_type" onChange="typeOfMaterial()">
 		   <option value="">Choose one:</option>
 <?php 		foreach($material_types as $material_id => $material): ?>
 <?php		$selected = (isset($item_data['material_type']) && $material_id == $item_data['material_type']) ? ' selected="selected"' : ''; ?>
@@ -847,7 +779,7 @@ class requestDisplayer extends noteDisplayer {
 	<? /* FIXME: if type of material is set, need to run typeOfMaterial after loading to update form */ ?>
 									      
 	       <div id="material_type_other_block" style="display:none">
-  	         <input name="material_type_other"
+  	         <input name="material_type_other" id="material_type_other"
 		  type="text" size="25" value="<?=$item_data['material_type_other']?>"/>
 		    <i>specify type of material</i>
 	       </div>
@@ -969,6 +901,7 @@ class requestDisplayer extends noteDisplayer {
 			  <td>
 			   <input type="radio" name="availability" value="0"> <span id="availability_option0">unavailable</span>
 			   <input type="radio" name="availability" value="1"> <span id="availability_option1">available</span>
+			   </td>
 			</tr>
 
 			<tr id="barcode">
@@ -1010,10 +943,10 @@ class requestDisplayer extends noteDisplayer {
 			}
 ?>
 <?php	if($isPhysical):	//auto-set item-group for electronic items ?>		
-			<tr align="left" valign="top">
-				<td align="right" bgcolor="#CCCCCC" class="strong">Item Type:</td>
-				<td>
-					<input type="radio" name="item_group" value="MONOGRAPH"<?=$item_group_select['monograph']?> />Monograph
+			<tr>
+			  <th>Item Type:</th>
+			  <td>
+    	<input type="radio" name="item_group" value="MONOGRAPH"<?=$item_group_select['monograph']?> />Monograph
 					&nbsp;<input type="radio" name="item_group" value="MULTIMEDIA"<?=$item_group_select['multimedia']?> /> Multimedia
 				</td>
 			</tr>
@@ -1094,6 +1027,11 @@ class requestDisplayer extends noteDisplayer {
 
 		//run code to set up the form in the beginning
 		//togglePersonal(1, 0);
+
+	  // update form if type of material is specified
+	  <? if ($item_data['material_type'] != ""): ?>
+	       typeOfMaterial();
+	  <? endif ?>
 
 <?php	endif; ?>
 	</script>

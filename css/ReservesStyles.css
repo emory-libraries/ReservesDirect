@@ -1313,32 +1313,32 @@ a.help_user_tag:hover {
 .help_error {}
 
 
-table#addItem { 
+table.editItem { 
  width: 100%;
  cell-spacing:3px;
 }
-table#addItem td, table#addItem th { 
+table.editItem td, table.editItem th { 
  padding:3px; 
 }
-table#addItem tr { 
+table.editItem tr { 
  vertical-align:middle;
 }
-table#addItem th {   
+table.editItem th {   
  padding-right: 13;
 }
 
-table#addItem tr.required th {   
+table.editItem tr.required th {   
  background-image: url('../images/required.png');
  background-position: 100% 3px;
  background-repeat:no-repeat;
 }
 
-table#addItem th { 
+table.editItem th { 
  width: 20%;
  text-align:right;
  background-color:#cccccc;
 }
-table#addItem td { 
+table.editItem td { 
  text-align:left;
  width:40em;
 }
