@@ -307,7 +307,7 @@ function common_getMaterialTypes() {
  * per-material-type configuration for edit form - custom labels, which fields are required, etc.
  * @return array associative array by material type with fields to be shown
  */
-function common_materialTypesDetails($type) {
+function common_materialTypesDetails() {
   return array("BOOK_PORTION" => 
 	       array("title" => array("required" => true, "label" => "Title"),
 		     "work_title" => array("required" => true, "label" => "Book Title"), // example text?
