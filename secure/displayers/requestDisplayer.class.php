@@ -406,7 +406,10 @@ class requestDisplayer extends noteDisplayer {
 		echo "</form>\n";		
 	}
 	
-	
+	/**
+	 * @see itemDisplayer::displayEditItemMeta - significant overlap/duplication with this function
+	 * @todo figure out a way to consolidate addItem and editItem logic?
+	 */
 	function addItem($cmd, $item_data, $hidden_fields=null, $errors = array()) {
 		global $u, $g_permission, $g_notetype, $g_catalogName;
 		
@@ -764,7 +767,9 @@ class requestDisplayer extends noteDisplayer {
 		</div>
   
 		<div class="headingCell1" style="width:25%; text-align:center;">Item Details</div>
-		
+
+<? /* NOTE: this form has *significant* overlap with editItem in itemDisplayer; if you make changes here,
+    you probably will need to make similar changes there also. */ ?>
 		<table id="addItem" class="borders editItem">
 		   <tr class="required">
 		     <th>Type of Material:</th>

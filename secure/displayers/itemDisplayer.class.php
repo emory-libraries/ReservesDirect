@@ -631,7 +631,10 @@ end personal-item owner (disabled)   */ ?>
 	 * @param reserves $reserve (optional) reserve object
 	 * @param array $dub_array (optional) array of information pertaining to duplicating an item. currently 'dubReserve' flag and 'selected_instr'
 	 * @desc Displays form for editing item information (optionally: reserve information)
-	 */	
+	 *
+	 * @see requestDisplayer::addItem - significant overlap/duplication with this function
+	 * @todo figure out a way to consolidate addItem and editItem logic?
+	 */
 	function displayEditItemMeta($item, $reserve=null, $dub_array=null) {
 		global $u, $g_permission;
 		
@@ -684,9 +687,11 @@ end personal-item owner (disabled)   */ ?>
 			}
 		//-->
 		</script>
+<? /* NOTE: this form has *significant* overlap with addItem in requestDisplayer; if you make changes here,
+    you probably will need to make similar changes there also. */ ?>
 		
 <?php	if($item->getItemGroup() == 'ELECTRONIC'): ?>
-		<form id="item_form" name="item_form" enctype="multipart/form-data" action="index.php?cmd=editItem" method="post" onSubmit="return validateForm(this,false);">		>		
+		<form id="item_form" name="item_form" enctype="multipart/form-data" action="index.php?cmd=editItem" method="post" onSubmit="return validateForm(this,false);">
 <?php	else: ?>
 		<form id="item_form" name="item_form" action="index.php?cmd=editItem" method="post" onSubmit="return validateForm(this,true);">
 <?php	endif; ?>
