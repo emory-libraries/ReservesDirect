@@ -407,7 +407,7 @@ class requestDisplayer extends noteDisplayer {
 	}
 	
 	
-	function addItem($cmd, $item_data, $hidden_fields=null) {
+	function addItem($cmd, $item_data, $hidden_fields=null, $errors = array()) {
 		global $u, $g_permission, $g_notetype, $g_catalogName;
 		
 		//for ease-of-use, define helper vars for determining digital/physical items
@@ -789,7 +789,7 @@ class requestDisplayer extends noteDisplayer {
 			</tr>
 			<tr>
 				<td align="left" valign="top">
-					<font color="#FF0000"><strong>*</strong></font><input type="radio" name="documentType" value="DOCUMENT" checked onClick="this.form.userFile.disabled = !this.checked; this.form.url.disabled = !this.checked;">&nbsp;<span class="strong">Upload an item &gt;&gt;</span>
+					<font color="#FF0000"><strong>*</strong></font><input type="radio" name="documentType" value="DOCUMENT" checked onClick="this.form.userFile.disabled = !this.checked; this.form.url.disabled = !this.checked;">&nbsp;<span class="strong">Upload a document &gt;&gt;</span>
 				</td>
 				<td align="left" valign="top"><input type="file" name="userFile" size="40"></td>
 			</tr>
@@ -819,13 +819,18 @@ class requestDisplayer extends noteDisplayer {
 ?>
 
 		<br />
-		
-		<? if ($isPhysical && empty($item_data['controlKey']) && !empty($item_data['item_id'])) { ?>
-			<div id="alertMsg" class="failedText">
-				This item is not properly linked to <?= $g_catalogName ?>.  Please update the <?= $g_catalogName ?> Control Number.
-			</div>
-		<? } ?>		
-		
+
+		   <? /* FIXME: duplicate alertMsg? */ ?>
+		<div id="alertMsg" class="failedText">
+	           <? if ($isPhysical && empty($item_data['controlKey']) && !empty($item_data['item_id'])) : ?>
+		   This item is not properly linked to <?= $g_catalogName ?>.  Please update the <?= $g_catalogName ?> Control Number.
+		   <? else: ?>
+		     <? foreach ($errors as $err): ?>
+		       <?= $err ?><br/>
+		     <? endforeach ?>
+	 	  <? endif ?>
+		</div>
+  
 		<div class="headingCell1" style="width:25%; text-align:center;">Item Details</div>
 		
 		<table id="addItem" class="borders">
@@ -835,10 +840,12 @@ class requestDisplayer extends noteDisplayer {
 		   <select id="material_type" name="material_type" onChange="typeOfMaterial()">
 		   <option value="">Choose one:</option>
 <?php 		foreach($material_types as $material_id => $material): ?>
-<?php		$selected = ($material_id == $item_data['material_type']) ? ' selected="selected"' : ''; ?>
+<?php		$selected = (isset($item_data['material_type']) && $material_id == $item_data['material_type']) ? ' selected="selected"' : ''; ?>
 		     <option value="<?= $material_id ?>"<?= $selected ?>><?= $material ?></option>
 <?php		endforeach ?>
 		</select>
+	<? /* FIXME: if type of material is set, need to run typeOfMaterial after loading to update form */ ?>
+									      
 	       <div id="material_type_other_block" style="display:none">
   	         <input name="material_type_other"
 		  type="text" size="25" value="<?=$item_data['material_type_other']?>"/>
@@ -910,8 +917,7 @@ class requestDisplayer extends noteDisplayer {
 			</tr>
 			<tr id="publisher">
 			   <th>Publisher:</th>
-			   <td><input name="publisher" type="text" size="50" value="<?=$item_data['publisher
-']?>"> </td>
+			   <td><input name="publisher" type="text" size="50" value="<?=$item_data['publisher']?>"> </td>
 			</tr>
 			<tr id="year">
 			   <th>Source / Year:</th>

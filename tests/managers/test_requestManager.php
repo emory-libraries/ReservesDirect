@@ -37,6 +37,39 @@ class TestRequestManager extends UnitTest {
 
 	  // could also test that itemAudit is created...
 	  
+	}
+
+	function test_addDigitalItemValidation() {
+	  global $_REQUEST;
+	  $_REQUEST = array();	// clear out any request
+	  $mgr = new requestManager('addDigitalItem', $this->user, $this->ci, array());
+	  $err = $mgr->addDigitalItemValidation();
+	  $this->assertIsA($err, "Array", "addDigitalItemValidation returns an array");
+	  $this->assertTrue(in_array("Type of material is required.", $err),
+			    "error list includes type of material required");
+
+	  $_REQUEST["documentType"] = "URL";
+	  $err = $mgr->addDigitalItemValidation();
+	  $this->assertTrue(in_array("Selected 'add a link', but no URL was specified.", $err),
+			    "url required when document type is url");
+	  $_REQUEST["url"] = "http://some.thi.ng";
+	  $err = $mgr->addDigitalItemValidation();
+	  $this->assertFalse(in_array("Selected 'add a link', but no URL was specified.", $err),
+			    "no url error when document type is url & url specified");
+	  
+	  $_REQUEST["documentType"] = "DOCUMENT";
+	  $err = $mgr->addDigitalItemValidation();
+	  $this->assertTrue(in_array("Selected 'upload a document', but no file was uploaded.", $err),
+			    "file required when document type is document");
+
+	  // spot-check per-item requirements checking
+	  unset($_REQUEST["documentType"]);
+	  $_REQUEST["material_type"] = "BOOK_PORTION";
+	  $err = $mgr->addDigitalItemValidation();
+	  $this->assertTrue(in_array("Title is required.", $err),
+			    "title is required when material type is book portion");
+	  $this->assertTrue(in_array("ISBN is required.", $err),
+			    "ISBN is required when material type is book portion");
 	  
 	}
 	

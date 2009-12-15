@@ -225,34 +225,56 @@ class requestManager
 				$page = "addReserve";
 				$loc  = "add electronic item";
 				
-				if(isset($_REQUEST['store_request'])) {	//form submitted, process item
-					//store item meta data
-					$item_id = $this->storeItem();
-					
-					//prefetch possible CIs
-					list($all_possible_CIs, $selected_CIs, $CI_request_matches) = $this->getCIsForItem($item_id);
-					
-					//pass the item_id to the select-course form
-					$this->displayFunction = 'displaySelectCIForItem';
-					$this->argList = array($item_id, $all_possible_CIs, $selected_CIs, $CI_request_matches);
-				}
-				else {	//show edit-item form
-					//if searching for an item, get form pre-fill data
-					$item_data = $this->searchItem($cmd);
-										
-					//pass on some info
-					$propagated_data = array();					
-					$propagated_data['cmd'] = $cmd;
-					if(!empty($item_data['item_id'])) {
-						$propagated_data['item_id'] = $item_data['item_id'];	//pass on the item_id if it exists
-					}
-					if(!empty($_REQUEST['ci'])) {
-						$propagated_data['ci'] = $_REQUEST['ci'];	//pass on CI ID if it is pre-selected
-					}
+				if(isset($_REQUEST['store_request'])) { //form submitted, process item
 
-					$this->displayFunction = 'addItem';
-					$this->argList = array($cmd, $item_data, $propagated_data);
+				  $errors = $this->addDigitalItemValidation();
+				  
+				  // only store the item if there are no validation errors
+				  if (count($errors) == 0) {
+				    //store item meta data
+				    $item_id = $this->storeItem();
+				    
+				    //prefetch possible CIs
+				    list($all_possible_CIs, $selected_CIs, $CI_request_matches) = $this->getCIsForItem($item_id);
+				    
+				    //pass the item_id to the select-course form
+				    $this->displayFunction = 'displaySelectCIForItem';
+				    $this->argList = array($item_id, $all_possible_CIs, $selected_CIs, $CI_request_matches);
+				    break;
+				  }
 				}
+				
+				// if we get to this point, show edit-item form
+				// -- either no store_request OR form submitted but invalid
+
+				//if searching for an item, get form pre-fill data
+				$item_data = $this->searchItem($cmd);
+
+				// if invalid request, populate form with submitted data
+				if (isset($_REQUEST['store_request'])) {
+				  foreach ($_REQUEST as $key => $val) {
+				    if (preg_match("/^[a-zA-Z_]*$/", $key)) {
+				      $item_data[$key] = $val;
+				    }
+				  }
+				}
+				  
+				
+				//pass on some info
+				$propagated_data = array();					
+				$propagated_data['cmd'] = $cmd;
+				if(!empty($item_data['item_id'])) {
+				  $propagated_data['item_id'] = $item_data['item_id'];	//pass on the item_id if it exists
+				}
+				if(!empty($_REQUEST['ci'])) {
+				  $propagated_data['ci'] = $_REQUEST['ci'];	//pass on CI ID if it is pre-selected
+				}
+
+				if (! isset($errors)) $errors = array();
+				
+				$this->displayFunction = 'addItem';
+				$this->argList = array($cmd, $item_data, $propagated_data, $errors);
+				
 			break;
 		}
 	}
@@ -425,16 +447,16 @@ class requestManager
 		global $alertMsg;
 		
 		//create a blank array with all the needed indeces
-		$item_data = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'volume_title'=>'', 'source'=>'', 'controlKey'=>'', 'selected_owner'=>null, 'physicalCopy'=>null, 'OCLC'=>'', 'ISSN'=>'', 'ISBN'=>'', 'item_group'=>null, 'notes'=>null, 'home_library'=>null, 'url'=>'', 'is_local_file'=>false);
+		$item_data = array('title'=>'', 'author'=>'', 'edition'=>'', 'performer'=>'', 'times_pages'=>'', 'volume_title'=>'', 'source'=>'', 'controlKey'=>'', 'selected_owner'=>null, 'physicalCopy'=>null, 'OCLC'=>'', 'ISSN'=>'', 'ISBN'=>'', 'item_group'=>null, 'notes'=>null, 'home_library'=>null, 'url'=>'', 'is_local_file'=>false, 'material_type' => '', 'material_type_other' => '','publisher'=> '', 'total_times_pages' => '');
 				
 		//decide if item info can be prefilled
 		$item_id = null;
-		if (!is_null($_REQUEST['item_id'])) {
+		if (isset($_REQUEST['item_id']) && !is_null($_REQUEST['item_id'])) {
 			$item_id = $_REQUEST['item_id'];
-		} elseif (!is_null($_REQUEST['reserve_id'])) {
+		} elseif (isset($_REQUEST['reserve_id']) && !is_null($_REQUEST['reserve_id'])) {
 			$reserve = new reserve($_REQUEST['reserve_id']);
 			$item_id = $reserve->getItem();			
-		} elseif (!is_null($_REQUEST['request_id'])) {
+		} elseif (isset($_REQUEST['request_id']) && !is_null($_REQUEST['request_id'])) {
 			$request = new request($_REQUEST['request_id']);
             $request->getRequestedItem();
 			$item_id = $request->requestedItem->getItemID();
@@ -588,7 +610,7 @@ class requestManager
 									     $_REQUEST['material_type_other']);
 		
 		//check personal item owner
-		if(($_REQUEST['personal_item'] == 'yes') && ($_REQUEST['personal_item_owner'] == 'new') && !empty($_REQUEST['selected_owner']) ) {
+		if(isset($_REQUEST['personal_item']) && ($_REQUEST['personal_item'] == 'yes') && ($_REQUEST['personal_item_owner'] == 'new') && !empty($_REQUEST['selected_owner']) ) {
 			$item->setPrivateUserID($_REQUEST['selected_owner']);
 		}
 		
@@ -740,6 +762,56 @@ class requestManager
 		
 		return $return_data;
 	}
+
+	/**
+	 * check submitted fields from addDigitalItem form for required values
+	 * @return array error messages for each missing required field
+	 */
+	function addDigitalItemValidation() {
+	  $err = array();
+	  
+	  if(!isset($_REQUEST['material_type']) || ($_REQUEST['material_type'] == '')) {
+	    $err[] = "Type of material is required.";
+	  } elseif (($_REQUEST['material_type'] == 'OTHER') &&
+		    ($_REQUEST['material_type_other'] == '')) {
+	    $err[] = "Type of material detail is required when 'Other' is selected.";
+	  }
+
+	  // FIXME: check for url or file upoaded?
+
+	  if (($_REQUEST["documentType"] == "URL") &&
+	      (!isset($_REQUEST["url"]) || ($_REQUEST["url"] == ""))) {
+	    $err[] = "Selected 'add a link', but no URL was specified.";
+	  } elseif (($_REQUEST["documentType"] == "DOCUMENT") &&
+		    ($_FILES["userFile"]["name"] == '')) {
+	    $err[] = "Selected 'upload a document', but no file was uploaded.";
+	  }
+
+	  // validate required fields for selected material type
+	  if (isset($_REQUEST['material_type']) && $_REQUEST['material_type']) {
+	    $materialType_details = common_materialTypesDetails();
+	    foreach ($materialType_details[$_REQUEST['material_type']] as $field => $details) {
+	      // convert field name to form input 
+	      switch ($field) {
+	      case "work_title": $input = "volume_title"; break;
+	      case "year": $input = "source"; break;
+	      case "isbn":
+	      case "issn":
+	      case "oclc":
+		$input = strtoupper($field); break;
+	      case "barcode": $input = "local_control_key"; break;
+	      default: $input = $field;
+	      }
+	      if (isset($details["required"]) && $details["required"]
+		  && (!isset($_REQUEST[$input]) || $_REQUEST[$input] == "")) {
+		$err[] = $details["label"] . " is required.";		
+	      }
+	    }
+	  }
+
+	  return $err;
+	}
+
 }
 
 ?>
