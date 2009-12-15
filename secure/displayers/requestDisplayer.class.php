@@ -415,7 +415,7 @@ class requestDisplayer extends noteDisplayer {
 		$isDigital = ($cmd=='addDigitalItem') ? true : false;
 		
 		//get array of document types/icons/helper apps (digital items only)
-		$doc_types = $isDigital ? $u->getAllDocTypeIcons() : null;
+		$doc_types = $isDigital ? $u->getAllDocTypeIcons('name') : null;
 		//get array of libraries (physical items only)
 		$libraries = $isPhysical ? $u->getLibraries() : null;
 		// get array of material types
@@ -848,6 +848,7 @@ class requestDisplayer extends noteDisplayer {
 	       </div>
 		   </td>
 		   </tr>
+<? /** personal copy owner disabled 
 		<tr id="personal_item_row">
 		  <th valign="top">
 		     <span id="personal_req_mark" style="color:#FF0000;">*</span>
@@ -891,7 +892,8 @@ class requestDisplayer extends noteDisplayer {
 						</span>
 					</div>
 				</td>
-			</tr>
+				</tr>
+ end personal copy owner (disabled)   */ ?>
 			<tr id="title">
 			  <th><font color="#FF0000">*</font>Title:</th>
 			  <td align="left"><input name="title" type="text" size="50" value="<?=$item_data['title']?>"></td>
@@ -965,7 +967,7 @@ class requestDisplayer extends noteDisplayer {
 			   <input type="radio" name="availability" value="1"> <span id="availability_option1">available</span>
 			</tr>
 
-			<tr>
+			<tr id="barcode">
 			   <th>
 				<?php	if($isPhysical): ?>
 					<?= $g_catalogName ?> Control Number:

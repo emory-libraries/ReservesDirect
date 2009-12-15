@@ -361,12 +361,13 @@ function common_materialTypesDetails($type) {
 		     "availability" => array("required" => true, "label" => "Availability of Movie",
 					     "options" => array("Commercially Unavailable",
 								"Commercially Available")),
+		     "barcode" => array("label" => "Barcode / Alternate ID"), 
 		     ),
 	       "AUDIO" =>
 	       array("title" => array("required" => true, "label" => "Song/Movement Title"),
 		     "work_title" => array("required" => true, "label" => "CD Title"),
 		     "author" => array("required" => true, "label" => "Artist/Composer"),
-		     // FIXME: performer field?
+		     "performer" => array("label" => "Performer"), 
 		     "publisher" => array("required" => true, "label" => "Label"),
 		     "year" => array("required" => true, "label" => "Year Produced"),
 		     "times_pages" => array("required" => true, "label" => "Time of Portion Used"), 	// example!
@@ -375,6 +376,7 @@ function common_materialTypesDetails($type) {
 		     "availability" => array("required" => true, "label" => "Availability of CD",
 					     "options" => array("Commercially Unavailable",
 								"Commercially Available")),
+		     "barcode" => array("label" => "Barcode / Alternate ID"), 
 		     ),
 	       "OTHER" =>
 	       array("title" => array("required" => true, "label" => "Title"), 
