@@ -528,7 +528,7 @@ class requestDisplayer extends noteDisplayer {
 			    var tr = $(field);
 			    tr.show();
 			    if (type_details[field]["label"]) {
-			      tr.cells[0].innerHTML = type_details[field]["label"];
+			      tr.cells[0].innerHTML = type_details[field]["label"] + ":";
 			    }
 			    if (type_details[field]["required"]) {
 			      tr.className = "required";
@@ -829,10 +829,8 @@ class requestDisplayer extends noteDisplayer {
 		<div class="headingCell1" style="width:25%; text-align:center;">Item Details</div>
 		
 		<table id="addItem" class="borders">
-		   <tr>
-		     <th>
-  		       <span id="material_type_req_mark" style="color:#FF0000;">*</span>
-		       Type of Material:</th>
+		   <tr class="required">
+		     <th>Type of Material:</th>
 		     <td>
 		   <select id="material_type" name="material_type" onChange="typeOfMaterial()">
 		   <option value="">Choose one:</option>
@@ -894,8 +892,8 @@ class requestDisplayer extends noteDisplayer {
 				</td>
 				</tr>
  end personal copy owner (disabled)   */ ?>
-			<tr id="title">
-			  <th><font color="#FF0000">*</font>Title:</th>
+			<tr id="title" class="required">
+			  <th>Title:</th>
 			  <td align="left"><input name="title" type="text" size="50" value="<?=$item_data['title']?>"></td>
 			</tr>
 			<tr id="author">
@@ -1048,7 +1046,8 @@ class requestDisplayer extends noteDisplayer {
 		</div>
 				
 		<br />
-		<strong><font color="#FF0000">* </font></strong><span class="helperText">= required fields</span></td></tr>
+		    <font color="#FF0000"><img src="images/required.png" alt="*"/></font>
+		    <span class="helperText">= required fields</span></td></tr>
 
 		<br />
 		<div style="text-align:center;"><input type="submit" name="store_request" value="Add Item" onClick="return checkForm(this.form);"></div>
@@ -1071,24 +1070,24 @@ class requestDisplayer extends noteDisplayer {
 
 		if( addTypeValue == 'MANUAL' ) {
 			toggleILS(0);
-			togglePersonal(1, 0);
+			//togglePersonal(1, 0);
 			toggleNonManual(0);
 		}
 		else if( addTypeValue == 'PERSONAL' ) {
 			toggleILS(1);
-			togglePersonal(1, 1);
+			//togglePersonal(1, 1);
 			toggleNonManual(1);
 		}
 		else {
 			toggleILS(1);
-			togglePersonal(0, 0);
+			//togglePersonal(0, 0);
 			toggleNonManual(1);
 		}
 
 <?php	else: ?>
 
 		//run code to set up the form in the beginning
-		togglePersonal(1, 0);
+		//togglePersonal(1, 0);
 
 <?php	endif; ?>
 	</script>
