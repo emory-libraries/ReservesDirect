@@ -357,6 +357,7 @@ class itemManager
 	      // convert field name to form input 
 	      switch ($field) {
 	      case "work_title": $input = "volume_title"; break;
+	      case "edition": $input = "volume_edition"; break;
 	      case "year": $input = "source"; break;
 	      case "isbn":
 	      case "issn":
