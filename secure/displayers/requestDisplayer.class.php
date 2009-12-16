@@ -771,8 +771,10 @@ class requestDisplayer extends noteDisplayer {
                     <div class="noticeText">
 		      Instead of uploading a journal article, consider using the
 		      <a target="_blank" href="http://ejournals.emory.edu/openurlgen.php">Open URL Generator</a>
-		      to create a link instead.
+		      to create a link instead.<br/>
+		      Once you create a link, paste it into the "Add a link" box above.
 		    </div>
+
 		</div>
   
 		<div class="headingCell1" style="width:25%; text-align:center;margin-top:25px;">Item Details</div>
@@ -970,9 +972,7 @@ class requestDisplayer extends noteDisplayer {
 <?php	else : ?>			
 	
 			<input type="hidden" name="item_group" value="ELECTRONIC" />
-			
 <?php	endif; ?>
-
 		</table>
 		
 		<br />
