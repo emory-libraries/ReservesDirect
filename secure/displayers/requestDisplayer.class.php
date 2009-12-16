@@ -765,8 +765,17 @@ class requestDisplayer extends noteDisplayer {
 		     <? endforeach ?>
 	 	  <? endif ?>
 		</div>
+
+ 	    <div id="openurl_link" style="display:none" class="borders noticeBox">
+		    <div class="noticeImg"></div>
+                    <div class="noticeText">
+		      Instead of uploading a journal article, consider using the
+		      <a target="_blank" href="http://ejournals.emory.edu/openurlgen.php">Open URL Generator</a>
+		      to create a link instead.
+		    </div>
+		</div>
   
-		<div class="headingCell1" style="width:25%; text-align:center;">Item Details</div>
+		<div class="headingCell1" style="width:25%; text-align:center;margin-top:25px;">Item Details</div>
 
 <? /* NOTE: this form has *significant* overlap with editItem in itemDisplayer; if you make changes here,
     you probably will need to make similar changes there also. */ ?>
@@ -781,7 +790,6 @@ class requestDisplayer extends noteDisplayer {
 		     <option value="<?= $material_id ?>"<?= $selected ?>><?= $material ?></option>
 <?php		endforeach ?>
 		</select>
-	<? /* FIXME: if type of material is set, need to run typeOfMaterial after loading to update form */ ?>
 									      
 	       <div id="material_type_other_block" style="display:none">
   	         <input name="material_type_other" id="material_type_other"

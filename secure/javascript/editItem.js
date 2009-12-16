@@ -48,6 +48,16 @@ function typeOfMaterial() {
   } else {
     $('material_type_other_block').hide();
   }
+
+  // check for uploading file as journal article (only on addItem)
+  if ((type == "JOURNAL_ARTICLE") && document.forms[0].documentType[0].checked 
+	&& document.forms[0].documentType[0].value == "DOCUMENT") {
+    $('openurl_link').show();
+  } else {
+    $('openurl_link').hide();
+  }
+  
+
 }	
 
 
@@ -79,7 +89,6 @@ function checkMaterialTypes(form) {
     } else {
       form.material_type.parentNode.className = '';
     }
-    
     
     // check all required fields for current type of material
     var type_details = materialType_details[type];
