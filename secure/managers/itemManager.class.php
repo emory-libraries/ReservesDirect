@@ -144,94 +144,101 @@ class itemManager
 						}
 						//else maintaining the same link; do nothing
 					}
-					
-					//set item data
-					$item->setTitle($_REQUEST['title']);
-					$item->setTitle($_REQUEST['title']);
-					$item->setAuthor($_REQUEST['author']);
-					$item->setPerformer($_REQUEST['performer']);
-					$item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
-					$item->setVolumeTitle($_REQUEST['volumeTitle']);
-					$item->setVolumeEdition($_REQUEST['volumeEdition']);
-					$item->setPagesTimes($_REQUEST['pagesTimes']);
-					$item->setSource($_REQUEST['source']);										
-					$item->setISBN($_REQUEST['ISBN']);
-					$item->setISSN($_REQUEST['ISSN']);
-					$item->setOCLC($_REQUEST['OCLC']);	
-					$item->setStatus($_REQUEST['item_status']);
-					
-					if(isset($_REQUEST['material_type']))
-					  $item->setMaterialType($_REQUEST['material_type'],
-								 $_REQUEST['material_type_other']);
 
-					if(isset($_REQUEST['publisher']))
-					  $item->setPublisher($_REQUEST['publisher']);
-					if(isset($_REQUEST['total_times_pages']))
-					  $item->setTotalPagesTimes($_REQUEST['total_times_pages']);
-					if(isset($_REQUEST['availability']))
-					  $item->setAvailability($_REQUEST['availability']);
-					
-
-
-					
-					//physical item data
-					if($item->isPhysicalItem()) {
-						$item->setHomeLibraryID($_REQUEST['home_library']);
-						
-						//physical copy data
-						if($item->getPhysicalCopy()) {	//returns false if not a physical copy
-							//only set these if they were part of the form
-							if(isset($_REQUEST['barcode'])) $item->physicalCopy->setBarcode($_REQUEST['barcode']);
-							if(isset($_REQUEST['call_num'])) $item->physicalCopy->setCallNumber($_REQUEST['call_num']);							
-						}
-						
-						if(!empty($_REQUEST['local_control_key'])) {
-							$item->setLocalControlKey($_REQUEST['local_control_key']);
-						}						
-					}
-					
-					//personal copies
-					if($_REQUEST['personal_item'] == 'no') {	//do not want a private owner
-						$item->setPrivateUserID('null');
-					}
-					elseif($_REQUEST['personal_item'] == 'yes') {	//we want a private owner
-						//if we are choosing a new private owner, set it
-						if( ($_REQUEST['personal_item_owner']=='new') && !empty($_REQUEST['selected_owner']) ) {
-							$item->setprivateUserID($_REQUEST['selected_owner']);
-						}
-						//else we are keeping old private owner, so no change necessary
-					}
-					
-					//notes
-					if(!empty($_REQUEST['notes'])) {
-						foreach($_REQUEST['notes'] as $note_id=>$note_text) {
-							if(!empty($note_id)) {
-								$note = new note($note_id);
-								$note->setText($note_text);
-							}
-						}
-					}
-					
-					//if duplicating, show a different success screen
-					if($_REQUEST['dubReserve']) {
-						//get course instance
-						$ci = new courseInstance($reserve->getCourseInstanceID());
-						$ci->getPrimaryCourse();
-
-						//call requestDisplayer method
-						require_once("secure/displayers/requestDisplayer.class.php");
-						$loc = 'add an item';
-						$this->displayClass = 'requestDisplayer';
-						$this->displayFunction = 'addSuccessful';
-						$this->argList = array($ci, $item->getItemID(), $reserve->getReserveID(), true);
-					}
-					else {
-						//get courseinstance id, if editing reserve
-						$ci_id = ($reserve instanceof reserve) ? $reserve->getCourseInstanceID() : null;
-						
-						// display success
-						$this->displayFunction = 'displayItemSuccessScreen';
-						$this->argList = array($ci_id, urlencode($_REQUEST['search']));
+					$invalid = $this->editItemValidation();
+					if ($invalid) {
+					  //form is invalid; re-display edit page with error messages
+					  $page = "addReserve";
+					  $loc  = "edit item";
+					  $help_article = "33";
+					  
+					  $this->displayFunction = 'displayEditItem';
+					  $this->argList = array($item, $reserve, array('dubReserve'=>$_REQUEST['dubReserve'], 'selected_instr'=>$_REQUEST['selected_instr']), $invalid);
+					} else {
+					  //form is valid, set item data
+					  $item->setTitle($_REQUEST['title']);
+					  $item->setAuthor($_REQUEST['author']);
+					  $item->setPerformer($_REQUEST['performer']);
+					  $item->setDocTypeIcon($_REQUEST['selectedDocIcon']);
+					  $item->setVolumeTitle($_REQUEST['volume_title']);
+					  $item->setVolumeEdition($_REQUEST['volume_edition']);
+					  $item->setPagesTimes($_REQUEST['times_pages']);
+					  $item->setSource($_REQUEST['source']);										
+					  $item->setISBN($_REQUEST['ISBN']);
+					  $item->setISSN($_REQUEST['ISSN']);
+					  $item->setOCLC($_REQUEST['OCLC']);	
+					  $item->setStatus($_REQUEST['item_status']);
+					  
+					  if(isset($_REQUEST['material_type']))
+					    $item->setMaterialType($_REQUEST['material_type'],
+								   $_REQUEST['material_type_other']);
+					  
+					  if(isset($_REQUEST['publisher']))
+					    $item->setPublisher($_REQUEST['publisher']);
+					  if(isset($_REQUEST['total_times_pages']))
+					    $item->setTotalPagesTimes($_REQUEST['total_times_pages']);
+					  if(isset($_REQUEST['availability']))
+					    $item->setAvailability($_REQUEST['availability']);
+					  
+					  
+					  //physical item data
+					  if($item->isPhysicalItem()) {
+					    $item->setHomeLibraryID($_REQUEST['home_library']);
+					    
+					    //physical copy data
+					    if($item->getPhysicalCopy()) {	//returns false if not a physical copy
+					      //only set these if they were part of the form
+					      if(isset($_REQUEST['barcode'])) $item->physicalCopy->setBarcode($_REQUEST['barcode']);
+					      if(isset($_REQUEST['call_num'])) $item->physicalCopy->setCallNumber($_REQUEST['call_num']);							
+					    }
+					    
+					    if(!empty($_REQUEST['local_control_key'])) {
+					      $item->setLocalControlKey($_REQUEST['local_control_key']);
+					    }						
+					  }
+					  
+					  //personal copies
+					  if($_REQUEST['personal_item'] == 'no') {	//do not want a private owner
+					    $item->setPrivateUserID('null');
+					  }
+					  elseif($_REQUEST['personal_item'] == 'yes') {	//we want a private owner
+					    //if we are choosing a new private owner, set it
+					    if( ($_REQUEST['personal_item_owner']=='new') && !empty($_REQUEST['selected_owner']) ) {
+					      $item->setprivateUserID($_REQUEST['selected_owner']);
+					    }
+					    //else we are keeping old private owner, so no change necessary
+					  }
+					  
+					  //notes
+					  if(!empty($_REQUEST['notes'])) {
+					    foreach($_REQUEST['notes'] as $note_id=>$note_text) {
+					      if(!empty($note_id)) {
+						$note = new note($note_id);
+						$note->setText($note_text);
+					      }
+					    }
+					  }
+					  
+					  //if duplicating, show a different success screen
+					  if($_REQUEST['dubReserve']) {
+					    //get course instance
+					    $ci = new courseInstance($reserve->getCourseInstanceID());
+					    $ci->getPrimaryCourse();
+					    
+					    //call requestDisplayer method
+					    require_once("secure/displayers/requestDisplayer.class.php");
+					    $loc = 'add an item';
+					    $this->displayClass = 'requestDisplayer';
+					    $this->displayFunction = 'addSuccessful';
+					    $this->argList = array($ci, $item->getItemID(), $reserve->getReserveID(), true);
+					  } else {
+					    //get courseinstance id, if editing reserve
+					    $ci_id = ($reserve instanceof reserve) ? $reserve->getCourseInstanceID() : null;
+					    
+					    // display success
+					    $this->displayFunction = 'displayItemSuccessScreen';
+					    $this->argList = array($ci_id, urlencode($_REQUEST['search']));
+					  }
 					}
 				}
 				elseif(!empty($_REQUEST['submit_edit_item_copyright'])) {	//form submitted - edit item copyright
@@ -323,6 +330,51 @@ class itemManager
 			break;
 		}	
 	}
+
+
+
+	/**
+	 * check submitted fields from edit item form for required values
+	 * @return array error messages for each missing required field
+	 * @see requestManager:addDigitalItemValidation (mostly duplicate code)
+	 */
+	function editItemValidation() {
+	  $err = array();
+	  
+	  if(!isset($_REQUEST['material_type']) || ($_REQUEST['material_type'] == '')) {
+	    $err[] = "Type of material is required.";
+	  } elseif (($_REQUEST['material_type'] == 'OTHER') &&
+		    ($_REQUEST['material_type_other'] == '')) {
+	    $err[] = "Type of material detail is required when 'Other' is selected.";
+	  }
+
+	  // not validating url/uploaded file since it is optional
+
+	  // validate required fields for selected material type
+	  if (isset($_REQUEST['material_type']) && $_REQUEST['material_type']) {
+	    $materialType_details = common_materialTypesDetails();
+	    foreach ($materialType_details[$_REQUEST['material_type']] as $field => $details) {
+	      // convert field name to form input 
+	      switch ($field) {
+	      case "work_title": $input = "volume_title"; break;
+	      case "year": $input = "source"; break;
+	      case "isbn":
+	      case "issn":
+	      case "oclc":
+		$input = strtoupper($field); break;
+	      case "barcode": $input = "local_control_key"; break;
+	      default: $input = $field;
+	      }
+	      if (isset($details["required"]) && $details["required"]
+		  && (!isset($_REQUEST[$input]) || $_REQUEST[$input] == "")) {
+		$err[] = $details["label"] . " is required.";		
+	      }
+	    }
+	  }
+
+	  return $err;
+	}
+
 }
 
 ?>

@@ -383,13 +383,13 @@ class itemDisplayer extends noteDisplayer {
 	    	   <tr id="work_title">
 		     <th>Book/Journal/Work Title:</th>
 		     <td>
-			<input name="volumeTitle" type="text" id="volumeTitle" size="50" value="<?=$item->getVolumeTitle()?>">
+			<input name="volume_title" type="text" id="volume_title" size="50" value="<?=$item->getVolumeTitle()?>">
 		     </td>
 	    	   </tr>
 	    	   <tr id="edition">
 		     <th>Volume/Edition:</td>
 		     <td>
-			<input name="volumeEdition" type="text" id="volumeEdition" size="50" value="<?=$item->getVolumeEdition()?>">
+			<input name="volume_edition" type="text" id="volume_edition" size="50" value="<?=$item->getVolumeEdition()?>">
 		     </td>
 		   </tr>
 		   <tr id="publisher">
@@ -411,7 +411,7 @@ class itemDisplayer extends noteDisplayer {
 		   <tr id="times_pages">
 		     <th>Pages/Time:</th>
 		     <td>
-		       <input name="pagesTimes" type="text" id="pagesTimes" size="50" value="<?=$item->getPagesTimes()?>">
+		       <input name="times_pages" type="text" id="times_pages" size="50" value="<?=$item->getPagesTimes()?>">
 		     </td>
 		     <? if ($item->getItemGroup() == 'ELECTRONIC'): ?>
 		        <td><small>pp. 336-371 and pp. 399-442 (78 of 719)</small></td>
@@ -654,33 +654,26 @@ end personal-item owner (disabled)   */ ?>
 ?>
 		<script language="JavaScript">
 		//<!--
-		   function submitForm() {
-		     var form = document.getElementById('item_form');
-		     if(form && validateForm(form)) {
-		       document.getElementById('item_form').submit();
-		     }
-		   }
-
-			function validateForm(frm,physicalCopy) {			
+			function validateForm(frm) {			
 				var alertMsg = "";
 
-				if (physicalCopy) {
-					//make sure this physical copy is supposed to have a barcode
-					//	if it is, there will be an input element for it in the form
-					if( (document.getElementById('barcode') != null) && (document.getElementById('barcode').value == '') )
-						alertMsg = alertMsg + "Barcode is required.<br />";
+<?php	if($item->getItemGroup() != 'ELECTRONIC'): ?>
+				//make sure this physical copy is supposed to have a barcode
+				//	if it is, there will be an input element for it in the form
+				if( (document.getElementById('barcode') != null) && (document.getElementById('barcode').value == '') )
+					alertMsg = alertMsg + "Barcode is required.<br />";
 				}
-				else if((frm.documentType.value == "DOCUMENT") && (frm.userFile.value == "")) {
+<? else: ?>			
+				if((frm.documentType.value == "DOCUMENT") && (frm.userFile.value == "")) {
 					alertMsg = alertMsg + "You must choose a file to upload.<br />";
 				}
 				else if((frm.documentType.value == "URL") && (frm.url.value == "")) {
 					alertMsg = alertMsg + "URL is required.<br />";
 				}
+		
+				alertMsg += checkMaterialTypes(frm);
 
-				if (! physicalCopy) {
-				  alertMsg += checkMaterialTypes(frm);
-				}
-				
+<? endif ?>				
 				if (!alertMsg == "") { 
 				  document.getElementById('alertMsg').innerHTML = alertMsg;
 				  return false;
@@ -692,13 +685,8 @@ end personal-item owner (disabled)   */ ?>
 		</script>
 <? /* NOTE: this form has *significant* overlap with addItem in requestDisplayer; if you make changes here,
     you probably will need to make similar changes there also. */ ?>
-		
-<?php	if($item->getItemGroup() == 'ELECTRONIC'): ?>
-		<form id="item_form" name="item_form" enctype="multipart/form-data" action="index.php?cmd=editItem" method="post" onSubmit="return validateForm(this,false);">
-<?php	else: ?>
-		<form id="item_form" name="item_form" action="index.php?cmd=editItem" method="post" onSubmit="return validateForm(this,true);">
-<?php	endif; ?>
 
+	   <form id="item_form" name="item_form" action="index.php?cmd=editItem" method="post">
 			<input type="hidden" name="submit_edit_item_meta" value="submit" />
 			<input type="hidden" name="itemID" value="<?=$item->getItemID()?>" />
 			<?php self::displayHiddenFields($dub_array); //add duplication info as hidden fields ?>	
@@ -735,7 +723,7 @@ end personal-item owner (disabled)   */ ?>
 		<strong style="color:#FF0000;">*</strong> <span class="helperText">= required fields</span>
 		<p />
 		<div style="padding:10px; text-align:center;">
-		    <input type="button" name="submit_edit_item_meta" value="Save Changes" onclick="javascript: submitForm();"> <? /*			<input type="button" name="submit_edit_item_meta" value="Save Changes" onClick="return validateForm(this.form, <?= ($item->getItemGroup() == 'ELECTRONIC') ? 'false' : 'true' ?>);">*/ ?>
+		    <input type="submit" name="submit_edit_item_meta" value="Save Changes" onClick="return validateForm(this.form);">
 		</div>
 <?php		
 	}
@@ -1048,9 +1036,10 @@ end personal-item owner (disabled)   */ ?>
 	 * @param reserveItem $item reserveItem object
 	 * @param reserve $reserve (optional) reserve object
 	 * @param array $dub_array (optional) array of information pertaining to duplicating an item. currently 'dubReserve' flag and 'selected_instr'
+	 * @param array $errors (optional) array of error messages, e.g. missing required fields
 	 * @desc Displays form for editing item information (optionally: reserve information)
 	 */
-	function displayEditItem($item, $reserve=null, $dub_array=null) {
+	function displayEditItem($item, $reserve=null, $dub_array=null, $errors = array()) {
 		global $u, $g_permission;						
 		
 		//determine if editing a reserve
@@ -1094,7 +1083,11 @@ end personal-item owner (disabled)   */ ?>
 #		}
 #########################################
 ?>
-		<div id="alertMsg" align="center" class="failedText"></div>
+		<div id="alertMsg" align="center" class="failedText">
+		   <? foreach ($errors as $err): ?>
+		      <?= $err ?><br/>
+		   <? endforeach ?>
+		</div>
         <p />  
         
 <?php	if($edit_reserve): ?>
