@@ -20,7 +20,7 @@ class TestItemManager extends UnitTest {
 	  $this->loadDB('../fixtures/truncateTables.sql');
 	}
 
-	function test_addDigitalItem() {
+	function test_editItem() {
 	  global $_REQUEST;
 	  $id = 19762;
 	  // edit fixture item
@@ -41,6 +41,10 @@ class TestItemManager extends UnitTest {
 	  $_REQUEST['item_status'] = "ACTIVE";
 	  $_REQUEST['material_type'] = "JOURNAL_ARTICLE";
 	  $_REQUEST['home_library'] = 1;
+	  $_REQUEST['publisher'] = "HBJ";
+	  $_REQUEST['availability'] = 1;
+	  $_REQUEST['total_times_pages'] = 233;
+	  
 	  $this->mgr = new itemManager('editItem', $this->user);
 
 
@@ -50,6 +54,9 @@ class TestItemManager extends UnitTest {
 	  $this->assertEqual("M.G.E.", $item->getAuthor());
 	  $this->assertEqual("ACTIVE", $item->getStatus());
 	  $this->assertEqual("JOURNAL_ARTICLE", $item->getMaterialType());
+	  $this->assertEqual("HBJ", $item->getPublisher());
+	  $this->assertEqual(1, $item->getAvailability());
+	  $this->assertEqual(233, $item->getTotalPagesTimes());
 	  
 					
 	}

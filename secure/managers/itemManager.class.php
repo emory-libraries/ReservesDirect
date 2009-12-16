@@ -164,6 +164,15 @@ class itemManager
 					  $item->setMaterialType($_REQUEST['material_type'],
 								 $_REQUEST['material_type_other']);
 
+					if(isset($_REQUEST['publisher']))
+					  $item->setPublisher($_REQUEST['publisher']);
+					if(isset($_REQUEST['total_times_pages']))
+					  $item->setTotalPagesTimes($_REQUEST['total_times_pages']);
+					if(isset($_REQUEST['availability']))
+					  $item->setAvailability($_REQUEST['availability']);
+					
+
+
 					
 					//physical item data
 					if($item->isPhysicalItem()) {
