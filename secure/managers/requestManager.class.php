@@ -777,8 +777,6 @@ class requestManager
 	    $err[] = "Type of material detail is required when 'Other' is selected.";
 	  }
 
-	  // FIXME: check for url or file upoaded?
-
 	  if (($_REQUEST["documentType"] == "URL") &&
 	      (!isset($_REQUEST["url"]) || ($_REQUEST["url"] == ""))) {
 	    $err[] = "Selected 'add a link', but no URL was specified.";
