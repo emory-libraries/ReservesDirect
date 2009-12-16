@@ -904,8 +904,12 @@ class requestDisplayer extends noteDisplayer {
 			<tr id="availability">
 			  <th>Availability:</th>
 			  <td>
-			   <input type="radio" name="availability" value="0"> <span id="availability_option0">unavailable</span>
-			   <input type="radio" name="availability" value="1"> <span id="availability_option1">available</span>
+			   <input type="radio" name="availability" value="0"
+			   <?= ($item_data['availability'] == 0) ? 'checked="checked"' : '' ?> >
+			   	<span id="availability_option0">unavailable</span>
+			   <input type="radio" name="availability" value="1"
+			   <?= ($item_data['availability'] == 1) ? 'checked="checked"' : '' ?> >
+			   	<span id="availability_option1">available</span>
 			   </td>
 			</tr>
 

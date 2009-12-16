@@ -456,9 +456,12 @@ class itemDisplayer extends noteDisplayer {
 		   <tr id="availability">
 		      <th>Availability:</th>
 		      <td>
-			   <? /* FIXME: set to checked accordingly! */ ?>
-		       <input type="radio" name="availability" value="0"> <span id="availability_option0">unavailable</span>
-		        <input type="radio" name="availability" value="1"> <span id="availability_option1">available</span>
+			   <input type="radio" name="availability"
+			   <?= ($item->getAvailability() == 0) ? 'checked="checked"' : '' ?>  value="0">
+			   <span id="availability_option0">unavailable</span>
+		        <input type="radio" name="availability"
+			   <?= ($item->getAvailability() == 1) ? 'checked="checked"' : '' ?>  value="1">
+			   <span id="availability_option1">available</span>
 		       </td>
 		    </tr>
 
