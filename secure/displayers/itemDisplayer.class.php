@@ -457,10 +457,10 @@ class itemDisplayer extends noteDisplayer {
 		      <th>Availability:</th>
 		      <td>
 			   <input type="radio" name="availability"
-			   <?= ($item->getAvailability() == 0) ? 'checked="checked"' : '' ?>  value="0">
+		   <?= ($item->getAvailability() === 0) ? 'checked="checked"' : '' ?>  value="0">
 			   <span id="availability_option0">unavailable</span>
 		        <input type="radio" name="availability"
-			   <?= ($item->getAvailability() == 1) ? 'checked="checked"' : '' ?>  value="1">
+		   <?= ($item->getAvailability() == null || $item->getAvailability() == 1) ? 'checked="checked"' : '' ?>  value="1">
 			   <span id="availability_option1">available</span>
 		       </td>
 		    </tr>
