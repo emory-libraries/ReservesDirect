@@ -317,7 +317,7 @@ function common_materialTypesDetails() {
 		     "year" => array("required" => true, "label" => "Year of Publication"),
 		     "times_pages" => array("required" => true, "label" => "Page ranges"), 	// example!
 		     "total_times_pages" => array("required" => true, "label" => "Total pages in book"),
-		     "isbn" => array("required" => true, "label" => "ISBN"),
+		     "isbn" => array("label" => "ISBN"),
 		     "availability" => array("required" => true, "label" => "Print status of book",
 					     "options" => array("Out of Print", "In Print")),
 		     ),
@@ -372,7 +372,7 @@ function common_materialTypesDetails() {
 		     "year" => array("required" => true, "label" => "Year Produced"),
 		     "times_pages" => array("required" => true, "label" => "Time of Portion Used"), 	// example!
 		     "total_times_pages" => array("required" => true, "label" => "Total Time of CD"),
-		     "isbn" => array("required" => true, "label" => "ISBN"),
+		     "isbn" => array("label" => "ISBN"),
 		     "availability" => array("required" => true, "label" => "Availability of CD",
 					     "options" => array("Commercially Unavailable",
 								"Commercially Available")),
