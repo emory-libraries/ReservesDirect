@@ -907,7 +907,7 @@ class requestDisplayer extends noteDisplayer {
 			  <th>ISSN:</th>
 			  <td><input name="ISSN" maxlength="15" size="15" value="<?=$item_data['ISSN']?>" type="text"></td>
 			</tr>
-			<tr id="oclc">
+			<tr>
 			   <th>OCLC:</th>
 			   <td><input name="OCLC" maxlength="9" size="15" value="<?=$item_data['OCLC']?>" type="text"></td>
 			</tr>
