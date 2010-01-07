@@ -68,8 +68,6 @@ class TestRequestManager extends UnitTest {
 	  $err = $mgr->addDigitalItemValidation();
 	  $this->assertTrue(in_array("Title is required.", $err),
 			    "title is required when material type is book portion");
-	  $this->assertTrue(in_array("ISBN is required.", $err),
-			    "ISBN is required when material type is book portion");
 	  
 	}
 	
