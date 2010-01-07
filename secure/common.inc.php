@@ -382,7 +382,7 @@ function common_materialTypesDetails() {
 	       "OTHER" =>
 	       array("title" => array("required" => true, "label" => "Title"), 
 		     "author" => array("label" => "Author"),
-		     "year" => array("required" => true, "label" => "Year Created"),
+		     "year" => array("label" => "Year Created"),
 		     )
 	       );
 }
