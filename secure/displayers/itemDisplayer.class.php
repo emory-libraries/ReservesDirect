@@ -446,7 +446,7 @@ class itemDisplayer extends noteDisplayer {
 		       <input type="text" size="15" maxlength="8"  value="<?= $item->getISSN() ?>" name="ISSN" />
 		     </td>
 		   </tr>
-                   <tr id="oclc">
+                   <tr>
 		     <th>OCLC:</th>
 		     <td>
 		       <input type="text" size="15" maxlength="9"  value="<?= $item->getOCLC() ?>" name="OCLC" />
