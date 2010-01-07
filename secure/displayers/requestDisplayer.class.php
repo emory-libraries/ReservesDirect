@@ -846,41 +846,41 @@ class requestDisplayer extends noteDisplayer {
 				</td>
 				</tr>
  end personal copy owner (disabled)   */ ?>
-			<tr id="title" class="required">
+			<tr id="title" class="required" style="display:none">
 			  <th>Title:</th>
 			  <td align="left"><input name="title" type="text" size="50" value="<?=$item_data['title']?>"></td>
 			</tr>
-			<tr id="author">
+			<tr id="author" style="display:none">
 			  <th><font color="#FF0000"></font>Author/Composer:</th>
 			  <td><input name="author" type="text" size="50" value="<?=$item_data['author']?>"></td>
 			</tr>
-			<tr id="work_title">
+			<tr id="work_title" style="display:none">
 			  <th>Book/Journal/Work Title:</th>
 			  <td><input name="volume_title" type="text" size="50" value="<?=$item_data['volume_title']?>">
 			</td>
-			<tr id="edition">
+			<tr id="edition" style="display:none">
 			  <th>Volume/Edition:</th>
 			  <td><input name="volume_edition" type="text" size="50" value="<?=$item_data['edition']?>"></td>
 			</tr>
-			<tr id="publisher">
+			<tr id="publisher" style="display:none">
 			   <th>Publisher:</th>
 			   <td><input name="publisher" type="text" size="50" value="<?=$item_data['publisher']?>"> </td>
 			</tr>
-			<tr id="year">
+			<tr id="year" style="display:none">
 			   <th>Source / Year:</th>
 			   <td><input name="source" type="text" size="50" value="<?=$item_data['source']?>"> </td>
 			</tr>
-			<tr id="performer">
+			<tr id="performer" style="display:none">
 			  <th>Performer:</th>
 			  <td><input name="performer" type="text" size="50" value="<?=$item_data['performer']?>"></td>
-			<tr id="times_pages">
+			<tr id="times_pages" style="display:none">
 			  <th>Pages/Times:</th>
 			  <td><input name="times_pages" type="text" size="50" value="<?=$item_data['times_pages']?>"></td>
 			  <? if ($isDigital): ?>
 			    <td><small>pp. 336-371 and pp. 399-442 (78 of 719)</small></td>
 			  <? endif ?>			       
 			</tr>
-			<tr id="total_times_pages">
+			<tr id="total_times_pages" style="display:none">
 			   <th>Total Pages/Times:</th>
 			   <td><input name="total_times_pages" type="text" size="50" value="<?=$item_data['total_times_pages']?>"></td>
 			</tr>
@@ -899,19 +899,19 @@ class requestDisplayer extends noteDisplayer {
 				</td>
 			</tr>		
 <?php	endif; ?>
-			<tr id="isbn">
+			<tr id="isbn" style="display:none">
 			  <th>ISBN:</th>
 			  <td><input name="ISBN" size="15" maxlength="15" value="<?=$item_data['ISBN']?>" type="text"></td>
 			</tr>
-			<tr id="issn">
+			<tr id="issn" style="display:none">
 			  <th>ISSN:</th>
 			  <td><input name="ISSN" maxlength="15" size="15" value="<?=$item_data['ISSN']?>" type="text"></td>
 			</tr>
-			<tr id="oclc">
+			<tr id="oclc" style="display:none">
 			   <th>OCLC:</th>
 			   <td><input name="OCLC" maxlength="9" size="15" value="<?=$item_data['OCLC']?>" type="text"></td>
 			</tr>
-			<tr id="availability">
+			<tr id="availability" style="display:none">
 			  <th>Availability:</th>
 			  <td>
 			   <input type="radio" name="availability" value="0"
@@ -923,7 +923,7 @@ class requestDisplayer extends noteDisplayer {
 			   </td>
 			</tr>
 
-			<tr id="barcode">
+			<tr id="barcode" style="display:none">
 			   <th>
 				<?php	if($isPhysical): ?>
 					<?= $g_catalogName ?> Control Number:
