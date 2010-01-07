@@ -328,7 +328,7 @@ function common_materialTypesDetails() {
 		     "author" => array("required" => true, "label" => "Author"),
 		     "year" => array("required" => true, "label" => "Year of Publication"),
 		     "times_pages" => array("required" => true, "label" => "Pages"), 	
-		     "issn" => array("required" => true, "label" => "ISSN"),
+		     "issn" => array("label" => "ISSN"),
 		     ),
 	       "CONFERENCE_PAPER" =>
 	       array("title" => array("required" => true, "label" => "Paper Title"),
@@ -366,9 +366,10 @@ function common_materialTypesDetails() {
 	       "AUDIO" =>
 	       array("title" => array("required" => true, "label" => "Song/Movement Title"),
 		     "work_title" => array("required" => true, "label" => "CD Title"),
+		     "edition" => array("label" => "Title of Work"),
 		     "author" => array("required" => true, "label" => "Artist/Composer"),
 		     "performer" => array("label" => "Performer"), 
-		     "publisher" => array("required" => true, "label" => "Label"),
+		     "publisher" => array("required" => true, "label" => "Label Name & Number"),
 		     "year" => array("required" => true, "label" => "Year Produced"),
 		     "times_pages" => array("required" => true, "label" => "Time of Portion Used"), 	// example!
 		     "total_times_pages" => array("required" => true, "label" => "Total Time of CD"),
@@ -380,7 +381,7 @@ function common_materialTypesDetails() {
 		     ),
 	       "OTHER" =>
 	       array("title" => array("required" => true, "label" => "Title"), 
-		     "author" => array("required" => true, "label" => "Author"),
+		     "author" => array("label" => "Author"),
 		     "year" => array("required" => true, "label" => "Year Created"),
 		     )
 	       );
