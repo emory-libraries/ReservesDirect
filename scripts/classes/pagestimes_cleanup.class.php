@@ -1,7 +1,16 @@
 <?php
 // This class processes the pages_times column data in the items table.
-// The processed data is used to populate the total_pages_time and 
-// the used_pages_time columns in the items table.
+// Input pages_times column.
+// Output:
+// $this->pgs_used will populate the new used_pages_time column.
+// $this->pgs_total will populate the new total_pages_time column.
+// $this->pgs_format will rewrite the field pages_times to a consistent format.
+
+// The preferred formats for the pages_times column are as follows:
+// arabic or roman individual page.  i.e. 24   i.e. viii
+// arabic or roman page range.  i.e. 24-26     i.e. i-vii
+// if more than one page or page range, then separate by commas.
+// For music and audio a time range is necessary.  i.e. 1:20-3:33
 
 // The Pear Roman library is needed to process the roman number conversions.
 require_once 'Numbers/Roman.php';   // To install: pear install Numbers_Roman
@@ -13,7 +22,9 @@ class RdItemsPagesTimesCleanup {
   protected $skipped = 0;   // This item did not get processed because of bad data.
   protected $pgs_total = 0; // The total number of pages in the item.
   protected $pgs_used = 0;  // The total number of pages used from the item.
+  protected $pgs_format = nil;  // The new format of the data to overwrite existing pages_times data.
   protected $used_list = 0; // The total number of pages determined by list processing.
+  protected $count = 0;
   
   // Defined regex, where pages used and/or pages_total may be extracted.
   protected $page_patterns = array(
@@ -23,7 +34,7 @@ class RdItemsPagesTimesCleanup {
     "total" => '3', "used" => '1'), // 12 of 256 must e bound by start line and end line.
     "p_02" => array( "regex" => "/^([\d]+)[\s]*-[\s]*([\d]+)[\s]*(\()?(out of|of)[\s]*([\d]+)[\s]*(\))?$/i",
     "total" => '5', "range_start" => '1', "range_end" => '2'), // 1-23 of 256 OR 1-23 out of 256 
-    // p_03 is now being processed as a list, handled in the fall though regex patterns processing.
+    // p_03 is now being processed as a list, handled in the fall through regex patterns processing.
     //"p_03" => array( "regex" => "/^[p\.]*?[\s]*([ivxlcdm]+)[\s]*-[\s]*([ivxlcdm]+)[\s]*[\,|\;][\s]*([\d]+)[\s]*[-|\:][\s]*([\d]+)[\s]*$/i", 
     //"roman_start" => '1', "roman_end" => '2', "range_start" => '3', "range_end" => '4'), // xv-xlvi; 1-49
     "p_03" => array( "regex" => "/^([\d]+)[\s]*p[a]?g[e]?[s]?[\s]*(Total)?$/i", "used" => '1'), // 16 pages
@@ -54,18 +65,19 @@ class RdItemsPagesTimesCleanup {
   // Ignite this process - for testing read input file, process lines.
   protected function data_ignition() {
     $lines = file($this->filename, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    echo "Item\tUsed\tTotal\tTRIMMED\tORIGINAL STRING\n";
     foreach ($lines as $line_num => $orig) {
+        $this->count = $line_num;
       if (isset($orig))  $this->process_data($line_num, $orig);
     }
     // Last output line to display count of items that did not get processed (because of bad data)
     echo "\n================\nRESULTS:\n";
     echo $this->skipped . " items were not processed (bad data or unique data found).\n";  
-    echo ($line_num -  $this->skipped) . " items were processed using regex patterns.\n";
-    echo $this->used_list . " items were processed using list detection (TO DO).\n";    
+    echo ($line_num - $this->skipped - $this->used_list) . " items were processed using regex patterns.\n";
+    echo $this->used_list . " items were processed using list detection.\n";    
     echo "---------------------\n" . $line_num . " Total items in test.\n================\n";
   }
 
+  // Process each entry from the db.
   protected function process_data($line_num = 0, $orig = null) {
     $this->pgs_used = 0;
     $this->pgs_total = 0;
@@ -116,15 +128,16 @@ class RdItemsPagesTimesCleanup {
         }
         break;
       }
-      $i++; // this is only done to track the human readable regex pattern.
+      $i++; // this is done to index the human readable regex pattern.
     }
     
     // None of the regex patterns fit at this point, so now attempt to process data as a list.
     // Expect to process additional 1.7% of the items as a list.
-    if (!$data_has_been_processed && (strpos($s,",") ||  strpos($s,";"))) {  
+    if (!$data_has_been_processed && ((strpos($s,",") > 0) || (strpos($s,";") > 0))) {
       // Some example list items include (vi-xi, 19-27 OR pp109-119, 275-289, 311-323, 345-354
       // ONLY make the effort if there is a comma or semicolon in the input data.
       $this->process_list($s);
+      $data_has_been_processed = true;
     }
 
     // Approximately 5.2% of the data is in an unusable format
@@ -132,7 +145,7 @@ class RdItemsPagesTimesCleanup {
       $this->skipped++; 
       $this->pgs_used = "SKIP";
       // This will output the lines that did not get processed - because the format was not readable.
-      print "$line_num\tused[$this->pgs_used]\ttotal[$this->pgs_total]\ttrim[$s]\torig[$orig]\tpattern[ " . $this->pattern_desc[$i] . "]\n";
+      //print "$line_num\tused[$this->pgs_used]\ttotal[$this->pgs_total]\ttrim[$s]\torig[$orig]\tpattern[ " . $this->pattern_desc[$i] . "]\n";
     }
     else {
       // Here you can print out the data that was processed noting the regex pattern that found the match.
@@ -151,7 +164,7 @@ class RdItemsPagesTimesCleanup {
       }
       $pos = strlen($start) - $i;
       $new_end = substr_replace($new_end, $zero, $pos);   
-      $new_end += $end; 
+      $new_end += $end; // change the partial end value to a full value. ie. 321-92 would convert to 321-392
       $range = $new_end - $start;
       
       // Even so there may be bad data, that results in a negative number.
@@ -164,8 +177,74 @@ class RdItemsPagesTimesCleanup {
   }
     
   protected function process_list($list) {
-    // TO DO 
+    // This function is used to process any remaining data that will fit a list pattern.
+    // A list pattern is data that contains commas or semicolons.
+    $pgs_used = 0;  
+    $lpat = array(  // LIST PATTERNS
+      // arabic_rtotal allows for the (total) to be at the end of a range pattern - the total info is discarded.
+      'arabic_rtotal' => array( "regex" => "/^[pg\.\-]*[\s]*([\d]+)[\s]*-[\s]*([\d]+)[\s]*\([\d]+\)\.?$/i", 'range_start' => '1', 'range_end' => '2'), // pp. 10 - 13   
+      // arabic_range is any numeric range
+      'arabic_range' => array( "regex" => "/^[pg\.\-]*[\s]*([\d]+)[\s]*-[\s]*([\d]+)p?\.?/i", 'range_start' => '1', 'range_end' => '2'), // pp. 10 - 13
+      // arabic_ptotal allows for the (total) to be at the end of roman page pattern - the total info is discarded.
+      'arabic_ptotal' => array( "regex" => "/^[pg\.\-]*[\s]*([\d]+)[\s]*\([\d]+\)\.?$/i", "arabic_used" => '1'), // 12 
+      // arabic_page is any arabic page number
+      'arabic_page' => array( "regex" => "/^[pg\.\-]*[\s]*([\d]+)p?\.?$/", "arabic_used" => '1'), // 12 
+      // roman_range is any roman numeral range, this will result in adding 1 to the used page count.
+      'roman_range' => array( "regex" => "/^[pg\.]*[\s]*([ivxlcdm]+)\.?[\s]*-[\s]*([ivxlcdm]+)\.?/i",  'roman_start' => '1', 'roman_end' => '2'), // vii - x    
+      // roman_range is any roman numeral page number, this will result in adding 1 to the used page count.
+      'roman_page' => array( "regex" => "/^[p\.]*[\s]*([ivxlcdm]+)\.?$/i", 'roman_used' => '1'), // xvii 
+    );
+    
+    $list_arr = split('[,;]', trim($list));
+    foreach ($list_arr as $li) {
+      if (preg_match($lpat['arabic_range']['regex'], trim($li), $matches)) {  
+        $part = intval($this->find_range($matches[$lpat['arabic_range']['range_start']], $matches[$lpat['arabic_range']['range_end']]));
+      }
+      elseif (preg_match($lpat['arabic_rtotal']['regex'], trim($li), $matches)) {  
+       $part = intval($this->find_range($matches[$lpat['arabic_rtotal']['range_start']], $matches[$lpat['arabic_rtotal']['range_end']]));
+       if ($this->pgs_used == "SKIP")   return false;   // there could be bad data
+      }
+      elseif (preg_match($lpat['arabic_page']['regex'], trim($li), $matches)) {
+        $part = 1;  // this is one page number, not a range
+      }
+      elseif (preg_match($lpat['arabic_ptotal']['regex'], trim($li), $matches)) {
+        $part = 1;  // this is one page number, not a range
+      } 
+      elseif (preg_match($lpat['roman_range']['regex'], trim($li), $matches)) {
+        $part = intval($this->find_range(
+            Numbers_Roman::toNumber($matches[$lpat['roman_range']['roman_start']]), 
+            Numbers_Roman::toNumber($matches[$lpat['roman_range']['roman_end']]))); 
+        if ($this->pgs_used == "SKIP")   return false;   // there could be bad data       
+      }        
+      elseif (preg_match($lpat['roman_page']['regex'], trim($li), $matches))  {
+         $part = 1;  // this is one page number, not a range
+      }
+      elseif (preg_match("/^pp$/", trim($li), $matches));   // This is discarded data.
+      else {
+          $this->pgs_used = "SKIP";
+          return false; // failed to process this data.
+      } 
+      $this->pgs_used += $part;
+    }
+    $this->used_list += 1;  // This keeps a counter of the data that was correctly processed here.
+    return true;
+    
   }
 }
-new RdItemsPagesTimesCleanup("../../tests/fixtures/data_test_pagestimes.txt");
+// Uncomment this next line to run a test on some sample data
+// new RdItemsPagesTimesCleanup("../../tests/fixtures/sample-page-data.txt");
+
+// >php pagestimes_cleanup.class.php 
+// expect results similar to this:
+
+// The Notice: Numbers_Roman::toNumber error: Invalid numeral order in input (multiple subtraction) in /usr/share/php/PEAR.php on line 913
+// means that the roman numeral was an invalid sequence.
+
+// RESULTS:
+// 139 items were not processed (bad data or unique data found).
+// 153 items were processed using regex patterns.
+// 42 items were processed using list detection.
+// ---------------------
+// 334 Total items in test.
+
 ?>
