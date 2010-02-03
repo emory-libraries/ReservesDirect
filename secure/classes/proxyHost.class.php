@@ -67,12 +67,16 @@ class proxyHost {
 			
 			array_pop($parts);  //shorten url and look again 
 	       }
-		
-		if ($match['partial_match'] == 1 ||
-		    ($match['partial_match'] == 0 && $match['domain'] == $host)) {
-			//return $match['prefix'] . $url;
+
+		// check that sql result is a valid match
+		// - partial match should be exact OR something.domain.name, NOT just a part of the domain
+		// - for exact match, match domain should match url host exactly
+		if (($match['partial_match'] == 1 &&
+		     ($match['domain'] == $host || (strpos($host, '.' . $match['domain'])))
+		      || ($match['partial_match'] == 0 && $match['domain'] == $host))) {
 			return proxyHost::generateEZproxyTicket($match['prefix'], $url, $username);
 		} else {
+		  // no match found, proxy not required
 			return $url;
 		}		
 	}	
