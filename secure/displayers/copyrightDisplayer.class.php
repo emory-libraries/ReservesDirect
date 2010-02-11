@@ -268,9 +268,8 @@ class copyrightDisplayer extends baseDisplayer {
 
 
 	/**
-	 * @return void
+	 * displays item copyright log
 	 * @param int $item_id Item id
-	 * @return displays item copyright log
 	 */
 	public function displayCopyrightLogs($item_id) {
 		$copyright = new Copyright($item_id);
@@ -297,9 +296,8 @@ class copyrightDisplayer extends baseDisplayer {
 	
 	
 	/**
-	 * @return void
-	 * @param int $item_id Item id
 	 * @return displays item supporting files edit
+	 * @param int $item_id Item id
 	 */
 	public function displayCopyrightSupportingFile($item_id) {
 		$copyright = new copyright($item_id);

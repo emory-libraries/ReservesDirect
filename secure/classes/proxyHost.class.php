@@ -37,9 +37,10 @@ class proxyHost {
 
 
 	/**
+	 * determine if url requires proxy, generate proxied url if needed
+	 * @param  string $url url
+	 * @param  string $username logged in user, passed when generating proxy url
 	 * @return string proxied URL
-	 * @param  string URL
-	 * @desc   if url requires proxy proxy prefix is added
 	 */	
 	public static function proxyURL($url, $username) 
 	{	
@@ -52,51 +53,74 @@ class proxyHost {
 		$parts = array_reverse(split("\.", $host));
 
 		
-		//recursively search database for partial urls
-		//reduce count by one we do not want to search for TLD
-		$times = count($parts) - 1;		
-		for ($i=0; $i < $times; $i++)
-		{
-			//reverse order to use array pop this also mean TDL will always be in 0 pos
-			$match = proxyHost::doSearch(implode('.', array_reverse($parts)));
-			
-			if (!is_null($match))
-			{
+		// search database for domain name, in decreasing specificity	
+		// reduce count by one (should not search for top-level domain [TLD])
+		$times = count($parts) - 1;
+		for ($i=0; $i < $times; $i++) {
+			//reverse order to use array pop this also mean TLD will always be in 0 pos
+			$match = proxyHost::doSearch(implode('.', array_reverse($parts)));	
+		
+			if (!is_null($match))	{
 				//if we have a hit then stop looking
 				break;
 			}
 			
-			array_pop($parts);  //shorten url then try again						
-		}
-		
-		if ($match['partial_match'] == 1 || ($match['partial_match'] == 0 && $match['domain'] == $host))
-		{
-			//return $match['prefix'] . $url;
+			array_pop($parts);  //shorten url and look again 
+	       }
+
+		// check that sql result is a valid match
+		// - partial match should be exact OR something.domain.name, NOT just a part of the domain
+		// - for exact match, match domain should match url host exactly
+		if (($match['partial_match'] == 1 &&
+		     ($match['domain'] == $host || (strpos($host, '.' . $match['domain'])))
+		      || ($match['partial_match'] == 0 && $match['domain'] == $host))) {
 			return proxyHost::generateEZproxyTicket($match['prefix'], $url, $username);
 		} else {
+		  // no match found, proxy not required
 			return $url;
 		}		
 	}	
-	
+
+	/**
+	 * search for host proxy information by domain name
+	 * @param string $host domain name
+	 * @return array|null database row if match found, null if none
+	 */
 	public static function doSearch($host)
 	{
-		global $g_dbConn;					
+		global $g_dbConn;
+
+		// search for an exact match on domains where partial match is not allowed
+		// OR for a partial match if allowed
+		//
+		// query should only return base domain for a subdomain (if partial matches are allowed)
+		// when other subdomains are in db
+		// e.g., searching for 'sagepub.com' should return sagepub.com (partial) and
+		// not an exact-match subdomain, e.g. online.sagepub.com 
 		
 		switch($g_dbConn->phptype) {
 			default:	//mysql
 				$sql = "SELECT prefix, partial_match, domain
-						FROM proxied_hosts
-							JOIN proxies ON proxied_hosts.proxy_id = proxies.id
-						WHERE domain LIKE ?";
+					FROM proxied_hosts
+					JOIN proxies ON proxied_hosts.proxy_id = proxies.id
+					WHERE (domain = ? and partial_match = 0) OR
+					      (domain LIKE ? and partial_match = 1)";
 				
 		}
-		$rs = $g_dbConn->query($sql, "%$host");
+		$rs = $g_dbConn->query($sql, array($host, "%$host"));
 
 		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 			
 		return $rs->fetchRow(DB_FETCHMODE_ASSOC);			
 	}
-	
+
+	/**
+	 * generate proxied url
+	 * @param string $EZproxyServerURL base url for proxying
+	 * @param string $url url to be proxied
+	 * @param string $username logged in user (passed to proxy server)
+	 * @return string proxied url
+	 */
 	function generateEZproxyTicket($EZproxyServerURL, $url, $username)
 	{
 		global $g_EZproxyAuthorizationKey;
