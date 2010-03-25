@@ -51,14 +51,14 @@ function typeOfMaterial() {
 
   // check for uploading file as journal article (only on addItem)
   if ((type == "JOURNAL_ARTICLE") && document.forms[0].documentType[0].checked 
-	&& document.forms[0].documentType[0].value == "DOCUMENT") {
+  && document.forms[0].documentType[0].value == "DOCUMENT") {
     $('openurl_link').show();
-  } else {
+  } else if ($('openurl_link')) {
     $('openurl_link').hide();
   }
   
 
-}	
+} 
 
 
 // do form-validation for material-type portion of add/edit form
@@ -94,15 +94,15 @@ function checkMaterialTypes(form) {
     var type_details = materialType_details[type];
     for (var field in type_details) {
       if (type_details[field]["required"]) {
-	var tr = $(field);
-	var inputs = tr.select('input[type="text"]');
-	var radio_inputs = tr.select('input[type="radio"]');
-	if ((inputs.length && inputs[0].getValue() == '') ||
-	    (radio_inputs.length && (! radio_inputs[0].checked)
-	     && (! radio_inputs[1].checked))) {
-	  alertMsg += type_details[field]['label'] + ' is required.<br/>';
-	  tr.cells[1].className = 'incomplete';
-	}
+  var tr = $(field);
+  var inputs = tr.select('input[type="text"]');
+  var radio_inputs = tr.select('input[type="radio"]');
+  if ((inputs.length && inputs[0].getValue() == '') ||
+      (radio_inputs.length && (! radio_inputs[0].checked)
+       && (! radio_inputs[1].checked))) {
+    alertMsg += type_details[field]['label'] + ' is required.<br/>';
+    tr.cells[1].className = 'incomplete';
+  }
       }
     }
   }

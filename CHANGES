@@ -2,7 +2,7 @@ Created by Jason White (jbwhite@emory.edu)
 
 This file is part of ReservesDirect
 
-Copyright (c) 2004-2006 Emory University, Atlanta, Georgia.
+Copyright (c) 2004-2010 Emory University, Atlanta, Georgia.
 
 Licensed under the ReservesDirect License, Version 1.0 (the "License");      
 you may not use this file except in compliance with the License.     
@@ -21,6 +21,57 @@ http://www.reservesdirect.org/
 
 
 ************************************************************************
+Revision 2.5.0
+
+Changes
+
+Enhance item-level metadata to enable copyright enhancements. 
+
+-- User must select "type of material " when adding content to a course on 
+   Reserves Direct.
+-- User must enter required metadata for selected type of material
+-- Users must be reminded to link to journal articles and other online 
+   resources instead of uploading (insert Open URL Generator Link)
+-- Faculty and Staff have a consistent interface for adding and editing reserve 
+   items.
+
+
+Revision 2.4.11
+
+Changes
+
+-- db/2.4.11_database_updates.sql
+  add classnbr field in course_aliases table.
+  remove unique key on registrar_key in course_aliases table.
+  add unique key combo on registrar_key and classnbr in course_aliases table.
+  add unique key constraint on primary_course_alias_id in course_instances table.
+  These changes were done to accommodate for the new GROUP.CSV format, as well
+  as add tigher constraints in the table course_aliases and course_instances.
+  
+-- Update the rd_registrar_scripts repository to revision
+   https://svn.library.emory.edu/svn/rd_registrar_scripts/tags/release_2.4.11
+   These changes were done to accommodate a new GROUP.CSV file that will 
+   enable the import of the courses to be more accurate because of this new data.
+   
+-- Update configuration file (/etc/httpd/conf/reserves2test.xml)
+    set activation_padding_days = 21
+    set expiration_padding_days = 14 
+    This changes was done to allow the course to be active three weeks prior to 
+    the actual start date, rather than 2.
+   
+   
+Revision 2.4.10
+
+Changes
+
+-- Bugfix - proxyHost update in ReservesViewer.php
+   
+Revision 2.4.9
+
+Changes
+
+-- proxyHost update in ReservesViewer.php
+
 
 Revision 2.4.8
 

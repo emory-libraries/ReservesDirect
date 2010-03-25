@@ -880,11 +880,12 @@ class requestDisplayer extends noteDisplayer {
 			    <td><small>pp. 336-371 and pp. 399-442 (78 of 719)</small></td>
 			  <? endif ?>			       
 			</tr>
+    <? /* NOTE: Comment out for the Type of Material release       
 			<tr id="total_times_pages" style="display:none">
 			   <th>Total Pages/Times:</th>
 			   <td><input name="total_times_pages" type="text" size="50" value="<?=$item_data['total_times_pages']?>"></td>
 			</tr>
-
+		*/ ?>
 
 <?php	if($isDigital && !empty($doc_types)):	//document icon/mime for digital items ?>
 			<tr>

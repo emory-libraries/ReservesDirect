@@ -1,0 +1,34 @@
+RESERVES DIRECT DEPLOYMENT NOTES
+
+Release 2.5.X
+    
+  1. svn switch repositories to release version - adjust last digit as needed.
+      https://svn.library.emory.edu/oss/reservesdirect/tags/release_2.5.0
+      
+  2. For staging: copy production database to staging database.
+     For both staging and production:
+      run the migration script /home/httpd/html/reserves2/db/RD2.5.X_updates.sql
+      
+Release 2.4.11
+
+  1. update /etc/httpd/conf/reserves2test.xml
+      OLD VALUES
+        <registar_feed>
+          <activation_padding_days>14</activation_padding_days>
+          <expiration_padding_days>14</expiration_padding_days>
+        </registar_feed>
+      NEW VALUES
+        <registar_feed>
+          <activation_padding_days>21</activation_padding_days>
+          <expiration_padding_days>14</expiration_padding_days>
+        </registar_feed>
+    
+  2. svn switch repositories
+      sagan /home/httpd/html/reserves2 to
+      https://svn.library.emory.edu/oss/reservesdirect/tags/release_2.4.11
+      
+      sagan /home/saprod/rd_registrar_scripts
+      https://svn.library.emory.edu/svn/rd_registrar_scripts/tags/release_2.4.11
+      
+  3. run the migration script /home/httpd/html/reserves2/db/2.4.11_database_changes.sql
+        

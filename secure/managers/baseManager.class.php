@@ -32,17 +32,26 @@ http://www.reservesdirect.org/
  * - To be extended by other manager classes
  */
 abstract class baseManager {
-	public $displayClass;
-	public $displayFunction;
-	public $argList;
+  public $displayClass;
+  public $displayFunction;
+  public $argList;
 
-	function display() {
-		//echo "attempting to call ". $this->displayClass ."->". $this->displayFunction ."<br>";
+  /**
+   * call the display class to render the appropriate display
+   * function based on selected command
+   */
+  public function display() {
+    if (isset($_SESSION['debug'])) {
+      echo "Manager calling display function ". $this->displayClass ."->". $this->displayFunction ."<br>\n";
+    }
 
-		if (is_callable(array($this->displayClass, $this->displayFunction))) {
-			call_user_func_array(array($this->displayClass, $this->displayFunction), $this->argList);
-		}
-	}
+    if (is_callable(array($this->displayClass, $this->displayFunction))) {
+      call_user_func_array(array($this->displayClass, $this->displayFunction), $this->argList);
+    } else {
+      trigger_error("Configured display function ". $this->displayClass ."->". $this->displayFunction
+        ."is not callable", E_USER_WARNING);
+    }
+  }
 }
 
 ?>
