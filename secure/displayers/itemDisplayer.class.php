@@ -608,29 +608,34 @@ ITEM_SOURCE;
       <input name="source" type="text" id="source" size="50" value="<?=$item->getSource()?>">
          </td>
            </tr>
-       <tr id="performer">
+        <tr id="performer">
          <th>Performer:</th>
          <td>
            <input name="performer" type="text" id="performer" size="50" value="<?=$item->getPerformer()?>">
          </td>
-       </tr>
-       <tr id="times_pages">
+        </tr>
+        <tr id="times_pages">
          <th>Pages/Time:</th>
          <td>
            <input name="times_pages" type="text" id="times_pages" size="50" value="<?=$item->getPagesTimes()?>">
          </td>
          <? if ($item->getItemGroup() == 'ELECTRONIC'): ?>
-            <td><small>pp. 336-371 and pp. 399-442 (78 of 719)</small></td>
+            <td><small>Example page range: 336-371; 381-388
+            <br>Example time range: 2:10-5:30; 10:30-12:44</small></td>
          <? endif ?>
-           </tr>
-           
-    <? /* NOTE: Comment out for the Type of Material release   
-       <tr id="total_times_pages">
+        </tr>
+  
+        <tr id="used_times_pages">
+         <th>Total Used Pages/Times:</th>
+         <td><input name="used_times_pages" type="text" size="50" value="<?= $item->getUsedPagesTimes() ?>"></td>
+        </tr>
+         
+        <tr id="total_times_pages">
          <th>Total Pages/Times:</th>
          <td><input name="total_times_pages" type="text" size="50" value="<?= $item->getTotalPagesTimes() ?>"></td>
-       </tr>
-    */ ?>    
-           <tr>
+        </tr>
+
+       <tr>
          <th>Document Type Icon:</th>
          <td>
            <select name="selectedDocIcon" onChange="document.iconImg.src = this[this.selectedIndex].value;">
@@ -817,24 +822,18 @@ ITEM_SOURCE;
       function validateForm(frm) {      
         var alertMsg = "";
 
-<?php if($item->getItemGroup() != 'ELECTRONIC'): ?>
+<?php if ($item->isPhysicalItem()): ?>
         //make sure this physical copy is supposed to have a barcode
         //  if it is, there will be an input element for it in the form
-    if( (document.getElementById('barcode') != null) && (document.getElementById('barcode').value == '') ){ 
+        if( (document.getElementById('barcode') != null) && (document.getElementById('barcode').value == '') ){ 
           alertMsg = alertMsg + "Barcode is required.<br />";
         }
-<? else: ?>     
-        if((frm.documentType.value == "DOCUMENT") && (frm.userFile.value == "")) {
-          alertMsg = alertMsg + "You must choose a file to upload.<br />";
+<? else: ?>          
+        if((frm.userFile.value == "") && (frm.url.value == "")) {
+          alertMsg = alertMsg + 'You must choose an item source of either "Upload a document" or "Add a link".<br />';
         }
-        }
-        else if((frm.documentType.value == "URL") && (frm.url.value == "")) {
-          alertMsg = alertMsg + "URL is required.<br />";
-        }
-    
+<? endif ?>   
         alertMsg += checkMaterialTypes(frm);
-
-<? endif ?>       
         if (!alertMsg == "") { 
           document.getElementById('alertMsg').innerHTML = alertMsg;
           return false;

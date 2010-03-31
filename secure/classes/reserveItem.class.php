@@ -50,12 +50,9 @@ class reserveItem extends item
   public $publisher;
   public $availability;
   
-  // NOTE: Comment out for the Type of Material release
-  // public $totalPagesTimes;
-  
-  //  private $ISSN;
-  //  private $ISBN;
-  //  private $OCLC;
+  public $usedPagesTimes;
+  public $totalPagesTimes; 
+
   public $ISSN;
   public $ISBN;
   public $OCLC;
@@ -86,7 +83,7 @@ class reserveItem extends item
     switch ($g_dbConn->phptype)
     {
       default: //'mysql'
-        $sql = "SELECT item_id, title, item_group, last_modified, creation_date, item_type, author, source, volume_edition, pages_times, performer, local_control_key, url, mimeType, home_library, private_user_id, volume_title, item_icon, ISBN, ISSN, OCLC, status, material_type, publisher, availability
+        $sql = "SELECT item_id, title, item_group, last_modified, creation_date, item_type, author, source, volume_edition,  performer, local_control_key, url, mimeType, home_library, private_user_id, volume_title, item_icon, ISBN, ISSN, OCLC, status, material_type, publisher, availability, pages_times_range, pages_times_used, pages_times_total
             FROM items
             WHERE item_id = !";
     }
@@ -100,11 +97,11 @@ class reserveItem extends item
     else {
       //pull the info
       list($this->itemID, $this->title, $this->itemGroup, $this->lastModDate, $this->creationDate, 
-        $this->itemType, $this->author, $this->source, $this->volumeEdition, $this->pagesTimes, 
+        $this->itemType, $this->author, $this->source, $this->volumeEdition, 
         $this->performer, $this->localControlKey, $this->URL, $this->mimeTypeID, 
         $this->homeLibraryID, $this->privateUserID, $this->volumeTitle, $this->itemIcon, 
            $this->ISBN, $this->ISSN, $this->OCLC, $this->status, $this->material_type,
-           $this->publisher, $this->availability) 
+           $this->publisher, $this->availability, $this->pagesTimes, $this->usedPagesTimes, $this->totalPagesTimes) 
       = $rs;
         
       //get the notes
@@ -280,7 +277,7 @@ class reserveItem extends item
   /**
   * @return void
   * @param string $pagesTimes
-  * @desc set new pagesTimes in database
+  * @desc set new pages_times_range in database
   */
   function setPagesTimes($pagesTimes)
   {
@@ -289,7 +286,7 @@ class reserveItem extends item
     switch ($g_dbConn->phptype)
     {
       default: //'mysql'
-        $sql = "UPDATE items SET pages_times = ?, last_modified = ? WHERE item_id = !";
+        $sql = "UPDATE items SET pages_times_range = ?, last_modified = ? WHERE item_id = !";
         $d = date("Y-m-d"); //get current date
     }
     $rs = $g_dbConn->query($sql, array(stripslashes($pagesTimes), $d, $this->itemID));
@@ -298,6 +295,37 @@ class reserveItem extends item
     $this->pagesTimes = $pagesTimes;
     $this->lastModDate = $d;
   }
+  /**
+   * set used # of pages or time/duration for the work/volume
+   * @param string $pagesTimesUsed
+   */
+
+  function setUsedPagesTimes($pagesTimesUsed) {
+    global $g_dbConn;
+    $this->usedPagesTimes = $pagesTimesUsed;
+    switch ($g_dbConn->phptype) {
+    default: //'mysql'
+      $sql = "UPDATE items SET pages_times_used = ? WHERE item_id = !";
+    }
+    $rs = $g_dbConn->query($sql, array($this->usedPagesTimes, $this->itemID));
+    if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+  }
+  
+  /**
+   * set total # of pages or time/duration for the work/volume
+   * @param string $pagesTimesTotal
+   */
+
+  function setTotalPagesTimes($pagesTimesTotal) {
+    global $g_dbConn;
+    $this->totalPagesTimes = $pagesTimesTotal;
+    switch ($g_dbConn->phptype) {
+    default: //'mysql'
+      $sql = "UPDATE items SET pages_times_total = ? WHERE item_id = !";
+    }
+    $rs = $g_dbConn->query($sql, array($this->totalPagesTimes, $this->itemID));
+    if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+  }  
 
   /**
   * @return void
@@ -651,24 +679,6 @@ class reserveItem extends item
     $rs = $g_dbConn->query($sql, array($this->publisher, $this->itemID));
     if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
   }   
-
-  // NOTE: Comment out for the Type of Material release 
-  /**
-   * set total # of pages or time/duration for the work/volume
-   * @param string $pagesTimes
-   *
-
-  function setTotalPagesTimes($pagesTimes) {
-    global $g_dbConn;
-    $this->totalPagesTimes = $pagesTimes;
-    switch ($g_dbConn->phptype) {
-    default: //'mysql'
-      $sql = "UPDATE items SET total_pages_time = ? WHERE item_id = !";
-    }
-    $rs = $g_dbConn->query($sql, array($this->totalPagesTimes, $this->itemID));
-    if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
-  }
-   */
   
   /**
    * set availability
@@ -703,6 +713,9 @@ class reserveItem extends item
 
   function getPublisher() { return $this->publisher; }
   function getAvailability() { return $this->availability; }
+  
+  function getUsedPagesTimes() { return htmlentities(stripslashes($this->usedPagesTimes)); }
+  function getTotalPagesTimes() { return htmlentities(stripslashes($this->totalPagesTimes)); }    
   
   // NOTE: Comment out for the Type of Material release
   // function getTotalPagesTimes() { return $this->totalPagesTimes; }  

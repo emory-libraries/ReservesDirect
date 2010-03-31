@@ -326,8 +326,8 @@ function common_electronicMaterialTypesDetails() {
          "publisher" => array("required" => true, "label" => "Publisher"),
          "year" => array("required" => true, "label" => "Year of Publication"),
          "times_pages" => array("required" => true, "label" => "Page ranges"),  // example!
-         // NOTE: Comment out for the Type of Material release
-         // "total_times_pages" => array("required" => true, "label" => "Total pages in book"),
+         "used_times_pages" => array("required" => true, "label" => "Total pages used in book"),         
+         "total_times_pages" => array("required" => true, "label" => "Total pages in book"),         
          "isbn" => array("label" => "ISBN"),
          "availability" => array("required" => true, "label" => "Print status of book",
                "options" => array("Out of Print", "In Print")),
@@ -368,8 +368,8 @@ function common_electronicMaterialTypesDetails() {
          "publisher" => array("required" => true, "label" => "Studio"),
          "year" => array("required" => true, "label" => "Year Produced"),
          "times_pages" => array("required" => true, "label" => "Time of Portion Used"),   // example!
-         // NOTE: Comment out for the Type of Material release
-         // "total_times_pages" => array("required" => true, "label" => "Total Time of Movie"),
+         "used_times_pages" => array("required" => true, "label" => "Total time used in Movie"),         
+         "total_times_pages" => array("required" => true, "label" => "Total Time of Movie"),
          "availability" => array("required" => true, "label" => "Availability of Movie",
                "options" => array("Commercially Unavailable",
                 "Commercially Available")),
@@ -384,8 +384,8 @@ function common_electronicMaterialTypesDetails() {
          "publisher" => array("required" => true, "label" => "Label Name & Number"),
          "year" => array("required" => true, "label" => "Year Produced"),
          "times_pages" => array("required" => true, "label" => "Time of Portion Used"),   // example!
-         // NOTE: Comment out for the Type of Material release
-         // "total_times_pages" => array("required" => true, "label" => "Total Time of CD"),
+         "used_times_pages" => array("required" => true, "label" => "Total time used of CD"),
+         "total_times_pages" => array("required" => true, "label" => "Total Time of CD"),
          "isbn" => array("label" => "ISBN"),
          "availability" => array("required" => true, "label" => "Availability of CD",
                "options" => array("Commercially Unavailable",

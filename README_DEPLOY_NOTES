@@ -9,6 +9,17 @@ Release 2.5.X
      For both staging and production:
       run the migration script /home/httpd/html/reserves2/db/RD2.5.X_updates.sql
       
+  3. Update the items table with pagestimes field expanded into three new fields.
+     run a script to create a migration that will update the items table.
+     cd <root dir of app>
+     ./scripts/db_item_pagestime_expansion.php
+     This outputs two files:
+     db/2.5_pagestimes_update.csv
+     db/2.5_pagestimes_update.sql
+     The sql file should now be run to update the database.
+     mysql -h hostname -uusername -p databasename < db/2.5_pagestimes_update.sql
+
+      
 Release 2.4.11
 
   1. update /etc/httpd/conf/reserves2test.xml

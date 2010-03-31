@@ -63,8 +63,19 @@ class TestReserveItemClass extends UnitTest {
        $item->getPublisher() . "'");
     }
 
-    // NOTE: Comment out for the Type of Material release
-    /*
+    function testSetUsedPagesTimes() {
+      $item = new reserveItem(19762);
+      $pages = "300";
+      $item->setUsedPagesTimes($pages);
+      $this->assertEqual($pages, $item->getUsedPagesTimes(),
+       "used pages/times set correctly in reserve item; should be '$pages', got '"
+       . $item->getUsedPagesTimes() . "'");
+      $item = new reserveItem(19762);
+      $this->assertEqual($pages, $item->getUsedPagesTimes(),
+       "used pages/times set correctly in reserve item after db init; should be '$pages', got '" .
+       $item->getUsedPagesTimes() . "'");
+    }
+    
     function testSetTotalPagesTimes() {
       $item = new reserveItem(19762);
       $pages = "300";
@@ -76,8 +87,7 @@ class TestReserveItemClass extends UnitTest {
       $this->assertEqual($pages, $item->getTotalPagesTimes(),
        "total pages/times set correctly in reserve item after db init; should be '$pages', got '" .
        $item->getTotalPagesTimes() . "'");
-    }
-    */
+    }    
 
     function testSetAvailability() {
       $item = new reserveItem(19762);

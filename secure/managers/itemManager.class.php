@@ -523,8 +523,8 @@ class itemManager extends baseManager {
     if(isset($_REQUEST['publisher'])) $item->setPublisher($_REQUEST['publisher']);
     if(isset($_REQUEST['availability'])) $item->setAvailability($_REQUEST['availability']);
     
-    // NOTE: Comment out for the Type of Material release
-    // if(isset($_REQUEST['total_times_pages'])) $item->setTotalPagesTimes($_REQUEST['total_times_pages']);
+    if(isset($_REQUEST['used_times_pages'])) $item->setUsedPagesTimes($_REQUEST['used_times_pages']);
+    if(isset($_REQUEST['total_times_pages'])) $item->setTotalPagesTimes($_REQUEST['total_times_pages']);
     
     if(isset($_REQUEST['material_type'])) $item->setMaterialType($_REQUEST['material_type'],
                        $_REQUEST['material_type_other']);

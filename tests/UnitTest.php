@@ -64,7 +64,6 @@ class UnitTest extends UnitTestCase {
     if (DB::isError($rs)) {
       echo ("ERROR loading Fixture  " . $rs->getMessage() . "<BR>"); 
     }
-    
   }
-  
 }
+?>

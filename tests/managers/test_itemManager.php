@@ -86,9 +86,8 @@ class TestItemManager extends UnitTest {
     $_REQUEST['home_library'] = 1;
     $_REQUEST['publisher'] = "HBJ";
     $_REQUEST['availability'] = 1;
-    
-    // NOTE: Comment out for the Type of Material release
-    // $_REQUEST['total_times_pages'] = 233;
+    $_REQUEST['used_times_pages'] = "22";    
+    $_REQUEST['total_times_pages'] = "233";
     
     $this->mgr = new itemManager('editItem', $this->user);
 
@@ -106,9 +105,8 @@ class TestItemManager extends UnitTest {
     $this->assertEqual("12-33", $item->getPagesTimes());
     $this->assertEqual("12304003", $item->getISSN());
     $this->assertEqual("1902", $item->getSource());
-    
-    // NOTE: Comment out for the Type of Material release
-    // $this->assertEqual(233, $item->getTotalPagesTimes());
+    $this->assertEqual("22", $item->getUsedPagesTimes());
+    $this->assertEqual("233", $item->getTotalPagesTimes());
   }
 
   function test_editItemValidation() {
