@@ -777,15 +777,10 @@ ITEM_SOURCE;
       <script language="JavaScript1.2" src="secure/javascript/basicAJAX.js"></script>
       <script language="JavaScript1.2" src="secure/javascript/notes_ajax.js"></script>
 
-      <div class="headingCell1">NOTES</div>
       <div style="padding:8px 8px 12px 8px;text-align:center">
-      
-      <? /* Notes cannot be created unless the item has been saved first.   */ ?>
-      <?php if(isset($reserve)): ?>        
-        <?php  self::displayNotesBlockAJAX($notes, $obj_type, $id, $include_addnote_button); ?>
-      <?php else: ?>
-        <p>If you would like to add a note, please save the item first.<p>
-      <?php endif; ?> 
+  
+      <?php  self::displayNotesBlockAJAX($notes, $obj_type, $id, $include_addnote_button); ?>
+
       </div>
 <?php
   }
@@ -804,7 +799,7 @@ ITEM_SOURCE;
    * @todo figure out a way to consolidate addItem and editItem logic?
    */
   function displayEditItemMeta($item, $reserve=null, $dub_array=null) {
-    global $u, $g_permission, $g_copyrightNoticeURL;
+    global $u, $g_permission, $g_copyrightNoticeURL, $g_notetype;
     
     //determine if editing a reserve
     if(!empty($reserve) && ($reserve instanceof reserve)) { //valid reserve obj
@@ -829,7 +824,7 @@ ITEM_SOURCE;
           alertMsg = alertMsg + "Barcode is required.<br />";
         }
 <? else: ?>          
-        if((frm.userFile.value == "") && (frm.url.value == "")) {
+        if(isset($reserve) && (frm.userFile.value == "") && (frm.url.value == "")) {
           alertMsg = alertMsg + 'You must choose an item source of either "Upload a document" or "Add a link".<br />';
         }
 <? endif ?>   
@@ -884,10 +879,28 @@ ITEM_SOURCE;
     self::displayEditItemItemDetails($item);
 ?>
     </form>  
-<?php
-    //show item/reserve notes
-    self::displayEditItemNotesAJAX($item, $reserve);
-?>
+    
+    <div class="headingCell1">NOTES</div>        
+    <br />
+    <?php if(isset($reserve)): //if editing existing item, use AJAX notes handler ?>    
+      <?php  self::displayEditItemNotesAJAX($item, $reserve);  ?>
+    <?php else: //just display plain note form ?>
+
+    <strong>Add a new note:</strong>
+    <br />
+    <textarea name="new_note" cols="50" rows="3"></textarea>
+    <br />
+    <small>Note Type:
+      <?php if ($u->getRole() == $g_permission['instructor']): //instructor role ?>    
+        <label><input type="radio" name="new_note_type" value="<?=$g_notetype['instructor']?>" checked="true">Instructor Note</label>
+      <?php elseif ($u->getRole() >= $g_permission['staff']): // role staff level or above ?>       
+        <label><input type="radio" name="new_note_type" value="<?=$g_notetype['instructor']?>">Instructor</label>
+        <label><input type="radio" name="new_note_type" value="<?=$g_notetype['content']?>" checked="true">Content Note</label>
+        <label><input type="radio" name="new_note_type" value="<?=$g_notetype['staff']?>">Staff Note</label>
+        <label><input type="radio" name="new_note_type" value="<?=$g_notetype['copyright']?>">Copyright Note</label>  
+      <?php endif; ?>         
+    <?php endif; ?>  
+
     </div>
 
 <div style="font:arial; font-weight:bold; font-size:small; padding:5px;text-align:center;">I have read the Library's <a href="<?= $g_copyrightNoticeURL ?>" target="blank">copyright notice</a> and certify that to the best of my knowledge my use of this document falls within those guidelines.</div>
