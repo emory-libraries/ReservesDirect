@@ -482,7 +482,7 @@ class reserveItem extends item
               return 'images/doc_type_icons/doctype-disc2.gif';
             break;
             case 'ELECTRONIC':
-              return 'images/doc_type_icons/doctype-link.gif';
+              return 'images/doc_type_icons/doctype-pdf.gif';
             break;
             default:
               return 'images/doc_type_icons/doctype-clear.gif';
