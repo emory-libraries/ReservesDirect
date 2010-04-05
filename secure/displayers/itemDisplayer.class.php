@@ -824,7 +824,7 @@ ITEM_SOURCE;
           alertMsg = alertMsg + "Barcode is required.<br />";
         }
 <? else: ?>          
-        if(isset($reserve) && (frm.userFile.value == "") && (frm.url.value == "")) {
+        if((frm.userFile.value == "") && (frm.url.value == "")) {
           alertMsg = alertMsg + 'You must choose an item source of either "Upload a document" or "Add a link".<br />';
         }
 <? endif ?>   
