@@ -309,6 +309,7 @@ function common_getElectronicMaterialTypes() {
          "IMAGE" => "Image",
          "VIDEO" => "Movie",
          "AUDIO" => "Audio or Sound Recording",
+         "WEBPAGE" => "Webpage Link",         
          "OTHER" => "Other");
 }
 
@@ -392,6 +393,11 @@ function common_electronicMaterialTypesDetails() {
                 "Commercially Available")),
          "barcode" => array("label" => "Barcode / Alternate ID"), 
          ),
+         "WEBPAGE" =>
+         array("title" => array("required" => true, "label" => "Title"),
+         "author" => array("label" => "Creator"),
+         "year" => array("label" => "Year Created"),         
+         ),         
          "OTHER" =>
          array("title" => array("required" => true, "label" => "Title"), 
          "author" => array("label" => "Author"),

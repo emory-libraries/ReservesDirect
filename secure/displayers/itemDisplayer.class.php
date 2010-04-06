@@ -644,11 +644,7 @@ ITEM_SOURCE;
       $selected = ($item->getItemIcon() == $icon['helper_app_icon']) ? ' selected="selected"' : '';
 ?>
          <? /* Set the default to the Item Icon */ ?>
-         <? if ($icon['helper_app_name'] == 'Default'): ?>
-            <option value="<?=$item->getItemIcon($item->getMaterialType())?>"<?=$selected?>><?=$icon['helper_app_name']?></option>
-         <? else: ?> 
-            <option value="<?=$icon['helper_app_icon']?>"<?=$selected?>><?=$icon['helper_app_name']?></option> 
-         <? endif ?>
+         <option value="<?=$icon['helper_app_icon']?>"<?=$selected?>><?=$icon['helper_app_name']?></option> 
 <?php endforeach; ?>
            </select>
            <img name="iconImg" width="24" height="20" src="<?=$item->getItemIcon()?>" />
@@ -886,19 +882,18 @@ ITEM_SOURCE;
       <?php  self::displayEditItemNotesAJAX($item, $reserve);  ?>
     <?php else: //just display plain note form ?>
 
-    <strong>Add a new note:</strong>
-    <br />
-    <textarea name="new_note" cols="50" rows="3"></textarea>
-    <br />
-    <small>Note Type:
-      <?php if ($u->getRole() == $g_permission['instructor']): //instructor role ?>    
-        <label><input type="radio" name="new_note_type" value="<?=$g_notetype['instructor']?>" checked="true">Instructor Note</label>
-      <?php elseif ($u->getRole() >= $g_permission['staff']): // role staff level or above ?>       
+      <strong>Add a new note:</strong>
+      <br />
+      <textarea name="new_note" cols="50" rows="3"></textarea>
+      <br />
+      <?php if ($u->getRole() >= $g_permission['staff']): // role staff level or above ?>       
+        <small>Note Type:
         <label><input type="radio" name="new_note_type" value="<?=$g_notetype['instructor']?>">Instructor</label>
         <label><input type="radio" name="new_note_type" value="<?=$g_notetype['content']?>" checked="true">Content Note</label>
         <label><input type="radio" name="new_note_type" value="<?=$g_notetype['staff']?>">Staff Note</label>
         <label><input type="radio" name="new_note_type" value="<?=$g_notetype['copyright']?>">Copyright Note</label>  
-      <?php endif; ?>         
+      <?php endif; ?>  
+      <br />       
     <?php endif; ?>  
 
     </div>
