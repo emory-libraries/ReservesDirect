@@ -146,9 +146,34 @@ ITEM_SOURCE;
    */
   function _itemsource_newElectronic($reserveItem) {
     $output = <<<ITEM_SOURCE
+    <script type="text/javascript" src="secure/javascript/openurl.js"></script>
+    <script language="JavaScript">
+      function testurl(mypage) {
+        var alertMsg = "";  
+        if (mypage) { sfxWin(mypage); }
+        else {
+          alertMsg = 'Please enter a URL in the "Add a link" text box if you would like to "Test URL".';
+        }
+        document.getElementById('alertMsg').innerHTML = alertMsg;        
+      }    
+      function getopenurl(frm) {      
+        var alertMsg = "";  
+        alertMsg = get_url(frm);
+        //document.getElementById('alertMsg').innerHTML = alertMsg;      
+        return alertMsg;       
+      }              
+      </script>
+
+    <div id="openurl_link" style="display:none" class="borders noticeBox">
+      <div class="noticeImg"></div>
+      <div class="noticeText">
+        Instead of uploading a journal article, consider using the
+        "Get URL" button below to locate a link instead.<br/>         
+      </div>
+    </div>
     <table width="100%" border="0" cellpadding="3" cellspacing="0" bgcolor="#CCCCCC" class="borders">
       <tr>
-        <td align="left" colspan="2" valign="top"> <p class="strong">Would you like to:</p></td>
+        <td align="left" colspan="2" valign="top"> <p class="strong"><br>Would you like to:</p></td>
       </tr>
       <tr>
         <td align="left" valign="top">
@@ -166,6 +191,17 @@ ITEM_SOURCE;
         </td>
         <td align="left" valign="top">
           <input name="url" type="text" size="50" DISABLED>
+          <br>
+          <table>
+            <tr>
+              <td><input type="button" name="test_url" value="Test URL" onclick="testurl(this.form.url.value);" /></td>
+              <td>Open a window to test if the URL link above is valid.</td>
+            </tr>
+            <tr>
+              <td><input type="button" name="get_url" value="Get URL" onclick="this.form.url.disabled = false;this.form.userFile.disabled = true;this.form.documentType[0].checked = false;this.form.documentType[1].checked = true;this.form.url.value = getopenurl(this.form);" /></td>
+              <td>Use the metadata from the ITEM DETAILS section above to locate an open url.</td>
+            </tr>                               
+          </table>
         </td>
       </tr>
       <tr>
@@ -177,18 +213,7 @@ ITEM_SOURCE;
           </font>
         </td>
       </tr>
-    </table>
-      <div id="openurl_link" style="display:none" class="borders noticeBox">
-        <div class="noticeImg"></div>
-                    <div class="noticeText">
-          Instead of uploading a journal article, consider using the
-          <a target="_blank" href="http://ejournals.emory.edu/openurlgen.php">Open URL Generator</a>
-          to create a link instead.<br/>
-          Once you create a link, paste it into the "Add a link" box above.
-        </div>
-
-    </div>
-                
+    </table>                
 ITEM_SOURCE;
     return $output;
   }
