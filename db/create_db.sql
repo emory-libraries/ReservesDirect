@@ -806,8 +806,7 @@ INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, h
 INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (5, 'application/vnd.ms-excel', 'http://office.microsoft.com/Assistance/9798/viewerscvt.aspx', 'Microsoft Excel', 'images/doc_type_icons/doctype-text.gif');
 INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (6, 'application/vnd.ms-powerpoint', 'http://office.microsoft.com/Assistance/9798/viewerscvt.aspx', 'Microsoft Powerpoint', 'images/doc_type_icons/doctype-text.gif');
 INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (7, 'text/html', NULL, 'Link', 'images/doc_type_icons/doctype-link.gif');
-INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (8, 'text/html', NULL, 'Book', 'images/doc_type_icons/doctype-book.gif');
-INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (9, 'text/html', NULL, 'Multimedia Disk', 'images/doc_type_icons/doctype-disc2.gif');
+INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (8, 'text/html', NULL, 'Image', 'images/doc_type_icons/doctype-image.gif');
 
 -- --------------------------------------------------------
 
