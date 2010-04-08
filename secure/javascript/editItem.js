@@ -56,8 +56,35 @@ function typeOfMaterial() {
   } else if ($('openurl_link')) {
     $('openurl_link').hide();
   }
-  
-
+  // update the icon file type
+  switch(type)
+  {
+  case "BOOK_PORTION": document.iconImg.src = "images/doc_type_icons/doctype-pdf.gif"; 
+            document.item_form.selectedDocIcon.selectedIndex = 1;  break;
+  case "JOURNAL_ARTICLE": document.iconImg.src = "images/doc_type_icons/doctype-pdf.gif";  
+          document.item_form.selectedDocIcon.selectedIndex = 1;    break;
+  case "CONFERENCE_PAPER": document.iconImg.src = "images/doc_type_icons/doctype-text.gif";   
+          document.item_form.selectedDocIcon.selectedIndex = 4;    break;
+  case "COURSE_MATERIALS": document.iconImg.src = "images/doc_type_icons/doctype-text.gif";   
+          document.item_form.selectedDocIcon.selectedIndex = 4;    break;
+  case "IMAGE": document.iconImg.src = "images/doc_type_icons/doctype-image.gif";  
+          document.item_form.selectedDocIcon.selectedIndex = 8;    break;
+  case "VIDEO": document.iconImg.src = "images/doc_type_icons/doctype-movie.gif";  
+          document.item_form.selectedDocIcon.selectedIndex = 3;    break;
+  case "AUDIO": document.iconImg.src = "images/doc_type_icons/doctype-sound.gif";  
+          document.item_form.selectedDocIcon.selectedIndex = 2;    break;
+  case "WEBPAGE": document.iconImg.src = "images/doc_type_icons/doctype-link.gif"; 
+          document.item_form.selectedDocIcon.selectedIndex = 7;  break;
+  case "OTHER": document.iconImg.src = "images/doc_type_icons/doctype-clear.gif"; 
+          document.item_form.selectedDocIcon.selectedIndex = 0;  break;
+  case "BOOK": document.iconImg.src = "images/doc_type_icons/doctype-book.gif"; break;
+  case "CD": document.iconImg.src = "images/doc_type_icons/doctype-disc.gif"; break;
+  case "DVD": document.iconImg.src = "images/doc_type_icons/doctype-disc.gif"; break;
+  case "VHS": document.iconImg.src = "images/doc_type_icons/doctype-disc.gif"; break;
+  case "SOFTWARE": document.iconImg.src = "images/doc_type_icons/doctype-disc.gif"; break;         
+  default: document.iconImg.src = "images/doc_type_icons/doctype-pdf.gif"; break;
+  }
+    
 } 
 
 
