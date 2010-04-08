@@ -42,10 +42,10 @@ function OpenURLItem()
 }
 
 // Opens a standard popup window for links on the site.
-function sfxWin(mypage) {
+function openWin(mypage, w, h) {
 
-  var winw = 640;
-  var winh = 480;
+  var winw = w;
+  var winh = h;
   var winl = (screen.width - winw) / 2;
   var wint = (screen.height - winh) / 2;
 
@@ -68,9 +68,9 @@ function get_url(frm) {
   sURL += "?url_ver=" + escape(url_ver); 
   sURL += "&rft_val_fmt=" + escape(rft_val_fmt);
   
-  obj["title"] = frm.title.value;
+  obj["atitle"] = frm.title.value;
   obj = getAuthorInfo(obj, frm.author.value);
-  obj["volume_title"] = frm.volume_title.value;
+  obj["jtitle"] = frm.volume_title.value;
   obj = getVolumeInfo(obj, frm.volume_edition.value);
   obj = getYearInfo(obj, frm.source.value);
   obj = getPageInfo(obj, frm.times_pages.value);           

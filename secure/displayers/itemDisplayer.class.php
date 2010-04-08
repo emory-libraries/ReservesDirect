@@ -150,7 +150,7 @@ ITEM_SOURCE;
     <script language="JavaScript">
       function testurl(mypage) {
         var alertMsg = "";  
-        if (mypage) { sfxWin(mypage); }
+        if (mypage) { openWin(mypage,640,480); }
         else {
           alertMsg = 'Please enter a URL in the "Add a link" text box if you would like to "Test URL".';
         }
@@ -161,7 +161,11 @@ ITEM_SOURCE;
         alertMsg = get_url(frm);
         //document.getElementById('alertMsg').innerHTML = alertMsg;      
         return alertMsg;       
-      }              
+      } 
+      function editurl() { 
+        openWin('http://ejournals.emory.edu/openurlgen.php',860,550);
+        //window.open('http://ejournals.emory.edu/openurlgen.php','Open URL Generator','width=400,height=350,resizable=yes');   
+      }                    
       </script>
 
     <div id="openurl_link" style="display:none" class="borders noticeBox">
@@ -186,7 +190,7 @@ ITEM_SOURCE;
       </tr>
       <tr>
         <td align="left" valign="top">
-          <font color="#FF0000"><strong>*</strong></font><input type="radio" name="documentType" value="URL" onClick="this.form.url.disabled = !this.checked; this.form.userFile.disabled = this.checked;">
+          <font color="#FF0000"><strong>*</strong></font><input type="radio" name="documentType" value="URL" onClick="this.form.url.disabled = !this.checked; this.form.userFile.disabled = this.checked;this.form.iconImg.src = 'images/doc_type_icons/doctype-link.gif';this.form.iconImg.src = 'images/doc_type_icons/doctype-link.gif';this.form.selectedDocIcon.selectedIndex = 7;">
           <span class="strong">Add a link &gt;&gt;</span>
         </td>
         <td align="left" valign="top">
@@ -194,13 +198,17 @@ ITEM_SOURCE;
           <br>
           <table>
             <tr>
-              <td><input type="button" name="test_url" value="Test URL" onclick="testurl(this.form.url.value);" /></td>
+              <td><input type="button" name="test_url" value="Preview URL" onclick="testurl(this.form.url.value);" /></td>
               <td>Open a window to test if the URL link above is valid.</td>
             </tr>
             <tr>
               <td><input type="button" name="get_url" value="Get URL" onclick="this.form.url.disabled = false;this.form.userFile.disabled = true;this.form.documentType[0].checked = false;this.form.documentType[1].checked = true;this.form.url.value = getopenurl(this.form);" /></td>
               <td>Use the metadata from the ITEM DETAILS section above to locate an open url.</td>
-            </tr>                               
+            </tr>   
+            <tr>
+              <td><input type="button" name="get_url" value="Edit URL Details" onclick="editurl();" /></td>
+              <td>Launch the openurl generator for more options.</td>
+            </tr>                            
           </table>
         </td>
       </tr>
@@ -216,8 +224,8 @@ ITEM_SOURCE;
     </table>                
 ITEM_SOURCE;
     return $output;
-  }
-
+  }  
+  
   /**
    * item source section of edit form for an existing physical item
    * @param reserveItem $reserveItem
@@ -590,12 +598,16 @@ ITEM_SOURCE;
             <option value="<?= $material_id ?>"<?= $selected ?>><?= $material ?></option>
            <?php    endforeach ?>
            </select>
+<?php if($item->isPhysicalItem()): ?>           
+          <img name="iconImg" width="24" height="20" src="<?=$item->getItemIcon()?>" /> 
+<?php endif; ?>
            <div id="material_type_other_block"
            style="display:<?= ($item->getMaterialType() == 'OTHER') ? 'inline' : 'none' ?>">
              <input name="material_type_other" id="material_type_other"
                 type="text" size="25" value="<?=$item->getMaterialType('detail') ?>"/>
              <i>specify type of material</i>
            </div>
+
           </td>
        </tr>
 
@@ -659,7 +671,7 @@ ITEM_SOURCE;
          <th>Total Pages/Times:</th>
          <td><input name="total_times_pages" type="text" size="50" value="<?= $item->getTotalPagesTimes() ?>"></td>
         </tr>
-
+<?php if(!$item->isPhysicalItem()): ?>
        <tr>
          <th>Document Type Icon:</th>
          <td>
@@ -675,6 +687,7 @@ ITEM_SOURCE;
            <img name="iconImg" width="24" height="20" src="<?=$item->getItemIcon()?>" />
          </td>
        </tr>
+<?php endif; ?>       
        <tr id="isbn">
          <th>ISBN:</th>
          <td><input type="text" size="15" maxlength="13" value="<?= $item->getISBN() ?>" name="ISBN" /></td>
@@ -893,11 +906,14 @@ ITEM_SOURCE;
       self::displayEditItemReserveDetails($reserve);
     }
     
-    //show item source
-    self::displayEditItemSource($item);
-    
-    //show item details
-    self::displayEditItemItemDetails($item);
+    if ($item->isPhysicalItem()) {  // For physical items show the item source on top.
+      self::displayEditItemSource($item);       //show item source
+      self::displayEditItemItemDetails($item);  //show item details   
+    }
+    else { // For electronic items show the item details on top.
+      self::displayEditItemItemDetails($item);  //show item details  
+      self::displayEditItemSource($item);       //show item source
+    }
 ?>
     </form>  
     
