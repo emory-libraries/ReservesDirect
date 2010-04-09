@@ -165,7 +165,13 @@ ITEM_SOURCE;
       function editurl() { 
         openWin('http://ejournals.emory.edu/openurlgen.php',860,550);
         //window.open('http://ejournals.emory.edu/openurlgen.php','Open URL Generator','width=400,height=350,resizable=yes');   
-      }                    
+      }   
+      function setAddUrlFocus(url, userFile, d0, d1) {  
+        url.disabled = false;
+        userFile.disabled = true;
+        d0.checked = false;
+        d1.checked = true;  
+      }                        
       </script>
 
     <div id="openurl_link" style="display:none" class="borders noticeBox">
@@ -202,7 +208,7 @@ ITEM_SOURCE;
               <td>Open a window to test if the URL link above is valid.</td>
             </tr>
             <tr>
-              <td><input type="button" name="get_url" value="Get URL" onclick="this.form.url.disabled = false;this.form.userFile.disabled = true;this.form.documentType[0].checked = false;this.form.documentType[1].checked = true;this.form.url.value = getopenurl(this.form);" /></td>
+              <td><input type="button" name="get_url" value="Get URL" onclick="setAddUrlFocus(this.form.url,this.form.userFile,this.form.documentType[0],this.form.documentType[1]);this.form.url.value = getopenurl(this.form);" /></td>
               <td>Use the metadata from the ITEM DETAILS section above to locate an open url.</td>
             </tr>   
             <tr>
