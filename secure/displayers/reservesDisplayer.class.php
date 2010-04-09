@@ -188,7 +188,14 @@ class reservesDisplayer extends noteDisplayer {
     if(!empty($_REQUEST['ci'])) {
       echo '            <li><a href="index.php?cmd=importClass&amp;new_ci='.$_REQUEST['ci'].'" align="center">Import Class</a></li>';
     }
-    if (isset($request['ci']) && $request['ci']) {
+    if (!isset($request['ci']))
+      echo "              <li><a href=\"index.php?cmd=addDigitalItem\" align=\"center\">Add an Electronic Item</a></li>\n";
+    else if ($request['ci'])
+      echo "              <li><a href=\"index.php?cmd=addDigitalItem&ci=".$request['ci']."\" align=\"center\">Add an Electronic Item</a></li>\n";
+    if (!isset($request['ci']))
+      echo "              <li><a href=\"index.php?cmd=addPhysicalItem\">Add a Physical Item</a></li>\n";
+    else if ($request['ci']) {
+      echo "              <li><a href=\"index.php?cmd=addPhysicalItem&ci=".$request['ci']."\">Add a Physical Item</a></li>\n";
       echo "              <li><a href=\"index.php?cmd=faxReserve&ci=".$request['ci']."\">Fax a Document</a></li>\n";
       echo "              <li><a href=\"index.php?cmd=searchScreen&ci=".$request['ci']."\">Search for the Item</a></li>\n";
     }
