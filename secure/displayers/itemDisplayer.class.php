@@ -592,7 +592,7 @@ ITEM_SOURCE;
         <tr class="required">
           <th>Type of Material:</th>
           <td>
-              <select id="material_type" name="material_type" onChange="typeOfMaterial()">
+              <select id="material_type" name="material_type" onChange="typeOfMaterial();setItemGroup(this.form.material_type.value,this.form.item_group);">
 <?php       foreach($materialTypes as $material_id => $material): ?>
 <?php           $selected = ($material_id == $item->getMaterialType()) ? ' selected="selected"' : ''; ?>
             <option value="<?= $material_id ?>"<?= $selected ?>><?= $material ?></option>
@@ -737,6 +737,18 @@ ITEM_SOURCE;
     <script language="JavaScript">
        // init form based on selected type of material
        typeOfMaterial();
+       
+       // Set the item_group based on type of material for physical items
+       function setItemGroup(material_type,item_group) {
+        switch(material_type)
+        {
+          case "BOOK": item_group.value = 'MONOGRAPH'; break;
+          case "CD": 
+          case "DVD": 
+          case "VHS": 
+          case "SOFTWARE": item_group.value = 'MULTIMEDIA'; break;    
+        }         
+       }      
     </script>
 <?php
   }
@@ -880,11 +892,8 @@ ITEM_SOURCE;
 <?php if(! $item->isPhysicalItem()): ?>   
       <input type="hidden" name="item_group" value="ELECTRONIC" />  
       <input type="hidden" name="submit_edit_item_meta" value="submit" />
-<?php elseif($item->getMaterialType() == 'BOOK'): ?>
-      <input type="hidden" name="item_group" value="MONOGRAPH" /> 
-      <input type="hidden" name="store_request" value="submit" />
 <?php else: ?>
-      <input type="hidden" name="item_group" value="MULTIMEDIA" /> 
+      <input type="hidden" name="item_group" value="MONOGRAPH" /> 
       <input type="hidden" name="store_request" value="submit" />
 <?php endif; ?>      
       

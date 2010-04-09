@@ -193,15 +193,6 @@ class itemManager extends baseManager {
         $loc  = "add physical item";
        
         if(isset($_REQUEST['store_request'])) { //form submitted, process item
-
-          // Set the item group based on material type.
-          switch ($_REQUEST['material_type']) {
-            case "BOOK": $_REQUEST['item_group'] = 'MONOGRAPH'; break;
-            case "CD": $_REQUEST['item_group'] = 'MULTIMEDIA'; break;
-            case "DVD": $_REQUEST['item_group'] = 'MULTIMEDIA'; break;
-            case "VHS": $_REQUEST['item_group'] = 'MULTIMEDIA'; break;
-            case "SOFTWARE": $_REQUEST['item_group'] = 'MULTIMEDIA'; break; 
-          }
           
           //store item meta data
           $item_id = $this->storeItem();
