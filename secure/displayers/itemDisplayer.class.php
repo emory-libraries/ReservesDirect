@@ -875,7 +875,7 @@ ITEM_SOURCE;
         if( (document.getElementById('barcode') != null) && (document.getElementById('barcode').value == '') ){ 
           alertMsg = alertMsg + "Barcode is required.<br />";
         }
-<? elseif (!$item->itemID): ?>          
+<? else: ?>          
         if((frm.userFile.value == "") && (frm.url.value == "")) {
           alertMsg = alertMsg + 'You must choose an item source of either "Upload a document" or "Add a link".<br />';
         }
