@@ -1,14 +1,14 @@
 <html>
 <head>
 <title>ReservesDirect</title>
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 
-<? echo "<link rel=\"stylesheet\" href=\"" . $_SESSION['css'] ."\" type=\"text/css\">\n"; ?>
+<? echo "<link rel=\"stylesheet\" href=\"" . $_SESSION['css'] ."\" type=\"text/css\" />\n"; ?>
 
-<script language="JavaScript1.2" src="secure/javascript/jsFunctions.js"></script>
-<script language="JavaScript1.2" src="secure/javascript/prototype.js"></script>
-<script language="JavaScript1.2" src="secure/javascript/ajax_transport.js"></script>
-<script language="JavaScript1.2" src="secure/javascript/basicAJAX.js"></script>
+<script language="JavaScript1.2" type="text/javascript" src="secure/javascript/jsFunctions.js"></script>
+<script language="JavaScript1.2" type="text/javascript" src="secure/javascript/prototype.js"></script>
+<script language="JavaScript1.2" type="text/javascript" src="secure/javascript/ajax_transport.js"></script>
+<script language="JavaScript1.2" type="text/javascript" src="secure/javascript/basicAJAX.js"></script>
 
 <!-- start JSCalendar files -->
 <?php $calendar->load_files(); //load JSCalendar JS files $calendar is globally defined in index.php?>
@@ -21,49 +21,49 @@
 <?php include('secure/html/help_sidebar.inc.html'); ?>
 
 <div id="container" class="helpOff">
-  	<!--banner.inc-->
-	<?php include("secure/html/banner.inc.html"); ?>
-	<div id="Navigation">
-		<!--func_nav-->
-		<?php include("secure/html/func_nav.inc.html"); ?>
-		<!--main_nav.inc-->
-    	<?php include("secure/html/main_nav.inc.html"); ?>
-		<!--sub_nav.inc.html-->
-		<?php include("secure/html/sub_nav.inc.html"); ?>
-	</div>
+    <!--banner.inc-->
+  <?php include("secure/html/banner.inc.html"); ?>
+  <div id="Navigation">
+    <!--func_nav-->
+    <?php include("secure/html/func_nav.inc.html"); ?>
+    <!--main_nav.inc-->
+      <?php include("secure/html/main_nav.inc.html"); ?>
+    <!--sub_nav.inc.html-->
+    <?php include("secure/html/sub_nav.inc.html"); ?>
+  </div>
 
-	<div id="divider">&nbsp;</div>
-	
-	<!--locationIndicator.inc-->
-  	<?php include("secure/html/locationIndicator.inc.html"); ?>
+  <div id="divider">&nbsp;</div>
   
-  	<?php
-	  	//Display NoScript error if greater than proxy and javascript is not enabled
-	  	if ($u->getRole() >= $g_permission['proxy'])
-	  		echo "<noscript><div id=\"noJavaAlert\" class=\"failedText\">$g_no_javascript_msg</div></noscript>\n";
-	?>
+  <!--locationIndicator.inc-->
+    <?php include("secure/html/locationIndicator.inc.html"); ?>
+  
+    <?php
+      //Display NoScript error if greater than proxy and javascript is not enabled
+      if ($u->getRole() >= $g_permission['proxy'])
+        echo "<noscript><div id=\"noJavaAlert\" class=\"failedText\">$g_no_javascript_msg</div></noscript>\n";
+  ?>
     
     <? 
-    	if (!is_null($news = news::getNews($u->getRole())))
-    	{    		
-    		echo "<div id=\"displayMsg\">";
-    		for($i=0; $i < count($news); $i++)
-    		{
-    			echo "<div class=\"". $news[$i]['class'] ."\">" . $news[$i]['text'] . "</div>\n";
-    		}
-    		echo "</div>";
-    	}        	
+      if (!is_null($news = news::getNews($u->getRole())))
+      {       
+        echo "<div id=\"displayMsg\">";
+        for($i=0; $i < count($news); $i++)
+        {
+          echo "<div class=\"". $news[$i]['class'] ."\">" . $news[$i]['text'] . "</div>\n";
+        }
+        echo "</div>";
+      }         
     ?>
-	 	 
+     
     <div id="alertMsg" class="failedText">
         <? if (isset($alertMsg)) echo $alertMsg; ?>
     </div>
-   	<div id="Content">
-		<? $mgr->display() ?>
-	</div>
-	
- 	<?php include("secure/html/footer.inc.html"); ?>
- 	
+    <div id="Content">
+    <? $mgr->display() ?>
+  </div>
+  
+  <?php include("secure/html/footer.inc.html"); ?>
+  
 </div>
 
 </body>
