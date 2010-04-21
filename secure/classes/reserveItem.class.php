@@ -47,6 +47,7 @@ class reserveItem extends item
   public $physicalCopy;
   public $itemIcon;
   public $status;
+  public $copyright_status;
   public $publisher;
   public $availability;
   
@@ -83,7 +84,13 @@ class reserveItem extends item
     switch ($g_dbConn->phptype)
     {
       default: //'mysql'
-        $sql = "SELECT item_id, title, item_group, last_modified, creation_date, item_type, author, source, volume_edition,  performer, local_control_key, url, mimeType, home_library, private_user_id, volume_title, item_icon, ISBN, ISSN, OCLC, status, material_type, publisher, availability, pages_times_range, pages_times_used, pages_times_total
+        $sql = "SELECT item_id, title, item_group, last_modified,
+                creation_date, item_type, author, source, volume_edition,
+                performer, local_control_key, url, mimeType, home_library,
+                private_user_id, volume_title, item_icon, ISBN, ISSN, OCLC,
+                status, copyright_status, material_type, publisher,
+                availability, pages_times_range, pages_times_used,
+                pages_times_total
             FROM items
             WHERE item_id = !";
     }
@@ -96,13 +103,16 @@ class reserveItem extends item
     }
     else {
       //pull the info
-      list($this->itemID, $this->title, $this->itemGroup, $this->lastModDate, $this->creationDate, 
-        $this->itemType, $this->author, $this->source, $this->volumeEdition, 
-        $this->performer, $this->localControlKey, $this->URL, $this->mimeTypeID, 
-        $this->homeLibraryID, $this->privateUserID, $this->volumeTitle, $this->itemIcon, 
-           $this->ISBN, $this->ISSN, $this->OCLC, $this->status, $this->material_type,
-           $this->publisher, $this->availability, $this->pagesTimes, $this->usedPagesTimes, $this->totalPagesTimes) 
-      = $rs;
+      list($this->itemID, $this->title, $this->itemGroup,
+           $this->lastModDate, $this->creationDate, $this->itemType,
+           $this->author, $this->source, $this->volumeEdition,
+           $this->performer, $this->localControlKey, $this->URL,
+           $this->mimeTypeID, $this->homeLibraryID, $this->privateUserID,
+           $this->volumeTitle, $this->itemIcon, $this->ISBN, $this->ISSN,
+           $this->OCLC, $this->status, $this->copyright_status,
+           $this->material_type, $this->publisher, $this->availability,
+           $this->pagesTimes, $this->usedPagesTimes, $this->totalPagesTimes) 
+        = $rs;
         
       //get the notes
       $this->setupNotes('items', $this->itemID);
@@ -624,6 +634,31 @@ class reserveItem extends item
       if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
     }
   } 
+
+  /**
+  * @return void
+  * @param string $copyright_status
+  * @desc Updates the copyright status value
+  */
+  function setCopyrightStatus($copyright_status)
+  {
+    if (is_null($copyright_status) || $this->isHeading())
+    {
+      // Headings have no copyright concerns.
+      return null;
+    } else {
+      global $g_dbConn;
+  
+      $this->copyright_status = $copyright_status;
+      switch ($g_dbConn->phptype)
+      {
+        default: //'mysql'
+          $sql = "UPDATE items SET copyright_status = ? WHERE item_id = !";
+      }
+      $rs = $g_dbConn->query($sql, array($copyright_status, $this->itemID));
+      if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+    }
+  } 
   
   
   /**
@@ -710,6 +745,7 @@ class reserveItem extends item
   function getOCLC() { return $this->OCLC; }  
   
   function getStatus() { return $this->status; }
+  function getCopyrightStatus() { return $this->copyright_status; }
 
   function getPublisher() { return $this->publisher; }
   function getAvailability() { return $this->availability; }
