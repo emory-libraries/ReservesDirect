@@ -26,9 +26,7 @@ http://www.reservesdirect.org/
 
 *******************************************************************************/
 
-require_once('secure/classes/copyright.class.php');
 require_once('secure/displayers/noteDisplayer.class.php');
-require_once('secure/displayers/copyrightDisplayer.class.php');
 require_once('secure/managers/ajaxManager.class.php');
 
 class itemDisplayer extends noteDisplayer {
@@ -1104,171 +1102,6 @@ ITEM_SOURCE;
 <?php
   }
   
-  
-  /**
-   * @return void
-   * @param reserveItem object $item
-   * @desc Displays item-copyright edit screen
-   */
-  function displayEditItemCopyright($item) {
-    $copyright = new Copyright($item->getItemID());
-
-    //get copyright library
-    $home_lib_id = $item->getHomeLibraryID();
-    if(!empty($home_lib_id)) {
-      $home_lib = new library($home_lib_id);
-      $copyright_lib = new library($home_lib->getCopyrightLibraryID());
-      $copyright_lib_name = $copyright_lib->getLibrary();
-    }
-    else {
-      $copyright_lib_name = 'n/a';
-    }
-    
-    //get status basis
-    $status_basis = $copyright->getStatusBasis();
-    $status_basis = !empty($status_basis) ? $status_basis : 'n/a';
-    
-    //get contact name
-    $contact = $copyright->getContact();
-    $contact_org = $contact['org_name'];
-?>
-  <script language="JavaScript1.2" src="secure/javascript/liveSearch.js"></script>
-  <script language="JavaScript1.2" src="secure/javascript/basicAJAX.js"></script>
-  <script language="JavaScript1.2" src="secure/javascript/notes_ajax.js"></script>
-  <script language="JavaScript1.2" src="secure/javascript/copyright_ajax.js"></script>
-  
-  <script language="JavaScript">
-    function toggleDisplay(element_id, show) {
-      if(document.getElementById(element_id)) {
-        if(show) {        
-          document.getElementById(element_id).style.display = '';
-        }
-        else {
-          document.getElementById(element_id).style.display = 'none';
-        }
-      }
-    }
-  </script>
-    
-  <div id="copyright" class="displayArea">
-    <div class="headingCell1">SUMMARY</div>
-    <table width="100%" class="simpleList">
-      <tr>
-        <td width="150" class="labelCell1"><strong>Current Status:</strong></td>
-        <td width="150" class="<?=$copyright->getStatus()?>"><?=$copyright->getStatus()?></td>
-        <td width="150" class="labelCell1"><strong>Review Library:</strong></td>
-        <td><?=$copyright_lib_name?></td>
-      </tr>
-      <tr>
-        <td width="150" class="labelCell1"><strong>Reason:</strong></td>
-        <td><?=$status_basis?></td>
-        <td width="150" class="labelCell1"><strong>Copyright Contact:</strong></td>
-        <td><?=$contact_org?></td>
-      </tr>   
-    </table>
-<?php
-    self::displayEditItemCopyrightStatus($item->getItemID());
-    
-    //only show the rest of the sections if the record exists
-    $copyright_id = $copyright->getID();
-    if(!empty($copyright_id)) {
-      self::displayEditItemCopyrightContact($item->getItemID());
-      self::displayEditItemCopyrightNotes($item->getItemID());
-      self::displayEditItemCopyrightFiles($item->getItemID());
-      self::displayEditItemCopyrightLog($item->getItemID());  
-    }
-?>  
-  </div>
-<?php 
-  }
-  
-  
-  /**
-   * @return void
-   * @desc Displays form to edit copyright status.
-   */
-  function displayEditItemCopyrightStatus($item_id) {
-    $copyright = new Copyright($item_id);
-?>
-    <div class="contentTabs" style="text-align:center; border-top:1px solid #333333;"><a href="#" onclick="javascript: toggleDisplay('copyright_edit_status', 1); return false;">STATUS</a></div>
-    <div id="copyright_edit_status" style="border-top:1px solid #333333; padding:10px; display:none;">    
-      <?php copyrightDisplayer::displayCopyrightEditStatus($item_id, $copyright->getStatus(), $copyright->getStatusBasisID()); ?> 
-      <input type="button" name="cancel" value="Close" onclick="javascript: toggleDisplay('copyright_edit_status', 0);" />
-    </form>
-    </div>
-<?php
-  }
-  
-  
-  /**
-   * @return void
-   * @desc Displays form to edit copyright status.
-   */
-  function displayEditItemCopyrightContact($item_id) {
-?>    
-    <div class="contentTabs" style="text-align:center; border-top:1px solid #333333;"><a href="#" onclick="javascript: toggleDisplay('copyright_contact', 1); return false;">CONTACT</a></div>
-    <div id="copyright_contact" style="border-top:1px solid #333333; padding:10px; display:none;">
-      <?php copyrightDisplayer::displayCopyrightContactsBlockAJAX($item_id, true, true); ?>
-      <input type="button" name="cancel" value="Close" onclick="javascript: toggleDisplay('copyright_contact', 0);" />
-    </div>
-<?php
-  }
-  
-  
-  /**
-   * @return void
-   * @param int $item_id ID of item
-   * @desc Displays copyright notes.
-   */
-  function displayEditItemCopyrightNotes($item_id) {
-    //fetch notes
-    $notes = noteManager::fetchNotesForObj('copyright', $item_id);
-?>
-    <div class="contentTabs" style="text-align:center; border-top:1px solid #333333;"><a href="#" onclick="javascript: toggleDisplay('copyright_notes', 1); return false;">NOTES</a></div>
-    <div id="copyright_notes" style="border-top:1px solid #333333; padding:10px; display:none;">
-      <?php self::displayNotesBlockAJAX($notes, 'copyright', $item_id, true); ?>
-      <input type="button" name="cancel" value="Close" onclick="javascript: toggleDisplay('copyright_notes', 0);" />
-    </div>
-<?php
-  }
-  
-  
-  /**
-   * @return void
-   * @param int $item_id ID of item
-   * @desc Displays copyright files.
-   */
-  function displayEditItemCopyrightFiles($item_id) {
-    
-?>
-    <div class="contentTabs" style="text-align:center; border-top:1px solid #333333;"><a href="#" onclick="javascript: toggleDisplay('copyright_files', 1); return false;">SUPPORTING FILES</a></div>
-    <div id="copyright_files" style="border-top:1px solid #333333; padding:10px; display:none;">
-    
-<span style="color:red">DELETE ACTUAL FILE ON DELETE?</span>
-<br /><br />
-
-      <?php copyrightDisplayer::displayCopyrightSupportingFile($item_id); ?>
-      <input type="button" name="cancel" value="Close" onclick="javascript: toggleDisplay('copyright_files', 0);" />
-    </div>
-<?php
-  }
-  
-
-  /**
-   * @return void
-   * @desc Displays copyright log.
-   */
-  function displayEditItemCopyrightLog($item_id) {
-?>
-    <div class="contentTabs" style="text-align:center; border-top:1px solid #333333;"><a href="#" onclick="javascript: toggleDisplay('copyright_log', 1); return false;">LOG</a></div>
-    <div id="copyright_log" style="display:none;">
-      <?php copyrightDisplayer::displayCopyrightLogs($item_id); ?>
-      <input type="button" name="cancel" value="Close" onclick="javascript: toggleDisplay('copyright_log', 0);" />
-    </div>
-<?php
-  }
-  
-  
   /**
    * @return void
    * @param reserveItem $item reserveItem object
@@ -1291,36 +1124,18 @@ ITEM_SOURCE;
     }
 
     //style the tab
-    $tab_styles = array('meta'=>'', 'history'=>'', 'copyright'=>'');
+    $tab_styles = array('meta'=>'', 'history'=>'');
     if(!isset($_REQUEST['tab'])) $_REQUEST['tab'] = '';
     switch($_REQUEST['tab']) {
       case 'history':
         $tab_styles['history'] = 'class="current"';
       break;
 
-#########################################
-# HIDE COPYRIGHT UNTIL FURTHER NOTICE #     
-######################################### 
-#     case 'copyright':
-#       $tab_styles['copyright'] = 'class="current"';
-#     break;
-#########################################
-      
       default:
         $tab_styles['meta'] = 'class="current"';
       break;
     }
     
-#########################################
-# HIDE COPYRIGHT UNTIL FURTHER NOTICE #     
-#########################################     
-#   //check for a pending copyright-review
-#   $copyright = new Copyright($item->getItemID());
-#   $copyright_alert = '';
-#   if(($copyright->getStatus() != 'APPROVED') && ($copyright->getStatus() != 'DENIED')) {
-#     $copyright_alert = '<span class="alert">! pending review !</span>';
-#   }
-#########################################
 ?>
     <div id="alertMsg" align="center" class="failedText">
     <? /* FIXME: What do we need to check for to alert user? */ ?>
@@ -1342,15 +1157,6 @@ ITEM_SOURCE;
         <li <?=$tab_styles['meta']?>><a href="index.php?cmd=editItem&<?=$edit_item_href?><?= $search_param ?>">Item Info</a></li>
 <?php   if(($u->getRole() >= $g_permission['staff']) && $edit_reserve): ?>
         <li <?=$tab_styles['history']?>><a href="index.php?cmd=editItem&<?=$edit_item_href?>&tab=history<?= $search_param ?>">History</a></li>
-<?php
-#########################################
-# HIDE COPYRIGHT UNTIL FURTHER NOTICE #
-# (remove spaces b/n <, >, and ?)   #
-#########################################
-
-#       <li < ?=$tab_styles['copyright']? >><a href="index.php?cmd=editItem&amp;< ?=$edit_item_href? >&amp;tab=copyright">Copyright < ?=$copyright_alert? ></a></li>
-#########################################
-?>
 
 <?php   endif; ?>
       </ul>
@@ -1366,14 +1172,6 @@ ITEM_SOURCE;
       case 'history':
         self::displayItemHistory($item);
       break;
-      
-#########################################
-# HIDE COPYRIGHT UNTIL FURTHER NOTICE #     
-#########################################     
-#     case 'copyright':
-#       self::displayEditItemCopyright($item);
-#     break;
-#########################################
       
       default:
         if ($reserve instanceof Reserve)
