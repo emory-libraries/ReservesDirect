@@ -1,59 +1,56 @@
 <?
-	$tab_addReserve    	= "";
-	$tab_manageClasses 	= "";
-	$tab_manageUser    	= "";
-	$tab_myReserves		= "";
-	$tab_reserves		= "";	
-	$tab_search			= "";
-	$tab_reports		= "";
-	$tab_admin			= "";
-	$tab_selector = "tab_".$page;
-	$$tab_selector = "id=\"current\"";
-	
-	$tabs = array();
-	$tabs['myReserves']    = "<li $tab_myReserves><a href=\"index.php\">My Courses</a></li>\n";
-	$tabs['addReserves']   = null;
-	$tabs['manageClasses'] = null;
-	$tabs['manageUser']    = null;
-	$tabs['search']        = null;
-	$tabs['reports']       = null;
-	$tabs['admin']         = null;
+  $tab_addReserve    = "";
+  $tab_manageClasses = "";
+  $tab_manageUser    = "";
+  $tab_myReserves    = "";
+  $tab_reserves      = "";	
+  $tab_search        = "";
+  $tab_reports       = "";
+  $tab_admin         = "";
+  $tab_selector  = "tab_".$page;
+  $$tab_selector = "id=\"current\"";
 
-	$tab_order = array('myReserves', 'addReserves', 'manageClasses',
-	                   'manageUser', 'search', 'reports', 'admin');
-	
-	switch ($_SESSION['userclass'])
-	{
-		case 'admin':
-			$tabs['admin']	= "<li $tab_admin><a href=\"index.php?cmd=admin\">Admin</a></li>\n";
-		case 'staff':
-			$tabs['addReserve']	= "<li $tab_addReserve><a href=\"index.php?cmd=addReserve\">Manage Items</a></li>\n";
-			$tabs['manageClasses'] 	= "<li $tab_manageClasses><a href=\"index.php?cmd=manageClasses\">Manage Classes</a></li>\n";
-			$tabs['manageUser'] = "<li $tab_manageUser><a href=\"index.php?cmd=manageUser\">Manage Users</a></li>\n";
-			$tabs['search']	= "<li $tab_search><a href=\"index.php?cmd=searchTab\">Search</a></li>\n";
-			$tabs['reports']	= "<li $tab_reports><a href=\"index.php?cmd=reportsTab\">View Statistics</a></li>\n";			
-		break;
-			
-		case 'instructor':
-			$tabs['addReserve']	   	= "<li $tab_addReserve><a href=\"index.php?cmd=addReserve\">Add a Reserve</a></li>\n";	
-			$tabs['manageUser']	   	= "<li $tab_manageUser><a href=\"index.php?cmd=manageUser\">Manage Users</a></li>\n";
-			$tabs['reports']			= "<li $tab_reports><a href=\"index.php?cmd=reportsTab\">View Statistics</a></li>\n";
-		case 'proxy':
-		break;
-		
-		case 'custodian':
-			$tabs['manageUser']	= "<li $tab_manageUser><a href=\"index.php?cmd=manageUser\">Manage Users</a></li>\n";
-		break;
+  $tabs = array();
+  $tabs['myReserves']    = "<li $tab_myReserves><a href=\"index.php\">My Courses</a></li>\n";
+  $tabs['addReserves']   = null;
+  $tabs['manageClasses'] = null;
+  $tabs['manageUser']    = null;
+  $tabs['search']        = null;
+  $tabs['reports']       = null;
+  $tabs['admin']         = null;
 
-	}
-	
-	ksort($tabs);
+  $tab_order = array('myReserves', 'addReserves', 'manageClasses',
+                     'manageUser', 'search', 'reports', 'admin');
+
+  switch ($_SESSION['userclass'])
+  {
+    case 'admin':
+      $tabs['admin']	= "<li $tab_admin><a href=\"index.php?cmd=admin\">Admin</a></li>\n";
+    case 'staff':
+      $tabs['addReserve']	= "<li $tab_addReserve><a href=\"index.php?cmd=addReserve\">Manage Items</a></li>\n";
+      $tabs['manageClasses'] 	= "<li $tab_manageClasses><a href=\"index.php?cmd=manageClasses\">Manage Classes</a></li>\n";
+      $tabs['manageUser'] = "<li $tab_manageUser><a href=\"index.php?cmd=manageUser\">Manage Users</a></li>\n";
+      $tabs['search']	= "<li $tab_search><a href=\"index.php?cmd=searchTab\">Search</a></li>\n";
+      $tabs['reports']	= "<li $tab_reports><a href=\"index.php?cmd=reportsTab\">View Statistics</a></li>\n";			
+      break;
+
+    case 'instructor':
+      $tabs['addReserve']	   	= "<li $tab_addReserve><a href=\"index.php?cmd=addReserve\">Add a Reserve</a></li>\n";	
+      $tabs['manageUser']	   	= "<li $tab_manageUser><a href=\"index.php?cmd=manageUser\">Manage Users</a></li>\n";
+      $tabs['reports']			= "<li $tab_reports><a href=\"index.php?cmd=reportsTab\">View Statistics</a></li>\n";
+    case 'proxy':
+      break;
+
+    case 'custodian':
+      $tabs['manageUser']	= "<li $tab_manageUser><a href=\"index.php?cmd=manageUser\">Manage Users</a></li>\n";
+      break;
+  }
+
+  ksort($tabs);
 ?>
 
-
-		<div id="mainNav">
-		    <ul>
-				<? foreach($tab_order as $k) if (!is_null($tabs[$k])) echo $tabs[$k]; ?>
-		    </ul>
-  	  	</div>
-
+    <div id="mainNav">
+      <ul>
+        <? foreach($tab_order as $k) if (!is_null($tabs[$k])) echo $tabs[$k]; ?>
+      </ul>
+    </div>
