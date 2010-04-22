@@ -10,15 +10,17 @@
 	$tab_selector = "tab_".$page;
 	$$tab_selector = "id=\"current\"";
 	
-	//Tab index defines order of tabs aphabetically hense the aa, y and z prefixes
 	$tabs = array();
-	$tabs['aamyReserves']		= "<li $tab_myReserves><a href=\"index.php\">My Courses</a></li>\n";
-	$tabs['addReserves']	= null;
-	$tabs['manageClasses']	= null;
-	$tabs['manageUser']	= null;
-	$tabs['ySearch']		= null;
-	$tabs['zReports']		= null;
-	$tabs['zzAdmin']		= null;
+	$tabs['myReserves']    = "<li $tab_myReserves><a href=\"index.php\">My Courses</a></li>\n";
+	$tabs['addReserves']   = null;
+	$tabs['manageClasses'] = null;
+	$tabs['manageUser']    = null;
+	$tabs['search']        = null;
+	$tabs['reports']       = null;
+	$tabs['admin']         = null;
+
+	$tab_order = array('myReserves', 'addReserves', 'manageClasses',
+	                   'manageUser', 'search', 'reports', 'admin');
 	
 	switch ($_SESSION['userclass'])
 	{
@@ -51,7 +53,7 @@
 
 		<div id="mainNav">
 		    <ul>
-				<? foreach(array_keys($tabs) as $k) if (!is_null($tabs[$k])) echo $tabs[$k]; ?>
+				<? foreach($tab_order as $k) if (!is_null($tabs[$k])) echo $tabs[$k]; ?>
 		    </ul>
   	  	</div>
 
