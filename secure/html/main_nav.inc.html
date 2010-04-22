@@ -17,10 +17,12 @@
   $tabs['manageUser']    = null;
   $tabs['search']        = null;
   $tabs['reports']       = null;
+  $tabs['copyright']     = null;
   $tabs['admin']         = null;
 
   $tab_order = array('myReserves', 'addReserves', 'manageClasses',
-                     'manageUser', 'search', 'reports', 'admin');
+                     'manageUser', 'search', 'reports', 'copyright',
+                     'admin');
 
   switch ($_SESSION['userclass'])
   {
@@ -31,6 +33,7 @@
       $tabs['manageClasses'] 	= "<li $tab_manageClasses><a href=\"index.php?cmd=manageClasses\">Manage Classes</a></li>\n";
       $tabs['manageUser'] = "<li $tab_manageUser><a href=\"index.php?cmd=manageUser\">Manage Users</a></li>\n";
       $tabs['search']	= "<li $tab_search><a href=\"index.php?cmd=searchTab\">Search</a></li>\n";
+      $tabs['copyright'] = "<li $tab_search><a href=\"index.php?cmd=copyrightTab\">Copyright</a></li>\n";
       $tabs['reports']	= "<li $tab_reports><a href=\"index.php?cmd=reportsTab\">View Statistics</a></li>\n";			
       break;
 
