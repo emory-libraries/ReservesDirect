@@ -848,5 +848,30 @@ class reserve extends Notes {
 		return $notes;
 	}
 
+    static function getCopyrightReviewReserves()
+    {
+      global $g_dbConn;
+
+      switch ($_g_dbconn->phptype)
+      {
+        default:
+          $sql = "SELECT DISTINCT r.reserve_id
+                  FROM reserves r
+                    JOIN items i ON r.item_id = i.item_id
+                    JOIN course_instances ci on r.course_instance_id = ci.course_instance_id
+                  WHERE i.material_type = 'BOOK_PORTION' AND 
+                        ci.status = 'ACTIVE'
+                  ORDER BY ci.course_instance_id, i.item_id";
+      }
+      $rs = $g_dbConn->query($sql);
+      if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+      $results = array();
+      while ($row = $rs->fetchRow())
+      {
+        $results[] = new reserve($row[0]);
+      }
+      return $results;
+    }
 }
 ?>

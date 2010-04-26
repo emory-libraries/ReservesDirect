@@ -26,13 +26,61 @@ http://www.reservesdirect.org/
 
 
 *******************************************************************************/
-require_once('secure/displayers/baseDisplayer.class.php');
+require_once('secure/classes/reserveItem.class.php');
+require_once('secure/classes/courseInstance.class.php');
 
-class copyrightDisplayer extends baseDisplayer {
+class copyrightDisplayer {
 
-  function displayCopyrightQueue()
+  function displayCopyrightQueue($reserves)
   {
-    ?><h3>Hello, copyright world!</h3><?php
+    $rowCount = 0;
+    ?><ul>
+        <?php foreach ($reserves as $reserve) {
+            $item = new reserveItem($reserve->itemID);
+            $ci = new courseInstance($reserve->courseInstanceID);
+
+            $rowCount++;
+            $rowClass = ($rowCount % 2) ? 'oddRow' : 'evenRow';
+
+            ?><li style="list-style:none;">
+              <div class="<?=$rowClass?>">
+                <div class="iconBlock">
+                  <img src="<?=$item->getItemIcon()?>" alt="icon">
+                </div>
+                <div class="metaBlock-wide">
+                  <a href="reservesViewer.php?reserve=<?=$reserve->reserveID?>" target="_blank" class="itemTitle" style="margin:0px; padding:0px;"><?=$item->getTitle()?></a>
+                  <a href='index.php?cmd=editItem&reserveID=<?=$reserve->reserveID?>'><img src="images/pencil-gray.gif" border="0" alt="edit"></a>
+                  <br />
+                  <span class="itemAuthor"<?=$item->getAuthor()?></span>
+
+                  <?php if ($item->getPerformer()) { ?>
+                    <br />
+                    <span class="itemMetaPre">Performed by:</span><span class="itemMeta"><?=$item->getPerformer()?></span>
+                  <?php } ?>
+                  <?php if ($item->getVolumeTitle()) { ?>
+                    <br />
+                    <span class="itemMetaPre">From:</span><span class="itemMeta"><?=$item->getVolumeTitle()?></span>
+                  <?php } ?>
+                  <?php if ($item->getVolumeEdition()) { ?>
+                    <br />
+                    <span class="itemMetaPre">Volume/Edition:</span><span class="itemMeta"><?=$item->getVolumeEdition()?></span>
+                  <?php } ?>
+                  <?php if ($item->getPagesTimes()) { ?>
+                    <br />
+                    <span class="itemMetaPre">Pages/Times:</span><span class="itemMeta"><?=$item->getPagesTimes()?></span>
+                  <?php } ?>
+                  <?php if ($item->getSource()) { ?>
+                    <br />
+                    <span class="itemMetaPre">Source/Year:</span><span class="itemMeta"><?=$item->getSource()?></span>
+                  <?php } ?>
+                </div>
+              </div>
+            </li>
+           <div style="clear:both;"></div><?php
+          }
+        ?>
+      </ul>
+    <?php
   }
 
 }

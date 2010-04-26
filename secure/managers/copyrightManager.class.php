@@ -27,6 +27,7 @@ http://www.reservesdirect.org/
 
 *******************************************************************************/
 
+require_once('secure/classes/reserves.class.php');
 require_once('secure/displayers/copyrightDisplayer.class.php');
 require_once('secure/managers/baseManager.class.php');
 
@@ -44,7 +45,9 @@ class copyrightManager extends baseManager {
       case 'copyrightTab':
         $loc = 'Items needing copyright';
         $this->displayFunction = "displayCopyrightQueue";
-        $this->argList = array();
+
+        $reserves = reserve::getCopyrightReviewReserves();
+        $this->argList = array($reserves);
         break;
     }
   }
