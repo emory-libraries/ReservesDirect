@@ -557,6 +557,12 @@ table.displaylist td{
 	
 }
 
+ul.wideList {
+  padding-left: 0px;
+  border-top: 1px solid #333333;
+  border-bottom: 1px solid #333333;
+}
+
 /* oddRow/evenRow define how alternating row colors appear in tables */
 .oddRow {
     padding-top:1px; /* this fixes a display error in IE for the default implementation. Change at your own risk. */

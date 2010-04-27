@@ -145,8 +145,8 @@ class classDisplayer extends baseDisplayer {
             <input type="hidden" name="ci" value="<?=$ci->getCourseInstanceID()?>" />
             
             <span class="label">Class Status</span>:
-            <input type="radio" name="status" value="ACTIVE" <?php echo ($ci->getStatus()=='ACTIVE') ? 'checked="true"' : 'moo'; ?> /> <span class="<?=common_getStatusStyleTag('ACTIVE')?>">ACTIVE</span>
-            <input type="radio" name="status" value="INACTIVE" <?php echo (($ci->getStatus()=='INACTIVE') || ($ci->getStatus()=='AUTOFEED')) ? 'checked="true"' : ''; ?> /> <span class="<?=common_getStatusStyleTag('INACTIVE')?>">INACTIVE</span>
+            <input type="radio" name="status" value="ACTIVE" <?php echo ($ci->getStatus()=='ACTIVE') ? 'checked="true"' : 'moo'; ?> /> <?=common_getStatusSpan('ACTIVE')?>
+            <input type="radio" name="status" value="INACTIVE" <?php echo (($ci->getStatus()=='INACTIVE') || ($ci->getStatus()=='AUTOFEED')) ? 'checked="true"' : ''; ?> /> <?common_getStatusSpan('INACTIVE')?>
 <?php     if($ci->getStatus()=='AUTOFEED'): ?>
             (Added by Registrar)
 <?php     endif; ?>
@@ -164,7 +164,7 @@ class classDisplayer extends baseDisplayer {
             <span class="label">Class Active Dates</span>: <input type="text" id="activation" name="activation" size="10" maxlength="10" value="<?=$ci->getActivationDate()?>" /> <?=$calendar->getWidgetAndTrigger('activation', $ci->getActivationDate())?> to <input type="text" id="expiration" name="expiration" size="10" maxlength="10" value="<?=$ci->getExpirationDate()?>" /> <?=$calendar->getWidgetAndTrigger('expiration', $ci->getExpirationDate())?> <input type="submit" name="updateClassDates" value="Change Dates">
           </form>
 <?php else: ?>
-          <span class="label">Class Status</span>: <span class="<?=common_getStatusStyleTag($ci->getStatus())?>"><?=$ci->getStatus()?></span>
+          <span class="label">Class Status</span>: <?=common_getStatusSpan($ci->getStatus())?>
           <?php if ($ci->getStatus() <> 'ACTIVE'): ?> <i>Please contact your reserves desk to Activate this class </i> <?php  endif; ?>
 <?php endif; ?>
         </div>        

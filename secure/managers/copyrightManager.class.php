@@ -43,7 +43,7 @@ class copyrightManager extends baseManager {
     switch ($cmd)
     {
       case 'copyrightTab':
-        $loc = 'Items needing copyright';
+        $loc = 'Items needing copyright review';
         $this->displayFunction = "displayCopyrightQueue";
 
         $reserves = reserve::getCopyrightReviewReserves();

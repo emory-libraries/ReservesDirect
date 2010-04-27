@@ -260,6 +260,12 @@ function common_getStatusStyleTag($status)
   return $statusTag;
 }
 
+function common_getStatusSpan($status)
+{
+  $tag = common_getStatusStyleTag($status);
+  return "<span class=\"$tag\">$status</span>";
+}
+
 function common_getEnrollmentStyleTag($enrollment) {
   switch(strtoupper($enrollment)) {
     case 'OPEN':

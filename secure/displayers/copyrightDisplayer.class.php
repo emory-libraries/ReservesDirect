@@ -26,7 +26,9 @@ http://www.reservesdirect.org/
 
 
 *******************************************************************************/
+require_once('secure/common.inc.php');
 require_once('secure/classes/reserveItem.class.php');
+require_once('secure/classes/course.class.php');
 require_once('secure/classes/courseInstance.class.php');
 
 class copyrightDisplayer {
@@ -34,10 +36,12 @@ class copyrightDisplayer {
   function displayCopyrightQueue($reserves)
   {
     $rowCount = 0;
-    ?><ul>
+    ?><ul class='wideList'>
         <?php foreach ($reserves as $reserve) {
             $item = new reserveItem($reserve->itemID);
             $ci = new courseInstance($reserve->courseInstanceID);
+            $ci->getInstructors();
+            $course = new course($ci->primaryCourseAliasID);
 
             $rowCount++;
             $rowClass = ($rowCount % 2) ? 'oddRow' : 'evenRow';
@@ -48,31 +52,30 @@ class copyrightDisplayer {
                   <img src="<?=$item->getItemIcon()?>" alt="icon">
                 </div>
                 <div class="metaBlock-wide">
-                  <a href="reservesViewer.php?reserve=<?=$reserve->reserveID?>" target="_blank" class="itemTitle" style="margin:0px; padding:0px;"><?=$item->getTitle()?></a>
-                  <a href='index.php?cmd=editItem&reserveID=<?=$reserve->reserveID?>'><img src="images/pencil-gray.gif" border="0" alt="edit"></a>
-                  <br />
-                  <span class="itemAuthor"<?=$item->getAuthor()?></span>
+                  <div>
+                    <a href="reservesViewer.php?reserve=<?=$reserve->reserveID?>" target="_blank" class="itemTitle" style="margin:0px; padding:0px;"><?=$item->getTitle()?></a>
+                    <a href='index.php?cmd=editItem&reserveID=<?=$reserve->reserveID?>'><img src="images/pencil.gif" border="0" alt="edit"></a>
+                  </div>
+                  <?php if ($item->getAuthor()) { ?>
+                    <div class="itemAuthor"<?=$item->getAuthor()?></div>
+                  <?php } ?>
 
-                  <?php if ($item->getPerformer()) { ?>
-                    <br />
-                    <span class="itemMetaPre">Performed by:</span><span class="itemMeta"><?=$item->getPerformer()?></span>
-                  <?php } ?>
-                  <?php if ($item->getVolumeTitle()) { ?>
-                    <br />
-                    <span class="itemMetaPre">From:</span><span class="itemMeta"><?=$item->getVolumeTitle()?></span>
-                  <?php } ?>
-                  <?php if ($item->getVolumeEdition()) { ?>
-                    <br />
-                    <span class="itemMetaPre">Volume/Edition:</span><span class="itemMeta"><?=$item->getVolumeEdition()?></span>
-                  <?php } ?>
-                  <?php if ($item->getPagesTimes()) { ?>
-                    <br />
-                    <span class="itemMetaPre">Pages/Times:</span><span class="itemMeta"><?=$item->getPagesTimes()?></span>
-                  <?php } ?>
-                  <?php if ($item->getSource()) { ?>
-                    <br />
-                    <span class="itemMetaPre">Source/Year:</span><span class="itemMeta"><?=$item->getSource()?></span>
-                  <?php } ?>
+                  <div><?=common_getStatusSpan($reserve->getStatus())?></div>
+
+                  <div>
+                    <span class="itemMetaPre">Used in:</span>
+                    <span class="itemMeta">
+                      <a href='index.php?cmd=editClass&ci=<?=$ci->courseInstanceID?>'><span><?=$course->displayCourseNo()?></span>:
+                      <span><?=$course->getName()?></span></a>,
+                      <span><?=$ci->displayTerm()?></span>
+                    </span>
+                  </div>
+
+                  <div>
+                    <span class="itemMetaPre">Instructor:</span>
+                    <span class="itemMeta"><?=$ci->displayInstructors()?></span>
+                  </div>
+
                 </div>
               </div>
             </li>
