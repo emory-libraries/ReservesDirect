@@ -76,6 +76,11 @@ class copyrightDisplayer {
                     <span class="itemMeta"><?=$ci->displayInstructors()?></span>
                   </div>
 
+                  <div>
+                    <span class="itemMetaPre">Students:</span>
+                    <span class="itemMeta"><?=$ci->getRollCount()?></span>
+                  </div>
+
                 </div>
               </div>
             </li>
