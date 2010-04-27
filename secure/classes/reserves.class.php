@@ -40,6 +40,7 @@ class reserve extends Notes {
 	public $expirationDate;
 	public $sortOrder;
 	public $status;
+	public $copyrightStatus;
 	public $creationDate;
 	public $lastModDate;
 	public $hidden = false;
@@ -120,10 +121,12 @@ class reserve extends Notes {
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT reserve_id, course_instance_id, item_id, activation_date, expiration, status, sort_order, date_created, last_modified, requested_loan_period, parent_id "
-					.  "FROM reserves "
-					.  "WHERE reserve_id = ! "
-					;
+				$sql = "SELECT reserve_id, course_instance_id, item_id,
+							activation_date, expiration, status,
+							copyright_status, sort_order, date_created,
+							last_modified, requested_loan_period, parent_id
+						FROM reserves
+						WHERE reserve_id = ! ";
 		}
 
 		$rs = $g_dbConn->getRow($sql, array($reserveID));
@@ -134,7 +137,11 @@ class reserve extends Notes {
 			return;
 		}
 
-		list($this->reserveID, $this->courseInstanceID, $this->itemID, $this->activationDate, $this->expirationDate, $this->status, $this->sortOrder, $this->creationDate, $this->lastModDate, $this->requested_loan_period, $this->parentID) = $rs;
+		list($this->reserveID, $this->courseInstanceID, $this->itemID,
+		     $this->activationDate, $this->expirationDate, $this->status,
+		     $this->copyrightStatus, $this->sortOrder, $this->creationDate,
+		     $this->lastModDate, $this->requested_loan_period,
+		     $this->parentID) = $rs;
 
 		//get instructor notes
 		$this->setupNotes('reserves', $this->reserveID, $g_notetype['instructor']);
@@ -458,6 +465,31 @@ class reserve extends Notes {
 		}
 	}
 
+	/**
+	 * @return void
+	 * @param string $copyrightStatus
+	 * @desc Updates the copyright status value
+	 */
+	function setCopyrightStatus($copyrightStatus)
+	{
+		if (is_null($copyrightStatus) || $this->isHeading()) {
+			// Headings have no copyright concerns.
+			return null;
+		} else {
+			global $g_dbConn;
+
+			$this->copyrightStatus = $copyrightStatus;
+			switch ($g_dbConn->phptype)
+			{
+				default: //'mysql'
+					$sql = "UPDATE items SET copyright_status = ? WHERE item_id = !";
+			}
+			$rs = $g_dbConn->query($sql, array($copyrightStatus, $this->itemID));
+			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		}
+	} 
+  
+
 		/**
 	* @return void
 	* @param int $sortOrder
@@ -751,7 +783,8 @@ class reserve extends Notes {
 			return "DENIED ALL";
 		}
 	}	
-	
+
+	function getCopyrightStatus() { return $this->copyrightStatus; }
 	function getReserveID(){ return $this->reserveID; }
 	function getCourseInstanceID() { return $this->courseInstanceID; }
 	function getItemID() { return $this->itemID; }
