@@ -229,6 +229,12 @@ switch ($cmd)
     $mgr = new reportManager($cmd, $u, $_REQUEST);
   break;
 
+  case 'copyrightTab':
+    $page = 'copyright';
+    require_once("secure/managers/copyrightManager.class.php");
+    $mgr = new copyrightManager($cmd, $u, $_REQUEST);
+  break;
+
   case 'admin':
     $page = 'admin';
     require_once("secure/managers/adminManager.class.php");

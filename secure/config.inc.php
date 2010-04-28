@@ -142,4 +142,7 @@ http://www.reservesdirect.org/
     unset($trustedSystems);    
     
     $g_ils = (array)$configure->ils;
+
+    $g_copyrightLimit = (string)$configure->copyright_limit;
+    $g_copyrightNotice = (string)$configure->copyright_notice;
 ?>

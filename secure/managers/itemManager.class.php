@@ -29,7 +29,6 @@ require_once("secure/displayers/itemDisplayer.class.php");
 require_once("secure/displayers/requestDisplayer.class.php");
 require_once("secure/managers/baseManager.class.php");
 require_once("secure/managers/classManager.class.php");
-require_once("secure/managers/copyrightManager.class.php");
 require_once('secure/managers/reservesManager.class.php');
 require_once("secure/managers/requestManager.class.php");
 require_once('secure/classes/note.class.php');
@@ -165,25 +164,7 @@ class itemManager extends baseManager {
           $this->argList[] = urlencode($_REQUEST['search']);
             }
           }
-        } elseif(!empty($_REQUEST['submit_edit_item_copyright'])) {
-          //form submitted - edit item copyright
-          switch($_REQUEST['form_id']) {
-          case 'copyright_status':
-            copyrightManager::setStatus();            
-            break;
-            
-          case 'copyright_supporting_items_delete':
-            copyrightManager::deleteSupportingItem();
-            break;
-            
-          case 'copyright_supporting_items_add':
-            copyrightManager::addSupportingItem();
-            break;
-          }
-          
-          //go back to edit item copyright screen
-          $this->prepEditItem($item, $reserve);
-        } else {  //display edit page
+        }  else {  //display edit page
           $this->prepEditItem($item, $reserve);
         }     
         break;

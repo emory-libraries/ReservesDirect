@@ -30,7 +30,6 @@ require_once("secure/common.inc.php");
 require_once("secure/classes/note.class.php");
 require_once("secure/classes/reserves.class.php");
 require_once("secure/classes/reserveItem.class.php");
-require_once("secure/classes/copyright.class.php");
 require_once("secure/displayers/noteDisplayer.class.php");
 
 class noteManager
@@ -166,19 +165,6 @@ class noteManager
 		if(!empty($note_id)) {
 			$note = new note($note_id);
 			if($note->getID()) {
-				
-#########################################
-#	HIDE COPYRIGHT UNTIL FURTHER NOTICE #			
-#########################################	
-#				if($note->getType() == $g_notetype['copyright']) {
-#					//attempt to log it
-#					if(($obj_type=='copyright') && !empty($obj_id)) {
-#						$copyright = new Copyright($obj_id);
-#						$copyright->log('delete note', '#'.$note->getID());
-#					}
-#				}
-#########################################
-
 				$note->destroy();				
 			}
 		}		

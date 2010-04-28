@@ -31,13 +31,11 @@ http://www.reservesdirect.org/
 	header("Pragma: no-cache");
 
 	require_once("secure/config.inc.php");
-	require_once("secure/classes/copyright.class.php");
 	require_once("secure/classes/department.class.php");
 	require_once("secure/classes/users.class.php");
 	require_once("secure/classes/terms.class.php");
 	require_once("secure/classes/json_wrapper.class.php");	
 	require_once("secure/managers/noteManager.class.php");
-	require_once("secure/managers/copyrightManager.class.php");
 	require_once("secure/managers/helpManager.class.php");
 	require_once("secure/managers/requestManager.class.php");
 	require_once("secure/displayers/noteDisplayer.class.php");
@@ -241,53 +239,6 @@ http://www.reservesdirect.org/
 			noteManager::deleteNote($request['id'], $request['obj_type'], $request['obj_id']);
 		break;
 		
-		case 'copyrightContactList':
-			//search for contacts
-			$copyright = new Copyright();
-			$contacts = $copyright->findContacts($qry);
-			
-			//add xml header
-			$returnValue = xmlHead();
-			
-			//add contacts to result as a li
-			foreach($contacts as $contact) {
-				$returnValue .= wrapResults($json->encode($contact['contact_id']), $contact['org_name']);
-			}
-		break;
-		
-		case 'fetchCopyrightContact':
-			//parse the request
-			parse_str(base64_decode($_REQUEST['query']), $request);
-			
-			//search for contacts
-			$copyright = new Copyright();
-			$contact = $copyright->getContact($request['contact_id']);	
-				
-			//return info
-			$returnValue = $json->encode($contact);
-		break;
-		
-		case 'saveCopyrightContact':
-			//parse the request
-			parse_str(base64_decode($_REQUEST['query']), $request);
-			
-			//init a blank object
-			$copyright = new Copyright();
-			//save contact
-			$copyright->saveContact($request['org_name'], $request['contact_name'], $request['address'], $request['phone'], $request['email'], $request['www'], $request['contact_id']);
-		break;
-		
-		case 'setCopyrightContact':
-			//parse the request
-			parse_str(base64_decode($_REQUEST['query']), $request);
-			
-			//set some vars
-			$_REQUEST['item_id'] = $request['item_id'];
-			$_REQUEST['contact_id'] = $request['contact_id'];
-			
-			copyrightManager::setContact();
-		break;
-		
 		case 'fetchHelpTags':
 			//parse the request
 			parse_str(base64_decode($_REQUEST['query']), $request);
@@ -346,8 +297,6 @@ http://www.reservesdirect.org/
 	}
 	
 
-	
-	
 	print($returnValue);
 
 function xmlHead(){	return "<?xml version='1.0' encoding='utf-8'  ?><ul class=\"LSRes\">";	}
@@ -358,8 +307,4 @@ function wrapResults($value, $option)
 	return "<li class=\"LSRow\" onmouseover='liveSearchHover(this)' onclick='liveSearchClicked(this, \"". base64_encode($value)."\")'>$option</li>";
 }
 
-	
-
-	
-	
 ?>

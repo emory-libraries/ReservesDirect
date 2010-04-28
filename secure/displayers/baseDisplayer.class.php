@@ -98,7 +98,7 @@ abstract class baseDisplayer {
 					<?=$reserve->edit_link?>&nbsp;
 				</div>
 				<div class="statusBox">
-					<span class="<?=common_getStatusStyleTag($reserve->getStatus())?>"><?=$reserve->getStatus()?></span>
+                    <?=common_getStatusSpan($reserve->getStatus())?>
 				</div>
 			</div>
 		<? } else { ?>
@@ -108,7 +108,7 @@ abstract class baseDisplayer {
 				<div class="sortBox">&nbsp;</div>
 				<div class="editBox">&nbsp;</div>
 				<div class="statusBox">
-					<span class="<?=common_getStatusStyleTag($reserve->getStatus())?>"><?=$reserve->getStatus()?></span>
+                    <?=common_getStatusSpan($reserve->getStatus())?>
 				</div>
 			</div>		
 		<? } ?>
@@ -513,77 +513,6 @@ abstract class baseDisplayer {
 
 <?php	endif;
 
-	}
-	
-	
-	/**
-	 * @return void
-	 * @param string $next_cmd The next command to execute
-	 * @param array $courses (optional) Array of course objects to show for select
-	 * @param string $msg (optional) Text to display above the class select
-	 * @param array $hidden_fields (optional) Array of info to pass on as hidden fields
-	 * @param string $ca_variable name of html variable for selected ca
-	 * @desc Displays course selector -- ajax for staff
-	 */
-	public function displaySelectCourse($next_cmd, $courses=null, $msg=null, $hidden_fields=null, $ca_variable='ci') 
-	{
-//echo "function displaySelectCourse(next_cmd=$next_cmd, courses=$courses, msg=$msg, hf=$hidden_fields, ca_var=$ca_variable)<p> ";		
-		
-		global $u, $g_permission;
-		
-		if(!empty($msg)) {
-			echo '<span class="helperText">'.$msg.'</span><p />';
-		}				
-		
-			
-	//begin display
-
-		echo "<form action=\"index.php\" method=\"post\" name=\"select_course\">\n";
-		echo "	<input type=\"hidden\" id=\"cmd\" name=\"cmd\" value=\"$next_cmd\" />\n";	
-			
-		self::displayHiddenFields($hidden_fields); 
-			
-		echo "	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "		<tr>\n";
-		echo "			<td class=\"headingCell1\" width=\"25%\" align=\"center\">SELECT COURSE</td>\n";
-		echo "			<td width=\"75%\" align=\"center\">&nbsp;</td>\n";
-		echo "		</tr>\n";
-		echo "		<tr>\n";
-		echo "	    	<td colspan=\"2\">\n";
-		echo "		    	<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"5\" class=\"displayList\">\n";
-		echo "		    		<tr class=\"headingCell1\" style=\"text-align:left;\">\n";
-		echo "		    			<td width=\"5%\" style=\"text-align:center;\">Select</td>\n";
-		echo "		    			<td width=\"20%\">Department</td>\n";
-		echo "		    			<td width=\"15%\">Course Number</td>\n";
-		echo "		    			<td width=\"10%\">Section</td>\n";
-		echo "						<td>Course Title</td>\n";			
-		echo "		    		</tr>\n";
-			
-		$rowClass = 'evenRow';
-		//loop through the courses
-		foreach($courses as $ca)
-		{
-			$rowClass = ($rowClass == 'evenRow') ? 'oddRow' : 'evenRow';
-
-			echo "		<tr class=\"$rowClass\">\n";
-			echo "			<td style=\"text-align:center;\">\n";
-			echo "				<input type=\"radio\" id=\"ci\" name=$ca_variable\" value=\"" . $ca->getCourseAliasID() . "\" onClick=\"this.form.submit.disabled=false;\" />\n";
-			echo "			</td>\n";
-			echo "			<td>" . $ca->displayCourseNo() . "</td>\n";
-			echo "			<td>" . $ca->department->getName() . "</td>\n";
-			echo "			<td>" . $ca->getSection() . "</td>\n";
-			echo "			<td>" . $ca->getName() . "</td>\n";
-			echo "		</tr>\n";
-
-		}
-
-		echo "		</table>\n";
-		echo "	</td>\n";
-		echo "</tr>\n";
-		echo "</table>\n";
-		echo "<p />\n";
-		echo "<input type=\"submit\" name=\"submit\" value=\"Continue\" disabled=\"disabled\">\n";		
-		echo "</form>\n";
 	}
 	
 	/**

@@ -105,6 +105,7 @@ $functional_permissions = array
 	 'reportsTab' 					=> $g_permission['instructor'],
 	 'viewReport'	 				=> $g_permission['instructor'],
 
+	 'copyrightTab'					=> $g_permission['staff'],
 	 'admin'	 					=> $g_permission['admin'],
 
 	 'help'							=> $g_permission['student'],

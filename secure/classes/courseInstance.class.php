@@ -343,6 +343,28 @@ class courseInstance
 		return $roll;
 	}
 
+    /**
+     * @return int
+     * @desc Return the number of students in the course, across all aliases.
+     */
+    function getRollCount() {
+        global $g_dbConn;
+
+        switch ($g_dbConn->phptype) {
+            default:
+                $sql = "SELECT COUNT(DISTINCT a.access_id)
+                        FROM access a
+                            JOIN course_aliases ca ON ca.course_alias_id = a.alias_id
+                        WHERE ca.course_instance_id = !
+                            AND a.permission_level = 0";
+        }
+
+        $rs = $g_dbConn->query($sql, array($this->courseInstanceID));
+		if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+        $row = $rs->fetchRow();
+        return $row[0];
+    }
+
 	/**
 	* @return void
 	* @desc destroy the database entry

@@ -40,6 +40,7 @@ class reserve extends Notes {
 	public $expirationDate;
 	public $sortOrder;
 	public $status;
+	public $copyrightStatus;
 	public $creationDate;
 	public $lastModDate;
 	public $hidden = false;
@@ -120,10 +121,12 @@ class reserve extends Notes {
 		switch ($g_dbConn->phptype)
 		{
 			default: //'mysql'
-				$sql = "SELECT reserve_id, course_instance_id, item_id, activation_date, expiration, status, sort_order, date_created, last_modified, requested_loan_period, parent_id "
-					.  "FROM reserves "
-					.  "WHERE reserve_id = ! "
-					;
+				$sql = "SELECT reserve_id, course_instance_id, item_id,
+							activation_date, expiration, status,
+							copyright_status, sort_order, date_created,
+							last_modified, requested_loan_period, parent_id
+						FROM reserves
+						WHERE reserve_id = ! ";
 		}
 
 		$rs = $g_dbConn->getRow($sql, array($reserveID));
@@ -134,7 +137,11 @@ class reserve extends Notes {
 			return;
 		}
 
-		list($this->reserveID, $this->courseInstanceID, $this->itemID, $this->activationDate, $this->expirationDate, $this->status, $this->sortOrder, $this->creationDate, $this->lastModDate, $this->requested_loan_period, $this->parentID) = $rs;
+		list($this->reserveID, $this->courseInstanceID, $this->itemID,
+		     $this->activationDate, $this->expirationDate, $this->status,
+		     $this->copyrightStatus, $this->sortOrder, $this->creationDate,
+		     $this->lastModDate, $this->requested_loan_period,
+		     $this->parentID) = $rs;
 
 		//get instructor notes
 		$this->setupNotes('reserves', $this->reserveID, $g_notetype['instructor']);
@@ -458,6 +465,31 @@ class reserve extends Notes {
 		}
 	}
 
+	/**
+	 * @return void
+	 * @param string $copyrightStatus
+	 * @desc Updates the copyright status value
+	 */
+	function setCopyrightStatus($copyrightStatus)
+	{
+		if (is_null($copyrightStatus) || $this->isHeading()) {
+			// Headings have no copyright concerns.
+			return null;
+		} else {
+			global $g_dbConn;
+
+			$this->copyrightStatus = $copyrightStatus;
+			switch ($g_dbConn->phptype)
+			{
+				default: //'mysql'
+					$sql = "UPDATE items SET copyright_status = ? WHERE item_id = !";
+			}
+			$rs = $g_dbConn->query($sql, array($copyrightStatus, $this->itemID));
+			if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+		}
+	} 
+  
+
 		/**
 	* @return void
 	* @param int $sortOrder
@@ -751,7 +783,8 @@ class reserve extends Notes {
 			return "DENIED ALL";
 		}
 	}	
-	
+
+	function getCopyrightStatus() { return $this->copyrightStatus; }
 	function getReserveID(){ return $this->reserveID; }
 	function getCourseInstanceID() { return $this->courseInstanceID; }
 	function getItemID() { return $this->itemID; }
@@ -848,5 +881,89 @@ class reserve extends Notes {
 		return $notes;
 	}
 
+    static function getCopyrightReviewReserves()
+    {
+      global $g_dbConn;
+      global $g_copyrightLimit;
+
+      switch ($g_dbConn->phptype)
+      {
+        default:
+          /* Crazy sql warning! I'd love to see this cleaned up if anyone can
+           * think of a way. Separating books into a separate table might
+           * help.
+           * 
+           * Given each of the books used for a course, we want to know all
+           * of the reserves for that book/course combination, but only if
+           * the total page usage is greater than some configurable percent.
+           * 
+           * Our strategy here is to use a subquery to calculate the
+           * percents used, and then join that into the main query. Let's
+           * explain that from the inside out:
+           *
+           * In the subquery:
+           *  * Join items, reserves, and course_instances to get,
+           *    essentially, all of the items used for each ci.
+           *  * Filter that: Since the point of the subquery is to provide
+           *    pages_times info per ISBN, get rid of rows where we don't
+           *    have enough info to provide that info.
+           *  * Yield one row for each ISBN/CIID where we're able to
+           *    calculate an aggregate percent used.
+           *
+           * In the main query:
+           *  * Join reserves, items, and course_instances to get,
+           *    essentially, all of the items used for each ci.
+           *  * Use an outer join to augment that with the subquery's
+           *    aggregate percent used wherever we were able to calculate
+           *    it. This means that when we have ISBN and pages_times info
+           *    in the main query, we should now also have aggregate percent
+           *    used data from the subquery. Where ISBN or pages_times are
+           *    missing or invalid, aggregate percent used data will be
+           *    NULL.
+           *  * Filter the results: We only care about BOOK_PORTION items
+           *    and ACTIVE course instances.
+           *  * Filter it further: We only care about items whose aggregate
+           *    percent used is above the threshold or unavailable.
+           *    Remember: The outer join means that the usage information is
+           *    NULL unless we had enough information to calculate it in the
+           *    subquery.
+           *  * Yield the reserves that match our criteria, ordered by
+           *    course instance and item id to ease human browsing.
+           */
+
+          $sql = "SELECT DISTINCT r.reserve_id
+                  FROM reserves r
+                    JOIN items i ON r.item_id = i.item_id
+                    JOIN course_instances ci ON r.course_instance_id = ci.course_instance_id
+                    LEFT JOIN (SELECT i.ISBN, ci.course_instance_id,
+                                      SUM(CAST(i.pages_times_used AS DECIMAL) /
+                                          CAST(i.pages_times_total AS DECIMAL)) * 100 AS pct
+                               FROM items i
+                                 JOIN reserves r ON r.item_id = i.item_id
+                                 JOIN course_instances ci ON r.course_instance_id = ci.course_instance_id
+                               WHERE i.ISBN IS NOT NULL AND
+                                     i.ISBN <> '0' AND
+                                     i.pages_times_used IS NOT NULL AND
+                                     i.pages_times_total IS NOT NULL
+                               GROUP BY i.ISBN, ci.course_instance_id
+                              ) tot ON i.ISBN = tot.ISBN AND
+                                       ci.course_instance_id = tot.course_instance_id
+                  WHERE r.copyright_status NOT IN ('ACCEPTED', 'DENIED') AND
+                        i.material_type = 'BOOK_PORTION' AND 
+                        ci.status = 'ACTIVE' AND
+                        (tot.pct IS NULL OR
+                         tot.pct >= ?)
+                  ORDER BY ci.course_instance_id, i.item_id";
+      }
+      $rs = $g_dbConn->query($sql, array((int)$g_copyrightLimit));
+      if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+
+      $results = array();
+      while ($row = $rs->fetchRow())
+      {
+        $results[] = new reserve($row[0]);
+      }
+      return $results;
+    }
 }
 ?>

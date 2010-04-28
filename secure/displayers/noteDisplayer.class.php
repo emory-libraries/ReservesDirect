@@ -126,9 +126,6 @@ class noteDisplayer extends baseDisplayer {
       case 'reserve':
         $available_note_types = array('instructor', 'content', 'staff', 'copyright');
       break;      
-      case 'copyright':
-        $available_note_types = array('copyright');
-      break;
     }
     
     //filter allowed note types based on permission level
