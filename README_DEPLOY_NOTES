@@ -18,8 +18,11 @@ Release 2.5.X
      db/2.5_pagestimes_update.sql
      The sql file should now be run to update the database.
      mysql -h hostname -uusername -p databasename < db/2.5_pagestimes_update.sql
+     
+  4. Add two new properties to the configuration file:
+    <copyright_limit>CHANGEME</copyright_limit>   
+    <copyright_notice>This the the copyright notice for 2010.</copyright_notice>
 
-      
 Release 2.4.11
 
   1. update /etc/httpd/conf/reserves2test.xml

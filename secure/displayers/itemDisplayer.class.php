@@ -145,38 +145,11 @@ ITEM_SOURCE;
   function _itemsource_newElectronic($reserveItem) {
     $output = <<<ITEM_SOURCE
     <script type="text/javascript" src="secure/javascript/openurl.js"></script>
-    <script language="JavaScript">
-      function testurl(mypage) {
-        var alertMsg = "";  
-        if (mypage) { openWin(mypage,640,480); }
-        else {
-          alertMsg = 'Please enter a URL in the "Add a link" text box if you would like to "Test URL".';
-        }
-        document.getElementById('alertMsg').innerHTML = alertMsg;        
-      }    
-      function getopenurl(frm) {      
-        var alertMsg = "";  
-        alertMsg = get_url(frm);
-        //document.getElementById('alertMsg').innerHTML = alertMsg;      
-        return alertMsg;       
-      } 
-      function editurl() { 
-        openWin('http://ejournals.emory.edu/openurlgen.php',860,550);
-        //window.open('http://ejournals.emory.edu/openurlgen.php','Open URL Generator','width=400,height=350,resizable=yes');   
-      }   
-      function setAddUrlFocus(url, userFile, d0, d1) {  
-        url.disabled = false;
-        userFile.disabled = true;
-        d0.checked = false;
-        d1.checked = true;  
-      }                        
-      </script>
 
     <div id="openurl_link" style="display:none" class="borders noticeBox">
       <div class="noticeImg"></div>
       <div class="noticeText">
-        Instead of uploading a journal article, consider using the
-        "Get URL" button below to locate a link instead.<br/>         
+        Instead of uploading a journal article, consider using the "Get URL" button below to locate a link to the article in one of Emory's online journals or databases instead.<br/>         
       </div>
     </div>
     <table width="100%" border="0" cellpadding="3" cellspacing="0" bgcolor="#CCCCCC" class="borders">
@@ -185,32 +158,32 @@ ITEM_SOURCE;
       </tr>
       <tr>
         <td align="left" valign="top">
-          <font color="#FF0000"><strong>*</strong></font><input type="radio" name="documentType" value="DOCUMENT" checked onClick="this.form.userFile.disabled = !this.checked; this.form.url.disabled = !this.checked;">&nbsp;<span class="strong">Upload a document &gt;&gt;</span>
+          <font color="#FF0000"><strong>*</strong></font><input type="radio" name="documentType" id="radioDOC" value="DOCUMENT" checked onClick="this.form.userFile.disabled = !this.checked; this.form.url.disabled = !this.checked;">&nbsp;<span class="strong">Upload a document &gt;&gt;</span>
         </td>
         <td align="left" valign="top">
-          <input type="file" name="userFile" size="40"> <br/>
+          <input type="file" id="userFile" name="userFile" size="40"> <br/>
           <i>Please limit uploaded documents to 25 clear, clean sheets to minimize downloading and printing time.</i>
         </td>
       </tr>
       <tr>
         <td align="left" valign="top">
-          <font color="#FF0000"><strong>*</strong></font><input type="radio" name="documentType" value="URL" onClick="this.form.url.disabled = !this.checked; this.form.userFile.disabled = this.checked;this.form.iconImg.src = 'images/doc_type_icons/doctype-link.gif';this.form.iconImg.src = 'images/doc_type_icons/doctype-link.gif';this.form.selectedDocIcon.selectedIndex = 7;">
+          <font color="#FF0000"><strong>*</strong></font><input type="radio" name="documentType" id="radioURL" value="URL" onClick="this.form.url.disabled = !this.checked; this.form.userFile.disabled = this.checked;this.form.iconImg.src = 'images/doc_type_icons/doctype-link.gif';this.form.iconImg.src = 'images/doc_type_icons/doctype-link.gif';">
           <span class="strong">Add a link &gt;&gt;</span>
         </td>
         <td align="left" valign="top">
-          <input name="url" type="text" size="50" DISABLED>
+          <input id="url" name="url" type="text" size="50" DISABLED>
           <br>
           <table>
             <tr>
-              <td><input type="button" name="test_url" value="Preview URL" onclick="testurl(this.form.url.value);" /></td>
+              <td><input type="button" id="preview_url" value="Preview URL" /></td>
               <td>Open a window to test if the URL link above is valid.</td>
             </tr>
             <tr>
-              <td><input type="button" name="get_url" value="Get URL" onclick="setAddUrlFocus(this.form.url,this.form.userFile,this.form.documentType[0],this.form.documentType[1]);this.form.url.value = getopenurl(this.form);" /></td>
+              <td><input type="button" id="get_url" value="Get URL" /></td>
               <td>Use the metadata from the ITEM DETAILS section above to locate an open url.</td>
             </tr>   
             <tr>
-              <td><input type="button" name="get_url" value="Edit URL Details" onclick="editurl();" /></td>
+              <td><input type="button" id="edit_url" value="Edit URL Details" /></td>
               <td>Launch the openurl generator for more options.</td>
             </tr>                            
           </table>
@@ -337,6 +310,56 @@ ITEM_SOURCE;
     
     $output = <<<ITEM_SOURCE
     <script type="text/javascript">
+    
+      //shows/hides personal item elements; marks them as required or not
+      function togglePersonal(enable, req) {
+        //show block or not?
+        if(enable) {
+          document.getElementById('personal_item_row').style.display = '';
+        }
+        else {
+          document.getElementById('personal_item_no').checked = true;
+          document.getElementById('personal_item_row').style.display = 'none';
+          return;
+        }
+        
+        //if required, show just the name search and red *
+        if(req) {
+          document.getElementById('personal_req_mark').style.display = '';
+          document.getElementById('personal_item_choice').style.display = 'none';
+          document.getElementById('personal_item_owner_block').style.display = '';
+          document.getElementById('personal_item_yes').checked = true;
+          togglePersonalOwnerSearch();
+        }
+        else {
+          document.getElementById('personal_req_mark').style.display = 'none';
+          document.getElementById('personal_item_choice').style.display = '';
+          togglePersonalOwner();
+        }
+      }     
+      
+      //shows/hides personal item owner search fields
+      function togglePersonalOwner() {
+        if(document.getElementById('personal_item_no').checked) {
+          document.getElementById('personal_item_owner_block').style.display = 'none';
+        }
+        else if(document.getElementById('personal_item_yes').checked) {
+          document.getElementById('personal_item_owner_block').style.display = '';
+          togglePersonalOwnerSearch();
+        } 
+      } 
+                
+      //shows/hides personal item owner search fields
+      function togglePersonalOwnerSearch() {  
+        //if personal owner set
+        if(document.getElementById('personal_item_owner_curr').checked) {
+          document.getElementById('personal_item_owner_search').style.visibility = 'hidden';
+        }
+        else if(document.getElementById('personal_item_owner_new').checked) {
+          document.getElementById('personal_item_owner_search').style.visibility = 'visible';
+        } 
+      }
+      
   
       //disables/enables ILS elements
       function toggleILS(enable) {
@@ -391,10 +414,6 @@ ITEM_SOURCE;
         <td width="40%" align="left" valign="top">
              <input type="radio" name="addType" value="PERSONAL" onclick="toggleILS(1); togglePersonal(1,1); toggleNonManual(1);"{$addType_select['personal']}>
           <span class="strong">Personal Copy (EUCLID Item Available)</span>
-        </td>
-        <td width="40%" align="left" valign="top">
-          <input type="radio" name="addType" value="MANUAL"  onclick="toggleILS(0); togglePersonal(1, 0); toggleNonManual(0);">
-          <span class="strong">Enter Item Manually (no EUCLID lookup)</span>
         </td>
       </tr>
       <tr bgcolor="#CCCCCC" id="ils_search">
@@ -560,9 +579,11 @@ ITEM_SOURCE;
    * @global user $u current user - used to get document type icons appropriate to user
    * @global array $g_permission
    * @global string $g_catalogName
+   * @global string $g_copyright_limit
+   * @global string $g_copyright_notice
    */ 
-  function displayEditItemItemDetails($item) {
-    global $u, $g_permission, $g_catalogName;
+  function displayEditItemItemDetails($item, $ciid=null) {
+    global $u, $g_permission, $g_catalogName, $g_copyrightNotice, $g_copyrightLimit;    
 
     // get appropriate material types for this item
     if ($item->isPhysicalItem()) {
@@ -588,7 +609,11 @@ ITEM_SOURCE;
       var materialType_details = <?= json_encode($materialTypesDetails) ?>;
     //-->
     </script>
-<script type="text/javascript" src="secure/javascript/editItem.js"></script>        
+    <script type="text/javascript" src="secure/javascript/editItem.js"></script>
+    <script type="text/javascript" src="secure/javascript/domFunction.js"></script>
+    <script language="JavaScript">
+      var unobtrusive = new domFunction(unobtrusive, { 'Footer' : 'id'});                           
+    </script>
         
     <div class="headingCell1">ITEM DETAILS</div>
     <div id="item_details" style="padding:8px 8px 12px 8px;">
@@ -596,7 +621,7 @@ ITEM_SOURCE;
         <tr class="required">
           <th>Type of Material:</th>
           <td>
-              <select id="material_type" name="material_type" onChange="typeOfMaterial();setItemGroup(this.form.material_type.value,this.form.item_group);">
+              <select id="material_type" name="material_type" onChange="typeOfMaterial();setItemGroup(this.form.material_type.value,this.form.item_group,this.form.iconImg);">
 <?php       foreach($materialTypes as $material_id => $material): ?>
 <?php           $selected = ($material_id == $item->getMaterialType()) ? ' selected="selected"' : ''; ?>
             <option value="<?= $material_id ?>"<?= $selected ?>><?= $material ?></option>
@@ -655,10 +680,20 @@ ITEM_SOURCE;
            <input name="performer" type="text" id="performer" size="50" value="<?=$item->getPerformer()?>">
          </td>
         </tr>
+        
+       <tr id="isbn">
+         <th>ISBN:</th>
+         <td><input id="itemisbn" type="text" size="15" maxlength="13" value="<?= $item->getISBN() ?>" name="ISBN" /></td>
+          <? if ($item->getItemGroup() == 'ELECTRONIC'): ?>
+            <td><small>If you do not know the ISBN of your book, please search for it in <a target="_blank" href="http://www.booksinprint.com/bip/">Books In Print
+            </a></small></td>
+         <? endif ?>
+       </tr>        
+        
         <tr id="times_pages">
          <th>Pages/Time:</th>
          <td>
-           <input name="times_pages" type="text" id="times_pages" size="50" value="<?=$item->getPagesTimes()?>">
+           <input id="timespagesrange" name="times_pages" type="text" size="50" value="<?=$item->getPagesTimes()?>" >
          </td>
          <? if ($item->getItemGroup() == 'ELECTRONIC'): ?>
             <td><small>Example page range: 336-371; 381-388
@@ -668,18 +703,35 @@ ITEM_SOURCE;
   
         <tr id="used_times_pages">
          <th>Total Used Pages/Times:</th>
-         <td><input name="used_times_pages" type="text" size="50" value="<?= $item->getUsedPagesTimes() ?>"></td>
+         <td><input id="timespagesused"  name="used_times_pages" type="text" size="50" value="<?= $item->getUsedPagesTimes() ?>" ></td>
         </tr>
          
         <tr id="total_times_pages">
          <th>Total Pages/Times:</th>
-         <td><input name="total_times_pages" type="text" size="50" value="<?= $item->getTotalPagesTimes() ?>"></td>
+         <td><input id="timespagestotal" name="total_times_pages" type="text" size="50" value="<?= $item->getTotalPagesTimes() ?>" ></td>        
         </tr>
+        
+        <tr id="percent_times_pages">
+         <th>Overall Book Usage:</th>
+         <td>
+<?php if(!empty($_REQUEST['ci'])): ?>
+        <input id="percenttimespages" name="percent_times_pages" value="<?= $item->getOverallBookUsage($_REQUEST['ci']) ?>" readonly />      
+<?php else: ?>
+        <input id="percenttimespages" name="percent_times_pages" value="<?= $item->getOverallBookUsage($ciid) ?>" readonly />
+<?php endif; ?>         
+         <input type="hidden" id="copyright_limit" value="<?= $g_copyrightLimit ?>" />         
+         <input type="hidden" id="copyright_notice" value="<?= $g_copyrightNotice ?>" />
+         </td>
+         <? if ($item->getItemGroup() == 'ELECTRONIC'): ?>
+            <td><label id='percentmsg' /><small>This field displays the total % of book uploaded to this course.</small></td>
+         <? endif ?>          
+        </tr>               
+        
 <?php if(!$item->isPhysicalItem()): ?>
        <tr>
          <th>Document Type Icon:</th>
          <td>
-           <select name="selectedDocIcon" onChange="document.iconImg.src = this[this.selectedIndex].value;">
+           <select id="selectedDocIcon" name="selectedDocIcon" onChange="document.iconImg.src = this[this.selectedIndex].value;">
 <?php
     foreach($u->getAllDocTypeIcons() as $icon):
       $selected = ($item->getItemIcon() == $icon['helper_app_icon']) ? ' selected="selected"' : '';
@@ -688,15 +740,12 @@ ITEM_SOURCE;
          <option value="<?=$icon['helper_app_icon']?>"<?=$selected?>><?=$icon['helper_app_name']?></option> 
 <?php endforeach; ?>
            </select>
-           <img name="iconImg" width="24" height="20" src="<?=$item->getItemIcon()?>" />
+           <img id="iconImg" name="iconImg" width="24" height="20" src="<?=$item->getItemIcon()?>" />
          </td>
        </tr>
 <?php endif; ?>       
-       <tr id="isbn">
-         <th>ISBN:</th>
-         <td><input type="text" size="15" maxlength="13" value="<?= $item->getISBN() ?>" name="ISBN" /></td>
-       </tr>
-                   <tr id="issn">
+
+       <tr id="issn">
          <th>ISSN:</th>
          <td>
            <input type="text" size="15" maxlength="8"  value="<?= $item->getISSN() ?>" name="ISSN" />
@@ -743,15 +792,46 @@ ITEM_SOURCE;
        typeOfMaterial();
        
        // Set the item_group based on type of material for physical items
-       function setItemGroup(material_type,item_group) {
+       function setItemGroup(material_type,item_group,itemIcon) {
+         
+<?php if (!$item->itemID): ?>          
         switch(material_type)
         {
-          case "BOOK": item_group.value = 'MONOGRAPH'; break;
+          // For new items only:
+          // Change icon based on material type, when material type has changed.
+          // Also, set the item group for physical items.
+          
+          // PHYSICAL ITEMS
+          case "BOOK": item_group.value = 'MONOGRAPH'; 
+            document.item_form.iconImg.src = "images/doc_type_icons/doctype-book.gif"; break;
           case "CD": 
           case "DVD": 
           case "VHS": 
-          case "SOFTWARE": item_group.value = 'MULTIMEDIA'; break;    
-        }         
+          case "SOFTWARE": item_group.value = 'MULTIMEDIA'; 
+            document.item_form.iconImg.src = "images/doc_type_icons/doctype-disc.gif"; break;
+             
+          // ELECTRONIC ITEMS
+          case "BOOK_PORTION": document.item_form.iconImg.src = "images/doc_type_icons/doctype-pdf.gif"; 
+                    document.item_form.selectedDocIcon.selectedIndex = 1;  break;
+          case "JOURNAL_ARTICLE": document.item_form.iconImg.src = "images/doc_type_icons/doctype-pdf.gif";  
+                  document.item_form.selectedDocIcon.selectedIndex = 1;    break;
+          case "CONFERENCE_PAPER": document.item_form.iconImg.src = "images/doc_type_icons/doctype-text.gif";   
+                  document.item_form.selectedDocIcon.selectedIndex = 4;    break;
+          case "COURSE_MATERIALS": document.item_form.iconImg.src = "images/doc_type_icons/doctype-text.gif";   
+                  document.item_form.selectedDocIcon.selectedIndex = 4;    break;
+          case "IMAGE": document.item_form.iconImg.src = "images/doc_type_icons/doctype-image.gif";  
+                  document.item_form.selectedDocIcon.selectedIndex = 8;    break;
+          case "VIDEO": document.item_form.iconImg.src = "images/doc_type_icons/doctype-movie.gif";  
+                  document.item_form.selectedDocIcon.selectedIndex = 3;    break;
+          case "AUDIO": document.item_form.iconImg.src = "images/doc_type_icons/doctype-sound.gif";  
+                  document.item_form.selectedDocIcon.selectedIndex = 2;    break;
+          case "WEBPAGE": document.item_form.iconImg.src = "images/doc_type_icons/doctype-link.gif"; 
+                  document.item_form.selectedDocIcon.selectedIndex = 7;  break;
+          case "OTHER": document.item_form.iconImg.src = "images/doc_type_icons/doctype-clear.gif"; 
+                  document.item_form.selectedDocIcon.selectedIndex = 0;  break;      
+          default: document.item_form.iconImg.src = "images/doc_type_icons/doctype-pdf.gif"; break;
+        }        
+<? endif ?> 
        }      
     </script>
 <?php
@@ -821,7 +901,9 @@ ITEM_SOURCE;
     $notes = noteManager::fetchNotesForObj($obj_type, $id, true);
     
     //only allow adding notes to reserves (not items) unless edited by staff
-    $include_addnote_button = (($u->getRole() >= $g_permission['instructor']) || ($obj_type=='reserve')) ? true : false;
+    //$include_addnote_button = (($u->getRole() >= $g_permission['instructor']) || ($obj_type=='reserve')) ? true : false;
+    // previously removed the addnote button (nested form broke IE), so only show the existing notes here.
+    $include_addnote_button = false;
     
 ?>
       <script language="JavaScript1.2" src="secure/javascript/basicAJAX.js"></script>
@@ -866,6 +948,9 @@ ITEM_SOURCE;
     //<!--
       function validateForm(frm) {      
         var alertMsg = "";
+        
+        // Validation: Is copyright percentage within guideline limit?
+        if (!validateCopyrightPercentage()) return false;
 
 <?php if ($item->isPhysicalItem()): ?>
         //make sure this physical copy is supposed to have a barcode
@@ -873,18 +958,67 @@ ITEM_SOURCE;
         if( (document.getElementById('barcode') != null) && (document.getElementById('barcode').value == '') ){ 
           alertMsg = alertMsg + "Barcode is required.<br />";
         }
-<? else: ?>          
+<? elseif (!$item->itemID): ?>          
         if((frm.userFile.value == "") && (frm.url.value == "")) {
           alertMsg = alertMsg + 'You must choose an item source of either "Upload a document" or "Add a link".<br />';
         }
 <? endif ?>   
-        alertMsg += checkMaterialTypes(frm);
+        alertMsg += checkMaterialTypes2(frm);
         if (!alertMsg == "") { 
           document.getElementById('alertMsg').innerHTML = alertMsg;
           return false;
         } else {
           return true;
         }         
+      }
+      // do form-validation for material-type portion of add/edit form
+      function checkMaterialTypes2(form) {
+        // remove any 'incomplete' markings
+        var edit_tables = $$('.editItem');
+        var table = edit_tables[0];
+        for (var i = 0; i < table.rows.length; i++) {
+          row = table.rows[i];
+          if (row.cells[1]) {
+            row.cells[1].className = "";
+          }
+        }
+        var alertMsg = '';
+
+        // material type is now required
+        if ($('material_type').options[$('material_type').selectedIndex].value == '') {
+          alertMsg += 'Please select type of material.<br/>';
+          form.material_type.parentNode.className = 'incomplete';
+        } else {
+          var type = $('material_type').options[$('material_type').selectedIndex].value;
+         
+          var theLabel = document.getElementById('material_type');
+          // special-case for material type 'other' 
+          if ((type == "OTHER") && ($('material_type_other').getValue() == '')) {
+            alertMsg += 'Type of material must be specified when "Other" is selected.<br/>';
+            theLabel.parentNode.className = 'incomplete';
+            theLabel.parentNode.className = 'incomplete';
+          } else {
+            theLabel.parentNode.className = '';
+          }
+          
+          // check all required fields for current type of material
+          var type_details = materialType_details[type];
+          for (var field in type_details) {
+            if (type_details[field]["required"]) {
+              var tr = $(field);
+              var inputs = tr.select('input[type="text"]');
+              var radio_inputs = tr.select('input[type="radio"]');
+              if ((inputs.length && inputs[0].getValue() == '') ||
+                  (radio_inputs.length && (! radio_inputs[0].checked)
+                   && (! radio_inputs[1].checked))) {
+                alertMsg += type_details[field]['label'] + ' is required.<br/>';
+                tr.cells[1].className = 'incomplete';
+              }
+            }
+          }
+        }
+        
+        return alertMsg;
       }
     //-->
     </script>
@@ -901,7 +1035,7 @@ ITEM_SOURCE;
       <input type="hidden" name="store_request" value="submit" />
 <?php endif; ?>      
       
-      <input type="hidden" name="itemID" value="<?=$item->getItemID()?>" />
+      <input type="hidden" id="itemID" name="itemID" value="<?=$item->getItemID()?>" />
       <?php self::displayHiddenFields($dub_array); //add duplication info as hidden fields ?> 
 <?php if($edit_reserve): ?>
       <input type="hidden" name="reserveID" value="<?=$reserve->getReserveID()?>" />  
@@ -909,7 +1043,10 @@ ITEM_SOURCE;
 
 <?php if(!empty($_REQUEST['ci'])):
   /* if course id is set (e.g., adding new digital item from a class), pass on  */ ?>
-      <input type="hidden" name="ci" value="<?= $_REQUEST['ci']?>" /> 
+      <input type="hidden" name="ci" value="<?= $_REQUEST['ci']?>" />
+      <input type="hidden" id="ciid" value="<?= $_REQUEST['ci']?>" /> 
+<?php elseif($edit_reserve): ?>
+      <input type="hidden" id="ciid" value="<?=$reserve->getCourseInstanceID()?>" />
 <?php endif; ?>
 
       <div id="item_meta" class="displayArea">    
@@ -924,31 +1061,36 @@ ITEM_SOURCE;
       self::displayEditItemItemDetails($item);  //show item details   
     }
     else { // For electronic items show the item details on top.
-      self::displayEditItemItemDetails($item);  //show item details  
+      if($edit_reserve) {
+        self::displayEditItemItemDetails($item, $reserve->getCourseInstanceID());  //show item details  
+      }
+      else {
+        self::displayEditItemItemDetails($item);  //show item details 
+      }
       self::displayEditItemSource($item);       //show item source
     }
-?>
-    </form>  
-    
+?>    
     <div class="headingCell1">NOTES</div>        
     <br />
-    <?php if(isset($reserve)): //if editing existing item, use AJAX notes handler ?>    
-      <?php  self::displayEditItemNotesAJAX($item, $reserve);  ?>
-    <?php else: //just display plain note form ?>
-
-      <strong>Add a new note:</strong>
-      <br />
-      <textarea name="new_note" cols="50" rows="3"></textarea>
-      <br />
-      <?php if ($u->getRole() >= $g_permission['staff']): // role staff level or above ?>       
-        <small>Note Type:
-        <label><input type="radio" name="new_note_type" value="<?=$g_notetype['instructor']?>">Instructor</label>
-        <label><input type="radio" name="new_note_type" value="<?=$g_notetype['content']?>" checked="true">Content Note</label>
-        <label><input type="radio" name="new_note_type" value="<?=$g_notetype['staff']?>">Staff Note</label>
-        <label><input type="radio" name="new_note_type" value="<?=$g_notetype['copyright']?>">Copyright Note</label>  
-      <?php endif; ?>  
-      <br />       
+<?php if(isset($reserve)): //if editing existing item, use AJAX notes handler ?>    
+    <?php  self::displayEditItemNotesAJAX($item, $reserve);  ?>
+<?php endif; ?> 
+    
+    <div id="item_notes" style="padding:8px 8px 12px 8px;">
+    <?php self::displayEditNotes($notes, $note_ref); ?>
+    </div>
+    <strong>Add a new note:</strong>
+    <br />
+    <textarea name="new_note" cols="50" rows="3"></textarea>
+    <br />
+    <?php if ($u->getRole() >= $g_permission['staff']): // role staff level or above ?>       
+      <small>Note Type:
+      <label><input type="radio" name="new_note_type" value="<?=$g_notetype['instructor']?>">Instructor</label>
+      <label><input type="radio" name="new_note_type" value="<?=$g_notetype['content']?>" checked="true">Content Note</label>
+      <label><input type="radio" name="new_note_type" value="<?=$g_notetype['staff']?>">Staff Note</label>
+      <label><input type="radio" name="new_note_type" value="<?=$g_notetype['copyright']?>">Copyright Note</label>  
     <?php endif; ?>  
+    <br />        
 
     </div>
 
@@ -961,6 +1103,7 @@ ITEM_SOURCE;
     <div style="padding:10px; text-align:center;">
         <input type="submit" name="submit_edit_item_meta" value="Save Changes" onClick="return validateForm(this.form);">
     </div>
+    </form>      
 <?php   
   }
   
@@ -1101,7 +1244,7 @@ ITEM_SOURCE;
   </div>
 <?php
   }
-  
+   
   /**
    * @return void
    * @param reserveItem $item reserveItem object
@@ -1124,7 +1267,7 @@ ITEM_SOURCE;
     }
 
     //style the tab
-    $tab_styles = array('meta'=>'', 'history'=>'');
+    $tab_styles = array('meta'=>'', 'history'=>'', 'copyright'=>'');
     if(!isset($_REQUEST['tab'])) $_REQUEST['tab'] = '';
     switch($_REQUEST['tab']) {
       case 'history':
@@ -1135,7 +1278,7 @@ ITEM_SOURCE;
         $tab_styles['meta'] = 'class="current"';
       break;
     }
-    
+
 ?>
     <div id="alertMsg" align="center" class="failedText">
     <? /* FIXME: What do we need to check for to alert user? */ ?>

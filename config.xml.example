@@ -52,8 +52,8 @@ http://www.reservesdirect.org/
     </test_database>    
     
     <ils>
-    	<class_name>RD_Ils_EuclidTest</class_name><!-- Class returned by init ILS -->
-    	<view_path></view_path>
+      <class_name>RD_Ils_EuclidTest</class_name><!-- Class returned by init ILS -->
+      <view_path></view_path>
     </ils>
     
     <catalog>
@@ -75,8 +75,8 @@ http://www.reservesdirect.org/
         <ldapPort comment="'636' if connecting securely (ldaps), otherwise '389'">CHANGEME</ldapPort>
         <ldapVersion comment="ldap version, usually '3'">3</ldapVersion>
         <baseDistinguishedName comment="base for user search in ldap double bind">CHANGEME</baseDistinguishedName>
-	<searchDistinguishedName comment="initial bind dn for ldap double bind">CHANGEME</searchDistinguishedName>
-	<searchPassword comment="initial bind password for ldap double bind">CHANGEME</searchDistinguishedName>
+  <searchDistinguishedName comment="initial bind dn for ldap double bind">CHANGEME</searchDistinguishedName>
+  <searchPassword comment="initial bind password for ldap double bind">CHANGEME</searchDistinguishedName>
         <userAttributes comment="attributes, if available, used to seed new user profile in RD">
             <canonicalName comment="user's id (used to bind/authenticate)">CHANGEME</canonicalName>
             <email comment="email address (optional)">CHANGEME</email>
@@ -140,12 +140,15 @@ Please log into ?url as username ?username , password ?password
     </request_notifier>
     
     <registar_feed>
-    	<activation_padding_days>14</activation_padding_days>
-    	<expiration_padding_days>14</expiration_padding_days>
+      <activation_padding_days>14</activation_padding_days>
+      <expiration_padding_days>14</expiration_padding_days>
     </registar_feed>
     <EZproxyAuthorizationKey>reallybigsecret</EZproxyAuthorizationKey>
     <BlackBoardLink>CHANGEME.edu/blackboard</BlackBoardLink>
     <trusted_systems comment="trusted systems id=public key element value secret key; timeout is in minutes">
-    	<system id="CHANGEME" timeout="30">CHANGEME</system>
-    </trusted_systems>    
+      <system id="CHANGEME" timeout="30">CHANGEME</system>
+    </trusted_systems>  
+
+    <copyright_limit>CHANGEME</copyright_limit>   
+    <copyright_notice>This the the copyright notice for 2010.</copyright_notice>  
 </configuration>

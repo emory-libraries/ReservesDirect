@@ -768,7 +768,7 @@ INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (1, 1, 
 INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (2, 2, 'ram');
 INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (3, 3, 'mov');
 INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (4, 4, 'doc');
-INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (5, 5, 'xcl');
+INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (5, 5, 'xls');
 INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (6, 6, 'ppt');
 INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (7, 7, '');
 INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (8, 4, 'docx');
@@ -778,7 +778,9 @@ INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (11, 6,
 INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (12, 7, 'html');
 INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (13, 7, 'htm');
 INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (14, 7, 'xhtml');
-
+INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (15, 8, 'jpeg');
+INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (16, 8, 'jpg');
+INSERT INTO mimetype_extensions (id, mimetype_id, file_extension) VALUES (17, 8, 'gif');
 -- --------------------------------------------------------
 
 -- 
@@ -803,10 +805,10 @@ INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, h
 INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (2, 'audio/x-pn-realaudio', 'http://www.real.com/', 'RealPlayer', 'images/doc_type_icons/doctype-sound.gif');
 INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (3, 'video/quicktime', 'http://www.apple.com/quicktime/', 'Quicktime Player', 'images/doc_type_icons/doctype-movie.gif');
 INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (4, 'application/msword', 'http://office.microsoft.com/Assistance/9798/viewerscvt.aspx', 'Microsoft Word', 'images/doc_type_icons/doctype-text.gif');
-INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (5, 'application/vnd.ms-excel', 'http://office.microsoft.com/Assistance/9798/viewerscvt.aspx', 'Microsoft Excel', 'images/doc_type_icons/doctype-text.gif');
-INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (6, 'application/vnd.ms-powerpoint', 'http://office.microsoft.com/Assistance/9798/viewerscvt.aspx', 'Microsoft Powerpoint', 'images/doc_type_icons/doctype-text.gif');
+INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (5, 'application/vnd.ms-excel', 'http://office.microsoft.com/Assistance/9798/viewerscvt.aspx', 'Microsoft Excel', 'images/doc_type_icons/doctype-excel.gif');
+INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (6, 'application/vnd.ms-powerpoint', 'http://office.microsoft.com/Assistance/9798/viewerscvt.aspx', 'Microsoft Powerpoint', 'images/doc_type_icons/doctype-ppt.gif');
 INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (7, 'text/html', NULL, 'Link', 'images/doc_type_icons/doctype-link.gif');
-INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (8, 'text/html', NULL, 'Image', 'images/doc_type_icons/doctype-image.gif');
+INSERT INTO mimetypes (mimetype_id, mimetype, helper_app_url, helper_app_name, helper_app_icon) VALUES (8, 'image/jpeg', NULL, 'Image', 'images/doc_type_icons/doctype-image.gif');
 
 -- --------------------------------------------------------
 

@@ -249,7 +249,7 @@ class PagesTime {
   * @return void
   * @desc Process list or pagestime range.
   */  
-  protected function process_list($list) {
+  function process_list($list) {
     // This function is used to process any remaining data that will fit a list pattern.
     // A list pattern is data that contains commas or semicolons.
     $ret = true;

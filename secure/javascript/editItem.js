@@ -55,84 +55,192 @@ function typeOfMaterial() {
     $('openurl_link').show();
   } else if ($('openurl_link')) {
     $('openurl_link').hide();
-  }
-  // update the icon file type
-  switch(type)
-  {
-  case "BOOK_PORTION": document.iconImg.src = "images/doc_type_icons/doctype-pdf.gif"; 
-            document.item_form.selectedDocIcon.selectedIndex = 1;  break;
-  case "JOURNAL_ARTICLE": document.iconImg.src = "images/doc_type_icons/doctype-pdf.gif";  
-          document.item_form.selectedDocIcon.selectedIndex = 1;    break;
-  case "CONFERENCE_PAPER": document.iconImg.src = "images/doc_type_icons/doctype-text.gif";   
-          document.item_form.selectedDocIcon.selectedIndex = 4;    break;
-  case "COURSE_MATERIALS": document.iconImg.src = "images/doc_type_icons/doctype-text.gif";   
-          document.item_form.selectedDocIcon.selectedIndex = 4;    break;
-  case "IMAGE": document.iconImg.src = "images/doc_type_icons/doctype-image.gif";  
-          document.item_form.selectedDocIcon.selectedIndex = 8;    break;
-  case "VIDEO": document.iconImg.src = "images/doc_type_icons/doctype-movie.gif";  
-          document.item_form.selectedDocIcon.selectedIndex = 3;    break;
-  case "AUDIO": document.iconImg.src = "images/doc_type_icons/doctype-sound.gif";  
-          document.item_form.selectedDocIcon.selectedIndex = 2;    break;
-  case "WEBPAGE": document.iconImg.src = "images/doc_type_icons/doctype-link.gif"; 
-          document.item_form.selectedDocIcon.selectedIndex = 7;  break;
-  case "OTHER": document.iconImg.src = "images/doc_type_icons/doctype-clear.gif"; 
-          document.item_form.selectedDocIcon.selectedIndex = 0;  break;
-  case "BOOK": document.iconImg.src = "images/doc_type_icons/doctype-book.gif"; break;
-  case "CD": document.iconImg.src = "images/doc_type_icons/doctype-disc.gif"; break;
-  case "DVD": document.iconImg.src = "images/doc_type_icons/doctype-disc.gif"; break;
-  case "VHS": document.iconImg.src = "images/doc_type_icons/doctype-disc.gif"; break;
-  case "SOFTWARE": document.iconImg.src = "images/doc_type_icons/doctype-disc.gif"; break;         
-  default: document.iconImg.src = "images/doc_type_icons/doctype-pdf.gif"; break;
-  }
-    
+  }    
 } 
 
+// Unobrusive Javascript: Separate javascript from html page.
+// Note: the following must be defined in the html page:
+// var unobtrusive = new domFunction(unobtrusive, { 'Footer' : 'id'});
+// Once element id='Footer' has been loaded, these onClick events are available.
+function unobtrusive()
+{
+  if(document.getElementById('edit_url')) { // "Edit URL" button onclick event
+      document.getElementById('edit_url').onclick = function() { 
+        edit_url(); 
+        return false; 
+      };  
+  }; 
+  if(document.getElementById('get_url')) { // "Get URL" button onclick event
+      document.getElementById('get_url').onclick = function() {  
+        // Set the Document Type Icon to "Link"
+        document.getElementById('selectedDocIcon').selectedIndex = 7;
+        // Set the Document Type Icon Image to 'www'
+        document.getElementById('iconImg').src = 'images/doc_type_icons/doctype-link.gif';
+        // Unset radio button and disable the Browse for "Upload a document"
+        document.getElementById('userFile').disabled = true; 
+        document.getElementById('radioDOC').checked = false;        
+        // Unset the radion button and enable to textbox for "Add a link"
+        document.getElementById('url').disabled = false;  
+        document.getElementById('radioURL').checked = true;
+        // Pass in the metadata to openurl function to retrieve the openurl              
+        document.getElementById('url').value = getopenurl(this.form);  
+        return false; 
+      };  
+  };   
+  if(document.getElementById('preview_url')) { // "Preview URL" button onclick event
+      document.getElementById('preview_url').onclick = function() { 
+        preview_url(document.getElementById('url').value); 
+        return false; 
+      };  
+  };
+  if(document.getElementById('timespagesrange')) { // Times/Pages Range onchange event
+    document.getElementById('timespagesrange').onchange = function() { 
+      ajaxGetUsedPagesFunction(2); 
+      return false; 
+    };  
+  };   
+  if(document.getElementById('timespagesused')) { // Total Used Pages onchange event
+    document.getElementById('timespagesused').onchange = function() { 
+      ajaxGetUsedPagesFunction(1); 
+      return false; 
+    };  
+  };
+    if(document.getElementById('timespagestotal')) {  // Total Pages in book onchange event
+    document.getElementById('timespagestotal').onchange = function() { 
+      ajaxGetUsedPagesFunction(1); 
+      return false; 
+    };  
+  };
+};
 
-// do form-validation for material-type portion of add/edit form
-function checkMaterialTypes(form) {
-  // remove any 'incomplete' markings
-  var edit_tables = $$('.editItem');
-  var table = edit_tables[0];
-  for (var i = 0; i < table.rows.length; i++) {
-    row = table.rows[i];
-    if (row.cells[1]) {
-      row.cells[1].className = "";
-    }
+// Onclick action for the "Edit URL" button
+function edit_url() { 
+  // Open a new window for the Open URL Generator form
+  // FIXME: Add the existing metadata to the input parameters for this call.
+  openWin('http://ejournals.emory.edu/openurlgen.php',860,550,'Open URL Generator');  
+}
+// Onclick action for the "Get URL" button      
+function getopenurl(frm) {      
+  var alertMsg = "";  
+  alertMsg = get_url(frm);      
+  return alertMsg;       
+}
+// Onclick action for the "Preview URL" button    
+function preview_url(mypage) {
+  var alertMsg = "";  
+  if (mypage) { openWin(mypage,640,480,'sfxwin'); }
+  else {
+    alertMsg = 'Please enter a URL in the "Add a link" text box if you would like to "Test URL".';
   }
-  var alertMsg = '';
+  document.getElementById('alertMsg').innerHTML = alertMsg;        
+} 
+  
+// Several events trigger this function "ajaxGetUsedPagesFunction" to be called.
+// Anytime change in the form id values: times_pages(aka range) or used_times_pages or total_times_pages.
+// The results include:
+// 1. an update to the used_times_pages (a calculation based on the range), if needed (type=2).
+// 2. an update to the percent_times_pages (based on combined ISBN results for course).
+// this function calls a php script (secure/calculateCopyrightPercent.php) to calculate this data.
 
-  // material type is now required
-  if ($('material_type').options[$('material_type').selectedIndex].value == '') {
-    alertMsg += 'Please select type of material.<br/>';
-    form.material_type.parentNode.className = 'incomplete';
-  } else {
-    var type = $('material_type').options[$('material_type').selectedIndex].value;
-   
-    // special-case for material type 'other' 
-    if ((type == "OTHER") && ($('material_type_other').getValue() == '')) {
-      alertMsg += 'Type of material must be specified when "Other" is selected.<br/>';
-      form.material_type.parentNode.className = 'incomplete';
-      form.material_type.parentNode.className = 'incomplete';
-    } else {
-      form.material_type.parentNode.className = '';
-    }
-    
-    // check all required fields for current type of material
-    var type_details = materialType_details[type];
-    for (var field in type_details) {
-      if (type_details[field]["required"]) {
-  var tr = $(field);
-  var inputs = tr.select('input[type="text"]');
-  var radio_inputs = tr.select('input[type="radio"]');
-  if ((inputs.length && inputs[0].getValue() == '') ||
-      (radio_inputs.length && (! radio_inputs[0].checked)
-       && (! radio_inputs[1].checked))) {
-    alertMsg += type_details[field]['label'] + ' is required.<br/>';
-    tr.cells[1].className = 'incomplete';
-  }
+function ajaxGetUsedPagesFunction(type){
+  var ajaxRequest;  // Ajax request object
+  
+  // only do this processing for material type = BOOK_PORTION
+  if (document.getElementById('material_type').value != 'BOOK_PORTION') {
+    return false;   
+  }   
+
+  try{
+    // Opera 8.0+, Firefox, Safari Browser Support
+    ajaxRequest = new XMLHttpRequest();
+  } catch (e){
+    // Internet Explorer Browser Support
+    try{
+      ajaxRequest = new ActiveXObject("Msxml2.XMLHTTP");
+    } catch (e) {
+      try{
+        ajaxRequest = new ActiveXObject("Microsoft.XMLHTTP");
+      } catch (e){
+        // Something went wrong
+        alert("Your browser broke!");
+        return false;
       }
     }
   }
-  
-  return alertMsg;
+  // this function receives data sent from the server
+  ajaxRequest.onreadystatechange = function(){
+    if(ajaxRequest.readyState == 4) {
+      //alert("AJAX RESPONSE = " + ajaxRequest.responseText);
+      // this will be returning these values:
+      // 1. ajaxUsed = the range for the current item (it may be that the range has not been changed)
+      // 2. ajaxPer = the copyright percentage for the current item.
+      // 3. ajaxCombo = the combined copyright percentage for all items with the same ISBN in this course.      
+      if (ajaxRequest.responseText != null) {
+        var ajaxReturn = ajaxRequest.responseText;
+        var s1 = ajaxReturn.indexOf(";");
+        var s2 = ajaxReturn.indexOf(";", s1+1);
+        var ajaxUsed = ajaxReturn.substring(0,s1);
+        var ajaxPer = ajaxReturn.substring(s1+1,s2);
+        var ajaxCombo = ajaxReturn.substring(s2+1,ajaxReturn.length);
+        //alert("AJAX RESPONSE => " + ajaxRequest.responseText + "\najaxUsed = " + ajaxUsed + "\najaxPer = " + ajaxPer + "\najaxCombo = " + ajaxCombo);
+
+        // Populate the "Total pages used in book" value        
+        document.getElementById('timespagesused').value = parseInt(ajaxUsed); 
+                 
+        // Populate the Overall Book Usage Percentage value
+        if (parseInt(ajaxCombo) > 0) {
+          document.getElementById('percenttimespages').value = parseInt(ajaxCombo) + "%";
+        }
+        else {
+          document.getElementById('percenttimespages').value = "";          
+        }
+      }
+    }
+  }
+
+  var url_script = "AJAX_copyright.php";
+  var url_range = "?range=" + encodeURIComponent(document.getElementById('timespagesrange').value);  
+  var url_used = "&used=" + encodeURIComponent(document.getElementById('timespagesused').value);    
+  var url_total = "&total=" + encodeURIComponent(document.getElementById('timespagestotal').value);  
+  var url_isbn = "&isbn=" + encodeURIComponent(document.getElementById('itemisbn').value);
+  var url_type = "&type=" + encodeURIComponent(type);
+  var url_item = "&item=" + encodeURIComponent(document.getElementById('itemID').value);
+  var url_ci = "&ci=" + encodeURIComponent(document.getElementById('ciid').value);  
+  var url_params =  url_script + url_range + url_used + url_total + url_isbn + url_type + url_ci + url_item;
+  //alert(url_params);
+  ajaxRequest.open("GET", url_params, true);
+  ajaxRequest.send(null); 
+}
+
+function replaceAll( str, searchTerm, replaceWith, ignoreCase ) {
+  var regex = "/"+searchTerm+"/g";
+  if( ignoreCase ) regex += "i";
+  return str.replace( eval(regex), replaceWith );
+}
+
+function validateCopyrightPercentage() {
+        
+  // Validation: Is copyright percentage within guideline limit?
+  // get the value from Overall Book Usage
+  var bookpercentage = document.getElementById('percenttimespages').value; 
+  // remove the percent sign from the Overall Book Usage textbox string. 
+  bookpercentage = bookpercentage.substring(0,bookpercentage.indexOf("%"));
+  // retrieve the fair use guideline amount config property <copyright_limit>
+  var limit = document.getElementById('copyright_limit').value;
+  // if the value is present, then check for over the limit.
+  if (document.getElementById('percenttimespages') != null && parseInt(bookpercentage) > parseInt(limit)) {          
+    // the percentage has exceeded the limit.
+    var msg = document.getElementById('copyright_notice').value
+    // replace the placeholder in notice with config property <copyright_limit> value.
+    msg = msg.replace("copyright_limit", limit);
+    // Add some newlines to improve readability to notice (config property <copyright_notice>).
+    msg = replaceAll(msg, "[\.] ", ".\n\n", false); 
+    // Show confirmation popup box if copyright percentage is over guideline limit.        
+    var answer = confirm(msg);
+    // If the user selects 'Cancel' to the over limit popup, then abort save.          
+    if (!answer) {  
+      return false;           
+    }
+  }
+  return true;
 }

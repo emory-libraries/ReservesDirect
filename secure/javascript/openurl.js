@@ -42,16 +42,16 @@ function OpenURLItem()
 }
 
 // Opens a standard popup window for links on the site.
-function openWin(mypage, w, h) {
+function openWin(mypage, w, h, title) {
 
   var winw = w;
   var winh = h;
   var winl = (screen.width - winw) / 2;
   var wint = (screen.height - winh) / 2;
 
-  var winprops = 'height='+winh+',width='+winw+',top='+wint+',left='+winl+',toolbar=no,scrollbars=yes,resizable'
+  var winprops = 'height='+winh+',width='+winw+',top='+wint+',left='+winl+',location=no,toolbar=no,scrollbars=yes,resizable'
 
-  SFXwin = window.open(mypage, 'sfxwin', winprops);
+  SFXwin = window.open(mypage, title, winprops);
   
   if (parseInt(navigator.appVersion) >= 4) { SFXwin.window.focus(); }
 }
