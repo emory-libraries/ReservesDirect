@@ -223,7 +223,7 @@ class item extends Notes {
   * book with given ISBN in a given course instance, 
   * but exclude the current item if defined.
   */
-  function getCopyrightData($qry, $params, $current_item_id)
+  function selectOverallBookUsage($qry, $params, $current_item_id)
   {
     global $g_dbConn;
       
@@ -245,8 +245,36 @@ class item extends Notes {
       }
     }
     return $cummulative_percentage;
-  }   
-
+  } 
+    
+  /**
+  * @return cummulative percentage for book in given course
+  * @param int $itemID (optional)
+  * @desc Find the cummulative percentage of copyright book usage for a
+  * book with given ISBN in a given course instance, 
+  * but exclude the current item if defined.
+  */
+  function selectOverallUsedPages($qry, $params, $current_item_id)
+  {
+    global $g_dbConn;
+      
+    $cummulative_used = 0;
+    $rs = $g_dbConn->query($qry, $params);
+    if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+    else {
+      if($rs->numRows() > 0) {
+        while($row = $rs->fetchRow(DB_FETCHMODE_ASSOC)) 
+        {
+          $used = ($row["pages_times_used"] == null) ? 0 :  $row["pages_times_used"];
+          if ($used > 0 && ($row["item_id"] != $current_item_id)) {
+            $cummulative_used += $used;
+          }
+        }
+      }
+    }
+    return $cummulative_used;
+  }
+  
   function getTitle(){ return htmlentities(stripslashes($this->title)); }
   function getItemID(){ return htmlentities(stripslashes($this->itemID)); }
   function getItemGroup() { return htmlentities(stripslashes($this->itemGroup)); }

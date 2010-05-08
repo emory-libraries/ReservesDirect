@@ -114,7 +114,7 @@
               WHERE r.course_instance_id = ? and i.ISBN = ?';
       $params = array($in['ci'], $in['isbn']);
       $item = new item();
-      $additional_book_percentages = $item->getCopyrightData($query, $params, $in['item']);  
+      $additional_book_percentages = $item->selectOverallBookUsage($query, $params, $in['item']);  
       $cummulative_percentage += $additional_book_percentages;
     }
     

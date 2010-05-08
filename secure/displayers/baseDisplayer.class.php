@@ -233,7 +233,7 @@ abstract class baseDisplayer {
     $volTitle = $reserve->item->getVolumeTitle();
     $volEdition = $reserve->item->getVolumeEdition();
     $pagesTimes = $reserve->item->getPagesTimes();
-    $usedPagesTimes = $reserve->item->getUsedPagesTimes();
+    $usedPagesTimes = $reserve->item->getOverallUsedPages($reserve->getCourseInstanceID());
     $source = $reserve->item->getSource();
     $itemIcon = $reserve->item->getItemIcon();
     $viewReserveURL = "reservesViewer.php?reserve=" . $reserve->getReserveID();
@@ -263,7 +263,7 @@ abstract class baseDisplayer {
       <br />
       <span class="itemMeta"><?=$callNumber?></span>
       <br />
-      <span class="itemMetaPre">On Reserve at:</span><span class="itemMeta"><?=$reserveDesk?></span> [<a href="<?=$viewReserveURL?>" target="_blank" class="strong">more info</a>]  
+      <span class="itemMetaPre">On Reserve at: </span><span class="itemMeta"><?=$reserveDesk?></span> [<a href="<?=$viewReserveURL?>" target="_blank" class="strong">more info</a>]  
       
 <?php else: ?>
       <?php if ($reserve->getStatus() == 'ACTIVE' || $reserve->getStatus() == 'INACTIVE'): ?>
@@ -280,31 +280,31 @@ abstract class baseDisplayer {
 <?php if($performer): ?>
 
           <br />
-          <span class="itemMetaPre">Performed by:</span><span class="itemMeta"><?=$performer?></span>
+          <span class="itemMetaPre">Performed by: </span><span class="itemMeta"><?=$performer?></span>
           
 <?php endif; ?>
 <?php if($volTitle): ?>
 
           <br />
-          <span class="itemMetaPre">From:</span><span class="itemMeta"><?=$volTitle?></span>
+          <span class="itemMetaPre">From: </span><span class="itemMeta"><?=$volTitle?></span>
           
 <?php endif; ?>
 <?php if($volEdition): ?>
 
           <br />
-          <span class="itemMetaPre">Volume/Edition:</span><span class="itemMeta"><?=$volEdition?></span>
+          <span class="itemMetaPre">Volume/Edition: </span><span class="itemMeta"><?=$volEdition?></span>
           
 <?php endif; ?>
 <?php if($usedPagesTimes): ?>
 
           <br />
-          <span class="itemMetaPre">Pages/Time Used:</span><span class="itemMeta"><?=$usedPagesTimes?></span>
+          <span class="itemMetaPre">Total Pages/Time Used: </span><span class="itemMeta"><?=$usedPagesTimes?></span>
           
 <?php endif; ?>
 <?php if($source): ?>
 
           <br />
-          <span class="itemMetaPre">Source/Year:</span><span class="itemMeta"><?=$source?></span>
+          <span class="itemMetaPre">Source/Year: </span><span class="itemMeta"><?=$source?></span>
           
 <?php endif; ?>
 
