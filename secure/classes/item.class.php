@@ -218,10 +218,12 @@ class item extends Notes {
   
   /**
   * @return cummulative percentage for book in given course
+  * @param string query
+  * @param array params for query 
   * @param int $itemID (optional)
   * @desc Find the cummulative percentage of copyright book usage for a
   * book with given ISBN in a given course instance, 
-  * but exclude the current item if defined.
+  * but exclude the current item, if defined.
   */
   function selectOverallBookUsage($qry, $params, $current_item_id)
   {
@@ -248,11 +250,13 @@ class item extends Notes {
   } 
     
   /**
-  * @return cummulative percentage for book in given course
+  * @return total pages used for book in given course
+  * @param string query
+  * @param array params for query 
   * @param int $itemID (optional)
-  * @desc Find the cummulative percentage of copyright book usage for a
-  * book with given ISBN in a given course instance, 
-  * but exclude the current item if defined.
+  * @desc Find the total pages used for book usage
+  * for given ISBN in a given course instance, 
+  * but exclude the current item, if defined.
   */
   function selectOverallUsedPages($qry, $params, $current_item_id)
   {

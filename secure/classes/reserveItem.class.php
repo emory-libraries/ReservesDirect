@@ -866,6 +866,11 @@ class reserveItem extends item
     return ($not_heading && $local && $not_manuscript);   
   } 
   
+  /**
+  * @return the percentage used pages per item/isbn for course
+  * @param string $ci course instance ID
+  * @desc Calculcate the percentage of used pages per item/isbn for this course.
+  */   
   function getOverallBookUsage($ci=null) {
     $query = 'SELECT i.item_id, i.pages_times_used, i.pages_times_total FROM items as i
       LEFT JOIN reserves as r on r.item_id = i.item_id
@@ -880,6 +885,11 @@ class reserveItem extends item
     return intval($overallBookUsage); 
   }
   
+  /**
+  * @return the total number of used pages per item/isbn for course
+  * @param string $ci course instance ID
+  * @desc Calculcate the total number of used pages per item/isbn for this course.
+  */  
   function getOverallUsedPages($ci=null) {
     $query = 'SELECT i.item_id, i.pages_times_used, i.pages_times_total FROM items as i
       LEFT JOIN reserves as r on r.item_id = i.item_id
