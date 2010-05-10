@@ -189,7 +189,7 @@ function ajaxGetUsedPagesFunction(type){
                  
         // Populate the Overall Book Usage Percentage value
         if (parseInt(ajaxCombo) > 0) {
-          document.getElementById('percenttimespages').value = parseInt(ajaxCombo) + "%";
+          document.getElementById('percenttimespages').value = parseInt(ajaxCombo);
         }
         else {
           document.getElementById('percenttimespages').value = "";          

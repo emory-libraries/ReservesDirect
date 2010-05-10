@@ -715,9 +715,9 @@ ITEM_SOURCE;
          <th>Overall Book Usage:</th>
          <td>
 <?php if(!empty($_REQUEST['ci'])): ?>
-        <input id="percenttimespages" name="percent_times_pages" value="<?= $item->getOverallBookUsage($_REQUEST['ci'], true) ?>" readonly />      
+        <input id="percenttimespages" name="percent_times_pages" value="<?= $item->getOverallBookUsage($_REQUEST['ci'], true) ?>" readonly /> %     
 <?php else: ?>
-        <input id="percenttimespages" name="percent_times_pages" value="<?= $item->getOverallBookUsage($ciid, false) ?>" readonly />
+        <input id="percenttimespages" name="percent_times_pages" value="<?= $item->getOverallBookUsage($ciid, false) ?>" readonly /> %
 <?php endif; ?>         
          <input type="hidden" id="copyright_limit" value="<?= $g_copyrightLimit ?>" />         
          <input type="hidden" id="copyright_notice" value="<?= $g_copyrightNotice ?>" />
