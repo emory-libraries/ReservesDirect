@@ -896,11 +896,6 @@ class reserveItem extends item
       WHERE r.course_instance_id = ? and i.ISBN = ?'; 
     $params = array($ci, $this->getISBN());  
     $overallUsedPages = $this->selectOverallUsedPages($query, $params, null);
-    $currentUsedPages = 0;
-    if ($this->getUsedPagesTimes() > 0) {
-      $currentUsedPages = intval($this->getUsedPagesTimes());
-    }
-    $overallUsedPages += $currentUsedPages;
     return intval($overallUsedPages); 
   }   
 

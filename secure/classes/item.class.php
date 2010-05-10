@@ -270,7 +270,7 @@ class item extends Notes {
         while($row = $rs->fetchRow(DB_FETCHMODE_ASSOC)) 
         {
           $used = ($row["pages_times_used"] == null) ? 0 :  $row["pages_times_used"];
-          if ($used > 0 && ($row["item_id"] != $current_item_id)) {
+          if ($used > 0) {
             $cummulative_used += $used;
           }
         }
