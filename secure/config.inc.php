@@ -25,7 +25,6 @@ ReservesDirect is located at:
 http://www.reservesdirect.org/
 
 *******************************************************************************/
-  set_include_path(get_include_path() . PATH_SEPARATOR . '/usr/local/lib/php');
   require_once("DB.php");
   
   //sets $xmlConfig to path of config.xml file
