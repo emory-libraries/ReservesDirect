@@ -871,17 +871,20 @@ class reserveItem extends item
   * @param string $ci course instance ID
   * @desc Calculcate the percentage of used pages per item/isbn for this course.
   */   
-  function getOverallBookUsage($ci=null) {
+  function getOverallBookUsage($ci=null, $add=true) {
     $query = 'SELECT i.item_id, i.pages_times_used, i.pages_times_total FROM items as i
       LEFT JOIN reserves as r on r.item_id = i.item_id
       WHERE r.course_instance_id = ? and i.ISBN = ?';  
     $params = array($ci, $this->getISBN());  
     $overallBookUsage = $this->selectOverallBookUsage($query, $params, null);
-    $currentBookUsage = 0;
-    if ($this->getTotalPagesTimes() > 0) {
+    
+    // If adding an item to a book, then pull add the new item here.
+    if ($add && $this->getTotalPagesTimes() > 0) {
+      $currentBookUsage = 0;      
       $currentBookUsage = intval($this->getUsedPagesTimes()/$this->getTotalPagesTimes()*100);
+      $overallBookUsage += $currentBookUsage;      
     }
-    $overallBookUsage += $currentBookUsage;
+
     return intval($overallBookUsage); 
   }
   
