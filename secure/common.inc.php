@@ -334,7 +334,7 @@ function common_electronicMaterialTypesDetails() {
          "year" => array("required" => true, "label" => "Year of Publication"),
          "isbn" => array("required" => true, "label" => "ISBN"),         
          "times_pages" => array("required" => true, "label" => "Page ranges"),  // example!
-         "used_times_pages" => array("required" => true, "label" => "Total pages used in book"),         
+         "used_times_pages" => array("required" => true, "label" => "Total pages used in item"),         
          "total_times_pages" => array("required" => true, "label" => "Total pages in book"),
          "percent_times_pages" => array("label" => "Overall Book Usage"),
          "availability" => array("required" => true, "label" => "Print status of book",
