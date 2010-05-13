@@ -966,12 +966,9 @@ ITEM_SOURCE;
           alertMsg = alertMsg + "Barcode is required.<br />";
         }
 <? elseif (!$item->itemID): ?>  
-        alert("Hello 2"); 
-        if((document.getElementById('userFile').value == "") && (document.getElementById('url').value == "")) {
-        alert("Hello 3");          
+        if((document.getElementById('userFile').value == "") && (document.getElementById('url').value == "")) {       
           alertMsg = alertMsg + 'You must choose an item source of either "Upload a document" or "Add a link".<br />';
-        }
-        alert("Hello 4");        
+        }     
 <? endif ?>   
 
         alertMsg += checkMaterialTypes2(frm);      
