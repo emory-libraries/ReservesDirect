@@ -863,7 +863,7 @@ ITEM_SOURCE;
       $note_ref = 'reserveID='.$reserve->getReserveID();      
     }
 ?>
-    <div class="headingCell1">NOTES</div>
+    <div class="headingCell1">NOTES A</div>
     <div id="item_notes" style="padding:8px 8px 12px 8px;">
       <?php self::displayEditNotes($notes, $note_ref); ?>
       
@@ -905,18 +905,20 @@ ITEM_SOURCE;
     $notes = noteManager::fetchNotesForObj($obj_type, $id, true);
     
     //only allow adding notes to reserves (not items) unless edited by staff
-    //$include_addnote_button = (($u->getRole() >= $g_permission['instructor']) || ($obj_type=='reserve')) ? true : false;
-    // previously removed the addnote button (nested form broke IE), so only show the existing notes here.
-    $include_addnote_button = false;
+    $include_addnote_button = (($u->getRole() >= $g_permission['instructor']) || ($obj_type=='reserve')) ? true : false;
     
 ?>
       <script language="JavaScript1.2" src="secure/javascript/basicAJAX.js"></script>
       <script language="JavaScript1.2" src="secure/javascript/notes_ajax.js"></script>
 
       <div style="padding:8px 8px 12px 8px;text-align:center">
-  
-      <?php  self::displayNotesBlockAJAX($notes, $obj_type, $id, $include_addnote_button); ?>
-
+      
+      <? /* Notes cannot be created unless the item has been saved first.   */ ?>
+      <?php if(isset($reserve)): ?>        
+        <?php  self::displayNotesBlockAJAX($notes, $obj_type, $id, $include_addnote_button); ?>
+      <?php else: ?>
+        <p>If you would like to add a note, please save the item first.<p>
+      <?php endif; ?> 
       </div>
 <?php
   }
@@ -949,14 +951,10 @@ ITEM_SOURCE;
     //build the form
 ?>
     <script language="JavaScript">
-    //<!--
-      function submitForm() {
-        if(document.getElementById('item_form')) {
-          document.getElementById('item_form').submit();
-        }
-      }    
+    //<!--   
       function validateForm(frm) {      
         var alertMsg = "";
+
         
         // Validation: Is copyright percentage within guideline limit?
         if (!validateCopyrightPercentage()) return false;
@@ -967,12 +965,16 @@ ITEM_SOURCE;
         if( (document.getElementById('barcode') != null) && (document.getElementById('barcode').value == '') ){ 
           alertMsg = alertMsg + "Barcode is required.<br />";
         }
-<? elseif (!$item->itemID): ?>          
-        if((frm.userFile.value == "") && (frm.url.value == "")) {
+<? elseif (!$item->itemID): ?>  
+        alert("Hello 2"); 
+        if((document.getElementById('userFile').value == "") && (document.getElementById('url').value == "")) {
+        alert("Hello 3");          
           alertMsg = alertMsg + 'You must choose an item source of either "Upload a document" or "Add a link".<br />';
         }
+        alert("Hello 4");        
 <? endif ?>   
-        alertMsg += checkMaterialTypes2(frm);
+
+        alertMsg += checkMaterialTypes2(frm);      
         if (!alertMsg == "") { 
           document.getElementById('alertMsg').innerHTML = alertMsg;
           return false;
@@ -1035,7 +1037,7 @@ ITEM_SOURCE;
 <? /* NOTE: post to same command, to preserve info about action (editItem or addDigitalItem   */ ?>
         
      <form id="item_form" name="item_form" action="index.php?cmd=<?= $_REQUEST['cmd'] ?>" method="post"
-        <? if (! $item->isPhysicalItem()): ?> enctype="multipart/form-data" <? endif ?> onSubmit="return validateForm(this,false);">
+        <? if (! $item->isPhysicalItem()): ?> enctype="multipart/form-data" <? endif ?> >
 <?php if(! $item->isPhysicalItem()): ?>   
       <input type="hidden" name="item_group" value="ELECTRONIC" />  
       <input type="hidden" name="submit_edit_item_meta" value="submit" />
@@ -1082,28 +1084,27 @@ ITEM_SOURCE;
       self::displayEditItemSource($item);       //show item source
     }
 ?>    
-    </form>   
+    </form>
+    <br />
     <div class="headingCell1">NOTES</div>        
     <br />
-<?php if(isset($reserve)): //if editing existing item, use AJAX notes handler ?>    
-    <?php  self::displayEditItemNotesAJAX($item, $reserve);  ?>
-<?php endif; ?> 
-    
-    <div id="item_notes" style="padding:8px 8px 12px 8px;">
-    <?php self::displayEditNotes($notes, $note_ref); ?>
-    </div>
-    <strong>Add a new note:</strong>
-    <br />
-    <textarea name="new_note" cols="50" rows="3"></textarea>
-    <br />
-    <?php if ($u->getRole() >= $g_permission['staff']): // role staff level or above ?>       
-      <small>Note Type:
-      <label><input type="radio" name="new_note_type" value="<?=$g_notetype['instructor']?>">Instructor</label>
-      <label><input type="radio" name="new_note_type" value="<?=$g_notetype['content']?>" checked="true">Content Note</label>
-      <label><input type="radio" name="new_note_type" value="<?=$g_notetype['staff']?>">Staff Note</label>
-      <label><input type="radio" name="new_note_type" value="<?=$g_notetype['copyright']?>">Copyright Note</label>  
+    <?php if(isset($reserve)): //if editing existing item, use AJAX notes handler ?>    
+      <?php  self::displayEditItemNotesAJAX($item, $reserve);  ?>
+    <?php else: //just display plain note form ?>
+
+      <strong>Add a new note:</strong>
+      <br />
+      <textarea name="new_note" cols="50" rows="3"></textarea>
+      <br />
+      <?php if ($u->getRole() >= $g_permission['staff']): // role staff level or above ?>       
+        <small>Note Type:
+        <label><input type="radio" name="new_note_type" value="<?=$g_notetype['instructor']?>">Instructor</label>
+        <label><input type="radio" name="new_note_type" value="<?=$g_notetype['content']?>" checked="true">Content Note</label>
+        <label><input type="radio" name="new_note_type" value="<?=$g_notetype['staff']?>">Staff Note</label>
+        <label><input type="radio" name="new_note_type" value="<?=$g_notetype['copyright']?>">Copyright Note</label>  
+      <?php endif; ?>  
+      <br />       
     <?php endif; ?>  
-    <br />        
 
     </div>
 
@@ -1114,8 +1115,8 @@ ITEM_SOURCE;
     <span class="helperText">= required fields</span>
     <p />
     <div style="padding:10px; text-align:center;">
-        <input type="submit" name="submit_edit_item_meta" value="Save Changes" onclick="javascript: submitForm();">
-    </div>   
+        <input type="submit" name="submit_edit_item_meta" value="Save Changes" onClick="return validateForm(this.form);">
+    </div>
 <?php   
   }
   
@@ -1429,7 +1430,6 @@ ITEM_SOURCE;
         </td>
           </tr>
       </table>
-      </form>
 <?php
   
   }

@@ -42,14 +42,17 @@ class noteDisplayer extends baseDisplayer {
 ?>
     <div id="notes_content">
       <?php self::displayNotesContentAJAX($notes, $obj_type, $obj_id); //notes content ?>
-    </div>
     
-    <?php self::displayNotesFormAJAX($obj_type, $obj_id); //include the add/edit-note form ?>
+   
     
 <?php
     if($include_add_button) { //include add-note button?
       self::displayAddNoteButtonAJAX();
     }
+?>
+    </div>
+    
+<?php    
   }
   
   
