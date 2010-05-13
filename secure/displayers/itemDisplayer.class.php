@@ -1077,6 +1077,7 @@ ITEM_SOURCE;
       self::displayEditItemSource($item);       //show item source
     }
 ?>    
+    </form>   
     <div class="headingCell1">NOTES</div>        
     <br />
 <?php if(isset($reserve)): //if editing existing item, use AJAX notes handler ?>    
@@ -1109,8 +1110,7 @@ ITEM_SOURCE;
     <p />
     <div style="padding:10px; text-align:center;">
         <input type="submit" name="submit_edit_item_meta" value="Save Changes" onClick="return validateForm(this.form);">
-    </div>
-    </form>      
+    </div>   
 <?php   
   }
   
