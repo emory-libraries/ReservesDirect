@@ -950,6 +950,11 @@ ITEM_SOURCE;
 ?>
     <script language="JavaScript">
     //<!--
+      function submitForm() {
+        if(document.getElementById('item_form')) {
+          document.getElementById('item_form').submit();
+        }
+      }    
       function validateForm(frm) {      
         var alertMsg = "";
         
@@ -1030,7 +1035,7 @@ ITEM_SOURCE;
 <? /* NOTE: post to same command, to preserve info about action (editItem or addDigitalItem   */ ?>
         
      <form id="item_form" name="item_form" action="index.php?cmd=<?= $_REQUEST['cmd'] ?>" method="post"
-        <? if (! $item->isPhysicalItem()): ?> enctype="multipart/form-data" <? endif ?> >
+        <? if (! $item->isPhysicalItem()): ?> enctype="multipart/form-data" <? endif ?> onSubmit="return validateForm(this,false);">
 <?php if(! $item->isPhysicalItem()): ?>   
       <input type="hidden" name="item_group" value="ELECTRONIC" />  
       <input type="hidden" name="submit_edit_item_meta" value="submit" />
@@ -1109,7 +1114,7 @@ ITEM_SOURCE;
     <span class="helperText">= required fields</span>
     <p />
     <div style="padding:10px; text-align:center;">
-        <input type="submit" name="submit_edit_item_meta" value="Save Changes" onClick="return validateForm(this.form);">
+        <input type="submit" name="submit_edit_item_meta" value="Save Changes" onclick="javascript: submitForm();">
     </div>   
 <?php   
   }
