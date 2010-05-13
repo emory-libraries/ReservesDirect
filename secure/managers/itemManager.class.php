@@ -107,13 +107,11 @@ class itemManager extends baseManager {
         list($item, $reserve) = $this->getReserveItem();
 
         //form submitted - edit item meta
-        if(!empty($_REQUEST['submit_edit_item_meta'])) {
-                  
+        if(!empty($_REQUEST['submit_edit_item_meta'])) {      
           // if editing a reserve, save reserve-specific fields?
-          if ($reserve instanceof reserve) {
+          if ($reserve instanceof reserve) {            
             $this->saveReserve($reserve);
           }
-          
           $invalid = $this->editItemValidation();
           if ($invalid) {
             //form is invalid; re-display edit page with error messages
@@ -130,38 +128,38 @@ class itemManager extends baseManager {
             
             //if duplicating, show a different success screen
             if(isset($_REQUEST['dubReserve']) && $_REQUEST['dubReserve']) {
-        //get course instance
-        $ci = new courseInstance($reserve->getCourseInstanceID());
-        $ci->getPrimaryCourse();
-        
-        //call requestDisplayer method
-        require_once("secure/displayers/requestDisplayer.class.php");
-        $loc = 'add an item';
-        $this->displayClass = 'requestDisplayer';
-        $this->displayFunction = 'addSuccessful';
-        $this->argList = array($ci, $item->getItemID(), $reserve->getReserveID(), true);
+              //get course instance
+              $ci = new courseInstance($reserve->getCourseInstanceID());
+              $ci->getPrimaryCourse();
+              
+              //call requestDisplayer method
+              require_once("secure/displayers/requestDisplayer.class.php");
+              $loc = 'add an item';
+              $this->displayClass = 'requestDisplayer';
+              $this->displayFunction = 'addSuccessful';
+              $this->argList = array($ci, $item->getItemID(), $reserve->getReserveID(), true);
             } elseif ($new_item) {
-        // when creating a brand-new item, promp user for which course instance
-        // the reserve item should be added to
-        
-        //prefetch possible CIs
-        list($all_possible_CIs, $selected_CIs,
-             $CI_request_matches) = requestManager::getCIsForItem($item_id);
-        //pass the item_id and CIs to the select-course form
-        $this->displayClass = "requestDisplayer";
-        $this->displayFunction = 'displaySelectCIForItem';
-        $this->argList = array($item_id, $all_possible_CIs,
-                   $selected_CIs, $CI_request_matches);
+              // when creating a brand-new item, promp user for which course instance
+              // the reserve item should be added to
+              
+              //prefetch possible CIs
+              list($all_possible_CIs, $selected_CIs,
+                   $CI_request_matches) = requestManager::getCIsForItem($item_id);
+              //pass the item_id and CIs to the select-course form
+              $this->displayClass = "requestDisplayer";
+              $this->displayFunction = 'displaySelectCIForItem';
+              $this->argList = array($item_id, $all_possible_CIs,
+              $selected_CIs, $CI_request_matches);
 
             } else {
-        // get courseinstance id, if editing reserve
-        $ci_id = ($reserve instanceof reserve) ? $reserve->getCourseInstanceID() : null;
-        
-        // display success
-        $this->displayFunction = 'displayItemSuccessScreen';
-        $this->argList = array($ci_id);
-        if (!empty($_REQUEST['search']))
-          $this->argList[] = urlencode($_REQUEST['search']);
+              // get courseinstance id, if editing reserve
+              $ci_id = ($reserve instanceof reserve) ? $reserve->getCourseInstanceID() : null;
+              
+              // display success
+              $this->displayFunction = 'displayItemSuccessScreen';
+              $this->argList = array($ci_id);
+              if (!empty($_REQUEST['search']))
+                $this->argList[] = urlencode($_REQUEST['search']);
             }
           }
         }  else {  //display edit page
@@ -434,7 +432,8 @@ class itemManager extends baseManager {
    * update reserve from submitted edit form
    *
    */
-  function saveReserve($reserve) {
+  function saveReserve($reserve) 
+  {
     //set status
     $reserve->setStatus($_REQUEST['reserve_status']);
     
@@ -447,6 +446,11 @@ class itemManager extends baseManager {
       if(!empty($_REQUEST['reserve_expiration_date'])) {
         $reserve->setExpirationDate($_REQUEST['reserve_expiration_date']);
       }   
+    }
+    
+    // set copyright status
+    if(isset($_REQUEST['copyright_status']))   {
+      $reserve->setCopyrightStatus($_REQUEST['copyright_status']);      
     }
     
     //set parent heading
@@ -505,7 +509,7 @@ class itemManager extends baseManager {
     if(isset($_REQUEST['availability'])) $item->setAvailability($_REQUEST['availability']);
     
     if(isset($_REQUEST['used_times_pages'])) $item->setUsedPagesTimes($_REQUEST['used_times_pages']);
-    if(isset($_REQUEST['total_times_pages'])) $item->setTotalPagesTimes($_REQUEST['total_times_pages']);
+    if(isset($_REQUEST['total_times_pages'])) $item->setTotalPagesTimes($_REQUEST['total_times_pages']);        
     
     if(isset($_REQUEST['material_type'])) $item->setMaterialType($_REQUEST['material_type'],
                        $_REQUEST['material_type_other']);

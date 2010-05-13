@@ -582,7 +582,7 @@ ITEM_SOURCE;
    * @global string $g_copyright_limit
    * @global string $g_copyright_notice
    */ 
-  function displayEditItemItemDetails($item, $ciid=null) {
+  function displayEditItemItemDetails($item, $copyrightStatusDisplay=0, $ciid=null) {
     global $u, $g_permission, $g_catalogName, $g_copyrightNotice, $g_copyrightLimit;    
 
     // get appropriate material types for this item
@@ -685,8 +685,8 @@ ITEM_SOURCE;
          <th>ISBN:</th>
          <td><input id="itemisbn" type="text" size="15" maxlength="13" value="<?= $item->getISBN() ?>" name="ISBN" /></td>
           <? if ($item->getItemGroup() == 'ELECTRONIC'): ?>
-            <td><small>If you do not know the ISBN of your book, please search for it in <a target="_blank" href="http://www.booksinprint.com/bip/">Books In Print
-            </a></small></td>
+            <td>If you do not know the ISBN of your book, please search for it in <a target="_blank" href="http://www.booksinprint.com/bip/">Books In Print
+            </a></td>
          <? endif ?>
        </tr>        
         
@@ -725,7 +725,11 @@ ITEM_SOURCE;
          <? if ($item->getItemGroup() == 'ELECTRONIC'): ?>
             <td><label id='percentmsg' /><small>This field displays the total % of book uploaded to this course.</small></td>
          <? endif ?>          
-        </tr>               
+        </tr>  
+        
+        <? /* Display copyright status for this reserve, if appropriate. (id="copyrightstatus") */ ?>
+        <? /* Dropdown menu sample output available in testGetCopyrightStatusDisplay */ ?> 
+        <?=$copyrightStatusDisplay?>
         
 <?php if(!$item->isPhysicalItem()): ?>
        <tr>
@@ -1062,10 +1066,13 @@ ITEM_SOURCE;
     }
     else { // For electronic items show the item details on top.
       if($edit_reserve) {
-        self::displayEditItemItemDetails($item, $reserve->getCourseInstanceID());  //show item details  
+        // get the copyright information from the reserves before passing on to the detail section.
+        $reservesLimit = $item->getOverallBookUsage($reserve->getCourseInstanceID(), false);
+        self::displayEditItemItemDetails($item, $reserve->getCopyrightStatusDisplay($u, $reservesLimit), $reserve->getCourseInstanceID());  
+        //show item details  
       }
       else {
-        self::displayEditItemItemDetails($item);  //show item details 
+        self::displayEditItemItemDetails($item,"");  //show item details 
       }
       self::displayEditItemSource($item);       //show item source
     }

@@ -33,10 +33,14 @@ require_once('secure/classes/courseInstance.class.php');
 
 class copyrightDisplayer {
 
-  function displayCopyrightQueue($reserves)
-  {
-    $rowCount = 0;
-    ?><ul class='wideList'>
+  function displayCopyrightQueue($reserves, $numcopyrightreserves, $currentpage, $totalpages)
+  {     
+    
+    $rowCount = 0; // used for odd/even row tinting
+
+    ?>
+        <ul class='wideList'>
+        <div class="headingCell1">COPYRIGHT RESERVES REVIEW QUEUE &mdash; page <?=$currentpage?></div>        
         <?php foreach ($reserves as $reserve) {
             $item = new reserveItem($reserve->itemID);
             $ci = new courseInstance($reserve->courseInstanceID);
@@ -45,7 +49,7 @@ class copyrightDisplayer {
 
             $rowCount++;
             $rowClass = ($rowCount % 2) ? 'oddRow' : 'evenRow';
-
+                        
             ?><li style="list-style:none;">
               <div class="<?=$rowClass?>">
                 <div class="iconBlock">
@@ -60,7 +64,7 @@ class copyrightDisplayer {
                     <div class="itemAuthor"<?=$item->getAuthor()?></div>
                   <?php } ?>
 
-                  <div><?=common_getStatusSpan($reserve->getStatus())?></div>
+                  <div><?=common_getStatusSpan($reserve->getCopyrightStatus())?></div>
 
                   <div>
                     <span class="itemMetaPre">Used in:</span>
@@ -89,6 +93,53 @@ class copyrightDisplayer {
         ?>
       </ul>
     <?php
-  }
+    if (isset($reserves) && !empty($reserves)) {
+      /******  build the pagination links ******/
+      // range of num links to show
+      $range = 3;
 
+      // if not on page 1, don't show back links
+      if ($currentpage > 1) {
+         // show << link to go back to page 1
+         echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=1'><<</a> ";
+         // get previous page num
+         $prevpage = $currentpage - 1;
+         // show < link to go back to 1 page
+         echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=$prevpage'><</a> ";
+      } // end if 
+
+      // loop to show links to range of pages around current page
+      for ($x = ($currentpage - $range); $x < (($currentpage + $range) + 1); $x++) {
+         // if it's a valid page number...
+         if (($x > 0) && ($x <= $totalpages)) {
+            // if we're on current page...
+            if ($x == $currentpage) {
+               // 'highlight' it but don't make a link
+               echo " [<b>$x</b>] ";
+            // if not current page...
+            } else {
+               // make it a link
+               echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=$x'>$x</a> ";
+            } // end else
+         } // end if 
+      } // end for
+                       
+      // if not on last page, show forward and last page links        
+      if ($currentpage != $totalpages) {
+        // get next page
+        $nextpage = $currentpage + 1;
+        // echo forward link for next page 
+        echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=$nextpage'>></a> ";
+        // echo forward link for lastpage
+        echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=$totalpages'>>></a> ";
+
+      } // end if
+      /****** end build pagination links ******/
+      // Show the total number of reserves in the queue      
+      echo "<div align='right'>($numcopyrightreserves reserves in the copyright queue)</div>";
+    }
+    else {
+      echo "<h2>There are no reserves that are new or pending exceeding the copyright limit at this time.</h2>";
+    }    
+  }
 }

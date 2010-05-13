@@ -223,6 +223,8 @@ function validateCopyrightPercentage() {
   // Validation: Is copyright percentage within guideline limit?
   // get the value from Overall Book Usage
   var bookpercentage = document.getElementById('percenttimespages').value; 
+  // remove the percent sign from the Overall Book Usage textbox string. 
+  bookpercentage = bookpercentage.substring(0,bookpercentage.indexOf("%"));
   // retrieve the fair use guideline amount config property <copyright_limit>
   var limit = document.getElementById('copyright_limit').value;
   // if the value is present, then check for over the limit.

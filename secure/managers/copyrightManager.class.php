@@ -46,8 +46,36 @@ class copyrightManager extends baseManager {
         $loc = 'Items needing copyright review';
         $this->displayFunction = "displayCopyrightQueue";
 
-        $reserves = reserve::getCopyrightReviewReserves();
-        $this->argList = array($reserves);
+        // Pagination calculations
+        // total number of reserves needing review.
+        $numcopyrightreserves = count(reserve::getCopyrightReviewReserves());  
+        $rowsperpage = 10;  // number of rows to show per page
+        $totalpages = ceil($numcopyrightreserves / $rowsperpage); // find out total pages
+
+        // get the current page or set a default
+        if (isset($_GET['currentpage']) && is_numeric($_GET['currentpage'])) {
+           $currentpage = (int) $_GET['currentpage']; // cast var as int
+        } else {
+           $currentpage = 1;  // default page num
+        } 
+        
+        if ($currentpage > $totalpages) { // if current page is greater than total pages...
+           $currentpage = $totalpages;  // set current page to last page
+        } 
+        
+        if ($currentpage < 1) { // if current page is less than first page...
+           $currentpage = 1;  // set current page to first page
+        } 
+
+        // the offset of the list, based on current page 
+        $offset = ($currentpage - 1) * $rowsperpage;
+           
+        // Retrieve the reserves in the copyright queue for this particular page.
+        $reserves = reserve::getCopyrightReviewReserves($offset, $rowsperpage);
+        
+        // Pass these parameters to the view.
+        $this->argList = array($reserves, $numcopyrightreserves, $currentpage, $totalpages);
+
         break;
     }
   }

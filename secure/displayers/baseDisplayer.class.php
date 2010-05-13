@@ -199,7 +199,7 @@ abstract class baseDisplayer {
    * @desc outputs HTML showing information about a reserve.  For use in class/reserve lists.
    */
   public function displayReserveInfo(&$reserve, $meta_style='') {
-    global $u, $g_reservesViewer;
+    global $u, $g_reservesViewer, $g_copyrightLimit;
 
     if(!($reserve->item instanceof reserveItem)) {
       $reserve->getItem();  //pull in item info
@@ -238,6 +238,20 @@ abstract class baseDisplayer {
     $itemIcon = $reserve->item->getItemIcon();
     $viewReserveURL = "reservesViewer.php?reserve=" . $reserve->getReserveID();
     
+    // if the copyright limit has been reached, then display a showCopyright status message.
+    $showCopyrightStatus = false;
+    $copyrightStatus = "";
+    if ($reserve->item->getOverallBookUsage($reserve->getCourseInstanceID()) > $g_copyrightLimit) {
+      $showCopyrightStatus = true;  // copyright percentage is over copyright limit.
+      $ci = new CourseInstance($reserve->getCourseInstanceID());  // will allow retrieval of term and year     
+      switch ($reserve->getCopyrightStatus()) {   // Copyright Message Text
+        case 'NEW': 
+        case 'PENDING': $copyrightStatus = "Pending Copyright Review"; break;
+        case 'ACCEPTED':$copyrightStatus = "Copyright Approved for " . $ci->getTerm() . " " . $ci->getYear(); break;
+        case 'DENIED':  $copyrightStatus = "Copyright Request Denied"; break;
+      }
+    }
+        
     //for physical items, pull in some other info
     if($reserve->item->isPhysicalItem()) {
       $reserve->item->getPhysicalCopy();  //get physical copy info
@@ -295,10 +309,10 @@ abstract class baseDisplayer {
           <span class="itemMetaPre">Volume/Edition: </span><span class="itemMeta"><?=$volEdition?></span>
           
 <?php endif; ?>
-<?php if($usedPagesTimes): ?>
+<?php if($showCopyrightStatus): ?>
 
           <br />
-          <span class="itemMetaPre">Total Pages/Time Used: </span><span class="itemMeta"><?=$usedPagesTimes?></span>
+          <span class="itemMetaPre">Copyright Status: </span><span class="itemMeta"><?=$copyrightStatus?></span>
           
 <?php endif; ?>
 <?php if($source): ?>

@@ -1,12 +1,12 @@
 --
---  requests.sql
---  basic request test set
+--  copyright.sql
+--  basic copyright test set
   
---  Created by Jason White (jbwhite@emory.edu)
+--  Created by Sari Connard (sconna2@emory.edu)
 --  
 --  This file is part of ReservesDirect
 
---  Copyright (c) 2004-2009 Emory University, Atlanta, Georgia.
+--  Copyright (c) 2004-2010 Emory University, Atlanta, Georgia.
 
 --  Licensed under the ReservesDirect License, Version 1.0 (the "License");      
 --  you may not use this file except in compliance with the License.     
@@ -49,24 +49,25 @@ INSERT INTO `items` (`item_id`, `title`,`author`,`source`,`volume_title`,`conten
 (25751,"Cognitive psychology and information processing / Psychologys contribution to the information-processing paradigm / Chapter 2","Lachman, Roy; Lachman, Janet L.; Butterfield, Earl C.","Hillsdale, N.J. : Lawrence Erlbaum Associates ; 1979. New York distributed by Halsted Press, c1979.","Cognitive psychology and information processing : an introduction","","1979","pp. 35-59 (25 of 573)","","","2004-11-22","2010-04-02","b7/b7bbcf87f7c7f7bc17ac6bc075e881d6_25751.pdf",1,1,"ELECTRONIC","ITEM","images/doc_type_icons/doctype-pdf.gif","047026649","","5017863","ACTIVE","BOOK_PORTION","","","35-59","573","25"),
 (25752,"Cognitive psychology and information processing / Science and paradigms: The premises of this book / Chapter 1","Lachman, Roy; Lachman, Janet L.; Butterfield, Earl C.","Hillsdale, N.J. : Lawrence Erlbaum Associates ; 1979. New York distributed by Halsted Press, c1979.","Cognitive psychology and information processing : an introduction","","1979","pp. 1-34 (34 of 573)","","","2004-11-22","2010-04-02","f4/f4bb7ba318421fb353c3d51a4a43b2cd_25752.pdf",1,1,"ELECTRONIC","ITEM","images/doc_type_icons/doctype-pdf.gif","047026649","","5017863","ACTIVE","BOOK_PORTION","","","1-34","573","34"),
 (142752,"Hurrian Myths","Hoffner, Harry A.","Atlanta, GA : Scholars Press, c1998.","Hittite Myths","","","pp. 40-81 (42 of 120)","","","2009-01-08","2010-04-02","49/49c190ce770409fdf46f7b1cc5ec6b46_142754.pdf",1,1,"ELECTRONIC","ITEM","images/doc_type_icons/doctype-pdf.gif","0788504886","","","ACTIVE","BOOK_PORTION","","","40-81","120","42");
+(142753,"Hurrian Myths II","Hoffner, Harry A.","Atlanta, GA : Scholars Press, c1998.","Hittite Myths","","","pp. 40-81 (42 of 120)","","","2009-01-08","2010-04-02","49/49c190ce770409fdf46f7b1cc5ec6b46_142754.pdf",1,1,"ELECTRONIC","ITEM","images/doc_type_icons/doctype-pdf.gif","0788504881","","","ACTIVE","BOOK_PORTION","","","40-81","120","42");
 
-INSERT INTO `reserves` (`reserve_id`, `course_instance_id`, `item_id`, `activation_date`, `expiration`, `status`, `date_created`, `last_modified`, `requested_loan_period`, `parent_id`) VALUES
-(412602, 57900, 133509, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL),
-(412603, 57900, 133510, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL),
-(412600, 57900, 134034, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL),
-(412601, 57900, 134044, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL),
-(405012, 57900, 152535, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL),
-(405013, 57900, 152536, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL),
-(405014, 57900, 152537, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL),
-(419683, 57900, 157144, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL),
-(411007, 57900, 101845, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL),
-(411008, 57900, 101848, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL),
-(411009, 57900, 101849, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL),
-(407981, 57900, 25749, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL),
-(407984, 57900, 25750, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL),
-(407983, 57900, 25751, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL),
-(407982, 57900, 25752, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL),
-(371613, 57900, 142752, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL);
+INSERT INTO `reserves` (`reserve_id`, `course_instance_id`, `item_id`, `activation_date`, `expiration`, `status`, `date_created`, `last_modified`, `requested_loan_period`, `parent_id`, `copyright_status`) VALUES
+(412602, 57900, 133509, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL, 'NEW'),
+(412603, 57900, 133510, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL, 'NEW'),
+(412600, 57900, 134034, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL, 'NEW'),
+(412601, 57900, 134044, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL, 'NEW'),
+(405012, 57900, 152535, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL, 'DENIED'),
+(405013, 57900, 152536, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL, 'DENIED'),
+(405014, 57900, 152537, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL, 'DENIED'),
+(419683, 57900, 157144, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL, 'NEW'),
+(411007, 57900, 101845, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL, 'PENDING'),
+(411008, 57900, 101848, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL, 'PENDING'),
+(411009, 57900, 101849, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL, 'PENDING'),
+(407981, 57900, 25749, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL, 'ACCEPTED'),
+(407984, 57900, 25750, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL, 'ACCEPTED'),
+(407983, 57900, 25751, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL, 'ACCEPTED'),
+(407982, 57900, 25752, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL, 'ACCEPTED'),
+(371613, 57900, 142752, '2009-12-01', '2010-05-16', 'ACTIVE', '2010-03-17', '2010-04-22', NULL, NULL, 'PENDING');
 
 INSERT INTO `course_instances` (`course_instance_id`, `primary_course_alias_id`, `term`, `year`, `activation_date`, `expiration_date`, `status`, `enrollment`, `reviewed_date`, `reviewed_by`) VALUES
 (60904, 57900, 'SPRING', 2010, '2009-12-01', '2010-05-16', 'ACTIVE', 'OPEN', NULL, NULL);
