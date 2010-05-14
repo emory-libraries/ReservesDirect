@@ -955,7 +955,6 @@ ITEM_SOURCE;
       function validateForm(frm) {      
         var alertMsg = "";
 
-        
         // Validation: Is copyright percentage within guideline limit?
         if (!validateCopyrightPercentage()) return false;
 
@@ -970,8 +969,8 @@ ITEM_SOURCE;
           alertMsg = alertMsg + 'You must choose an item source of either "Upload a document" or "Add a link".<br />';
         }     
 <? endif ?>   
-
-        alertMsg += checkMaterialTypes2(frm);      
+        // Validate the required fields for the defined material type.
+        alertMsg += checkMaterialTypes2(frm); 
         if (!alertMsg == "") { 
           document.getElementById('alertMsg').innerHTML = alertMsg;
           return false;
@@ -1081,7 +1080,6 @@ ITEM_SOURCE;
       self::displayEditItemSource($item);       //show item source
     }
 ?>    
-    </form>
     <br />
     <div class="headingCell1">NOTES</div>        
     <br />
@@ -1114,6 +1112,7 @@ ITEM_SOURCE;
     <div style="padding:10px; text-align:center;">
         <input type="submit" name="submit_edit_item_meta" value="Save Changes" onClick="return validateForm(this.form);">
     </div>
+    </form>    
 <?php   
   }
   
