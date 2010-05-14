@@ -220,25 +220,32 @@ function replaceAll( str, searchTerm, replaceWith, ignoreCase ) {
 
 function validateCopyrightPercentage() {
         
-  // Validation: Is copyright percentage within guideline limit?
-  // get the value from Overall Book Usage
-  var bookpercentage = document.getElementById('percenttimespages').value; 
-  // retrieve the fair use guideline amount config property <copyright_limit>
-  var limit = document.getElementById('copyright_limit').value;
-  // if the value is present, then check for over the limit.
-  if (document.getElementById('percenttimespages') != null && parseInt(bookpercentage) > parseInt(limit)) {          
-    // the percentage has exceeded the limit.
-    var msg = document.getElementById('copyright_notice').value
-    // replace the placeholder in notice with config property <copyright_limit> value.
-    msg = msg.replace("copyright_limit", limit);
-    // Add some newlines to improve readability to notice (config property <copyright_notice>).
-    msg = replaceAll(msg, "[\.] ", ".\n\n", false); 
-    // Show confirmation popup box if copyright percentage is over guideline limit.        
-    var answer = confirm(msg);
-    // If the user selects 'Cancel' to the over limit popup, then abort save.          
-    if (!answer) {  
-      return false;           
+  var type = $('material_type').options[$('material_type').selectedIndex].value;
+  if (type == "BOOK_PORTION") {
+    $('material_type_other_block').style.display = 'inline';
+
+    // Validation: Is copyright percentage within guideline limit?
+    // get the value from Overall Book Usage
+    var bookpercentage = document.getElementById('percenttimespages').value; 
+    // retrieve the fair use guideline amount config property <copyright_limit>
+    var limit = document.getElementById('copyright_limit').value;
+    // if the value is present, then check for over the limit.
+    if (document.getElementById('percenttimespages') != null && parseInt(bookpercentage) > parseInt(limit)) {          
+      // the percentage has exceeded the limit.
+      var msg = document.getElementById('copyright_notice').value
+      // replace the placeholder in notice with config property <copyright_limit> value.
+      msg = msg.replace("copyright_limit", limit);
+      // Add some newlines to improve readability to notice (config property <copyright_notice>).
+      msg = replaceAll(msg, "[\.] ", ".\n\n", false); 
+      // Show confirmation popup box if copyright percentage is over guideline limit.        
+      var answer = confirm(msg);
+      // If the user selects 'Cancel' to the over limit popup, then abort save.          
+      if (!answer) {  
+        return false;           
+      }
     }
-  }
-  return true;
+    return true;
+  } else {
+    return true;
+  }    
 }
