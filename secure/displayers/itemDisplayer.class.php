@@ -1031,7 +1031,7 @@ ITEM_SOURCE;
     </script>
 
 <? /* NOTE: post to same command, to preserve info about action (editItem or addDigitalItem   */ ?>
-        
+      
      <form id="item_form" name="item_form" action="index.php?cmd=<?= $_REQUEST['cmd'] ?>" method="post"
         <? if (! $item->isPhysicalItem()): ?> enctype="multipart/form-data" <? endif ?> >
 <?php if(! $item->isPhysicalItem()): ?>   
@@ -1081,11 +1081,28 @@ ITEM_SOURCE;
     }
 ?>    
     <br />
+
     <div class="headingCell1">NOTES</div>        
-    <br />
-    <?php if(isset($reserve)): //if editing existing item, use AJAX notes handler ?>    
-      <?php  self::displayEditItemNotesAJAX($item, $reserve);  ?>
-    <?php else: //just display plain note form ?>
+    <br />    
+    
+    <?php if(isset($reserve)): //if editing existing item, use AJAX notes handler ?>   
+    
+      <?php  // CHECK IF THIS IS IE, when editting notes.
+      $ie = false;
+      $userAgent = strtolower($_SERVER['HTTP_USER_AGENT']); 
+      if (preg_match('/msie/', $userAgent)) {
+          $name = 'msie';
+          $ie = true;
+      } 
+      ?>
+      
+      <?php if(!$ie): // if not IE, then allow notes to be editted. ?>    
+        <?php  self::displayEditItemNotesAJAX($item, $reserve);  ?>
+      <?php else: // suggest a non IE browser for editting notes. ?>
+        <p>If you would like to add or edit the notes, please use a browswer other than IE.</p>
+      <?php endif; ?>  
+        
+      <?php else: //just display plain note form ?>
 
       <strong>Add a new note:</strong>
       <br />
