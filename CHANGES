@@ -19,19 +19,45 @@ permissions and limitations under the License.
 ReservesDirect is located at:
 http://www.reservesdirect.org/
 
-
 ************************************************************************
+Revision 2.5.4
+
+Changes
+
+The Admin Copyright Queue is a new area that hold material requiring copyright review.
+
+-- An admin can view a basic list of items that need to be reviewed for 
+  copyright permissions.
+-- An admin can page through the copyright review queue so they're not 
+  overwhelmed with a huge page of items
+-- An admin can select an item from the review queue to see full item 
+  metadata to help them make appropriate copyright request.
+-- When an admin or instructor reactivates/copies an item or class, new items 
+  are automatically considered for inclusion in the copyright review queue.
+-- When admin or instructor views course materials, it includes information 
+  about copyright review status for items requiring approval.
+-- An admin can edit an item to mark that copyright has been secured or 
+  refused or that the item requires further attention.
+-- An admin can edit an item to add an internal copyright note that can be 
+  viewed only by admins so that staff can communicate among each other 
+  privately regarding copyright process.
+-- When copyright for an item has been secured or rejected, it no longer 
+  appears in the review list. 
+
 Revision 2.5.3
 
 Changes
 
 Copyright Percentages are calculated for "Portion of Book" material types.
 
--- Percentage of Book (metadata field for Portion of Book type) is automatically calculated for user based on "Sum{page range fields}/Total pages of book" (metadata fields that the user is required to complete).
-
--- Admin and Instructors can view total number of pages per book across sections/chapters in a single course.
-
--- Users have the ability to search Books In Print for the required ISBN. To the right of the ISBN field is the text: "If you do not know the ISBN of your book, please search for it in Books In Print"  http://www.booksinprint.com/bip/.
+-- Percentage of Book (metadata field for Portion of Book type) is automatically 
+  calculated for user based on "Sum{page range fields}/Total pages of book" 
+  (metadata fields that the user is required to complete).
+-- (void in lieu of changes scheduled for revision 2.5.5) Admin and Instructors 
+  can view total number of pages per book across sections/chapters in a single course.
+-- Users have the ability to search Books In Print for the required ISBN. To the 
+  right of the ISBN field is the text: "If you do not know the ISBN of your book, 
+  please search for it in Books In Print"  http://www.booksinprint.com/bip/.
 
 Revision 2.5.2
 
@@ -39,11 +65,12 @@ Changes
 
 OpenUrl functionality is available for electronic items.
 
--- Instructor and Admins can click on a "Test URL" button to launch the URL defined in the "Add a Link" text box.
-
--- Instructor and Admins can click on a "Get URL" button to create an openurl using the metadata fields in the display.
-
--- Instructor and Admins can click on a "Edit URL" button to launch the openurl window to manually generate an openurl.
+-- Instructor and Admins can click on a "Test URL" button to launch the URL 
+  defined in the "Add a Link" text box.
+-- Instructor and Admins can click on a "Get URL" button to create an openurl 
+  using the metadata fields in the display.
+-- Instructor and Admins can click on a "Edit URL" button to launch the openurl 
+  window to manually generate an openurl.
    
    
 Revision 2.5.1
