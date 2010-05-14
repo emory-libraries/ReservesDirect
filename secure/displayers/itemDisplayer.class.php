@@ -1099,7 +1099,7 @@ ITEM_SOURCE;
       <?php if(!$ie): // if not IE, then allow notes to be editted. ?>    
         <?php  self::displayEditItemNotesAJAX($item, $reserve);  ?>
       <?php else: // suggest a non IE browser for editting notes. ?>
-        <p>If you would like to add or edit the notes, please use a browswer other than IE.</p>
+        <p>If you would like to add or edit the notes, please use a browser other than Internet Explorer.</p>
       <?php endif; ?>  
         
       <?php else: //just display plain note form ?>
