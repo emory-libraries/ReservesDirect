@@ -1041,6 +1041,25 @@ CREATE TABLE IF NOT EXISTS reserves (
 -- --------------------------------------------------------
 
 -- 
+-- Table structure for table `rightsholders`
+-- 
+
+DROP TABLE IF EXISTS rightsholders;
+CREATE TABLE IF NOT EXISTS rightsholders (
+  ISBN varchar(13) NOT NULL,
+  name varchar(255) default NULL,
+  contact_name varchar(255) default NULL,
+  contact_email varchar(255) default NULL,
+  fax varchar(50) default NULL,
+  post_address varchar(255) default NULL,
+  rights_url varchar(255) default NULL,
+  policy_limit varchar(255) default NULL,
+  PRIMARY KEY (ISBN)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `skins`
 -- 
 

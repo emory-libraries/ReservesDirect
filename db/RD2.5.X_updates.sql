@@ -23,3 +23,16 @@ INSERT INTO mimetype_extensions (mimetype_id, file_extension) VALUES (8, 'gif');
 
 -- add new field for copyright status in the reserves table for queue display.
 ALTER TABLE `reserves` ADD `copyright_status` set('NEW', 'PENDING', 'ACCEPTED', 'DENIED') NOT NULL DEFAULT 'NEW' COMMENT 'Do we need/have permission from pub?';
+
+-- create rightsholder info table.
+CREATE TABLE rightsholders (
+  ISBN varchar(13) NOT NULL,
+  name varchar(255),
+  contact_name varchar(255),
+  contact_email varchar(255),
+  fax varchar(50),
+  post_address text,
+  rights_url varchar(255),
+  policy_limit varchar(255),
+  PRIMARY KEY (ISBN)
+);
