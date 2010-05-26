@@ -5,6 +5,7 @@ require_once("secure/classes/reserveItem.class.php");
 class TestReserveItemClass extends UnitTest {
   function setUp() {
     $this->loadDB('../fixtures/requests.sql');
+    $this->loadDB('../fixtures/rightsholders.sql');
     $this->loadDB('../fixtures/libraries.sql');
   }
   
@@ -108,7 +109,21 @@ class TestReserveItemClass extends UnitTest {
        "availability set correctly in reserve item after db init; should be true, got '" .
        $item->getAvailability() . "'");
     }
-    
+
+    function testGetRightsholder() {
+      $item = new reserveItem(19762); # isbn with rightsholder info
+      $rh = $item->getRightsholder();
+      $this->assertEqual($rh->getName(), 'Somebody Book Publishers, inc');
+
+      $item = new reserveItem(96261); # isbn without rightsholder info
+      $rh = $item->getRightsholder();
+      $this->assertNotNull($rh);
+      $this->assertNull($rh->getName());
+
+      $item = new reserveItem(63031); # null isbn
+      $rh = $item->getRightsholder();
+      $this->assertNull($rh);
+    }
 
 }
 

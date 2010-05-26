@@ -27,6 +27,7 @@ http://www.reservesdirect.org/
 *******************************************************************************/
 require_once("secure/classes/item.class.php");
 require_once("secure/classes/physicalCopy.class.php");
+require_once("secure/classes/rightsholder.class.php");
 require_once("secure/classes/user.class.php");
 
 class reserveItem extends item
@@ -786,6 +787,14 @@ class reserveItem extends item
       if ($this->getItemID()) $this->physicalCopy->getByItemID($this->getItemID());
     }
     return $this->physicalCopy;
+  }
+
+  function getRightsholder() {
+    $isbn = $this->getISBN();
+    if (is_null($isbn)) {
+      return null;
+    }
+    return new rightsholder($isbn);
   }
 
   function isPhysicalItem()
