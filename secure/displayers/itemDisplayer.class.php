@@ -841,6 +841,57 @@ ITEM_SOURCE;
 <?php
   }
   
+  /**
+   * Display rightsholder info for item
+   * @param rightsholder $rh the item's rightsholder object
+   */
+  function displayEditItemRightsholder($rh) {
+?>
+    <div class="headingCell1">RIGHTSHOLDER</div>
+    <div id="rightsholder_details" style="padding:8px 8px 12px 8px;">
+      <small>This rightsholder information is shared with all reserves that
+        use the ISBN specified above.</small>
+      <table class="editItem" border="0" cellpadding="2" cellspacing="0">
+        <tr>
+          <th>Rightsholder Name:</th>
+          <td><input name="rh_name" type="text" size="50"
+                value="<?= is_null($rh) ? '' : $rh->getName() ?>"></td>
+        </tr>
+        <tr>
+          <th>Contact Name:</th>
+          <td><input name="rh_contact_name" type="text" size="50"
+                value="<?= is_null($rh) ? '' : $rh->getContactName() ?>"></td>
+        </tr>
+        <tr>
+          <th>Contact Email:</th>
+          <td><input name="rh_contact_email" type="text" size="50"
+                value="<?= is_null($rh) ? '' : $rh->getContactEmail() ?>"></td>
+        </tr>
+        <tr>
+          <th>Fax:</th>
+          <td><input name="rh_fax" type="text" size="50"
+                value="<?= is_null($rh) ? '' : $rh->getFax() ?>"></td>
+        </tr>
+        <tr>
+          <th>Rights URL:</th>
+          <td><input name="rh_rights_url" type="text" size="50"
+                value="<?= is_null($rh) ? '' : $rh->getRightsUrl() ?>"></td>
+        </tr>
+        <tr>
+          <th>Limit:</th>
+          <td><input name="rh_policy_limit" type="text" size="50"
+                value="<?= is_null($rh) ? '' : $rh->getPolicyLimit() ?>"></td>
+        </tr>
+        <tr>
+          <th>Postal Address:</th>
+          <td><textarea name="rh_post_address" rows="3" cols="50"><?= 
+              is_null($rh) ? '' : $rh->getPostAddress() ?></textarea></td>
+        </tr>
+      </table>
+    </div>
+<?php
+  }
+
   
   /**
    * Displays the edit-item-notes block
@@ -1077,6 +1128,7 @@ ITEM_SOURCE;
       else {
         self::displayEditItemItemDetails($item,"");  //show item details 
       }
+      self::displayEditItemRightsholder($item->getRightsholder());
       self::displayEditItemSource($item);       //show item source
     }
 ?>    
