@@ -1129,7 +1129,11 @@ ITEM_SOURCE;
         self::displayEditItemItemDetails($item,"");  //show item details 
       }
       self::displayEditItemSource($item);       //show item source
-      self::displayEditItemRightsholder($item->getRightsholder());
+
+      if ($u->getRole() >= $g_permission['staff']) {
+        // show rightsholder section, but only to >= staff
+        self::displayEditItemRightsholder($item->getRightsholder());
+      }
     }
 ?>    
     <br />
