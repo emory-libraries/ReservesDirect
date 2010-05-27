@@ -1128,8 +1128,8 @@ ITEM_SOURCE;
       else {
         self::displayEditItemItemDetails($item,"");  //show item details 
       }
-      self::displayEditItemRightsholder($item->getRightsholder());
       self::displayEditItemSource($item);       //show item source
+      self::displayEditItemRightsholder($item->getRightsholder());
     }
 ?>    
     <br />
