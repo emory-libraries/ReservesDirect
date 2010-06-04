@@ -24,6 +24,10 @@ Release 2.5.X
     <copyright_notice>This the the copyright notice for 2010.</copyright_notice>
 
   5.  Pear package Numbers_Roman 1.0.2 needs to be installed.
+  
+  6. Update the configuration file:
+  <copyrightNoticeURL>http://web.library.emory.edu/services/course-reserves/reserves-copyright</copyrightNoticeURL>
+
 
 Release 2.4.11
 
