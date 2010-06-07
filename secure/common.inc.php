@@ -338,8 +338,7 @@ function common_electronicMaterialTypesDetails() {
          "times_pages" => array("required" => true, "label" => "Page ranges"),  // example!
          "used_times_pages" => array("required" => true, "label" => "Total pages used in item"),         
          "total_times_pages" => array("required" => true, "label" => "Total pages in book"),
-         "percent_times_pages" => array("label" => "Overall Book Usage"),
-         "copyright_status" => array("label" => "Copyright Status"),         
+         "percent_times_pages" => array("label" => "Overall Book Usage"),    
          "availability" => array("required" => true, "label" => "Print status of book",
          "options" => array("Out of Print", "In Print")),
          ),
@@ -439,7 +438,7 @@ function common_physicalMaterialTypesDetails() {
          "author" => array("label" => "Author"),
          "publisher" => array("label" => "Publisher"),
          "year" => array("label" => "Year of Publication"),
-         "isbn" => array("label" => "ISBN"),
+         "isbn" => array("label" => "ISBN"),  
          // oclc, reserve desk?
          ),
          "CD" =>
