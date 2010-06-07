@@ -548,10 +548,11 @@ ITEM_SOURCE;
                     </div>
         </p>
       </div>
+      </div>      
       <?php   endif; ?>
           </div>
     <?php   endif; #if in process?>
-        </div>
+
               
         <div id="reserve_dates_block" style="float:left;<?=$reserve_block_vis?>">
           <strong>Active Dates</strong> (YYYY-MM-DD) &nbsp;&nbsp; [<a href="#" name="reset_dates" onclick="resetDates('<?=$course_activation_date?>', '<?=$course_expiration_date?>'); return false;">Reset dates</a>]
