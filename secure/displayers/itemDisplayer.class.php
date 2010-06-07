@@ -726,12 +726,12 @@ ITEM_SOURCE;
             <td><label id='percentmsg' /><small>This field displays the total % of book uploaded to this course.</small></td>
          <? endif ?>          
         </tr>  
-        
+              
+<?php if(!$item->isPhysicalItem()): ?>
         <? /* Display copyright status for this reserve, if appropriate. (id="copyrightstatus") */ ?>
         <? /* Dropdown menu sample output available in testGetCopyrightStatusDisplay */ ?> 
         <?=$copyrightStatusDisplay?>
-        
-<?php if(!$item->isPhysicalItem()): ?>
+
        <tr>
          <th>Document Type Icon:</th>
          <td>
