@@ -622,7 +622,7 @@ ITEM_SOURCE;
         <tr class="required">
           <th>Type of Material:</th>
           <td>
-              <select id="material_type" name="material_type" onChange="typeOfMaterial();materialTypeEvents(this.form.material_type.value,this.form.item_group,this.form.iconImg);">
+              <select id="material_type" name="material_type" onChange="typeOfMaterial();materialTypeEvents();">
 <?php       foreach($materialTypes as $material_id => $material): ?>
 <?php           $selected = ($material_id == $item->getMaterialType()) ? ' selected="selected"' : ''; ?>
             <option value="<?= $material_id ?>"<?= $selected ?>><?= $material ?></option>
@@ -797,7 +797,9 @@ ITEM_SOURCE;
        typeOfMaterial();
        
        // Set the item_group based on type of material for physical items
-       function materialTypeEvents(material_type,item_group,itemIcon) {
+       function materialTypeEvents() {
+         
+         var material_type = document.getElementById('material_type').value;
          
         switch(material_type)
         { // For BOOK_PORTION only, display the rightsholder section.
@@ -852,9 +854,9 @@ ITEM_SOURCE;
    * Display rightsholder info for item
    * @param rightsholder $rh the item's rightsholder object
    */
-  function displayEditItemRightsholder($rh) {
+  function displayEditItemRightsholder($rh,$materialType) {
 ?>
-    <div id='rightsholder_hideshow'>
+<div id="rightsholder_hideshow" style="display:<?= ($materialType == 'BOOK_PORTION') ? 'inline' : 'none' ?>">
     <div class="headingCell1">RIGHTSHOLDER</div>
     <div id="rightsholder_details" style="padding:8px 8px 12px 8px;">
       <small>This rightsholder information is shared with all reserves that
@@ -1140,8 +1142,9 @@ ITEM_SOURCE;
       self::displayEditItemSource($item);       //show item source
 
       if ($u->getRole() >= $g_permission['staff']) {
+        $materialType = ($item->getMaterialType() == null) ?  'BOOK_PORTION' : $item->getMaterialType();     
         // show rightsholder section, but only to >= staff
-        self::displayEditItemRightsholder($item->getRightsholder());
+        self::displayEditItemRightsholder($item->getRightsholder(), $materialType);
       }
     }
 ?>    
