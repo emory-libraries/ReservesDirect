@@ -124,7 +124,14 @@ class TestReserveItemClass extends UnitTest {
       $rh = $item->getRightsholder();
       $this->assertNull($rh);
     }
-
+    
+    function testCountISBNUsage() {
+      $item = new reserveItem(19762); # isbn with rightsholder info
+      $this->assertEqual($item->getISBN(), 'FAKE ISBN', "count ISBN correctly; should be FAKE ISBN, got '" .
+      $item->getISBN() . "'");
+      $this->assertEqual($item->countISBNUsage(), 3, "count ISBN correctly; should be 3, got '" .
+       $item->countISBNUsage() . "'");
+    }    
 }
 
 if (! defined('RUNNER')) {

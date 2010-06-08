@@ -82,7 +82,7 @@ class TestItemManager extends UnitTest {
     $_REQUEST['ISSN'] = "12304003";
     $_REQUEST['OCLC'] = NULL; 
     $_REQUEST['item_status'] = "ACTIVE";
-    $_REQUEST['material_type'] = "JOURNAL_ARTICLE";
+    $_REQUEST['material_type'] = "BOOK_PORTION";
     $_REQUEST['home_library'] = 1;
     $_REQUEST['publisher'] = "HBJ";
     $_REQUEST['availability'] = 1;
@@ -105,7 +105,7 @@ class TestItemManager extends UnitTest {
     $this->assertEqual("vol1", $item->getVolumeEdition());
     $this->assertEqual("M.G.E.", $item->getAuthor());
     $this->assertEqual("ACTIVE", $item->getStatus());
-    $this->assertEqual("JOURNAL_ARTICLE", $item->getMaterialType());
+    $this->assertEqual("BOOK_PORTION", $item->getMaterialType());
     $this->assertEqual("HBJ", $item->getPublisher());
     $this->assertEqual(1, $item->getAvailability());
     $this->assertEqual("12-33", $item->getPagesTimes());
