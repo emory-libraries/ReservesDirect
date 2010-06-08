@@ -545,6 +545,12 @@ class reservesManager
                 }
                 //delete reserve
                 $reserve->destroy();
+                
+                // delete rightsholder there are no other references to the isbn.  
+                if ($reserve->item->countISBNUsage() == 0) {  // if there is only one item that refs the ISBN, then delete the rightsholder info.          
+                  $rh = $reserve->item->getRightsholder($reserve->item->getISBN()); // get the instance of the current item's rightsholder
+                  if ( ! is_null($rh) )  $rh->destroy();    // Delete the rightsholder from the rightsholders table.
+                }                
               }
 
               if (isset($_REQUEST['copyright_deny_class']) || isset($_REQUEST['copyright_deny_all_classes']))
