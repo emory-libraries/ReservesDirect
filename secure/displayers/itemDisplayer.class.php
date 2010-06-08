@@ -149,7 +149,7 @@ ITEM_SOURCE;
     <div id="openurl_link" style="display:none" class="borders noticeBox">
       <div class="noticeImg"></div>
       <div class="noticeText">
-        Instead of uploading a journal article, consider using the "Get URL" button below to locate a link to the article in one of Emory's online journals or databases instead.<br/>         
+        Instead of uploading a journal article, please use the "Get URL" button below to locate a link to the article, as not all of the Journal license agreements allow for the uploading of pdfs.<br/>         
       </div>
     </div>
     <table width="100%" border="0" cellpadding="3" cellspacing="0" bgcolor="#CCCCCC" class="borders">
