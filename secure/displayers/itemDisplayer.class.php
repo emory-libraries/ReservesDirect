@@ -864,37 +864,37 @@ ITEM_SOURCE;
       <table class="editItem" border="0" cellpadding="2" cellspacing="0">
         <tr>
           <th>Rightsholder Name:</th>
-          <td><input name="rh_name" type="text" size="50"
+          <td><input id="rh_name" name="rh_name" type="text" size="50"
                 value="<?= is_null($rh) ? '' : $rh->getName() ?>"></td>
         </tr>
         <tr>
           <th>Contact Name:</th>
-          <td><input name="rh_contact_name" type="text" size="50"
+          <td><input id="rh_contact_name" name="rh_contact_name" type="text" size="50"
                 value="<?= is_null($rh) ? '' : $rh->getContactName() ?>"></td>
         </tr>
         <tr>
           <th>Contact Email:</th>
-          <td><input name="rh_contact_email" type="text" size="50"
+          <td><input id="rh_contact_email" name="rh_contact_email" type="text" size="50"
                 value="<?= is_null($rh) ? '' : $rh->getContactEmail() ?>"></td>
         </tr>
         <tr>
           <th>Fax:</th>
-          <td><input name="rh_fax" type="text" size="50"
+          <td><input id="rh_fax" name="rh_fax" type="text" size="50"
                 value="<?= is_null($rh) ? '' : $rh->getFax() ?>"></td>
         </tr>
         <tr>
           <th>Rights URL:</th>
-          <td><input name="rh_rights_url" type="text" size="50"
+          <td><input id="rh_rights_url" name="rh_rights_url" type="text" size="50"
                 value="<?= is_null($rh) ? '' : $rh->getRightsUrl() ?>"></td>
         </tr>
         <tr>
           <th>Limit:</th>
-          <td><input name="rh_policy_limit" type="text" size="50"
+          <td><input id="rh_policy_limit" name="rh_policy_limit" type="text" size="50"
                 value="<?= is_null($rh) ? '' : $rh->getPolicyLimit() ?>"></td>
         </tr>
         <tr>
           <th>Postal Address:</th>
-          <td><textarea name="rh_post_address" rows="3" cols="50"><?= 
+          <td><textarea id="rh_post_address" name="rh_post_address" rows="3" cols="50"><?= 
               is_null($rh) ? '' : $rh->getPostAddress() ?></textarea></td>
         </tr>
       </table>
