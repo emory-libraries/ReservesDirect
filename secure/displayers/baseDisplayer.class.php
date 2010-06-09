@@ -238,6 +238,7 @@ abstract class baseDisplayer {
     $isbn = $reserve->item->getISBN();
     $itemIcon = $reserve->item->getItemIcon();
     $viewReserveURL = "reservesViewer.php?reserve=" . $reserve->getReserveID();
+    $fields = $reserve->item->getFieldDetails();
     
     // if the copyright limit has been reached, then display a showCopyright status message.
     $showCopyrightStatus = false;
@@ -292,34 +293,34 @@ abstract class baseDisplayer {
 <?php endif; ?>
 
 
-<?php if($volTitle): ?>
+<?php if($volTitle && isset($fields['work_title'])): ?>
 
           <br />
-          <span class="itemMetaPre">From: </span><span class="itemMeta"><?=$volTitle?></span>
+          <span class="itemMetaPre"><?=$fields['work_title']['label']?>: </span><span class="itemMeta"><?=$volTitle?></span>
           
 <?php endif; ?>
-<?php if($volEdition): ?>
+<?php if($volEdition && isset($fields['edition'])): ?>
 
           <br />
-          <span class="itemMetaPre">Volume/Edition: </span><span class="itemMeta"><?=$volEdition?></span>
+          <span class="itemMetaPre"><?=$fields['edition']['label']?>: </span><span class="itemMeta"><?=$volEdition?></span>
           
 <?php endif; ?>
-<?php if($publisher): ?>
+<?php if($publisher && isset($fields['publisher'])): ?>
 
           <br />
-          <span class="itemMetaPre">Publisher: </span><span class="itemMeta"><?=$publisher?></span>
+          <span class="itemMetaPre"><?=$fields['publisher']['label']?>: </span><span class="itemMeta"><?=$publisher?></span>
 
 <?php endif; ?>
-<?php if($source): ?>
+<?php if($source && isset($fields['year'])): ?>
 
           <br />
-          <span class="itemMetaPre">Source/Year: </span><span class="itemMeta"><?=$source?></span>
+          <span class="itemMetaPre"><?=$fields['year']['label']?>: </span><span class="itemMeta"><?=$source?></span>
           
 <?php endif; ?>
-<?php if($isbn): ?>
+<?php if($isbn && isset($fields['isbn'])): ?>
 
           <br />
-          <span class="itemMetaPre">ISBN: </span><span class="itemMeta"><?=$isbn?></span>
+          <span class="itemMetaPre"><?=$fields['isbn']['label']?>: </span><span class="itemMeta"><?=$isbn?></span>
 
 <?php endif; ?>
 <?php if($showCopyrightStatus): ?>

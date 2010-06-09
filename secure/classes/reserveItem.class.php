@@ -25,10 +25,11 @@ ReservesDirect is located at:
 http://www.reservesdirect.org/
 
 *******************************************************************************/
-require_once("secure/classes/item.class.php");
-require_once("secure/classes/physicalCopy.class.php");
-require_once("secure/classes/rightsholder.class.php");
-require_once("secure/classes/user.class.php");
+require_once('secure/classes/item.class.php');
+require_once('secure/classes/physicalCopy.class.php');
+require_once('secure/classes/rightsholder.class.php');
+require_once('secure/classes/user.class.php');
+require_once('secure/common.inc.php');
 
 class reserveItem extends item
 {
@@ -795,6 +796,11 @@ class reserveItem extends item
       return null;
     }
     return new rightsholder($isbn);
+  }
+
+  function getFieldDetails() {
+    $details = common_materialTypesDetails();
+    return $details[$this->getMaterialType()];
   }
 
   function isPhysicalItem()
