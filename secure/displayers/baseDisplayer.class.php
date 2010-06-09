@@ -229,12 +229,13 @@ abstract class baseDisplayer {
     $title = $reserve->item->getTitle();
     $author = $reserve->item->getAuthor();
     $url = $reserve->item->getURL();
-    $performer = $reserve->item->getPerformer();
     $volTitle = $reserve->item->getVolumeTitle();
     $volEdition = $reserve->item->getVolumeEdition();
     $pagesTimes = $reserve->item->getPagesTimes();
     $usedPagesTimes = $reserve->item->getOverallUsedPages($reserve->getCourseInstanceID());
     $source = $reserve->item->getSource();
+    $publisher = $reserve->item->getPublisher();
+    $isbn = $reserve->item->getISBN();
     $itemIcon = $reserve->item->getItemIcon();
     $viewReserveURL = "reservesViewer.php?reserve=" . $reserve->getReserveID();
     
@@ -291,12 +292,6 @@ abstract class baseDisplayer {
 <?php endif; ?>
 
 
-<?php if($performer): ?>
-
-          <br />
-          <span class="itemMetaPre">Performed by: </span><span class="itemMeta"><?=$performer?></span>
-          
-<?php endif; ?>
 <?php if($volTitle): ?>
 
           <br />
@@ -309,11 +304,11 @@ abstract class baseDisplayer {
           <span class="itemMetaPre">Volume/Edition: </span><span class="itemMeta"><?=$volEdition?></span>
           
 <?php endif; ?>
-<?php if($showCopyrightStatus): ?>
+<?php if($publisher): ?>
 
           <br />
-          <span class="itemMetaPre">Copyright Status: </span><span class="itemMeta"><?=$copyrightStatus?></span>
-          
+          <span class="itemMetaPre">Publisher: </span><span class="itemMeta"><?=$publisher?></span>
+
 <?php endif; ?>
 <?php if($source): ?>
 
@@ -321,7 +316,18 @@ abstract class baseDisplayer {
           <span class="itemMetaPre">Source/Year: </span><span class="itemMeta"><?=$source?></span>
           
 <?php endif; ?>
+<?php if($isbn): ?>
 
+          <br />
+          <span class="itemMetaPre">ISBN: </span><span class="itemMeta"><?=$isbn?></span>
+
+<?php endif; ?>
+<?php if($showCopyrightStatus): ?>
+
+          <br />
+          <span class="itemMetaPre">Copyright Status: </span><span class="itemMeta"><?=$copyrightStatus?></span>
+          
+<?php endif; ?>
 <?php
     //show notes
     noteDisplayer::displayNotes($notes);
