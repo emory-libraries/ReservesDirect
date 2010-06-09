@@ -39,12 +39,19 @@ class copyrightManager extends baseManager {
 
     $this->displayClass = "copyrightDisplayer";
     $this->user = $user;
+    $this->libraryID = 0;
 
     switch ($cmd)
     {
       case 'copyrightTab':
         $loc = 'Items needing copyright review';
         $this->displayFunction = "displayCopyrightQueue";
+        
+        // Get the Library
+        if (isset($_REQUEST['library'])) {
+          $this->libraryID = $_REQUEST['library'];
+          //print "LIBRARY ID = [" . $this->libraryID . "]\n";
+        } 
 
         // Pagination calculations
         // total number of reserves needing review.

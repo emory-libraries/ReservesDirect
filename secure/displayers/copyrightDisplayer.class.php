@@ -35,10 +35,28 @@ class copyrightDisplayer {
 
   function displayCopyrightQueue($reserves, $numcopyrightreserves, $currentpage, $totalpages)
   {     
-    
+    global $u, $g_permission;
     $rowCount = 0; // used for odd/even row tinting
 
-    ?>
+    ?>   
+      <form method="post" action="index.php">
+        <input type="hidden" name="cmd" value="copyrightTab" />
+                
+        <p />
+        
+        <strong>Library(ies):</strong>
+        <br /> 
+        <select id="library" multiple="false" name="library" size="5">
+<?php   foreach($u->getLibraries() as $lib): ?>
+          <option value="<?=$lib->getLibraryID()?>"><?=$lib->getLibrary()?></option>
+<?php   endforeach; ?>
+        </select>
+        <p />
+        <input type="submit" name="submit" value="Get Copyright Data for Selected Library" />
+      </form>
+        <p />
+        
+            
         <ul class='wideList'>
         <div class="headingCell1">COPYRIGHT RESERVES REVIEW QUEUE &mdash; page <?=$currentpage?></div>        
         <?php foreach ($reserves as $reserve) {
