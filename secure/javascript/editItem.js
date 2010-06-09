@@ -95,25 +95,25 @@ function unobtrusive()
   };
   if(document.getElementById('timespagesrange')) { // Times/Pages Range onchange event
     document.getElementById('timespagesrange').onchange = function() { 
-      ajaxCopyrightFunction(2); 
+      ajaxCopyrightFunction('page_range_update'); 
       return false; 
     };  
   };   
   if(document.getElementById('timespagesused')) { // Total Used Pages onchange event
     document.getElementById('timespagesused').onchange = function() { 
-      ajaxCopyrightFunction(1); 
+      ajaxCopyrightFunction('used_total_update'); 
       return false; 
     };  
   };
   if(document.getElementById('timespagestotal')) {  // Total Pages in book onchange event
     document.getElementById('timespagestotal').onchange = function() { 
-      ajaxCopyrightFunction(1); 
+      ajaxCopyrightFunction('used_total_update'); 
       return false; 
     };  
   };
   if(document.getElementById('itemisbn')) {  // ISBN
     document.getElementById('itemisbn').onchange = function() { 
-      ajaxCopyrightFunction(3); 
+      ajaxCopyrightFunction('isbn_update'); 
       return false; 
     };  
   };  
@@ -176,15 +176,14 @@ function ajaxCopyrightFunction(type){
   // this function receives data sent from the server
   ajaxRequest.onreadystatechange = function(){
     if(ajaxRequest.readyState == 4) {
-      //alert("AJAX RESPONSE = " + ajaxRequest.responseText);
-      // this will be returning these values:
-      // 1. ajaxUsed = the range for the current item (it may be that the range has not been changed)
-      // 2. ajaxPer = the copyright percentage for the current item.
-      // 3. ajaxCombo = the combined copyright percentage for all items with the same ISBN in this course.      
+      //alert("AJAX RESPONSE = " + ajaxRequest.responseText);   
       if (ajaxRequest.responseText != null) {
         var ajaxReturn = ajaxRequest.responseText;
         
-        if (type == 1 || type == 2) {
+        if (type == "page_range_update" || type == "used_total_update") {
+          // 1. ajaxUsed = the range for the current item (it may be that the range has not been changed)
+          // 2. ajaxPer = the copyright percentage for the current item.
+          // 3. ajaxCombo = the combined copyright percentage for all items with the same ISBN in this course.             
           var s1 = ajaxReturn.indexOf(";");
           var s2 = ajaxReturn.indexOf(";", s1+1);
           var ajaxUsed = ajaxReturn.substring(0,s1);
@@ -202,8 +201,8 @@ function ajaxCopyrightFunction(type){
           else {
             document.getElementById('percenttimespages').value = "";          
           }
-        } // end type = 1 or 2
-        else if (type == 3) { // update the rightsholder information.
+        } // end type = 'page_range_updated' or "used_total_update"
+        else if (type == "isbn_update") { // update the rightsholder information.
           var rha = eval(ajaxRequest.responseText);                  
           document.getElementById('rh_name').value = rha[0];
           document.getElementById("rh_contact_name").value = rha[1];
@@ -212,7 +211,7 @@ function ajaxCopyrightFunction(type){
           document.getElementById("rh_rights_url").value = rha[4];
           document.getElementById("rh_policy_limit").value = rha[5];
           document.getElementById("rh_post_address").value = rha[6].replace("\<BR\>", "\n");
-        } // end type = 3 (rightsholder information update)
+        } // end type = isbn_update
       } // end ajax response is not null
     } // end readyState = 4
   } // end onreadystatechange function

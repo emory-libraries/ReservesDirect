@@ -22,6 +22,7 @@
   require_once("secure/classes/pagesTime.class.php");
   require_once("secure/config.inc.php");
   require_once("secure/classes/item.class.php");
+  require_once("secure/classes/rightsholder.class.php");  
   
   $debug = false;
   // Here we set the input parameters based on the url $_REQUEST array.
@@ -41,6 +42,7 @@
     $ci_param=htmlspecialchars($_REQUEST['ci']);        // Course Instance ID
     $ci_param=stripslashes($ci_param);   
   }
+
   // Allow this script to be tested externally from the AJAX URL call.
   // (add) php AJAX_copyright.php "1-2" "" "300" "0140444734" "2" "" "57900" "debug"
   // (edit) php AJAX_copyright.php "2-4" "23" "190" "0300033060" "2" "156865" "57900" "debug"
@@ -54,7 +56,7 @@
     $ci_param = (isset($argv[7])) ? $argv[7] : "";
     $debug = (isset($argv[8])) ? true : false;    
   }  
-
+  
   $input = array( 
         "range" => $range_param, 
         "used" => $used_param, 
@@ -66,7 +68,35 @@
         "debug" => $debug,                                     
         );
         
-  echo calc_copyright($input);
+  switch ($type_param)
+  {
+    case 'page_range_update' :      
+    case 'used_total_update' :  echo calc_copyright($input); break;
+    case 'isbn_update' :           echo find_rightsholder($input['isbn']); break;
+  }
+  
+    /**
+   * return rightsholder information for the given isbn.
+   * 
+   * @param isbn The original date to be padded
+   * @return ret  Array of the rightsholder info.
+   */
+  function find_rightsholder($isbn)
+  { 
+    // 0788504886
+    $rh = new rightsholder($isbn);
+    $addr = str_replace("\n", "<BR>", $rh->getPostAddress()); 
+    $addr = str_replace("\r", "", $addr);     
+    
+    $return_value =  "new Array ('" . $rh->getName() .
+            "','" . $rh->getContactName() .
+            "','" . $rh->getContactEmail() .
+            "','" . $rh->getFax() .
+            "','" . $rh->getRightsUrl() .
+            "','" . $rh->getPolicyLimit() .              
+            "','" . $addr . "')"; 
+    echo $return_value;
+  }
     
   /**
    * return the range for the current item (it may be that the range has not been changed)
@@ -84,7 +114,7 @@
     // The range is only calculated if call came from the 'Page ranges' onChange trigger.
     // Otherwise it uses the given 'Total pages used in book' parameter.
     $current_used = ($in['used'] == null) ? 0 :  $in['used']; 
-    if ($in['type'] == 2) {
+    if ($in['type'] == 'page_range_update') {
       $pagesTimes = new PagesTime(); 
       $pagesTimes->process_list($in['range']);
       if ($pagesTimes->pgs_used > 0)  {
@@ -119,7 +149,7 @@
     }
     
     // There are two goals for the return value
-    // First return the used page calculation (type=2)
+    // First return the used page calculation (type='page_range_update')
     // Second return the percentage for this current item only.
     // Second return the sum of used percentages for this ISBN.
     $return_value = intval($current_used) . ";" . intval($current_item_percentage) . ";" . intval($cummulative_percentage);
