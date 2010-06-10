@@ -20,6 +20,30 @@ ReservesDirect is located at:
 http://www.reservesdirect.org/
 
 ************************************************************************
+Revision 2.5.5
+
+Changes
+
+ The Copyright Rightholder Information tracks rightsholder information that will allow admin and staff to add/edit/delete/view the information.
+ 
+-- When an admin or staff opens the add/edit item view, since the material type defaults to "Portion of Book," the form includes fields to enter rightsholder information for the book. This information includes: Rightsholder name, contact name, contact email, fax#, mailing address, form URL, limit. None are required.
+-- When an admin or staff changes the material type away from "Portion of Book", the rightsholder information should disappear since it is no longer needed.
+-- When an admin or staff changes the material type back to "Portion of Book", the rightsholder information should reappear since it might be needed again for tracking down copyright.
+-- When an admin or staff enters an ISBN in the add/edit item form, the application checks for rightsholder information for that ISBN and populates the fields accordingly.
+-- If an instructor enters an ISBN in the add/edit form, then when an admin or staff views that form, rightsholder information for that ISBN is displayed and editable if it is available.
+-- When a user is accessing the course listing page, items display bibliographic metadata to help the users identify the book. This metadata includes: Title, Author/Artist, Work Title, Publisher/Producer, Year of Pub/Production, ISBN; remove other fields.
+-- When a admin or staff goes to the copyright tab, they don't go immediately to the queue. First they get a page where they can select a filter library. Then they are sent to the good ol' queue, filtered by the primary course listing's departments's default library.
+-- When a user is editing an item for a portion of book, the Availability status should be labeled "Print Status" with options of "in print" and "out of print." The previous wording is unclear.
+-- When a user select a journal article for upload, the warning message should say, "Instead of uploading a journal article, please use the "Get URL" button below to locate a link to the article, as not all of the Journal license agreements allow for the uploading of pdfs." The previous wording wants more explanation.
+-- When a user is accessing the copyright queue, all existing reserve items that are in pdf format will default to material type of "Portion of Book", so these reactivated course items, as well as any existing reserve item will be considered for the copyright queue.
+-- When a user is performing an add or edit to a physical item, the following fields will be part of the ITEM SOURCE section:
+    - Barcode (appears with search button for add physical item)
+    - Reserve Desk (drop down menu)
+    - EUCLID control number
+    - call number
+-- When a user enters a barcode on the add physical item display and the item is found in EUCLID, then following fields will be populated if data is available:  (title, author, source/year, ISBN, OCLC, EUCLID control number, call number)
+
+            
 Revision 2.5.4
 
 Changes
