@@ -924,22 +924,26 @@ class reserve extends Notes {
                 FROM reserves r
                   JOIN items i ON r.item_id = i.item_id
                   JOIN course_instances ci ON r.course_instance_id = ci.course_instance_id
+                  JOIN course_aliases ca ON ci.primary_course_alias_id = ca.course_alias_id
+                  JOIN courses co ON ca.course_id = co.course_id
+                  JOIN departments dept ON co.department_id = dept.department_id
                   LEFT JOIN course_book_usage tot ON 
                       i.ISBN = tot.ISBN AND
                       ci.course_instance_id = tot.course_instance_id
                 WHERE r.copyright_status NOT IN ('ACCEPTED', 'DENIED') AND
                       i.material_type = 'BOOK_PORTION' AND 
                       ci.status = 'ACTIVE' AND
+                      dept.library_id = ? AND
                       (tot.percent_used IS NULL OR
                        tot.percent_used >= ?)
                 ORDER BY ci.course_instance_id, i.item_id";
     }
-    $params = array((int)$g_copyrightLimit);
+    $params = array($libraryID, (int)$g_copyrightLimit);
     
     // include any pagination requests that limit the result set.
     if (isset($offset) && isset($rowsperpage)) {
       $sql .= " LIMIT ?, ?";
-      $params = array((int)$g_copyrightLimit, $offset, $rowsperpage);
+      $params = array($libraryID, (int)$g_copyrightLimit, $offset, $rowsperpage);
     }  
     
     $rs = $g_dbConn->query($sql, $params);
