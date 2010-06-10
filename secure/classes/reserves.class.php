@@ -899,43 +899,59 @@ class reserve extends Notes {
       default:
         /* Given each of the books used for a course, we want to know all
          * of the reserves for that book/course combination, but only if
-         * the total page usage is greater than some configurable percent.
-         * 
-         *  * Join reserves, items, and course_instances to get,
-         *    essentially, all of the items used for each ci.
-         *  * Use an outer join to augment that with the aggregate percent
-         *    used (from a view) wherever we were able to calculate it. This
-         *    means that when we have ISBN and pages_times info in the main
-         *    query, we should now also have aggregate percent used data
-         *    from the subquery. Where ISBN or pages_times are missing or
-         *    invalid, aggregate percent used data will be NULL.
-         *  * Filter the results: We only care about BOOK_PORTION items
-         *    and ACTIVE course instances.
-         *  * Filter it further: We only care about items whose aggregate
-         *    percent used is above the threshold or unavailable.
-         *    Remember: The outer join means that the usage information is
-         *    NULL unless we had enough information to calculate it in the
-         *    subquery.
-         *  * Yield the reserves that match our criteria, ordered by
-         *    course instance and item id to ease human browsing.
+         * the total page usage is greater than the fair use threshold.
+         *
+         * Conceptually, here's how we approach it:
+         *  * Start with all active course instances.
+         *  * Get the instance's primary course alias, the course that it
+         *    represents, and the department that offers that course.
+         *  * Select only the departments whose home library was the one
+         *    passed in.
+         *  * For each remaining course instance, join in the instance's
+         *    reserves, and through that its items.
+         *  * Select only those reserves that are neither accepted nor
+         *    denied; that is, only those whose copyright status is still
+         *    pending.
+         *  * Select only those items that are portions of books.
+         *  * For each of those items, select again each of the course
+         *    instance's reserves and items matching the current item's
+         *    ISBN.
+         *  * Group the results by course instance and ISBN. Each group
+         *    contains all of the items for the current course instance that
+         *    match the current item's ISBN.
+         *  * Calculate the total percentage used from the grouped items.
+         *  * Select only those groups whose ISBN is unset, whose usage
+         *    percent can't be calculated, or whose usage percent is above
+         *    the fair use threshold.
+         *
+         * Note that an earlier implementation used a subquery to clean up
+         * the logic that grouped ISBNs. This ended up producing
+         * exceedingly slow results (multi-minute) for real datasets. The
+         * current implementation isn't great (~30sec on test hardware
+         * using real data), but it's adequate. A significant improvement
+         * from here would probably require significant schema changes.
          */
 
-        $sql = "SELECT DISTINCT r.reserve_id
-                FROM reserves r
-                  JOIN items i ON r.item_id = i.item_id
-                  JOIN course_instances ci ON r.course_instance_id = ci.course_instance_id
+        $sql = "SELECT r.reserve_id, sum(cast(i2.pages_times_used AS DECIMAL) /
+                                         cast(i2.pages_times_total AS DECIMAL)) * 100 percent_used
+                FROM course_instances ci
                   JOIN course_aliases ca ON ci.primary_course_alias_id = ca.course_alias_id
                   JOIN courses co ON ca.course_id = co.course_id
                   JOIN departments dept ON co.department_id = dept.department_id
-                  LEFT JOIN course_book_usage tot ON 
-                      i.ISBN = tot.ISBN AND
-                      ci.course_instance_id = tot.course_instance_id
+                  JOIN reserves r ON r.course_instance_id = ci.course_instance_id
+                  JOIN items i ON r.item_id = i.item_id
+                  JOIN reserves r2 ON ci.course_instance_id = r2.course_instance_id
+                  JOIN items i2 ON r2.item_id = i2.item_id AND
+                                   i.ISBN = i2.ISBN
                 WHERE r.copyright_status NOT IN ('ACCEPTED', 'DENIED') AND
-                      i.material_type = 'BOOK_PORTION' AND 
-                      ci.status = 'ACTIVE' AND
-                      dept.library_id = ? AND
-                      (tot.percent_used IS NULL OR
-                       tot.percent_used >= ?)
+                      i.material_type = 'BOOK_PORTION' AND
+                      ci.status='ACTIVE' AND
+                      dept.library_id = ?
+                GROUP BY ci.course_instance_id, r.reserve_id, i.ISBN
+                HAVING i.ISBN IS NULL OR
+                       i.ISBN = '0' OR
+                       percent_used IS NULL OR
+                       percent_used > ?
                 ORDER BY ci.course_instance_id, i.item_id";
     }
     $params = array($libraryID, (int)$g_copyrightLimit);
