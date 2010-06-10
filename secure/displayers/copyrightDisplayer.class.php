@@ -121,6 +121,13 @@ class copyrightDisplayer {
         ?>
       </ul>
     <?php
+    
+    foreach($u->getLibraries() as $lib) {
+      if($lib->getLibraryID() == $libraryID) {
+        $libraryName = $lib->getLibrary();
+      }
+    } 
+          
     if (isset($reserves) && !empty($reserves)) {
       /******  build the pagination links ******/
       // range of num links to show
@@ -164,10 +171,10 @@ class copyrightDisplayer {
       } // end if
       /****** end build pagination links ******/
       // Show the total number of reserves in the queue      
-      echo "<div align='right'>($numcopyrightreserves reserves in the copyright queue)</div>";
+      echo "<div align='right'>($numcopyrightreserves reserves in the copyright queue for $libraryName)</div>";
     }
-    else {
-      echo "<h2>There are no reserves that are new or pending exceeding the copyright limit at this time.</h2>";
+    else {       
+      echo "<h2>There are no reserves that are new or pending exceeding the copyright limit at this time for $libraryName.</h2>";
     }    
   }
 }
