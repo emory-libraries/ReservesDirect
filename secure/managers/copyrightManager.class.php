@@ -80,7 +80,7 @@ class copyrightManager extends baseManager {
         $offset = ($currentpage - 1) * $rowsperpage;
            
         // Retrieve the reserves in the copyright queue for this particular page.
-        $reserves = reserve::getCopyrightReviewReserves($offset, $rowsperpage);
+        $reserves = reserve::getCopyrightReviewReserves($offset, $rowsperpage, $libraryID);
         
         // Pass these parameters to the view.
         $this->argList = array($reserves, $numcopyrightreserves, $currentpage, $totalpages, $libraryID);

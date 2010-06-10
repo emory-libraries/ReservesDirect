@@ -889,7 +889,7 @@ class reserve extends Notes {
    * @desc Get a list of reserves whose copyright limit exceeds the limit,
    * and has a copyright_status of either 'NEW' or 'PENDING'.
    */  
-  static function getCopyrightReviewReserves($offset=null, $rowsperpage=null)
+  static function getCopyrightReviewReserves($offset=null, $rowsperpage=null, $libraryID=1)
   {
     global $g_dbConn;
     global $g_copyrightLimit;
