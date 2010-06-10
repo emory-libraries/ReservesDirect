@@ -897,37 +897,18 @@ class reserve extends Notes {
     switch ($g_dbConn->phptype)
     {
       default:
-        /* Crazy sql warning! I'd love to see this cleaned up if anyone can
-         * think of a way. Separating books into a separate table might
-         * help.
-         * 
-         * Given each of the books used for a course, we want to know all
+        /* Given each of the books used for a course, we want to know all
          * of the reserves for that book/course combination, but only if
          * the total page usage is greater than some configurable percent.
          * 
-         * Our strategy here is to use a subquery to calculate the
-         * percents used, and then join that into the main query. Let's
-         * explain that from the inside out:
-         *
-         * In the subquery:
-         *  * Join items, reserves, and course_instances to get,
-         *    essentially, all of the items used for each ci.
-         *  * Filter that: Since the point of the subquery is to provide
-         *    pages_times info per ISBN, get rid of rows where we don't
-         *    have enough info to provide that info.
-         *  * Yield one row for each ISBN/CIID where we're able to
-         *    calculate an aggregate percent used.
-         *
-         * In the main query:
          *  * Join reserves, items, and course_instances to get,
          *    essentially, all of the items used for each ci.
-         *  * Use an outer join to augment that with the subquery's
-         *    aggregate percent used wherever we were able to calculate
-         *    it. This means that when we have ISBN and pages_times info
-         *    in the main query, we should now also have aggregate percent
-         *    used data from the subquery. Where ISBN or pages_times are
-         *    missing or invalid, aggregate percent used data will be
-         *    NULL.
+         *  * Use an outer join to augment that with the aggregate percent
+         *    used (from a view) wherever we were able to calculate it. This
+         *    means that when we have ISBN and pages_times info in the main
+         *    query, we should now also have aggregate percent used data
+         *    from the subquery. Where ISBN or pages_times are missing or
+         *    invalid, aggregate percent used data will be NULL.
          *  * Filter the results: We only care about BOOK_PORTION items
          *    and ACTIVE course instances.
          *  * Filter it further: We only care about items whose aggregate
@@ -943,24 +924,14 @@ class reserve extends Notes {
                 FROM reserves r
                   JOIN items i ON r.item_id = i.item_id
                   JOIN course_instances ci ON r.course_instance_id = ci.course_instance_id
-                  LEFT JOIN (SELECT i.ISBN, ci.course_instance_id,
-                                    SUM(CAST(i.pages_times_used AS DECIMAL) /
-                                        CAST(i.pages_times_total AS DECIMAL)) * 100 AS pct
-                             FROM items i
-                               JOIN reserves r ON r.item_id = i.item_id
-                               JOIN course_instances ci ON r.course_instance_id = ci.course_instance_id
-                             WHERE i.ISBN IS NOT NULL AND
-                                   i.ISBN <> '0' AND
-                                   i.pages_times_used IS NOT NULL AND
-                                   i.pages_times_total IS NOT NULL
-                             GROUP BY i.ISBN, ci.course_instance_id
-                            ) tot ON i.ISBN = tot.ISBN AND
-                                     ci.course_instance_id = tot.course_instance_id
+                  LEFT JOIN course_book_usage tot ON 
+                      i.ISBN = tot.ISBN AND
+                      ci.course_instance_id = tot.course_instance_id
                 WHERE r.copyright_status NOT IN ('ACCEPTED', 'DENIED') AND
                       i.material_type = 'BOOK_PORTION' AND 
                       ci.status = 'ACTIVE' AND
-                      (tot.pct IS NULL OR
-                       tot.pct >= ?)
+                      (tot.percent_used IS NULL OR
+                       tot.percent_used >= ?)
                 ORDER BY ci.course_instance_id, i.item_id";
     }
     $params = array((int)$g_copyrightLimit);

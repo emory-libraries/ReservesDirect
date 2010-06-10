@@ -36,3 +36,20 @@ CREATE TABLE rightsholders (
   policy_limit varchar(255),
   PRIMARY KEY (ISBN)
 );
+
+-- new view for calculating, given a course instance and an isbn, what
+-- total percentage of that isbn have we stored for that course (to the
+-- degree that we have that information).
+CREATE VIEW course_book_usage AS
+  SELECT i.ISBN, ci.course_instance_id,
+         SUM(CAST(i.pages_times_used AS DECIMAL) /
+             CAST(i.pages_times_total AS DECIMAL)) * 100 AS percent_used
+  FROM items i
+    JOIN reserves r ON r.item_id = i.item_id
+    JOIN course_instances ci ON r.course_instance_id = ci.course_instance_id
+  WHERE i.ISBN IS NOT NULL AND
+        i.ISBN <> '0' AND
+        i.pages_times_used IS NOT NULL AND
+        i.pages_times_total IS NOT NULL
+  GROUP BY i.ISBN, ci.course_instance_id;
+
