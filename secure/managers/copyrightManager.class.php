@@ -39,7 +39,6 @@ class copyrightManager extends baseManager {
 
     $this->displayClass = "copyrightDisplayer";
     $this->user = $user;
-    $this->libraryID = 0;
 
     switch ($cmd)
     {
@@ -49,9 +48,12 @@ class copyrightManager extends baseManager {
         
         // Get the Library
         if (isset($_REQUEST['library'])) {
-          $this->libraryID = $_REQUEST['library'];
-          //print "LIBRARY ID = [" . $this->libraryID . "]\n";
+          $libraryID = $_REQUEST['library'];
+          print "LIBRARY ID = [" . $libraryID . "]\n";
         } 
+        else {
+          $libraryID = 1; // default to Woodruff library
+        }
 
         // Pagination calculations
         // total number of reserves needing review.
@@ -81,7 +83,7 @@ class copyrightManager extends baseManager {
         $reserves = reserve::getCopyrightReviewReserves($offset, $rowsperpage);
         
         // Pass these parameters to the view.
-        $this->argList = array($reserves, $numcopyrightreserves, $currentpage, $totalpages);
+        $this->argList = array($reserves, $numcopyrightreserves, $currentpage, $totalpages, $libraryID);
 
         break;
     }

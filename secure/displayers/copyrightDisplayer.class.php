@@ -33,7 +33,7 @@ require_once('secure/classes/courseInstance.class.php');
 
 class copyrightDisplayer {
 
-  function displayCopyrightQueue($reserves, $numcopyrightreserves, $currentpage, $totalpages)
+  function displayCopyrightQueue($reserves, $numcopyrightreserves, $currentpage, $totalpages, $libraryID)
   {     
     global $u, $g_permission;
     $rowCount = 0; // used for odd/even row tinting
@@ -48,7 +48,11 @@ class copyrightDisplayer {
         <br /> 
         <select id="library" multiple="false" name="library" size="5">
 <?php   foreach($u->getLibraries() as $lib): ?>
+<?php if($lib->getLibraryID() == $libraryID): ?>
+         <option value="<?=$lib->getLibraryID()?>"  selected="selected" ><?=$lib->getLibrary()?></option> 
+<?php else: ?>                   
           <option value="<?=$lib->getLibraryID()?>"><?=$lib->getLibrary()?></option>
+<?php endif; ?>              
 <?php   endforeach; ?>
         </select>
         <p />
