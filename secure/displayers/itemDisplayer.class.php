@@ -764,14 +764,14 @@ ITEM_SOURCE;
        </tr>
          
        <tr id="availability">
-          <th>Availability:</th>
+          <th>Print status:</th>
           <td>
          <input type="radio" name="availability"
        <?= ($item->getAvailability() === 0) ? 'checked="checked"' : '' ?>  value="0">
-         <span id="availability_option0">unavailable</span>
+         <span id="availability_option0">out of print</span>
             <input type="radio" name="availability"
        <?= ($item->getAvailability() == null || $item->getAvailability() == 1) ? 'checked="checked"' : '' ?>  value="1">
-         <span id="availability_option1">available</span>
+         <span id="availability_option1">in print</span>
            </td>
         </tr>
 

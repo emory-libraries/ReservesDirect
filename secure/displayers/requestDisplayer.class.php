@@ -915,14 +915,14 @@ class requestDisplayer extends noteDisplayer {
          <td><input name="OCLC" maxlength="9" size="15" value="<?=$item_data['OCLC']?>" type="text"></td>
       </tr>
       <tr id="availability" style="display:none">
-        <th>Availability:</th>
+        <th>Print status:</th>
         <td>
          <input type="radio" name="availability" value="0"
 <?= (isset($item_data['availability']) && $item_data['availability'] == 0) ? 'checked="checked"' : '' ?> >
-          <span id="availability_option0">unavailable</span>
+          <span id="availability_option0">out of print</span>
          <input type="radio" name="availability" value="1"
 <?= (!isset($item_data['availability']) || $item_data['availability'] == 1) ? 'checked="checked"' : '' ?> >
-          <span id="availability_option1">available</span>
+          <span id="availability_option1">in print</span>
          </td>
       </tr>
 

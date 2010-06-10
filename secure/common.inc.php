@@ -339,8 +339,8 @@ function common_electronicMaterialTypesDetails() {
          "used_times_pages" => array("required" => true, "label" => "Total pages used in item"),         
          "total_times_pages" => array("required" => true, "label" => "Total pages in book"),
          "percent_times_pages" => array("label" => "Overall Book Usage"),    
-         "availability" => array("required" => true, "label" => "Print status of book",
-         "options" => array("Out of Print", "In Print")),
+         "availability" => array("required" => true, "label" => "Print status",
+         "options" => array("out of print", "in print")),
          ),
          "JOURNAL_ARTICLE" =>
          array("title" => array("required" => true, "label" => "Article Title"),
