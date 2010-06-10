@@ -44,7 +44,7 @@ class copyrightDisplayer {
                 
         <p />
         
-        <strong>Library(ies):</strong>
+        <strong>Library:</strong>
         <br /> 
         <select id="library" multiple="false" name="library" size="5">
 <?php   foreach($u->getLibraries() as $lib): ?>
@@ -56,13 +56,19 @@ class copyrightDisplayer {
 <?php   endforeach; ?>
         </select>
         <p />
-        <input type="submit" name="submit" value="Get Copyright Data for Selected Library" />
+        <input type="submit" name="submit" value="Get Copyright Data for Selected Library"  />
       </form>
         <p />
-        
             
         <ul class='wideList'>
-        <div class="headingCell1">COPYRIGHT RESERVES REVIEW QUEUE &mdash; page <?=$currentpage?></div>        
+        <div class="headingCell1">COPYRIGHT RESERVES REVIEW QUEUE for 
+<?php   foreach($u->getLibraries() as $lib): ?>
+<?php if($lib->getLibraryID() == $libraryID): ?>
+         <?=$lib->getLibrary() ?> 
+<?php endif; ?>              
+<?php   endforeach; ?>    
+          &mdash; page <?=$currentpage?>
+        </div> 
         <?php foreach ($reserves as $reserve) {
             $item = new reserveItem($reserve->itemID);
             $ci = new courseInstance($reserve->courseInstanceID);

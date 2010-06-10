@@ -49,7 +49,6 @@ class copyrightManager extends baseManager {
         // Get the Library
         if (isset($_REQUEST['library'])) {
           $libraryID = $_REQUEST['library'];
-          print "LIBRARY ID = [" . $libraryID . "]\n";
         } 
         else {
           $libraryID = 1; // default to Woodruff library
