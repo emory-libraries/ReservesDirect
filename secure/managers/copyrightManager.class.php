@@ -51,7 +51,7 @@ class copyrightManager extends baseManager {
           $libraryID = $_REQUEST['library'];
         } 
         else {
-          $libraryID = 1; // default to Woodruff library
+          $libraryID = 0; // default to no library
         }
 
         // Pagination calculations

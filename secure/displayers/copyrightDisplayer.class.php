@@ -61,6 +61,8 @@ class copyrightDisplayer {
         <p />
             
         <ul class='wideList'>
+        
+<?php if($libraryID > 0): ?>        
         <div class="headingCell1">COPYRIGHT RESERVES REVIEW QUEUE for 
 <?php   foreach($u->getLibraries() as $lib): ?>
 <?php if($lib->getLibraryID() == $libraryID): ?>
@@ -69,6 +71,7 @@ class copyrightDisplayer {
 <?php   endforeach; ?>    
           &mdash; page <?=$currentpage?>
         </div> 
+<?php endif; ?>          
         <?php foreach ($reserves as $reserve) {
             $item = new reserveItem($reserve->itemID);
             $ci = new courseInstance($reserve->courseInstanceID);
@@ -173,7 +176,7 @@ class copyrightDisplayer {
       // Show the total number of reserves in the queue      
       echo "<div align='right'>($numcopyrightreserves reserves in the copyright queue for $libraryName)</div>";
     }
-    else {       
+    else if ($libraryID > 0) {       
       echo "<h2>There are no reserves that are new or pending exceeding the copyright limit at this time for $libraryName.</h2>";
     }    
   }
