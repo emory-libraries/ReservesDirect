@@ -136,11 +136,11 @@ class copyrightDisplayer {
       // if not on page 1, don't show back links
       if ($currentpage > 1) {
          // show << link to go back to page 1
-         echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=1'><<</a> ";
+         echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=1&library=$libraryID'><<</a> ";
          // get previous page num
          $prevpage = $currentpage - 1;
          // show < link to go back to 1 page
-         echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=$prevpage'><</a> ";
+         echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=$prevpage&library=$libraryID'><</a> ";
       } // end if 
 
       // loop to show links to range of pages around current page
@@ -154,7 +154,7 @@ class copyrightDisplayer {
             // if not current page...
             } else {
                // make it a link
-               echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=$x'>$x</a> ";
+               echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=$x&library=$libraryID'>$x</a> ";
             } // end else
          } // end if 
       } // end for
@@ -164,9 +164,9 @@ class copyrightDisplayer {
         // get next page
         $nextpage = $currentpage + 1;
         // echo forward link for next page 
-        echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=$nextpage'>></a> ";
+        echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=$nextpage&library=$libraryID'>></a> ";
         // echo forward link for lastpage
-        echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=$totalpages'>>></a> ";
+        echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=$totalpages&library=$libraryID'>>></a> ";
 
       } // end if
       /****** end build pagination links ******/

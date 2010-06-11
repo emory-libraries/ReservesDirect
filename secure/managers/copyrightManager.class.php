@@ -56,10 +56,15 @@ class copyrightManager extends baseManager {
 
         // Pagination calculations
         // total number of reserves needing review.
-        $numcopyrightreserves = count(reserve::getCopyrightReviewReserves());  
+        $numcopyrightreserves = count(reserve::getCopyrightReviewReserves(null,null,$libraryID));  
         $rowsperpage = 10;  // number of rows to show per page
         $totalpages = ceil($numcopyrightreserves / $rowsperpage); // find out total pages
 
+        // get the current page or set a default
+        if (isset($_GET['library']) ) {
+           $libraryID = (int) $_GET['library']; // cast var as int
+        }
+        
         // get the current page or set a default
         if (isset($_GET['currentpage']) && is_numeric($_GET['currentpage'])) {
            $currentpage = (int) $_GET['currentpage']; // cast var as int
