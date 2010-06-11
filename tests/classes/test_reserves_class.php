@@ -17,33 +17,33 @@ class TestReservesClass extends UnitTest {
   
   function testCopyrightReviewReserves() {
     $reserves = reserve::getCopyrightReviewReserves();
-    $this->assertEqual(count($reserves), 4);
-    $reserves = reserve::getCopyrightReviewReserves(0,2);
-    $this->assertEqual(count($reserves), 2);    
+    $this->assertEqual(count($reserves), 2);
+    $reserves = reserve::getCopyrightReviewReserves(0,1);
+    $this->assertEqual(count($reserves), 1);
   }
   
   function testCopyrightStatusAcceptedIsRemovedFromQueue() {
     $reserves = reserve::getCopyrightReviewReserves();
-    $this->assertEqual(count($reserves), 4);
+    $this->assertEqual(count($reserves), 2);
     $reserves = new Reserve(202864);
     $this->assertEqual($reserves->getCopyrightStatus(), 'NEW', "The copyright_status is NEW"); 
     // Set the copyright status to accepted, then get it to make sure it was set properly
     $status = "ACCEPTED";
     $reserves->setCopyrightStatus($status);
     $reserves = reserve::getCopyrightReviewReserves();
-    $this->assertEqual(count($reserves), 3);    
+    $this->assertEqual(count($reserves), 2);    
   }
   
   function testCopyrightStatusDeniedIsRemovedFromQueue() {
     $reserves = reserve::getCopyrightReviewReserves();
-    $this->assertEqual(count($reserves), 4);
+    $this->assertEqual(count($reserves), 2);
     $reserves = new Reserve(202864);
     $this->assertEqual($reserves->getCopyrightStatus(), 'NEW', "The copyright_status is NEW"); 
     // Set the copyright status to denied, then get it to make sure it was set properly
     $status = "DENIED";
     $reserves->setCopyrightStatus($status);
     $reserves = reserve::getCopyrightReviewReserves();
-    $this->assertEqual(count($reserves), 3);    
+    $this->assertEqual(count($reserves), 2);    
   }  
   
   function testGetCopyrightStatus() {

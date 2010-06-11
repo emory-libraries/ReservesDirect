@@ -120,6 +120,18 @@ class itemManager extends baseManager {
             $this->argList[] = $invalid;
             
           } else {
+            
+            // Check to see if the previous material type is BOOK_PORTION, and the new material type is not BOOK_PORTION
+            // OR if the material type is BOOK_PORTION and the ISBN has changed.
+            // If so, delete the rightsholder information for this (old) ISBN if it is not used by any other item.         
+            if (  ($_REQUEST['material_type'] == 'BOOK_PORTION' && $item->getISBN() != $_REQUEST['ISBN']) ||  
+                  ($_REQUEST['material_type'] != 'BOOK_PORTION' && $item->getMaterialType() == 'BOOK_PORTION')) {
+              if ($item->countISBNUsage() == 1) {  // if there is only one item that refs the ISBN, then delete the rightsholder info.  
+                $rh = $item->getRightsholder($item->getISBN()); // get the instance of the current item's rightsholder
+                if ( ! is_null($rh) )  $rh->destroy();    // Delete the rightsholder from the rightsholders table.
+              }
+            }
+                        
             // store whether or not this was a new item before updating the DB
             $new_item = (! $item->itemID);
             
@@ -477,7 +489,7 @@ class itemManager extends baseManager {
     // if no reserveItem was passed in, create a new one
     if ($item == null || !$item->itemID) {
       // FIXME: should this check be added to getReserveItem ?
-      //    if(empty($_REQUEST['item_id']) || !$item->getItemByID($_REQUEST['item_id'])) {  //If missing item_id or it is invalid     
+      //    if(empty($_REQUEST['item_id']) || !$item->getItemByID($_REQUEST['item_id']))   //If missing item_id or it is invalid
       //create item
       if ($item == null) $item = new reserveItem();
       $item->createNewItem(); 
@@ -514,13 +526,24 @@ class itemManager extends baseManager {
     if(isset($_REQUEST['material_type'])) $item->setMaterialType($_REQUEST['material_type'],
                        $_REQUEST['material_type_other']);
     
-
     //this will be an ILS-assigned key for physical items, or a manually-entered barcode for electronic items
     // FIXME: is local control key only applicable to physical items?
     // was only set on physical items in itemManager/editItem; set for both on add
     if(isset($_REQUEST['local_control_key'])) $item->setLocalControlKey($_REQUEST['local_control_key']);
 
-    
+    $rh = $item->getRightsholder($_REQUEST['ISBN']);
+    if ( ! is_null($rh) ) {
+      if ($_REQUEST['material_type'] == 'BOOK_PORTION') {
+        if (isset($_REQUEST['rh_name'])) $rh->setName($_REQUEST['rh_name']);
+        if (isset($_REQUEST['rh_contact_name'])) $rh->setContactName($_REQUEST['rh_contact_name']);
+        if (isset($_REQUEST['rh_contact_email'])) $rh->setContactEmail($_REQUEST['rh_contact_email']);
+        if (isset($_REQUEST['rh_fax'])) $rh->setFax($_REQUEST['rh_fax']);
+        if (isset($_REQUEST['rh_rights_url'])) $rh->setRightsUrl($_REQUEST['rh_rights_url']);
+        if (isset($_REQUEST['rh_policy_limit'])) $rh->setPolicyLimit($_REQUEST['rh_policy_limit']);
+        if (isset($_REQUEST['rh_post_address'])) $rh->setPostAddress($_REQUEST['rh_post_address']);
+      }
+    }
+
     //physical item data
     if($item->isPhysicalItem()) {
       if (isset($_REQUEST['home_library'])) $item->setHomeLibraryID($_REQUEST['home_library']);
@@ -560,10 +583,10 @@ class itemManager extends baseManager {
         $item->setMimeTypeByFileExt($file['ext']);
         // FIXME: this block was only in editItem; redundant or problematic when creating new?
         if ($item->copyrightReviewRequired()) {
-    $classes = $item->getAllCourseInstances();
-    for($i=0; $i < sizeof($classes); $i++) {
-      $classes[$i]->clearReviewed();
-    }
+          $classes = $item->getAllCourseInstances();
+          for($i=0; $i < sizeof($classes); $i++) {
+            $classes[$i]->clearReviewed();
+          }
         }
       }
       elseif($_REQUEST['documentType'] == 'URL') {  //adding a link

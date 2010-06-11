@@ -25,9 +25,11 @@ ReservesDirect is located at:
 http://www.reservesdirect.org/
 
 *******************************************************************************/
-require_once("secure/classes/item.class.php");
-require_once("secure/classes/physicalCopy.class.php");
-require_once("secure/classes/user.class.php");
+require_once('secure/classes/item.class.php');
+require_once('secure/classes/physicalCopy.class.php');
+require_once('secure/classes/rightsholder.class.php');
+require_once('secure/classes/user.class.php');
+require_once('secure/common.inc.php');
 
 class reserveItem extends item
 {
@@ -788,6 +790,19 @@ class reserveItem extends item
     return $this->physicalCopy;
   }
 
+  function getRightsholder() {
+    $isbn = $this->getISBN();
+    if (is_null($isbn)) {
+      return null;
+    }
+    return new rightsholder($isbn);
+  }
+
+  function getFieldDetails() {
+    $details = common_materialTypesDetails();
+    return $details[$this->getMaterialType()];
+  }
+
   function isPhysicalItem()
   {
     if ($this->itemGroup == 'MULTIMEDIA' || $this->itemGroup == 'MONOGRAPH') {
@@ -899,6 +914,20 @@ class reserveItem extends item
     $params = array($ci, $this->getISBN());  
     $overallUsedPages = $this->selectOverallUsedPages($query, $params, null);
     return intval($overallUsedPages); 
-  }   
-
+  }  
+  
+  /**
+  * @return the total number of reserve item that reference this ISBN
+  * @desc Calculcate the total number reserve items that reference this ISBN.
+  */  
+  function countISBNUsage() {
+    global $g_dbConn;
+    
+    $query = 'select COUNT(*) from items as i, reserves as r where i.item_id = r.item_id and i.ISBN =  ?'; 
+    $params = array($this->getISBN());  
+    $rs = $g_dbConn->getOne($query, $params);
+    if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
+    return intval($rs); 
+  }  
+       
 }

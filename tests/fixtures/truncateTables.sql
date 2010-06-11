@@ -61,6 +61,7 @@ TRUNCATE reports;
 TRUNCATE reports_cache;
 TRUNCATE requests;
 TRUNCATE reserves;
+TRUNCATE rightsholders;
 TRUNCATE skins;
 TRUNCATE special_users;
 TRUNCATE special_users_audit;

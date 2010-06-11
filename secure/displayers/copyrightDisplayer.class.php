@@ -33,14 +33,42 @@ require_once('secure/classes/courseInstance.class.php');
 
 class copyrightDisplayer {
 
-  function displayCopyrightQueue($reserves, $numcopyrightreserves, $currentpage, $totalpages)
+  function displayCopyrightQueue($reserves, $numcopyrightreserves, $currentpage, $totalpages, $libraryID)
   {     
-    
+    global $u, $g_permission;
     $rowCount = 0; // used for odd/even row tinting
 
-    ?>
+    ?>   
+      <form method="post" action="index.php">
+        <input type="hidden" name="cmd" value="copyrightTab" />
+                
+        <p />
+        
+        <strong>Library:</strong>
+        <br /> 
+        <select id="library" multiple="false" name="library" size="5">
+<?php   foreach($u->getLibraries() as $lib): ?>
+<?php if($lib->getLibraryID() == $libraryID): ?>
+         <option value="<?=$lib->getLibraryID()?>"  selected="selected" ><?=$lib->getLibrary()?></option> 
+<?php else: ?>                   
+          <option value="<?=$lib->getLibraryID()?>"><?=$lib->getLibrary()?></option>
+<?php endif; ?>              
+<?php   endforeach; ?>
+        </select>
+        <p />
+        <input type="submit" name="submit" value="Get Copyright Data for Selected Library"  />
+      </form>
+        <p />
+            
         <ul class='wideList'>
-        <div class="headingCell1">COPYRIGHT RESERVES REVIEW QUEUE &mdash; page <?=$currentpage?></div>        
+        <div class="headingCell1">COPYRIGHT RESERVES REVIEW QUEUE for 
+<?php   foreach($u->getLibraries() as $lib): ?>
+<?php if($lib->getLibraryID() == $libraryID): ?>
+         <?=$lib->getLibrary() ?> 
+<?php endif; ?>              
+<?php   endforeach; ?>    
+          &mdash; page <?=$currentpage?>
+        </div> 
         <?php foreach ($reserves as $reserve) {
             $item = new reserveItem($reserve->itemID);
             $ci = new courseInstance($reserve->courseInstanceID);
@@ -93,6 +121,13 @@ class copyrightDisplayer {
         ?>
       </ul>
     <?php
+    
+    foreach($u->getLibraries() as $lib) {
+      if($lib->getLibraryID() == $libraryID) {
+        $libraryName = $lib->getLibrary();
+      }
+    } 
+          
     if (isset($reserves) && !empty($reserves)) {
       /******  build the pagination links ******/
       // range of num links to show
@@ -101,11 +136,11 @@ class copyrightDisplayer {
       // if not on page 1, don't show back links
       if ($currentpage > 1) {
          // show << link to go back to page 1
-         echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=1'><<</a> ";
+         echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=1&library=$libraryID'><<</a> ";
          // get previous page num
          $prevpage = $currentpage - 1;
          // show < link to go back to 1 page
-         echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=$prevpage'><</a> ";
+         echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=$prevpage&library=$libraryID'><</a> ";
       } // end if 
 
       // loop to show links to range of pages around current page
@@ -119,7 +154,7 @@ class copyrightDisplayer {
             // if not current page...
             } else {
                // make it a link
-               echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=$x'>$x</a> ";
+               echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=$x&library=$libraryID'>$x</a> ";
             } // end else
          } // end if 
       } // end for
@@ -129,17 +164,17 @@ class copyrightDisplayer {
         // get next page
         $nextpage = $currentpage + 1;
         // echo forward link for next page 
-        echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=$nextpage'>></a> ";
+        echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=$nextpage&library=$libraryID'>></a> ";
         // echo forward link for lastpage
-        echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=$totalpages'>>></a> ";
+        echo " <a href='{$_SERVER['PHP_SELF']}?cmd={$_REQUEST['cmd']}&currentpage=$totalpages&library=$libraryID'>>></a> ";
 
       } // end if
       /****** end build pagination links ******/
       // Show the total number of reserves in the queue      
-      echo "<div align='right'>($numcopyrightreserves reserves in the copyright queue)</div>";
+      echo "<div align='right'>($numcopyrightreserves reserves in the copyright queue for $libraryName)</div>";
     }
-    else {
-      echo "<h2>There are no reserves that are new or pending exceeding the copyright limit at this time.</h2>";
+    else {       
+      echo "<h2>There are no reserves that are new or pending exceeding the copyright limit at this time for $libraryName.</h2>";
     }    
   }
 }

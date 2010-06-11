@@ -149,7 +149,7 @@ ITEM_SOURCE;
     <div id="openurl_link" style="display:none" class="borders noticeBox">
       <div class="noticeImg"></div>
       <div class="noticeText">
-        Instead of uploading a journal article, consider using the "Get URL" button below to locate a link to the article in one of Emory's online journals or databases instead.<br/>         
+        Instead of uploading a journal article, please use the "Get URL" button below to locate a link to the article, as not all of the Journal license agreements allow for the uploading of pdfs.<br/>         
       </div>
     </div>
     <table width="100%" border="0" cellpadding="3" cellspacing="0" bgcolor="#CCCCCC" class="borders">
@@ -548,10 +548,11 @@ ITEM_SOURCE;
                     </div>
         </p>
       </div>
+      </div>      
       <?php   endif; ?>
           </div>
     <?php   endif; #if in process?>
-        </div>
+
               
         <div id="reserve_dates_block" style="float:left;<?=$reserve_block_vis?>">
           <strong>Active Dates</strong> (YYYY-MM-DD) &nbsp;&nbsp; [<a href="#" name="reset_dates" onclick="resetDates('<?=$course_activation_date?>', '<?=$course_expiration_date?>'); return false;">Reset dates</a>]
@@ -621,7 +622,7 @@ ITEM_SOURCE;
         <tr class="required">
           <th>Type of Material:</th>
           <td>
-              <select id="material_type" name="material_type" onChange="typeOfMaterial();setItemGroup(this.form.material_type.value,this.form.item_group,this.form.iconImg);">
+              <select id="material_type" name="material_type" onChange="typeOfMaterial();materialTypeEvents();">
 <?php       foreach($materialTypes as $material_id => $material): ?>
 <?php           $selected = ($material_id == $item->getMaterialType()) ? ' selected="selected"' : ''; ?>
             <option value="<?= $material_id ?>"<?= $selected ?>><?= $material ?></option>
@@ -726,12 +727,12 @@ ITEM_SOURCE;
             <td><label id='percentmsg' /><small>This field displays the total % of book uploaded to this course.</small></td>
          <? endif ?>          
         </tr>  
-        
+              
+<?php if(!$item->isPhysicalItem()): ?>
         <? /* Display copyright status for this reserve, if appropriate. (id="copyrightstatus") */ ?>
         <? /* Dropdown menu sample output available in testGetCopyrightStatusDisplay */ ?> 
         <?=$copyrightStatusDisplay?>
-        
-<?php if(!$item->isPhysicalItem()): ?>
+
        <tr>
          <th>Document Type Icon:</th>
          <td>
@@ -763,14 +764,14 @@ ITEM_SOURCE;
        </tr>
          
        <tr id="availability">
-          <th>Availability:</th>
+          <th>Print status:</th>
           <td>
          <input type="radio" name="availability"
        <?= ($item->getAvailability() === 0) ? 'checked="checked"' : '' ?>  value="0">
-         <span id="availability_option0">unavailable</span>
+         <span id="availability_option0">out of print</span>
             <input type="radio" name="availability"
        <?= ($item->getAvailability() == null || $item->getAvailability() == 1) ? 'checked="checked"' : '' ?>  value="1">
-         <span id="availability_option1">available</span>
+         <span id="availability_option1">in print</span>
            </td>
         </tr>
 
@@ -796,8 +797,16 @@ ITEM_SOURCE;
        typeOfMaterial();
        
        // Set the item_group based on type of material for physical items
-       function setItemGroup(material_type,item_group,itemIcon) {
+       function materialTypeEvents() {
          
+         var material_type = document.getElementById('material_type').value;
+         
+        switch(material_type)
+        { // For BOOK_PORTION only, display the rightsholder section.
+          case "BOOK_PORTION":     document.getElementById('rightsholder_hideshow') .style.display = '';    break;
+          default:   document.getElementById('rightsholder_hideshow') .style.display = 'none';     break;
+        } 
+                 
 <?php if (!$item->itemID): ?>          
         switch(material_type)
         {
@@ -841,6 +850,59 @@ ITEM_SOURCE;
 <?php
   }
   
+  /**
+   * Display rightsholder info for item
+   * @param rightsholder $rh the item's rightsholder object
+   */
+  function displayEditItemRightsholder($rh,$materialType) {
+?>
+<div id="rightsholder_hideshow" style="display:<?= ($materialType == 'BOOK_PORTION') ? 'inline' : 'none' ?>">
+    <div class="headingCell1">RIGHTSHOLDER</div>
+    <div id="rightsholder_details" style="padding:8px 8px 12px 8px;">
+      <small>This rightsholder information is shared with all reserves that
+        use the ISBN specified above.</small>
+      <table class="editItem" border="0" cellpadding="2" cellspacing="0">
+        <tr>
+          <th>Rightsholder Name:</th>
+          <td><input id="rh_name" name="rh_name" type="text" size="50"
+                value="<?= is_null($rh) ? '' : $rh->getName() ?>"></td>
+        </tr>
+        <tr>
+          <th>Contact Name:</th>
+          <td><input id="rh_contact_name" name="rh_contact_name" type="text" size="50"
+                value="<?= is_null($rh) ? '' : $rh->getContactName() ?>"></td>
+        </tr>
+        <tr>
+          <th>Contact Email:</th>
+          <td><input id="rh_contact_email" name="rh_contact_email" type="text" size="50"
+                value="<?= is_null($rh) ? '' : $rh->getContactEmail() ?>"></td>
+        </tr>
+        <tr>
+          <th>Fax:</th>
+          <td><input id="rh_fax" name="rh_fax" type="text" size="50"
+                value="<?= is_null($rh) ? '' : $rh->getFax() ?>"></td>
+        </tr>
+        <tr>
+          <th>Rights URL:</th>
+          <td><input id="rh_rights_url" name="rh_rights_url" type="text" size="50"
+                value="<?= is_null($rh) ? '' : $rh->getRightsUrl() ?>"></td>
+        </tr>
+        <tr>
+          <th>Limit:</th>
+          <td><input id="rh_policy_limit" name="rh_policy_limit" type="text" size="50"
+                value="<?= is_null($rh) ? '' : $rh->getPolicyLimit() ?>"></td>
+        </tr>
+        <tr>
+          <th>Postal Address:</th>
+          <td><textarea id="rh_post_address" name="rh_post_address" rows="3" cols="50"><?= 
+              is_null($rh) ? '' : $rh->getPostAddress() ?></textarea></td>
+        </tr>
+      </table>
+    </div>
+    </div>
+<?php
+  }
+
   
   /**
    * Displays the edit-item-notes block
@@ -1078,6 +1140,12 @@ ITEM_SOURCE;
         self::displayEditItemItemDetails($item,"");  //show item details 
       }
       self::displayEditItemSource($item);       //show item source
+
+      if ($u->getRole() >= $g_permission['staff']) {
+        $materialType = ($item->getMaterialType() == null) ?  'BOOK_PORTION' : $item->getMaterialType();     
+        // show rightsholder section, but only to >= staff
+        self::displayEditItemRightsholder($item->getRightsholder(), $materialType);
+      }
     }
 ?>    
     <br />

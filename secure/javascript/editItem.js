@@ -95,22 +95,28 @@ function unobtrusive()
   };
   if(document.getElementById('timespagesrange')) { // Times/Pages Range onchange event
     document.getElementById('timespagesrange').onchange = function() { 
-      ajaxGetUsedPagesFunction(2); 
+      ajaxCopyrightFunction('page_range_update'); 
       return false; 
     };  
   };   
   if(document.getElementById('timespagesused')) { // Total Used Pages onchange event
     document.getElementById('timespagesused').onchange = function() { 
-      ajaxGetUsedPagesFunction(1); 
+      ajaxCopyrightFunction('used_total_update'); 
       return false; 
     };  
   };
-    if(document.getElementById('timespagestotal')) {  // Total Pages in book onchange event
+  if(document.getElementById('timespagestotal')) {  // Total Pages in book onchange event
     document.getElementById('timespagestotal').onchange = function() { 
-      ajaxGetUsedPagesFunction(1); 
+      ajaxCopyrightFunction('used_total_update'); 
       return false; 
     };  
   };
+  if(document.getElementById('itemisbn')) {  // ISBN
+    document.getElementById('itemisbn').onchange = function() { 
+      ajaxCopyrightFunction('isbn_update'); 
+      return false; 
+    };  
+  };  
 };
 
 // Onclick action for the "Edit URL" button
@@ -135,14 +141,14 @@ function preview_url(mypage) {
   document.getElementById('alertMsg').innerHTML = alertMsg;        
 } 
   
-// Several events trigger this function "ajaxGetUsedPagesFunction" to be called.
+// Several events trigger this function "ajaxCopyrightFunction" to be called.
 // Anytime change in the form id values: times_pages(aka range) or used_times_pages or total_times_pages.
 // The results include:
 // 1. an update to the used_times_pages (a calculation based on the range), if needed (type=2).
 // 2. an update to the percent_times_pages (based on combined ISBN results for course).
 // this function calls a php script (secure/calculateCopyrightPercent.php) to calculate this data.
 
-function ajaxGetUsedPagesFunction(type){
+function ajaxCopyrightFunction(type){
   var ajaxRequest;  // Ajax request object
   
   // only do this processing for material type = BOOK_PORTION
@@ -153,14 +159,14 @@ function ajaxGetUsedPagesFunction(type){
   try{
     // Opera 8.0+, Firefox, Safari Browser Support
     ajaxRequest = new XMLHttpRequest();
-  } catch (e){
+  } catch (e) {
     // Internet Explorer Browser Support
     try{
       ajaxRequest = new ActiveXObject("Msxml2.XMLHTTP");
     } catch (e) {
       try{
         ajaxRequest = new ActiveXObject("Microsoft.XMLHTTP");
-      } catch (e){
+      } catch (e) {
         // Something went wrong
         alert("Your browser broke!");
         return false;
@@ -170,33 +176,45 @@ function ajaxGetUsedPagesFunction(type){
   // this function receives data sent from the server
   ajaxRequest.onreadystatechange = function(){
     if(ajaxRequest.readyState == 4) {
-      //alert("AJAX RESPONSE = " + ajaxRequest.responseText);
-      // this will be returning these values:
-      // 1. ajaxUsed = the range for the current item (it may be that the range has not been changed)
-      // 2. ajaxPer = the copyright percentage for the current item.
-      // 3. ajaxCombo = the combined copyright percentage for all items with the same ISBN in this course.      
+      //alert("AJAX RESPONSE = " + ajaxRequest.responseText);   
       if (ajaxRequest.responseText != null) {
         var ajaxReturn = ajaxRequest.responseText;
-        var s1 = ajaxReturn.indexOf(";");
-        var s2 = ajaxReturn.indexOf(";", s1+1);
-        var ajaxUsed = ajaxReturn.substring(0,s1);
-        var ajaxPer = ajaxReturn.substring(s1+1,s2);
-        var ajaxCombo = ajaxReturn.substring(s2+1,ajaxReturn.length);
-        //alert("AJAX RESPONSE => " + ajaxRequest.responseText + "\najaxUsed = " + ajaxUsed + "\najaxPer = " + ajaxPer + "\najaxCombo = " + ajaxCombo);
+        
+        if (type == "page_range_update" || type == "used_total_update") {
+          // 1. ajaxUsed = the range for the current item (it may be that the range has not been changed)
+          // 2. ajaxPer = the copyright percentage for the current item.
+          // 3. ajaxCombo = the combined copyright percentage for all items with the same ISBN in this course.             
+          var s1 = ajaxReturn.indexOf(";");
+          var s2 = ajaxReturn.indexOf(";", s1+1);
+          var ajaxUsed = ajaxReturn.substring(0,s1);
+          var ajaxPer = ajaxReturn.substring(s1+1,s2);
+          var ajaxCombo = ajaxReturn.substring(s2+1,ajaxReturn.length);
+          //alert("AJAX RESPONSE => " + ajaxRequest.responseText + "\najaxUsed = " + ajaxUsed + "\najaxPer = " + ajaxPer + "\najaxCombo = " + ajaxCombo);
 
-        // Populate the "Total pages used in book" value        
-        document.getElementById('timespagesused').value = parseInt(ajaxUsed); 
-                 
-        // Populate the Overall Book Usage Percentage value
-        if (parseInt(ajaxCombo) > 0) {
-          document.getElementById('percenttimespages').value = parseInt(ajaxCombo);
-        }
-        else {
-          document.getElementById('percenttimespages').value = "";          
-        }
-      }
-    }
-  }
+          // Populate the "Total pages used in book" value        
+          document.getElementById('timespagesused').value = parseInt(ajaxUsed); 
+                   
+          // Populate the Overall Book Usage Percentage value
+          if (parseInt(ajaxCombo) > 0) {
+            document.getElementById('percenttimespages').value = parseInt(ajaxCombo);
+          }
+          else {
+            document.getElementById('percenttimespages').value = "";          
+          }
+        } // end type = 'page_range_updated' or "used_total_update"
+        else if (type == "isbn_update") { // update the rightsholder information.
+          var rha = eval(ajaxRequest.responseText);                  
+          document.getElementById('rh_name').value = rha[0];
+          document.getElementById("rh_contact_name").value = rha[1];
+          document.getElementById("rh_contact_email").value = rha[2];
+          document.getElementById("rh_fax").value = rha[3];
+          document.getElementById("rh_rights_url").value = rha[4];
+          document.getElementById("rh_policy_limit").value = rha[5];
+          document.getElementById("rh_post_address").value = rha[6].replace("\<BR\>", "\n");
+        } // end type = isbn_update
+      } // end ajax response is not null
+    } // end readyState = 4
+  } // end onreadystatechange function
 
   var url_script = "AJAX_copyright.php";
   var url_range = "?range=" + encodeURIComponent(document.getElementById('timespagesrange').value);  

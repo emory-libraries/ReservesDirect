@@ -45,13 +45,26 @@ class copyrightManager extends baseManager {
       case 'copyrightTab':
         $loc = 'Items needing copyright review';
         $this->displayFunction = "displayCopyrightQueue";
+        
+        // Get the Library
+        if (isset($_REQUEST['library'])) {
+          $libraryID = $_REQUEST['library'];
+        } 
+        else {
+          $libraryID = 1; // default to Woodruff library
+        }
 
         // Pagination calculations
         // total number of reserves needing review.
-        $numcopyrightreserves = count(reserve::getCopyrightReviewReserves());  
+        $numcopyrightreserves = count(reserve::getCopyrightReviewReserves(null,null,$libraryID));  
         $rowsperpage = 10;  // number of rows to show per page
         $totalpages = ceil($numcopyrightreserves / $rowsperpage); // find out total pages
 
+        // get the current page or set a default
+        if (isset($_GET['library']) ) {
+           $libraryID = (int) $_GET['library']; // cast var as int
+        }
+        
         // get the current page or set a default
         if (isset($_GET['currentpage']) && is_numeric($_GET['currentpage'])) {
            $currentpage = (int) $_GET['currentpage']; // cast var as int
@@ -71,10 +84,10 @@ class copyrightManager extends baseManager {
         $offset = ($currentpage - 1) * $rowsperpage;
            
         // Retrieve the reserves in the copyright queue for this particular page.
-        $reserves = reserve::getCopyrightReviewReserves($offset, $rowsperpage);
+        $reserves = reserve::getCopyrightReviewReserves($offset, $rowsperpage, $libraryID);
         
         // Pass these parameters to the view.
-        $this->argList = array($reserves, $numcopyrightreserves, $currentpage, $totalpages);
+        $this->argList = array($reserves, $numcopyrightreserves, $currentpage, $totalpages, $libraryID);
 
         break;
     }

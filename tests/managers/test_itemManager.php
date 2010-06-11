@@ -78,19 +78,25 @@ class TestItemManager extends UnitTest {
     $_REQUEST['volume_edition'] = "vol1";
     $_REQUEST['times_pages'] = "12-33";
     $_REQUEST['source'] = "1902";
-    $_REQUEST['ISBN'] = NULL;
+    $_REQUEST['ISBN'] = "1234567890";
     $_REQUEST['ISSN'] = "12304003";
     $_REQUEST['OCLC'] = NULL; 
     $_REQUEST['item_status'] = "ACTIVE";
-    $_REQUEST['material_type'] = "JOURNAL_ARTICLE";
+    $_REQUEST['material_type'] = "BOOK_PORTION";
     $_REQUEST['home_library'] = 1;
     $_REQUEST['publisher'] = "HBJ";
     $_REQUEST['availability'] = 1;
     $_REQUEST['used_times_pages'] = "22";    
     $_REQUEST['total_times_pages'] = "233";
+    $_REQUEST['rh_name'] = "Hubbard Holdings";
+    $_REQUEST['rh_contact_name'] = "Jack Spratt";
+    $_REQUEST['rh_contact_email'] = "jspratt@example.com";
+    $_REQUEST['rh_fax'] = "505-555-4321";
+    $_REQUEST['rh_rights_url'] = "http://example.com/copyright/request/";
+    $_REQUEST['rh_policy_limit'] = "nothing over 60%";
+    $_REQUEST['rh_post_address'] = "123 Main St.\nAlbuquerque, NM  87123\n";
     
     $this->mgr = new itemManager('editItem', $this->user);
-
 
     // get item from db & check updates
     $item = new reserveItem($id);
@@ -99,14 +105,25 @@ class TestItemManager extends UnitTest {
     $this->assertEqual("vol1", $item->getVolumeEdition());
     $this->assertEqual("M.G.E.", $item->getAuthor());
     $this->assertEqual("ACTIVE", $item->getStatus());
-    $this->assertEqual("JOURNAL_ARTICLE", $item->getMaterialType());
+    $this->assertEqual("BOOK_PORTION", $item->getMaterialType());
     $this->assertEqual("HBJ", $item->getPublisher());
     $this->assertEqual(1, $item->getAvailability());
     $this->assertEqual("12-33", $item->getPagesTimes());
+    $this->assertEqual("1234567890", $item->getISBN());
     $this->assertEqual("12304003", $item->getISSN());
     $this->assertEqual("1902", $item->getSource());
     $this->assertEqual("22", $item->getUsedPagesTimes());
     $this->assertEqual("233", $item->getTotalPagesTimes());
+
+    $rh = $item->getRightsholder();
+    $this->assertNotNull($rh);
+    $this->assertEqual("Hubbard Holdings", $rh->getName());
+    $this->assertEqual("Jack Spratt", $rh->getContactName());
+    $this->assertEqual("jspratt@example.com", $rh->getContactEmail());
+    $this->assertEqual("505-555-4321", $rh->getFax());
+    $this->assertEqual("http://example.com/copyright/request/", $rh->getRightsUrl());
+    $this->assertEqual("nothing over 60%", $rh->getPolicyLimit());
+    $this->assertEqual("123 Main St.\nAlbuquerque, NM  87123\n", $rh->getPostAddress());
   }
 
   function test_editItemValidation() {

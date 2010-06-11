@@ -229,14 +229,16 @@ abstract class baseDisplayer {
     $title = $reserve->item->getTitle();
     $author = $reserve->item->getAuthor();
     $url = $reserve->item->getURL();
-    $performer = $reserve->item->getPerformer();
     $volTitle = $reserve->item->getVolumeTitle();
     $volEdition = $reserve->item->getVolumeEdition();
     $pagesTimes = $reserve->item->getPagesTimes();
     $usedPagesTimes = $reserve->item->getOverallUsedPages($reserve->getCourseInstanceID());
     $source = $reserve->item->getSource();
+    $publisher = $reserve->item->getPublisher();
+    $isbn = $reserve->item->getISBN();
     $itemIcon = $reserve->item->getItemIcon();
     $viewReserveURL = "reservesViewer.php?reserve=" . $reserve->getReserveID();
+    $fields = $reserve->item->getFieldDetails();
     
     // if the copyright limit has been reached, then display a showCopyright status message.
     $showCopyrightStatus = false;
@@ -291,23 +293,35 @@ abstract class baseDisplayer {
 <?php endif; ?>
 
 
-<?php if($performer): ?>
+<?php if($volTitle && isset($fields['work_title'])): ?>
 
           <br />
-          <span class="itemMetaPre">Performed by: </span><span class="itemMeta"><?=$performer?></span>
+          <span class="itemMetaPre"><?=$fields['work_title']['label']?>: </span><span class="itemMeta"><?=$volTitle?></span>
           
 <?php endif; ?>
-<?php if($volTitle): ?>
+<?php if($volEdition && isset($fields['edition'])): ?>
 
           <br />
-          <span class="itemMetaPre">From: </span><span class="itemMeta"><?=$volTitle?></span>
+          <span class="itemMetaPre"><?=$fields['edition']['label']?>: </span><span class="itemMeta"><?=$volEdition?></span>
           
 <?php endif; ?>
-<?php if($volEdition): ?>
+<?php if($publisher && isset($fields['publisher'])): ?>
 
           <br />
-          <span class="itemMetaPre">Volume/Edition: </span><span class="itemMeta"><?=$volEdition?></span>
+          <span class="itemMetaPre"><?=$fields['publisher']['label']?>: </span><span class="itemMeta"><?=$publisher?></span>
+
+<?php endif; ?>
+<?php if($source && isset($fields['year'])): ?>
+
+          <br />
+          <span class="itemMetaPre"><?=$fields['year']['label']?>: </span><span class="itemMeta"><?=$source?></span>
           
+<?php endif; ?>
+<?php if($isbn && isset($fields['isbn'])): ?>
+
+          <br />
+          <span class="itemMetaPre"><?=$fields['isbn']['label']?>: </span><span class="itemMeta"><?=$isbn?></span>
+
 <?php endif; ?>
 <?php if($showCopyrightStatus): ?>
 
@@ -315,13 +329,6 @@ abstract class baseDisplayer {
           <span class="itemMetaPre">Copyright Status: </span><span class="itemMeta"><?=$copyrightStatus?></span>
           
 <?php endif; ?>
-<?php if($source): ?>
-
-          <br />
-          <span class="itemMetaPre">Source/Year: </span><span class="itemMeta"><?=$source?></span>
-          
-<?php endif; ?>
-
 <?php
     //show notes
     noteDisplayer::displayNotes($notes);
