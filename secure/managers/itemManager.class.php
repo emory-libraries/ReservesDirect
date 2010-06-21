@@ -480,12 +480,6 @@ class itemManager extends baseManager {
   function storeItem($item = null) {
     global $u;      
     
-    //when adding a 'MANUAL' physical item, the physical-copy data is hidden, but still passed on by the form
-    //make sure that we do not use it
-    if(!empty($_REQUEST['addType']) && ($_REQUEST['addType'] == 'MANUAL')) {
-      unset($_REQUEST['physical_copy']);
-    }
-
     // if no reserveItem was passed in, create a new one
     if ($item == null || !$item->itemID) {
       // FIXME: should this check be added to getReserveItem ?
