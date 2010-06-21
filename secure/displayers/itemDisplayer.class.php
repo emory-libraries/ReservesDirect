@@ -654,7 +654,18 @@ ITEM_SOURCE;
        <?= ($item->getAvailability() == null || $item->getAvailability() == 1) ? 'checked="checked"' : '' ?>  value="1">
          <span id="availability_option1">in print</span>
            </td>
-        </tr>          
+        </tr>  
+        
+<?php if($item->isPhysicalItem()): ?>
+        <tr>
+          <th>
+            <?= $g_catalogName ?> Control Number:
+          </th>
+          <td>
+             <input type="text" name="local_control_key" size="15" value="<?=$item->getLocalControlKey();?>" />
+          </td>
+        </tr> 
+<?php endif; ?>                
       </table>
     </div>
     
