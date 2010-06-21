@@ -383,7 +383,6 @@ function common_electronicMaterialTypesDetails() {
          "availability" => array("required" => true, "label" => "Availability of Movie",
                "options" => array("Commercially Unavailable",
                 "Commercially Available")),
-         "barcode" => array("label" => "Barcode / Alternate ID"), 
          ),
          "AUDIO" =>
          array("title" => array("required" => true, "label" => "Song/Movement Title"),
@@ -399,7 +398,6 @@ function common_electronicMaterialTypesDetails() {
          "availability" => array("required" => true, "label" => "Availability of CD",
                "options" => array("Commercially Unavailable",
                 "Commercially Available")),
-         "barcode" => array("label" => "Barcode / Alternate ID"), 
          ),
          "WEBPAGE" =>
          array("title" => array("required" => true, "label" => "Title"),
@@ -439,7 +437,6 @@ function common_physicalMaterialTypesDetails() {
          "publisher" => array("label" => "Publisher"),
          "year" => array("label" => "Year of Publication"),
          "isbn" => array("label" => "ISBN"),  
-         // oclc, reserve desk?
          ),
          "CD" =>
          array("title" => array("required" => true, "label" => "CD Title"),
@@ -448,30 +445,24 @@ function common_physicalMaterialTypesDetails() {
          "performer" => array("label" => "Performer"), 
          "publisher" => array("label" => "Label Name & Number"),
          "year" => array("label" => "Year Produced"),
-         // oclc, control number, reserve desk?
          ),
          "DVD" =>
          array("title" => array("required" => true, "label" => "Movie Title"),
          "author" => array("label" => "Director"),
          "publisher" => array("label" => "Studio"),
          "year" => array("label" => "Year Produced"),
-         "barcode" => array("label" => "Barcode / Alternate ID"),  // ??
-         // control number, reserve desk?
          ),
          "VHS" =>
          array("title" => array("required" => true, "label" => "Movie Title"),
            "author" => array("label" => "Director"),
            "publisher" => array("label" => "Studio"),
            "year" => array("label" => "Year Produced"),
-           "barcode" => array("label" => "Barcode / Alternate ID"),  // ??
-          // control number, reserve desk?
           ),           
          "SOFTWARE" =>
          array("title" => array("required" => true, "label" => "Title"),
          "edition" => array("label" => "Volume/Edition"),
          "publisher" => array("label" => "Publisher"),
          "year" => array("label" => "Year of Publication"),
-         // control number, reserve desk?
          ),
          );
 }
