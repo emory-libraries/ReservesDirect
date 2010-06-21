@@ -329,7 +329,7 @@ class itemManager extends baseManager {
     
     $item = new reserveItem($item_id);
     // if adding physical item, set item to identify as physical (place-holder value, should be overridden)
-    if ($this->command = "addPhysicalItem")
+    if ($this->command == "addPhysicalItem")
       $item->itemGroup = 'MONOGRAPH';
     
     $qryField = $qryValue = null;
