@@ -107,7 +107,7 @@ class itemManager extends baseManager {
         list($item, $reserve) = $this->getReserveItem();
 
         //form submitted - edit item meta
-        if(!empty($_REQUEST['submit_edit_item_meta'])) {      
+        if(!empty($_REQUEST['store_request'])) {      
           // if editing a reserve, save reserve-specific fields?
           if ($reserve instanceof reserve) {            
             $this->saveReserve($reserve);

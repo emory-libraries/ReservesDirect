@@ -962,11 +962,10 @@ ITEM_SOURCE;
       
      <form id="item_form" name="item_form" action="index.php?cmd=<?= $_REQUEST['cmd'] ?>" method="post"
         <? if (! $item->isPhysicalItem()): ?> enctype="multipart/form-data" <? endif ?> >
-<?php if(! $item->isPhysicalItem()): ?>   
-      <input type="hidden" name="item_group" value="ELECTRONIC" />  
-      <input type="hidden" name="submit_edit_item_meta" value="submit" />
-<?php else: ?>
+<?php if ($item->isPhysicalItem()): ?>   
       <input type="hidden" name="item_group" value="MONOGRAPH" /> 
+<?php else: ?>
+      <input type="hidden" name="item_group" value="ELECTRONIC" />  
       <input type="hidden" name="store_request" value="submit" />
 <?php endif; ?>      
       
@@ -1061,7 +1060,7 @@ ITEM_SOURCE;
     <span class="helperText">= required fields</span>
     <p />
     <div style="padding:10px; text-align:center;">
-        <input type="submit" name="submit_edit_item_meta" value="Save Changes" onClick="return validateForm(this.form);">
+        <input type="submit" name="store_request" value="Save Changes" onClick="return validateForm(this.form);">
     </div>
     </form>    
 <?php   

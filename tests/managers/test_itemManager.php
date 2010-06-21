@@ -28,7 +28,7 @@ class TestItemManager extends UnitTest {
     $_REQUEST['title'] = "test item";
     $_REQUEST['author'] = "Da Vinci";
     $_REQUEST['material_type'] = "IMAGE";
-    $_REQUEST['submit_edit_item_meta'] = 1;
+    $_REQUEST['store_request'] = 1;
     $_REQUEST['ci'] = $this->ci->courseInstanceID;
         
     $mgr = new itemManager('addDigitalItem', $this->user, $this->ci, array());
@@ -68,7 +68,7 @@ class TestItemManager extends UnitTest {
     $id = 19762;
     // edit fixture item
     $_REQUEST['itemID'] = $id;
-    $_REQUEST['submit_edit_item_meta'] = 1; // simulate form submission
+    $_REQUEST['store_request'] = 1; // simulate form submission
     $_REQUEST['title'] = "Cultural Anthropologie";
     $_REQUEST['author'] = "M.G.E.";
     // NOTE: currently all fields seem to be required, no checking if param is present
