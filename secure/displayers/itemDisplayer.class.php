@@ -297,17 +297,6 @@ ITEM_SOURCE;
       //      $barcode_value = (is_array($item_data['physicalCopy']) && !empty($item_data['physicalCopy'])) ? $item_data['physicalCopy'][0]['bar'] : '';
     }
     
-    //deal with physical item source pre-select
-    $addType_select = array('euclid'=>'', 'personal'=>'');
-    if($reserveItem->isPhysicalItem()) {
-      if(!empty($_REQUEST['addType']) && ($_REQUEST['addType']=='PERSONAL')) {
-        $addType_select['personal'] = ' checked="true"';        
-      }
-      else {
-        $addType_select['euclid'] = ' checked="true"';
-      }     
-    }
-    
     $output = <<<ITEM_SOURCE
      
     <table width="100%" border="0" cellpadding="3" cellspacing="0" class="borders">
@@ -327,9 +316,6 @@ ITEM_SOURCE;
 
       return $output;
   }
-
-
-    
   
   /**
    * @return void
