@@ -397,11 +397,36 @@ class itemManager extends baseManager {
       if ($item->getPerformer() == "" )   $item->performer  = $search_results['performer'];
       if ($item->getVolumeTitle() == "" )   $item->volumeTitle  = $search_results['volume_title'];
       if ($item->getPagesTimes() == "" )  $item->pagesTimes   = $search_results['times_pages'];
-      if ($item->getSource() == "" )  $item->source     = $search_results['source'];
       if ($item->getLocalControlKey()=="")  $item->localControlKey  = $search_results['controlKey'];
       if ($item->getOCLC() == "")   $item->OCLC   = $search_results['OCLC'];
       if ($item->getISSN() == "")   $item->ISSN   = $search_results['ISSN'];
       if ($item->getISBN() == "")   $item->ISBN   = $search_results['ISBN'];
+
+      // old code threw the entire publication info (including year) into
+      // $item->source. now we want the pub info in $item->publisher and the
+      // $year in $item->source. four possibilities:
+      //  1) it's all empty. populate it anew
+      //  2) source has the full pub info, and publisher is empty. old code
+      //     populated it. update it to the new style
+      //  3) source has something other than the pub info. old code
+      //     populated it, but the data changed. this is confusing: leave it
+      //     alone.
+      //  3) publisher has the full pub info, and source has the year. this
+      //     is new style. leave it alone
+      if ($item->getPublisher() == '') {
+        if ($item->getSource() == '') {
+          // choice 1.
+          $item->publisher = $search_results['source'];
+          $item->source = $search_results['source_year'];
+        } else if ($item->getSource() == $search_results['source']) {
+          // choice 2.
+          $item->publisher = $search_results['source'];
+          $item->source = $search_results['source_year'];
+        }
+        // choice 3.
+      } else {
+        // choice 4.
+      }
     }
     // FIXME: what is this? how to set on item?
     // $item_data['physicalCopy'] = $search_results['physicalCopy'];
