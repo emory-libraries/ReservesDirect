@@ -1024,7 +1024,7 @@ CREATE TABLE IF NOT EXISTS reserves (
   activation_date date NOT NULL default '0000-00-00',
   expiration date NOT NULL default '0000-00-00',
   `status` set('ACTIVE','INACTIVE','IN PROCESS','DENIED','SEARCHING STACKS','UNAVAILABLE','RECALLED','PURCHASING','RESPONSE NEEDED','SCANNING','COPYRIGHT REVIEW') NOT NULL default 'ACTIVE',
-  copyright_status set('NEW', 'PENDING', 'ACCEPTED', 'DENIED') NOT NULL DEFAULT 'NEW' COMMENT 'Do we need/have permission from pub?',
+  copyright_status set('NEW', 'PENDING', 'ACCEPTED', 'DENIED', 'HIST') NOT NULL DEFAULT 'NEW' COMMENT 'Do we need/have permission from pub?',
   sort_order int(11) NOT NULL default '0',
   date_created date NOT NULL default '0000-00-00',
   last_modified date NOT NULL default '0000-00-00',

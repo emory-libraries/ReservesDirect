@@ -22,7 +22,7 @@ INSERT INTO mimetype_extensions (mimetype_id, file_extension) VALUES (8, 'jpg');
 INSERT INTO mimetype_extensions (mimetype_id, file_extension) VALUES (8, 'gif');
 
 -- add new field for copyright status in the reserves table for queue display.
-ALTER TABLE `reserves` ADD `copyright_status` set('NEW', 'PENDING', 'ACCEPTED', 'DENIED') NOT NULL DEFAULT 'NEW' COMMENT 'Do we need/have permission from pub?';
+ALTER TABLE `reserves` ADD `copyright_status` set('NEW', 'PENDING', 'ACCEPTED', 'DENIED', 'HIST') NOT NULL DEFAULT 'NEW' COMMENT 'Do we need/have permission from pub?';
 
 -- create rightsholder info table.
 CREATE TABLE rightsholders (
@@ -37,11 +37,12 @@ CREATE TABLE rightsholders (
   PRIMARY KEY (ISBN)
 );
 
--- bootstrap material_type by assuming every PDF is a BOOK_PORTION, though
--- we only care about new courses
+-- bootstrap material_type by assuming every PDF is a BOOK_PORTION
 UPDATE items SET material_type='BOOK_PORTION' WHERE material_type IS NULL AND 
-  url LIKE '%.pdf' AND
-  item_id IN (SELECT r.item_id 
-              FROM reserves r
-                JOIN course_instances ci ON ci.course_instance_id = r.course_instance_id
-              WHERE ci.year >= 2010 and ci.term IS NOT 'SPRING');
+  url LIKE '%.pdf';
+  
+-- set copyright status of all historic courses to HIST
+UPDATE reserves SET `copyright_status`='HIST'
+WHERE course_instance_id IN (select course_instance_id from course_instances ci where
+ci.year < 2010 OR (ci.year = 2010 AND ci.term = 'SPRING')); 
+
