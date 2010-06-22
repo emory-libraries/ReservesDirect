@@ -191,9 +191,8 @@ class itemManager extends baseManager {
           //prefetch possible CIs
           list($all_possible_CIs, $selected_CIs, $CI_request_matches) = requestManager::getCIsForItem($item_id);
 
-          //pass on the searched-for barcode
-          if(!empty($_REQUEST['searchTerm'])) {
-            $requested_barcode = $_REQUEST['searchTerm'];
+          if(!empty($_REQUEST['barcode'])) {
+            $requested_barcode = $_REQUEST['barcode'];
           }
           else {
             $requested_barcode = null;
