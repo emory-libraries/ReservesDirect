@@ -192,7 +192,7 @@ class itemManager extends baseManager {
           list($all_possible_CIs, $selected_CIs, $CI_request_matches) = requestManager::getCIsForItem($item_id);
 
           //pass on the searched-for barcode
-          if(!empty($_REQUEST['searchTerm']) && ($_REQUEST['searchField'] == 'barcode')) {
+          if(!empty($_REQUEST['searchTerm'])) {
             $requested_barcode = $_REQUEST['searchTerm'];
           }
           else {
@@ -335,15 +335,11 @@ class itemManager extends baseManager {
     $qryField = $qryValue = null;
     
     if(!empty($_REQUEST['searchField']) && is_null($item->itemID)) {  //search info specified     
-      //find item in local DB by barcode or control key
-      if($_REQUEST['searchField'] == 'barcode') { //get by barcode
-        $phys_item = new physicalCopy();
-        if($phys_item->getByBarcode($_REQUEST['searchTerm'])) {
-    $item->getItemByID($phys_item->getItemID());
-        }
-      } else {  //get by local control
-        $item->getItemByLocalControl($_REQUEST['searchTerm']);
-      }         
+      // find item in local DB by barcode
+      $phys_item = new physicalCopy();
+      if($phys_item->getByBarcode($_REQUEST['searchTerm'])) {
+        $item->getItemByID($phys_item->getItemID());
+      }
     }
     
     if(!empty($_REQUEST['request_id'])) { //processing request, get info out of DB
@@ -367,7 +363,7 @@ class itemManager extends baseManager {
       $qryField = 'control';
       $qryValue = $item->getLocalControlKey();
     } else {
-      $qryField = isset($_REQUEST['searchField']) ? $_REQUEST['searchField'] : "";
+      $qryField = 'barcode';
       $qryValue = isset($_REQUEST['searchTerm']) ? $_REQUEST['searchTerm'] : "";
     }
     //if searching for a physical item, then there may be an ILS record
@@ -535,18 +531,6 @@ class itemManager extends baseManager {
         if (isset($_REQUEST['rh_rights_url'])) $rh->setRightsUrl($_REQUEST['rh_rights_url']);
         if (isset($_REQUEST['rh_policy_limit'])) $rh->setPolicyLimit($_REQUEST['rh_policy_limit']);
         if (isset($_REQUEST['rh_post_address'])) $rh->setPostAddress($_REQUEST['rh_post_address']);
-      }
-    }
-
-    //physical item data
-    if($item->isPhysicalItem()) {
-      if (isset($_REQUEST['home_library'])) $item->setHomeLibraryID($_REQUEST['home_library']);
-      
-      //physical copy data
-      if($item->getPhysicalCopy()) {  //returns false if not a physical copy
-        //only set these if they were part of the form
-        if(isset($_REQUEST['barcode'])) $item->physicalCopy->setBarcode($_REQUEST['barcode']);
-        if(isset($_REQUEST['call_num'])) $item->physicalCopy->setCallNumber($_REQUEST['call_num']);             
       }
     }
 
