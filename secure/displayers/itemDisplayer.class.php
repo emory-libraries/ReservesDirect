@@ -247,7 +247,7 @@ ITEM_SOURCE;
             <font color="#FF0000">*</font>&nbsp;Barcode:
           </td>
           <td>
-            <input name="barcode" type="text" id="barcode" size="30" value="$barcode"/>
+            <input name="barcode" type="text" id="barcode" size="30" value="$barcode" readonly />
           </td>
         </tr>
         <tr>    
@@ -255,7 +255,7 @@ ITEM_SOURCE;
             Call Number:
           </td>
           <td>
-            <input name="call_num" type="text" id="call_num" size="30" value="$call_num" />
+            <input name="call_num" type="text" id="call_num" size="30" value="$call_num"  readonly />
           </td>       
         </tr>
 ITEM_SOURCE;
@@ -274,44 +274,24 @@ ITEM_SOURCE;
    */
   function _itemsource_addPhysical($reserveItem) {
     global $u, $g_permission;
-    
-    //deal with barcode prefills
-    if(!empty($_REQUEST['searchField'])) {
-      if($_REQUEST['searchField'] == 'barcode') {
-        $barcode_select = ' selected = "selected"';
-        $control_select = '';
-        //assume that this index exists
-        $barcode_value = $_REQUEST['searchTerm'];
-      } else {
-        $barcode_select = '';
-        $control_select = ' selected = "selected"';
-        // FIXME: what is this? how to handle?
-        //  $barcode_value = (is_array($item_data['physicalCopy']) && !empty($item_data['physicalCopy'])) ? $item_data['physicalCopy'][0]['bar'] : '';
-      }
-      $search_term = $_REQUEST['searchTerm'];
-    } else {
-      $barcode_select = ' selected = "selected"';
-      $control_select = '';
-      $search_term = '';
-      // FIXME: ?? 
-      //      $barcode_value = (is_array($item_data['physicalCopy']) && !empty($item_data['physicalCopy'])) ? $item_data['physicalCopy'][0]['bar'] : '';
-    }
-    
+        
     $output = <<<ITEM_SOURCE
      
-    <table width="100%" border="0" cellpadding="3" cellspacing="0" class="borders">
+<table border="0" cellpadding="2" cellspacing="0" >   
       <tr bgcolor="#CCCCCC" id="ils_search">
-        <td colspan="3" align="left" valign="middle" bgcolor="#FFFFFF">
-          <input name="searchTerm" type="text" size="15" value="{$search_term}">
-          <select name="searchField">
-             <option value="barcode"{$barcode_select}>Barcode</option>
-             <option value="control"{$control_select}>Control Number</option>
-          </select>
+          <tr>    
+          <th align="right" width="220">
+            Barcode:<font color="#FF0000">*</font>&nbsp;
+          </th>
+          <td  valign="middle">
+            <input name="barcode" type="text" id="barcode" size="30" value=""/>
+          </td>
+        <td valign="middle">        
           &nbsp;
           <input type="submit" value="Search" onclick="this.form.cmd.value='{$_REQUEST['cmd']}';" / >
         </td>
       </tr>
-    </table>
+</table>
 ITEM_SOURCE;
 
       return $output;
