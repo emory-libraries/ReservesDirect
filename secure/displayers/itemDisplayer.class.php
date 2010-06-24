@@ -52,6 +52,7 @@ class itemDisplayer extends noteDisplayer {
     }
   } elseif ($reserveItem->isPhysicalItem()) {
     if($_REQUEST['cmd'] == 'editItem') {  // editing an existing physical item
+    //if($reserveItem->itemID) {  // editing an existing digital item     
       //editing a physical item - show library, etc.
       //only allow staff or better to edit this info    
       print itemDisplayer::_itemsource_existingPhysical($reserveItem);
@@ -274,12 +275,8 @@ ITEM_SOURCE;
   function _itemsource_addPhysical($reserveItem) {
     global $u, $g_permission;
         
-    if ($reserveItem->getPhysicalCopy()) {
-      $barcode = $reserveItem->physicalCopy->getBarcode(); 
-    }
-    else 
-    $barcode = "";
-          
+    $barcode = isset($_REQUEST['barcode']) ? $_REQUEST['barcode'] : "";
+  
     $output = <<<ITEM_SOURCE
      
 <table border="0" cellpadding="2" cellspacing="0" >   
