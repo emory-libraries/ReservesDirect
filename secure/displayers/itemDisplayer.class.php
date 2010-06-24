@@ -43,23 +43,22 @@ class itemDisplayer extends noteDisplayer {
       print '<div class="headingCell1">ITEM SOURCE</div>';
       // FIXME: why all static calls?
       
-        //editing an electronic item - show URL/upload fields
-        if($reserveItem->getItemGroup() == 'ELECTRONIC') {
+  //editing an electronic item - show URL/upload fields
+  if($reserveItem->getItemGroup() == 'ELECTRONIC') {
     if($reserveItem->itemID) {  // editing an existing digital item 
       print itemDisplayer::_itemsource_existingElectronic($reserveItem);
     } else {    // adding a new item
       print itemDisplayer::_itemsource_newElectronic($reserveItem);
     }
-        } elseif ($reserveItem->isPhysicalItem()) {
-    if($reserveItem->itemID) {  // editing an existing physical item
+  } elseif ($reserveItem->isPhysicalItem()) {
+    if($_REQUEST['cmd'] == 'editItem') {  // editing an existing physical item
       //editing a physical item - show library, etc.
-      //only allow staff or better to edit this info
+      //only allow staff or better to edit this info    
       print itemDisplayer::_itemsource_existingPhysical($reserveItem);
-    } else {      // adding a new physical item
+    } else {      // adding a new physical item    
       print itemDisplayer::_itemsource_addPhysical($reserveItem);
     }
   }
-
   } //displayEditItemSource()
 
 
@@ -275,6 +274,12 @@ ITEM_SOURCE;
   function _itemsource_addPhysical($reserveItem) {
     global $u, $g_permission;
         
+    if ($reserveItem->getPhysicalCopy()) {
+      $barcode = $reserveItem->physicalCopy->getBarcode(); 
+    }
+    else 
+    $barcode = "";
+          
     $output = <<<ITEM_SOURCE
      
 <table border="0" cellpadding="2" cellspacing="0" >   
@@ -284,7 +289,7 @@ ITEM_SOURCE;
             Barcode:<font color="#FF0000">*</font>&nbsp;
           </th>
           <td  valign="middle">
-            <input name="barcode" type="text" id="barcode" size="30" value=""/>
+            <input name="barcode" type="text" id="barcode" size="30" value="$barcode" />
           </td>
         <td valign="middle">        
           &nbsp;
