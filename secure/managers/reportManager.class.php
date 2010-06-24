@@ -28,13 +28,14 @@ http://www.reservesdirect.org/
 *******************************************************************************/
 require_once("secure/displayers/reportDisplayer.class.php");
 require_once("secure/classes/report.class.php");
+require_once("secure/config.inc.php");
 
 class reportManager extends baseManager {
 	public $user;
 
 	function reportManager($cmd, $user, $request)
 	{
-		global $ci, $loc, $help_article;
+		global $ci, $loc, $help_article, $g_copyrightLimit;
 		
 		$this->displayClass = "reportDisplayer";
 		$this->user = $user;
@@ -43,7 +44,14 @@ class reportManager extends baseManager {
 		{
 			case 'viewReport':	
 				$report = new cachedReport($_REQUEST['reportID']);	//init the object
-				$report->fillParameters($_REQUEST);	//attempt to fill parameters
+              
+                // prime the report params with approved global config
+                // values, but then override them with request args
+                $report_params = array('copyright_limit' => (int)$g_copyrightLimit);
+                foreach ($_REQUEST as $key => $value)
+                    $report_params[$key] = $value;
+
+				$report->fillParameters($report_params);	//attempt to fill parameters
 				
 				if($report->checkParameters()) {	//are all the parameters filled in?
 					$this->displayFunction = "displayReport";
