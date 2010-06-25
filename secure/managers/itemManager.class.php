@@ -138,6 +138,26 @@ class itemManager extends baseManager {
             //form is valid--  set item data
             $item_id = $this->storeItem($item);
             
+            //physical item data
+            if($item->isPhysicalItem()) {    
+              $item->setHomeLibraryID($_REQUEST['home_library']);
+                
+              //physical copy data
+              if($item->getPhysicalCopy()) {  //returns false if not a physical copy    
+                //only set these if they were part of the form
+                if(isset($_REQUEST['barcode'])) {               
+                  $item->physicalCopy->setBarcode($_REQUEST['barcode']);        
+                }
+                if(isset($_REQUEST['call_num'])) {         
+                  $item->physicalCopy->setCallNumber($_REQUEST['call_num']);         
+                }
+              }
+     
+              if(!empty($_REQUEST['local_control_key'])) {
+                $item->setLocalControlKey($_REQUEST['local_control_key']);
+              }           
+            }             
+            
             //if duplicating, show a different success screen
             if(isset($_REQUEST['dubReserve']) && $_REQUEST['dubReserve']) {
               //get course instance
@@ -553,6 +573,8 @@ class itemManager extends baseManager {
         if (isset($_REQUEST['rh_post_address'])) $rh->setPostAddress($_REQUEST['rh_post_address']);
       }
     }
+    
+    
 
     // add a new note, if set (creating new record)
     // FIXME: came from addDigitalItem; is this included in editItem form ?

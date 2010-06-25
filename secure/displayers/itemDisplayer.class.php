@@ -247,7 +247,7 @@ ITEM_SOURCE;
             <font color="#FF0000">*</font>&nbsp;Barcode:
           </td>
           <td>
-            <input name="barcode" type="text" id="barcode" size="30" value="$barcode" readonly />
+            <input name="barcode" type="text" id="barcode" size="30" value="$barcode" />
           </td>
         </tr>
         <tr>    
@@ -255,7 +255,7 @@ ITEM_SOURCE;
             Call Number:
           </td>
           <td>
-            <input name="call_num" type="text" id="call_num" size="30" value="$call_num"  readonly />
+            <input name="call_num" type="text" id="call_num" size="30" value="$call_num" />
           </td>       
         </tr>
 ITEM_SOURCE;
