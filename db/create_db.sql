@@ -1201,7 +1201,7 @@ CREATE TABLE IF NOT EXISTS users (
 -- 
 -- View `book_usage`
 -- 
-CREATE VIEW book_usage AS
+CREATE SQL SECURITY INVOKER VIEW book_usage AS
   SELECT ci.course_instance_id, r.reserve_id, i.ISBN,
          sum(cast(i2.pages_times_used AS DECIMAL) /
              cast(i2.pages_times_total AS DECIMAL)) * 100 percent_used

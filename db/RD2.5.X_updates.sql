@@ -47,7 +47,7 @@ WHERE course_instance_id IN (select course_instance_id from course_instances ci 
 ci.year < 2010 OR (ci.year = 2010 AND ci.term = 'SPRING'));
 
 -- create view for per-class book usage percents
-CREATE VIEW book_usage AS
+CREATE SQL SECURITY INVOKER VIEW book_usage AS
   SELECT ci.course_instance_id, r.reserve_id, i.ISBN,
          sum(cast(i2.pages_times_used AS DECIMAL) /
              cast(i2.pages_times_total AS DECIMAL)) * 100 percent_used
