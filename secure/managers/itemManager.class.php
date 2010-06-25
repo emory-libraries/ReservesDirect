@@ -107,7 +107,7 @@ class itemManager extends baseManager {
         list($item, $reserve) = $this->getReserveItem();
 
         //form submitted - edit item meta
-        if(!empty($_REQUEST['submit_edit_item_meta'])) {      
+        if(!empty($_REQUEST['store_request'])) {      
           // if editing a reserve, save reserve-specific fields?
           if ($reserve instanceof reserve) {            
             $this->saveReserve($reserve);
@@ -137,6 +137,26 @@ class itemManager extends baseManager {
             
             //form is valid--  set item data
             $item_id = $this->storeItem($item);
+            
+            //physical item data
+            if($item->isPhysicalItem()) {    
+              $item->setHomeLibraryID($_REQUEST['home_library']);
+                
+              //physical copy data
+              if($item->getPhysicalCopy()) {  //returns false if not a physical copy    
+                //only set these if they were part of the form
+                if(isset($_REQUEST['barcode'])) {               
+                  $item->physicalCopy->setBarcode($_REQUEST['barcode']);        
+                }
+                if(isset($_REQUEST['call_num'])) {         
+                  $item->physicalCopy->setCallNumber($_REQUEST['call_num']);         
+                }
+              }
+     
+              if(!empty($_REQUEST['local_control_key'])) {
+                $item->setLocalControlKey($_REQUEST['local_control_key']);
+              }           
+            }             
             
             //if duplicating, show a different success screen
             if(isset($_REQUEST['dubReserve']) && $_REQUEST['dubReserve']) {
@@ -182,18 +202,16 @@ class itemManager extends baseManager {
       case 'addPhysicalItem': // create/edit physical items and/or processing requests
         $page = "addReserve";
         $loc  = "add physical item";
-       
-        if(isset($_REQUEST['store_request'])) { //form submitted, process item
-          
+           
+        if(isset($_REQUEST['store_request'])) { //form submitted, process item          
           //store item meta data
           $item_id = $this->storeItem();
 
           //prefetch possible CIs
           list($all_possible_CIs, $selected_CIs, $CI_request_matches) = requestManager::getCIsForItem($item_id);
 
-          //pass on the searched-for barcode
-          if(!empty($_REQUEST['searchTerm']) && ($_REQUEST['searchField'] == 'barcode')) {
-            $requested_barcode = $_REQUEST['searchTerm'];
+          if(!empty($_REQUEST['barcode'])) {
+            $requested_barcode = $_REQUEST['barcode'];
           }
           else {
             $requested_barcode = null;
@@ -329,21 +347,16 @@ class itemManager extends baseManager {
     
     $item = new reserveItem($item_id);
     // if adding physical item, set item to identify as physical (place-holder value, should be overridden)
-    if ($this->command = "addPhysicalItem")
+    if ($this->command == "addPhysicalItem")
       $item->itemGroup = 'MONOGRAPH';
     
     $qryField = $qryValue = null;
-    
-    if(!empty($_REQUEST['searchField']) && is_null($item->itemID)) {  //search info specified     
-      //find item in local DB by barcode or control key
-      if($_REQUEST['searchField'] == 'barcode') { //get by barcode
-        $phys_item = new physicalCopy();
-        if($phys_item->getByBarcode($_REQUEST['searchTerm'])) {
-    $item->getItemByID($phys_item->getItemID());
-        }
-      } else {  //get by local control
-        $item->getItemByLocalControl($_REQUEST['searchTerm']);
-      }         
+    if(!empty($_REQUEST['searchField']) && is_null($item->itemID)) {  //search info specified    
+      // find item in local DB by barcode
+      $phys_item = new physicalCopy();
+      if($phys_item->getByBarcode($_REQUEST['barcode'])) {       
+        $item->getItemByID($phys_item->getItemID());
+      }
     }
     
     if(!empty($_REQUEST['request_id'])) { //processing request, get info out of DB
@@ -367,8 +380,8 @@ class itemManager extends baseManager {
       $qryField = 'control';
       $qryValue = $item->getLocalControlKey();
     } else {
-      $qryField = isset($_REQUEST['searchField']) ? $_REQUEST['searchField'] : "";
-      $qryValue = isset($_REQUEST['searchTerm']) ? $_REQUEST['searchTerm'] : "";
+      $qryField = 'barcode';
+      $qryValue = isset($_REQUEST['barcode']) ? $_REQUEST['barcode'] : "";
     }
     //if searching for a physical item, then there may be an ILS record
     //this should return an indexed array, which may be populated w/ data
@@ -401,11 +414,36 @@ class itemManager extends baseManager {
       if ($item->getPerformer() == "" )   $item->performer  = $search_results['performer'];
       if ($item->getVolumeTitle() == "" )   $item->volumeTitle  = $search_results['volume_title'];
       if ($item->getPagesTimes() == "" )  $item->pagesTimes   = $search_results['times_pages'];
-      if ($item->getSource() == "" )  $item->source     = $search_results['source'];
       if ($item->getLocalControlKey()=="")  $item->localControlKey  = $search_results['controlKey'];
       if ($item->getOCLC() == "")   $item->OCLC   = $search_results['OCLC'];
       if ($item->getISSN() == "")   $item->ISSN   = $search_results['ISSN'];
       if ($item->getISBN() == "")   $item->ISBN   = $search_results['ISBN'];
+
+      // old code threw the entire publication info (including year) into
+      // $item->source. now we want the pub info in $item->publisher and the
+      // $year in $item->source. four possibilities:
+      //  1) it's all empty. populate it anew
+      //  2) source has the full pub info, and publisher is empty. old code
+      //     populated it. update it to the new style
+      //  3) source has something other than the pub info. old code
+      //     populated it, but the data changed. this is confusing: leave it
+      //     alone.
+      //  3) publisher has the full pub info, and source has the year. this
+      //     is new style. leave it alone
+      if ($item->getPublisher() == '') {
+        if ($item->getSource() == '') {
+          // choice 1.
+          $item->publisher = $search_results['source'];
+          $item->source = $search_results['source_year'];
+        } else if ($item->getSource() == $search_results['source']) {
+          // choice 2.
+          $item->publisher = $search_results['source'];
+          $item->source = $search_results['source_year'];
+        }
+        // choice 3.
+      } else {
+        // choice 4.
+      }
     }
     // FIXME: what is this? how to set on item?
     // $item_data['physicalCopy'] = $search_results['physicalCopy'];
@@ -423,6 +461,7 @@ class itemManager extends baseManager {
    */
   function prepEditItem($item, $reserve = null) {
     global $page, $loc, $help_article;
+               
     $page = "addReserve";
     if ($loc == "") $loc  = "edit item";
     $help_article = "33";
@@ -479,26 +518,20 @@ class itemManager extends baseManager {
    */
   function storeItem($item = null) {
     global $u;      
-    
-    //when adding a 'MANUAL' physical item, the physical-copy data is hidden, but still passed on by the form
-    //make sure that we do not use it
-    if(!empty($_REQUEST['addType']) && ($_REQUEST['addType'] == 'MANUAL')) {
-      unset($_REQUEST['physical_copy']);
-    }
+        
+    //determine if editing item or creating new
+    //get a valid object in either case
+    $item = new reserveItem();
 
-    // if no reserveItem was passed in, create a new one
-    if ($item == null || !$item->itemID) {
-      // FIXME: should this check be added to getReserveItem ?
-      //    if(empty($_REQUEST['item_id']) || !$item->getItemByID($_REQUEST['item_id']))   //If missing item_id or it is invalid
-      //create item
-      if ($item == null) $item = new reserveItem();
+    if(empty($_REQUEST['itemID']) || !$item->getItemByID($_REQUEST['itemID'])) {  //If missing item_id or it is invalid  
+      //have to create item
       $item->createNewItem(); 
       //audit the action
       $itemAudit = new itemAudit();
       $itemAudit->createNewItemAudit($item->getItemID(),$u->getUserID());
       unset($itemAudit);                
-    }
-    
+    } //else object has been initialized successfully
+
     //add/edit data
     if(isset($_REQUEST['title'])) $item->setTitle($_REQUEST['title']);
     if(isset($_REQUEST['author'])) $item->setAuthor($_REQUEST['author']);
@@ -513,7 +546,9 @@ class itemManager extends baseManager {
     if(isset($_REQUEST['ISBN'])) $item->setISBN($_REQUEST['ISBN']);
     if(isset($_REQUEST['ISSN'])) $item->setISSN($_REQUEST['ISSN']);
     if(isset($_REQUEST['OCLC'])) $item->setOCLC($_REQUEST['OCLC']);
-
+    //this will be an ILS-assigned key for physical items, or a manually-entered barcode for electronic items
+    if(isset($_REQUEST['local_control_key'])) $item->setLocalControlKey($_REQUEST['local_control_key']);
+    
     // not in requestManager; only applicable when updating items?
     if(isset($_REQUEST['item_status'])) $item->setStatus($_REQUEST['item_status']);
     
@@ -525,11 +560,6 @@ class itemManager extends baseManager {
     
     if(isset($_REQUEST['material_type'])) $item->setMaterialType($_REQUEST['material_type'],
                        $_REQUEST['material_type_other']);
-    
-    //this will be an ILS-assigned key for physical items, or a manually-entered barcode for electronic items
-    // FIXME: is local control key only applicable to physical items?
-    // was only set on physical items in itemManager/editItem; set for both on add
-    if(isset($_REQUEST['local_control_key'])) $item->setLocalControlKey($_REQUEST['local_control_key']);
 
     $rh = $item->getRightsholder($_REQUEST['ISBN']);
     if ( ! is_null($rh) ) {
@@ -543,18 +573,8 @@ class itemManager extends baseManager {
         if (isset($_REQUEST['rh_post_address'])) $rh->setPostAddress($_REQUEST['rh_post_address']);
       }
     }
-
-    //physical item data
-    if($item->isPhysicalItem()) {
-      if (isset($_REQUEST['home_library'])) $item->setHomeLibraryID($_REQUEST['home_library']);
-      
-      //physical copy data
-      if($item->getPhysicalCopy()) {  //returns false if not a physical copy
-        //only set these if they were part of the form
-        if(isset($_REQUEST['barcode'])) $item->physicalCopy->setBarcode($_REQUEST['barcode']);
-        if(isset($_REQUEST['call_num'])) $item->physicalCopy->setCallNumber($_REQUEST['call_num']);             
-      }
-    }
+    
+    
 
     // add a new note, if set (creating new record)
     // FIXME: came from addDigitalItem; is this included in editItem form ?
@@ -566,17 +586,16 @@ class itemManager extends baseManager {
     if(!empty($_REQUEST['notes'])) {
       foreach($_REQUEST['notes'] as $note_id=>$note_text) {
         if(!empty($note_id)) {
-    $note = new note($note_id);
-    $note->setText($note_text);
+          $note = new note($note_id);
+          $note->setText($note_text);
         }
       }
     }
 
-    
     //if adding electronic item, need to process file or link
     // if updating existing item, check for new version of file or url
-    if(!$item->isPhysicalItem() && !empty($_REQUEST['documentType'])) {
-      if($_REQUEST['documentType'] == 'DOCUMENT') { //uploading a file
+    if(!$item->isPhysicalItem() && !empty($_REQUEST['documentType'])) {      
+      if($_REQUEST['documentType'] == 'DOCUMENT') { //uploading a file    
         $file = common_storeUploaded($_FILES['userFile'], $item->getItemID());                            
         $file_loc = $file['dir'] . $file['name'] . $file['ext'];
         $item->setURL($file_loc);
@@ -594,7 +613,6 @@ class itemManager extends baseManager {
       }
       //else maintaining the same link; do nothing
     }
-    
     // return item id
     return $item->getItemID();  
   }

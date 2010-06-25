@@ -43,23 +43,23 @@ class itemDisplayer extends noteDisplayer {
       print '<div class="headingCell1">ITEM SOURCE</div>';
       // FIXME: why all static calls?
       
-        //editing an electronic item - show URL/upload fields
-        if($reserveItem->getItemGroup() == 'ELECTRONIC') {
+  //editing an electronic item - show URL/upload fields
+  if($reserveItem->getItemGroup() == 'ELECTRONIC') {
     if($reserveItem->itemID) {  // editing an existing digital item 
       print itemDisplayer::_itemsource_existingElectronic($reserveItem);
     } else {    // adding a new item
       print itemDisplayer::_itemsource_newElectronic($reserveItem);
     }
-        } elseif ($reserveItem->isPhysicalItem()) {
-    if($reserveItem->itemID) {  // editing an existing physical item
+  } elseif ($reserveItem->isPhysicalItem()) {
+    if($_REQUEST['cmd'] == 'editItem') {  // editing an existing physical item
+    //if($reserveItem->itemID) {  // editing an existing digital item     
       //editing a physical item - show library, etc.
-      //only allow staff or better to edit this info
+      //only allow staff or better to edit this info    
       print itemDisplayer::_itemsource_existingPhysical($reserveItem);
-    } else {      // adding a new physical item
+    } else {      // adding a new physical item    
       print itemDisplayer::_itemsource_addPhysical($reserveItem);
     }
   }
-
   } //displayEditItemSource()
 
 
@@ -247,7 +247,7 @@ ITEM_SOURCE;
             <font color="#FF0000">*</font>&nbsp;Barcode:
           </td>
           <td>
-            <input name="barcode" type="text" id="barcode" size="30" value="$barcode"/>
+            <input name="barcode" type="text" id="barcode" size="30" value="$barcode" />
           </td>
         </tr>
         <tr>    
@@ -274,167 +274,30 @@ ITEM_SOURCE;
    */
   function _itemsource_addPhysical($reserveItem) {
     global $u, $g_permission;
-    
-    //deal with barcode prefills
-    if(!empty($_REQUEST['searchField'])) {
-      if($_REQUEST['searchField'] == 'barcode') {
-        $barcode_select = ' selected = "selected"';
-        $control_select = '';
-        //assume that this index exists
-        $barcode_value = $_REQUEST['searchTerm'];
-      } else {
-        $barcode_select = '';
-        $control_select = ' selected = "selected"';
-        // FIXME: what is this? how to handle?
-        //  $barcode_value = (is_array($item_data['physicalCopy']) && !empty($item_data['physicalCopy'])) ? $item_data['physicalCopy'][0]['bar'] : '';
-      }
-      $search_term = $_REQUEST['searchTerm'];
-    } else {
-      $barcode_select = ' selected = "selected"';
-      $control_select = '';
-      $search_term = '';
-      // FIXME: ?? 
-      //      $barcode_value = (is_array($item_data['physicalCopy']) && !empty($item_data['physicalCopy'])) ? $item_data['physicalCopy'][0]['bar'] : '';
-    }
-    
-    //deal with physical item source pre-select
-    $addType_select = array('euclid'=>'', 'personal'=>'');
-    if($reserveItem->isPhysicalItem()) {
-      if(!empty($_REQUEST['addType']) && ($_REQUEST['addType']=='PERSONAL')) {
-        $addType_select['personal'] = ' checked="true"';        
-      }
-      else {
-        $addType_select['euclid'] = ' checked="true"';
-      }     
-    }
-    
-    $output = <<<ITEM_SOURCE
-    <script type="text/javascript">
-    
-      //shows/hides personal item elements; marks them as required or not
-      function togglePersonal(enable, req) {
-        //show block or not?
-        if(enable) {
-          document.getElementById('personal_item_row').style.display = '';
-        }
-        else {
-          document.getElementById('personal_item_no').checked = true;
-          document.getElementById('personal_item_row').style.display = 'none';
-          return;
-        }
         
-        //if required, show just the name search and red *
-        if(req) {
-          document.getElementById('personal_req_mark').style.display = '';
-          document.getElementById('personal_item_choice').style.display = 'none';
-          document.getElementById('personal_item_owner_block').style.display = '';
-          document.getElementById('personal_item_yes').checked = true;
-          togglePersonalOwnerSearch();
-        }
-        else {
-          document.getElementById('personal_req_mark').style.display = 'none';
-          document.getElementById('personal_item_choice').style.display = '';
-          togglePersonalOwner();
-        }
-      }     
-      
-      //shows/hides personal item owner search fields
-      function togglePersonalOwner() {
-        if(document.getElementById('personal_item_no').checked) {
-          document.getElementById('personal_item_owner_block').style.display = 'none';
-        }
-        else if(document.getElementById('personal_item_yes').checked) {
-          document.getElementById('personal_item_owner_block').style.display = '';
-          togglePersonalOwnerSearch();
-        } 
-      } 
-                
-      //shows/hides personal item owner search fields
-      function togglePersonalOwnerSearch() {  
-        //if personal owner set
-        if(document.getElementById('personal_item_owner_curr').checked) {
-          document.getElementById('personal_item_owner_search').style.visibility = 'hidden';
-        }
-        else if(document.getElementById('personal_item_owner_new').checked) {
-          document.getElementById('personal_item_owner_search').style.visibility = 'visible';
-        } 
-      }
-      
+    $barcode = isset($_REQUEST['barcode']) ? $_REQUEST['barcode'] : "";
   
-      //disables/enables ILS elements
-      function toggleILS(enable) {
-        var frm = document.getElementById('additem_form');
-        var dspl;
-        if(enable) {
-          frm.searchTerm.disabled=false;
-          frm.searchField.disabled=false;
-          dspl = '';
-        }
-        else {
-          frm.searchTerm.disabled=true;
-          frm.searchField.disabled=true;        
-          dspl = 'none';
-        }
-    
-        document.getElementById('ils_search').style.display = dspl;
-      }
-    
-      //shows/hides non-manual entry elements
-      function toggleNonManual(show) {
-        if(document.getElementById('nonman_local_control_row')) {
-          if(show) {
-            document.getElementById('nonman_local_control_row').style.display = '';
-            document.getElementById('nonman_local_control_input').disabled = false;
-          }
-          else {
-            document.getElementById('nonman_local_control_row').style.display = 'none';
-            document.getElementById('nonman_local_control_input').disabled = true;
-          }           
-        }
-        
-        if(document.getElementById('man_local_control_row')) {
-          if(show) {
-            document.getElementById('man_local_control_row').style.display = 'none';
-            document.getElementById('man_local_control_input').disabled = true;
-          }
-          else {
-            document.getElementById('man_local_control_row').style.display = '';
-            document.getElementById('man_local_control_input').disabled = false;
-          }
-        }
-      }
-    </script>
-    
-    <table width="100%" border="0" cellpadding="3" cellspacing="0" class="borders">
-      <tr bgcolor="#CCCCCC">
-        <td width="20%" align="left" valign="middle">
-        <input name="addType" type="radio" value="EUCLID_ITEM" onClick="toggleILS(1); togglePersonal(0,0); toggleNonManual(1);"{$addType_select['euclid']}>
-          <span class="strong">EUCLID Item</span>
-        </td>
-        <td width="40%" align="left" valign="top">
-             <input type="radio" name="addType" value="PERSONAL" onclick="toggleILS(1); togglePersonal(1,1); toggleNonManual(1);"{$addType_select['personal']}>
-          <span class="strong">Personal Copy (EUCLID Item Available)</span>
-        </td>
-      </tr>
+    $output = <<<ITEM_SOURCE
+     
+<table border="0" cellpadding="2" cellspacing="0" >   
       <tr bgcolor="#CCCCCC" id="ils_search">
-        <td colspan="3" align="left" valign="middle" bgcolor="#FFFFFF">
-          <input name="searchTerm" type="text" size="15" value="{$search_term}">
-          <select name="searchField">
-             <option value="barcode"{$barcode_select}>Barcode</option>
-             <option value="control"{$control_select}>Control Number</option>
-          </select>
+          <tr>    
+          <th align="right" width="220">
+            Barcode:<font color="#FF0000">*</font>&nbsp;
+          </th>
+          <td  valign="middle">
+            <input name="barcode" type="text" id="barcode" size="30" value="$barcode" />
+          </td>
+        <td valign="middle">        
           &nbsp;
           <input type="submit" value="Search" onclick="this.form.cmd.value='{$_REQUEST['cmd']}';" / >
         </td>
       </tr>
-    </table>
+</table>
 ITEM_SOURCE;
 
       return $output;
   }
-
-
-    
   
   /**
    * @return void
@@ -773,22 +636,18 @@ ITEM_SOURCE;
        <?= ($item->getAvailability() == null || $item->getAvailability() == 1) ? 'checked="checked"' : '' ?>  value="1">
          <span id="availability_option1">in print</span>
            </td>
-        </tr>
-
-         
-        <tr id="barcode" style="display:none">
+        </tr>  
+        
+<?php if($item->isPhysicalItem()): ?>
+        <tr>
           <th>
-      <?php if($item->isPhysicalItem()): ?>
             <?= $g_catalogName ?> Control Number:
-      <?php else: ?>
-         Barcode / Alternate ID:
-      <?php endif; ?>
           </th>
           <td>
              <input type="text" name="local_control_key" size="15" value="<?=$item->getLocalControlKey();?>" />
           </td>
-        </tr>     
-          
+        </tr> 
+<?php endif; ?>                
       </table>
     </div>
     
@@ -1096,11 +955,10 @@ ITEM_SOURCE;
       
      <form id="item_form" name="item_form" action="index.php?cmd=<?= $_REQUEST['cmd'] ?>" method="post"
         <? if (! $item->isPhysicalItem()): ?> enctype="multipart/form-data" <? endif ?> >
-<?php if(! $item->isPhysicalItem()): ?>   
-      <input type="hidden" name="item_group" value="ELECTRONIC" />  
-      <input type="hidden" name="submit_edit_item_meta" value="submit" />
-<?php else: ?>
+<?php if ($item->isPhysicalItem()): ?>   
       <input type="hidden" name="item_group" value="MONOGRAPH" /> 
+<?php else: ?>
+      <input type="hidden" name="item_group" value="ELECTRONIC" />  
       <input type="hidden" name="store_request" value="submit" />
 <?php endif; ?>      
       
@@ -1195,7 +1053,7 @@ ITEM_SOURCE;
     <span class="helperText">= required fields</span>
     <p />
     <div style="padding:10px; text-align:center;">
-        <input type="submit" name="submit_edit_item_meta" value="Save Changes" onClick="return validateForm(this.form);">
+        <input type="submit" name="store_request" value="Save Changes" onClick="return validateForm(this.form);">
     </div>
     </form>    
 <?php   

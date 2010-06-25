@@ -1195,3 +1195,21 @@ CREATE TABLE IF NOT EXISTS users (
   KEY old_user_id (old_user_id),
   KEY last_name (last_name)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+-- 
+-- View `book_usage`
+-- 
+CREATE VIEW book_usage AS
+  SELECT ci.course_instance_id, r.reserve_id, i.ISBN,
+         sum(cast(i2.pages_times_used AS DECIMAL) /
+             cast(i2.pages_times_total AS DECIMAL)) * 100 percent_used
+  FROM course_instances ci
+    JOIN reserves r ON r.course_instance_id = ci.course_instance_id
+    JOIN items i ON r.item_id = i.item_id
+    JOIN reserves r2 ON ci.course_instance_id = r2.course_instance_id
+    JOIN items i2 ON r2.item_id = i2.item_id AND
+                     i.ISBN = i2.ISBN
+  WHERE i.material_type='BOOK_PORTION'
+  GROUP BY ci.course_instance_id, r.reserve_id, i.ISBN;
