@@ -131,15 +131,10 @@ class itemManager extends baseManager {
                 if ( ! is_null($rh) )  $rh->destroy();    // Delete the rightsholder from the rightsholders table.
               }
             }
-                        
-            // store whether or not this was a new item before updating the DB
-            $new_item = (! $item->itemID);
-            
-            //form is valid--  set item data
-            $item_id = $this->storeItem($item);
             
             //physical item data
-            if($item->isPhysicalItem()) {    
+            if($item->isPhysicalItem()) { 
+               
               $item->setHomeLibraryID($_REQUEST['home_library']);
                 
               //physical copy data
@@ -157,6 +152,14 @@ class itemManager extends baseManager {
                 $item->setLocalControlKey($_REQUEST['local_control_key']);
               }           
             }             
+                        
+            // store whether or not this was a new item before updating the DB
+            $new_item = (! $item->itemID);
+            
+            //form is valid--  set item data
+            $item_id = $this->storeItem($item);
+            
+            
             
             //if duplicating, show a different success screen
             if(isset($_REQUEST['dubReserve']) && $_REQUEST['dubReserve']) {
@@ -204,6 +207,28 @@ class itemManager extends baseManager {
         $loc  = "add physical item";
            
         if(isset($_REQUEST['store_request'])) { //form submitted, process item          
+        
+          if(empty($_REQUEST['itemID']) && isset($_REQUEST['barcode']) && $_REQUEST['material_type'] == 'BOOK') {
+            echo "<hr>WE NEED TO GET THE ITEM ID.<br>"; 
+            $phys_item = new physicalCopy();
+            if($phys_item->getByBarcode($_REQUEST['barcode'])) { 
+              echo "<br>";
+              print_r($phys_item);  
+              echo "<br>";   
+              $item = new reserveItem();
+              $item->createNewItem();
+              $item->getItemByID($phys_item->getItemID());
+              print_r($item);
+              echo "<br>item id = " . $item->itemID . "<br>"; 
+              $_REQUEST['itemID'] =  $item->itemID;             
+            }         
+          }
+           
+          if (isset($_REQUEST['itemID']))  echo "1 ITEM ID = " . $_REQUEST['itemID'] . "<br>"; 
+          if (isset($_REQUEST['barcode']))  echo "2 BARCODE = " . $_REQUEST['barcode'] . "<br>";  
+          if (isset($_REQUEST['material_type']))  echo "3 MATERIAL TYPE = " . $_REQUEST['material_type'] . "<br>";  ;                                            
+       
+        
           //store item meta data
           $item_id = $this->storeItem();
 
