@@ -1201,11 +1201,16 @@ CREATE TABLE IF NOT EXISTS users (
 -- 
 -- View `book_usage`
 -- 
-CREATE SQL SECURITY INVOKER VIEW book_usage AS
+CREATE OR REPLACE
+SQL SECURITY INVOKER
+VIEW book_usage AS
   SELECT ci.course_instance_id, r.reserve_id, i.ISBN,
          sum(cast(i2.pages_times_used AS DECIMAL) /
              cast(i2.pages_times_total AS DECIMAL)) * 100 percent_used
   FROM course_instances ci
+    JOIN course_aliases ca ON ci.primary_course_alias_id = ca.course_alias_id
+    JOIN courses co ON ca.course_id = co.course_id
+    JOIN departments dept ON co.department_id = dept.department_id
     JOIN reserves r ON r.course_instance_id = ci.course_instance_id
     JOIN items i ON r.item_id = i.item_id
     JOIN reserves r2 ON ci.course_instance_id = r2.course_instance_id
