@@ -1,15 +1,12 @@
 RESERVES DIRECT DEPLOYMENT NOTES
 
 Release 2.5.X
-    
-  1. svn switch repositories to release version - adjust last digit as needed.
-      https://svn.library.emory.edu/oss/reservesdirect/tags/release_2.5.0
       
-  2. For staging: copy production database to staging database.
+  1. For staging: copy production database to staging database.
      For both staging and production:
       run the migration script /home/httpd/html/reserves2/db/RD2.5.X_updates.sql
       
-  3. Update the items table with pagestimes field expanded into three new fields.
+  2. Update the items table with pagestimes field expanded into three new fields.
      run a script to create a migration that will update the items table.
      cd <root dir of app>
      ./scripts/db_item_pagestime_expansion.php
@@ -19,13 +16,13 @@ Release 2.5.X
      The sql file should now be run to update the database.
      mysql -h hostname -uusername -p databasename < db/2.5_pagestimes_update.sql
      
-  4. Add two new properties to the configuration file:
+  3. Add two new properties to the configuration file:
     <copyright_limit>CHANGEME</copyright_limit>   
     <copyright_notice>This the the copyright notice for 2010.</copyright_notice>
 
-  5.  Pear package Numbers_Roman 1.0.2 needs to be installed.
+  4.  Pear package Numbers_Roman 1.0.2 needs to be installed.
   
-  6. Update the configuration file:
+  5. Update the configuration file:
   <copyrightNoticeURL>http://web.library.emory.edu/services/course-reserves/reserves-copyright</copyrightNoticeURL>
 
 
