@@ -338,7 +338,8 @@ function common_electronicMaterialTypesDetails() {
          "times_pages" => array("required" => true, "label" => "Page ranges"),  // example!
          "used_times_pages" => array("required" => true, "label" => "Total pages used in item"),         
          "total_times_pages" => array("required" => true, "label" => "Total pages in book"),
-         "percent_times_pages" => array("label" => "Overall Book Usage"),    
+         "percent_times_pages" => array("label" => "Overall Book Usage"),
+         "copyright_status" => array("label" => "Copyright Status"),
          "availability" => array("required" => true, "label" => "Print status",
          "options" => array("out of print", "in print")),
          ),
