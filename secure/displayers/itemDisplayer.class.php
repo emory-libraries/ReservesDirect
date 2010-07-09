@@ -991,7 +991,7 @@ ITEM_SOURCE;
       if($edit_reserve) {
         // get the copyright information from the reserves before passing on to the detail section.
         $reservesLimit = $item->getOverallBookUsage($reserve->getCourseInstanceID(), false);
-        self::displayEditItemItemDetails($item, $reserve->getCopyrightStatusDisplay($u, $reservesLimit), $reserve->getCourseInstanceID());  
+        self::displayEditItemItemDetails($item, $reserve->getCopyrightStatusDisplay($u, $reservesLimit, $item->getISBN()), $reserve->getCourseInstanceID());  
         //show item details  
       }
       else {

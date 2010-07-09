@@ -1006,7 +1006,7 @@ class reserve extends Notes {
    * @param $reserveLimit the percentage of book usage for this reserve.
    * @desc Get the html code to display the copyright status display if needed.
    */
-  public function getCopyrightStatusDisplay($u, $reserveLimit=0) {
+  public function getCopyrightStatusDisplay($u, $reserveLimit=0, $isbn=null) {
     global $g_copyrightLimit, $g_permission;
     
     $copyright_status_display = "";
@@ -1017,8 +1017,9 @@ class reserve extends Notes {
     // Only display if the user role is greater than or equal to staff  
     if ($u->getRole() >= $g_permission['staff']) {
     
-      // Only display if copyright percentage is over the copyright limit.
-      if ($reserveLimit > $g_copyrightLimit) {
+      // Only display if copyright percentage is over the copyright limit,
+      // OR if the ISBN is 0.
+      if ($reserveLimit > $g_copyrightLimit || (isset($isbn) && ($isbn == '0')) ) {
         // Set the table row and label for the Copyright Status.
         $copyright_status_display .= '<tr id="copyright_status"><th>Copyright Status:</th><td>';
         // Initial the dropdown menu code for the Copyright Status.
