@@ -1019,7 +1019,7 @@ class reserve extends Notes {
     
       // Only display if copyright percentage is over the copyright limit,
       // OR if the ISBN is 0.
-      if ($reserveLimit > $g_copyrightLimit || (isset($isbn) && ($isbn == '0')) ) {
+      if ($reserveLimit > $g_copyrightLimit || $isbn == NULL || $isbn == '0') {
         // Set the table row and label for the Copyright Status.
         $copyright_status_display .= '<tr id="copyright_status"><th>Copyright Status:</th><td>';
         // Initial the dropdown menu code for the Copyright Status.
