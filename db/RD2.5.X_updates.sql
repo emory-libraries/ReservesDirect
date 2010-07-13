@@ -40,6 +40,16 @@ CREATE TABLE rightsholders (
 -- bootstrap material_type by assuming every PDF is a BOOK_PORTION
 UPDATE items SET material_type='BOOK_PORTION' WHERE material_type IS NULL AND 
   url LIKE '%.pdf';
+
+-- bootstrap material_type by assuming the icon maps to the material type
+UPDATE items SET material_type='BOOK_PORTION' WHERE item_icon LIKE '%doctype-pdf.gif';  
+UPDATE items SET material_type='AUDIO' WHERE item_icon LIKE '%doctype-sound.gif';  
+UPDATE items SET material_type='AUDIO' WHERE item_icon LIKE '%doctype-movie.gif';  
+UPDATE items SET material_type='COURSE_MATERIALS' WHERE item_icon LIKE '%doctype-text.gif';  
+UPDATE items SET material_type='COURSE_MATERIALS' WHERE item_icon LIKE '%doctype-excel.gif';  
+UPDATE items SET material_type='COURSE_MATERIALS' WHERE item_icon LIKE '%doctype-ppt.gif';  
+UPDATE items SET material_type='WEBPAGE' WHERE item_icon LIKE '%doctype-link.gif';  
+UPDATE items SET material_type='IMAGE' WHERE item_icon LIKE '%doctype-image.gif';   
   
 -- set copyright status of all historic courses to HIST
 UPDATE reserves SET `copyright_status`='HIST'
