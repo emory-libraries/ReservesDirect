@@ -150,7 +150,19 @@ class TestReserveItemClass extends UnitTest {
       $item->setISBN($isbn);
       $this->assertEqual($isbn_result, $item->getISBN(),
        "ISBN set correctly in reserve item when removing alpha chars; should be '$isbn_result', got '"
-       . $item->getISBN() . "'");       
+       . $item->getISBN() . "'"); 
+      // Test to see that 'X' is allowed in the ISBN string.
+      $isbn = "123456789X";
+      $item->setISBN($isbn);
+      $this->assertEqual($isbn, $item->getISBN(),
+       "ISBN set correctly and allow for 'X' in reserve item; should be '$isbn', got '"
+       . $item->getISBN() . "'");
+      // Test to see that 'X' is allowed in the ISBN string.
+      $isbn = "123x45X67x890";
+      $item->setISBN($isbn);
+      $this->assertEqual($isbn, $item->getISBN(),
+       "ISBN set correctly and allow for 'X' in reserve item; should be '$isbn', got '"
+       . $item->getISBN() . "'");             
     }
 }
 
