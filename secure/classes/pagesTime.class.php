@@ -248,8 +248,10 @@ class PagesTime {
   /**
   * @return void
   * @desc Process list or pagestime range.
+  * @param $list List of data to be processed.
+  * @param $ajaxcall - if called from ajax - only use the pages_used part.
   */  
-  function process_list($list) {
+  function process_list($list, $ajaxcall=false) {
     // This function is used to process any remaining data that will fit a list pattern.
     // A list pattern is data that contains commas or semicolons.
     $ret = true;
@@ -277,7 +279,7 @@ class PagesTime {
        $part = intval($this->find_range(
         $matches[$this->getListPattern('arabic_rtotal','range_start')], 
         $matches[$this->getListPattern('arabic_rtotal','range_end')]));
-       if ($data_has_been_processed == false)   $ret = false;   // there could be bad data      
+       if (!$ajaxcall && $data_has_been_processed == false)   $ret = false;   // there could be bad data      
        $this->pgs_format .= $matches[$this->getListPattern('arabic_rtotal','range_start')] 
         . "-" . $matches[$this->getListPattern('arabic_rtotal','range_end')];       
       }
@@ -298,7 +300,7 @@ class PagesTime {
         $part = intval($this->find_range(
             Numbers_Roman::toNumber($matches[$this->getListPattern('roman_range','roman_start')]), 
             Numbers_Roman::toNumber($matches[$this->getListPattern('roman_range','roman_end')]))); 
-        if ($data_has_been_processed == false)   $ret = false;   // there could be bad data  
+        if (!$ajaxcall && $data_has_been_processed == false)   $ret = false;   // there could be bad data  
         $this->pgs_format .= $matches[$this->getListPattern('roman_range','roman_start')] 
           . "-" . $matches[$this->getListPattern('roman_range','roman_end')];
       }        

@@ -116,7 +116,7 @@
     $current_used = ($in['used'] == null) ? 0 :  $in['used']; 
     if ($in['type'] == 'page_range_update') {
       $pagesTimes = new PagesTime(); 
-      $pagesTimes->process_list($in['range']);
+      $pagesTimes->process_list($in['range'], true);
       if ($pagesTimes->pgs_used > 0)  {
         $current_used = $pagesTimes->pgs_used;
       }
