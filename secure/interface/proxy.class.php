@@ -99,6 +99,10 @@ class proxy extends student
       $rs = $g_dbConn->query($sql3, $courseAliasID);
       if (DB::isError($rs)) { trigger_error($rs->getMessage(), E_USER_ERROR); }
 
+      /**
+      * @TODO: This should not delete the course, only remove the crosslisting.
+      * The reason this was never fixed is because the import feed restores the course.
+      */
       //Delete the actual course
       $course->destroy();
     } else {
