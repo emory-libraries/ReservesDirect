@@ -131,7 +131,27 @@ class TestReserveItemClass extends UnitTest {
       $item->getISBN() . "'");
       $this->assertEqual($item->countISBNUsage(), 3, "count ISBN correctly; should be 3, got '" .
        $item->countISBNUsage() . "'");
-    }    
+    }
+    
+    function testSetISBN() {
+      $item = new reserveItem(19762);
+      $isbn = "1234567890";
+      $item->setISBN($isbn);
+      $this->assertEqual($isbn, $item->getISBN(),
+       "ISBN set correctly in reserve item; should be '$isbn', got '"
+       . $item->getISBN() . "'");
+      $item = new reserveItem(19762);
+      $this->assertEqual($isbn, $item->getISBN(),
+       "ISBN set correctly in reserve item after db init; should be '$isbn', got '" .
+       $item->getISBN() . "'");
+      // Test to see that alpha characters are removed from the string before saving.
+      $isbn = "ABC1234567890";
+      $isbn_result = "1234567890";   
+      $item->setISBN($isbn);
+      $this->assertEqual($isbn_result, $item->getISBN(),
+       "ISBN set correctly in reserve item when removing alpha chars; should be '$isbn_result', got '"
+       . $item->getISBN() . "'");       
+    }
 }
 
 if (! defined('RUNNER')) {
