@@ -1,5 +1,13 @@
 RESERVES DIRECT DEPLOYMENT NOTES
 
+Release 2.6.X
+      
+  1. Switch to tag:
+     https://svn.library.emory.edu/oss/reservesdirect/tags/release_2.6.X
+  
+  2. Run the migration script:
+     /home/httpd/html/reserves2/db/RD2.6.X_updates.sql
+      
 Release 2.5.X
       
   1. For staging: copy production database to staging database.
