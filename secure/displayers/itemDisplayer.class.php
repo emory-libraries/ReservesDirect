@@ -1250,7 +1250,7 @@ ITEM_SOURCE;
     <div class="contentTabs">
       <ul>
         <li <?=$tab_styles['meta']?>><a href="index.php?cmd=editItem&<?=$edit_item_href?><?= $search_param ?>">Item Info</a></li>
-<?php   if(($u->getRole() >= $g_permission['staff']) && $edit_reserve): ?>
+<?php   if(($u->getRole() >= $g_permission['staff']) && ((!empty($_REQUEST['search'])) || $edit_reserve)): ?>
         <li <?=$tab_styles['history']?>><a href="index.php?cmd=editItem&<?=$edit_item_href?>&tab=history<?= $search_param ?>">History</a></li>
 
 <?php   endif; ?>
