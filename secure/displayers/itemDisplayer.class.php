@@ -695,8 +695,7 @@ ITEM_SOURCE;
           case "WEBPAGE": document.getElementById('iconImg').src = "images/doc_type_icons/doctype-link.gif"; 
                   document.item_form.selectedDocIcon.selectedIndex = 7;  break;
           case "OTHER": document.getElementById('iconImg').src = "images/doc_type_icons/doctype-clear.gif"; 
-                  document.item_form.selectedDocIcon.selectedIndex = 0;  break;      
-          default: document.getElementById('iconImg').src = "images/doc_type_icons/doctype-pdf.gif"; break;
+                  document.item_form.selectedDocIcon.selectedIndex = 0;  break;
         }        
 <? endif ?> 
 
