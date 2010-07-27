@@ -1017,9 +1017,9 @@ class reserve extends Notes {
     // Only display if the user role is greater than or equal to staff  
     if ($u->getRole() >= $g_permission['staff']) {
     
-      // Only display if copyright percentage is over the copyright limit,
+      // Only display if copyright percentage is over or equal to the copyright limit,
       // OR if the ISBN is 0.
-      if ($reserveLimit > $g_copyrightLimit || $isbn == NULL || $isbn == '0') {
+      if ($reserveLimit => $g_copyrightLimit || $isbn == NULL || $isbn == '0') {
         // Set the table row and label for the Copyright Status.
         $copyright_status_display .= '<tr id="copyright_status"><th>Copyright Status:</th><td>';
         // Initial the dropdown menu code for the Copyright Status.
