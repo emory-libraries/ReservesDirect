@@ -492,7 +492,7 @@ ITEM_SOURCE;
            <?php    endforeach ?>
            </select>
 <?php if($item->isPhysicalItem()): ?>           
-          <img name="iconImg" width="24" height="20" src="<?=$item->getItemIcon()?>" /> 
+          <img id="iconImg" name="iconImg" width="24" height="20" src="<?=$item->getItemIcon()?>" /> 
 <?php endif; ?>
            <div id="material_type_other_block"
            style="display:<?= ($item->getMaterialType() == 'OTHER') ? 'inline' : 'none' ?>">
@@ -659,13 +659,7 @@ ITEM_SOURCE;
        function materialTypeEvents() {
          
          var material_type = document.getElementById('material_type').value;
-         
-        switch(material_type)
-        { // For BOOK_PORTION only, display the rightsholder section.
-          case "BOOK_PORTION":     document.getElementById('rightsholder_hideshow') .style.display = '';    break;
-          default:   document.getElementById('rightsholder_hideshow') .style.display = 'none';     break;
-        } 
-                 
+      
 <?php if (!$item->itemID): ?>          
         switch(material_type)
         {
@@ -674,36 +668,42 @@ ITEM_SOURCE;
           // Also, set the item group for physical items.
           
           // PHYSICAL ITEMS
-          case "BOOK": item_group.value = 'MONOGRAPH'; 
-            document.item_form.iconImg.src = "images/doc_type_icons/doctype-book.gif"; break;
-          case "CD": 
+          case "BOOK": document.getElementById('item_group').value = 'MONOGRAPH'; 
+            document.getElementById('iconImg').src = "images/doc_type_icons/doctype-book.gif"; break;
+          case "CD":
           case "DVD": 
           case "VHS": 
-          case "SOFTWARE": item_group.value = 'MULTIMEDIA'; 
-            document.item_form.iconImg.src = "images/doc_type_icons/doctype-disc.gif"; break;
+          case "SOFTWARE": document.getElementById('item_group').value = 'MULTIMEDIA'; 
+            document.getElementById('iconImg').src = "images/doc_type_icons/doctype-disc.gif"; break;
              
           // ELECTRONIC ITEMS
-          case "BOOK_PORTION": document.item_form.iconImg.src = "images/doc_type_icons/doctype-pdf.gif"; 
+          case "BOOK_PORTION": document.getElementById('iconImg').src = "images/doc_type_icons/doctype-pdf.gif"; 
                     document.item_form.selectedDocIcon.selectedIndex = 1;  break;
-          case "JOURNAL_ARTICLE": document.item_form.iconImg.src = "images/doc_type_icons/doctype-pdf.gif";  
+          case "JOURNAL_ARTICLE": document.getElementById('iconImg').src = "images/doc_type_icons/doctype-pdf.gif";  
                   document.item_form.selectedDocIcon.selectedIndex = 1;    break;
-          case "CONFERENCE_PAPER": document.item_form.iconImg.src = "images/doc_type_icons/doctype-text.gif";   
+          case "CONFERENCE_PAPER": document.getElementById('iconImg').src = "images/doc_type_icons/doctype-text.gif";   
                   document.item_form.selectedDocIcon.selectedIndex = 4;    break;
-          case "COURSE_MATERIALS": document.item_form.iconImg.src = "images/doc_type_icons/doctype-text.gif";   
+          case "COURSE_MATERIALS": document.getElementById('iconImg').src = "images/doc_type_icons/doctype-text.gif";   
                   document.item_form.selectedDocIcon.selectedIndex = 4;    break;
-          case "IMAGE": document.item_form.iconImg.src = "images/doc_type_icons/doctype-image.gif";  
+          case "IMAGE": document.getElementById('iconImg').src = "images/doc_type_icons/doctype-image.gif";  
                   document.item_form.selectedDocIcon.selectedIndex = 8;    break;
-          case "VIDEO": document.item_form.iconImg.src = "images/doc_type_icons/doctype-movie.gif";  
+          case "VIDEO": document.getElementById('iconImg').src = "images/doc_type_icons/doctype-movie.gif";  
                   document.item_form.selectedDocIcon.selectedIndex = 3;    break;
-          case "AUDIO": document.item_form.iconImg.src = "images/doc_type_icons/doctype-sound.gif";  
+          case "AUDIO": document.getElementById('iconImg').src = "images/doc_type_icons/doctype-sound.gif";  
                   document.item_form.selectedDocIcon.selectedIndex = 2;    break;
-          case "WEBPAGE": document.item_form.iconImg.src = "images/doc_type_icons/doctype-link.gif"; 
+          case "WEBPAGE": document.getElementById('iconImg').src = "images/doc_type_icons/doctype-link.gif"; 
                   document.item_form.selectedDocIcon.selectedIndex = 7;  break;
-          case "OTHER": document.item_form.iconImg.src = "images/doc_type_icons/doctype-clear.gif"; 
+          case "OTHER": document.getElementById('iconImg').src = "images/doc_type_icons/doctype-clear.gif"; 
                   document.item_form.selectedDocIcon.selectedIndex = 0;  break;      
-          default: document.item_form.iconImg.src = "images/doc_type_icons/doctype-pdf.gif"; break;
+          default: document.getElementById('iconImg').src = "images/doc_type_icons/doctype-pdf.gif"; break;
         }        
 <? endif ?> 
+
+        switch(material_type)
+        { // For BOOK_PORTION only, display the rightsholder section.
+          case "BOOK_PORTION":     document.getElementById('rightsholder_hideshow') .style.display = '';    break;
+          default:   document.getElementById('rightsholder_hideshow') .style.display = 'none';     break;
+        }
        }      
     </script>
 <?php
@@ -956,9 +956,9 @@ ITEM_SOURCE;
      <form id="item_form" name="item_form" action="index.php?cmd=<?= $_REQUEST['cmd'] ?>" method="post"
         <? if (! $item->isPhysicalItem()): ?> enctype="multipart/form-data" <? endif ?> >
 <?php if ($item->isPhysicalItem()): ?>   
-      <input type="hidden" name="item_group" value="MONOGRAPH" /> 
+      <input type="hidden" id="item_group" name="item_group" value="MONOGRAPH" /> 
 <?php else: ?>
-      <input type="hidden" name="item_group" value="ELECTRONIC" />  
+      <input type="hidden" id="item_group" name="item_group" value="ELECTRONIC" />  
       <input type="hidden" name="store_request" value="submit" />
 <?php endif; ?>      
       
