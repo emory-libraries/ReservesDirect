@@ -658,16 +658,13 @@ ITEM_SOURCE;
        // Set the item_group based on type of material for physical items
        function materialTypeEvents() {
          
-         var material_type = document.getElementById('material_type').value;
-      
-<?php if (!$item->itemID): ?>          
+        var material_type = document.getElementById('material_type').value;
+
         switch(material_type)
-        {
-          // For new items only:
+        {          
+          // FOR NEW OR EDIT PHYSICAL ITEMS
           // Change icon based on material type, when material type has changed.
-          // Also, set the item group for physical items.
-          
-          // PHYSICAL ITEMS
+          // Also, set the item group for physical items.          
           case "BOOK": document.getElementById('item_group').value = 'MONOGRAPH'; 
             document.getElementById('iconImg').src = "images/doc_type_icons/doctype-book.gif"; break;
           case "CD":
@@ -675,8 +672,12 @@ ITEM_SOURCE;
           case "VHS": 
           case "SOFTWARE": document.getElementById('item_group').value = 'MULTIMEDIA'; 
             document.getElementById('iconImg').src = "images/doc_type_icons/doctype-disc.gif"; break;
-             
-          // ELECTRONIC ITEMS
+        }
+        
+<?php if (!$item->itemID): ?>         
+        switch(material_type) {             
+          // For NEW ELECTRONIC ITEMS ONLY
+          // Change icon based on material type, when material type has changed.          
           case "BOOK_PORTION": document.getElementById('iconImg').src = "images/doc_type_icons/doctype-pdf.gif"; 
                     document.item_form.selectedDocIcon.selectedIndex = 1;  break;
           case "JOURNAL_ARTICLE": document.getElementById('iconImg').src = "images/doc_type_icons/doctype-pdf.gif";  
