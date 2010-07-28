@@ -667,7 +667,8 @@ ITEM_SOURCE;
           // Also, set the item group for physical items.          
           case "BOOK": document.getElementById('item_group').value = 'MONOGRAPH'; 
             document.getElementById('iconImg').src = "images/doc_type_icons/doctype-book.gif"; break;
-          case "CD":
+          case "CD": document.getElementById('item_group').value = 'MULTIMEDIA';
+            document.getElementById('iconImg').src = "images/doc_type_icons/doctype-sound.gif"; break;
           case "DVD": 
           case "VHS": 
           case "SOFTWARE": document.getElementById('item_group').value = 'MULTIMEDIA'; 
