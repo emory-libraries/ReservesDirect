@@ -146,7 +146,7 @@ class classDisplayer extends baseDisplayer {
             
             <span class="label">Class Status</span>:
             <input type="radio" name="status" value="ACTIVE" <?php echo ($ci->getStatus()=='ACTIVE') ? 'checked="true"' : 'moo'; ?> /> <?=common_getStatusSpan('ACTIVE')?>
-            <input type="radio" name="status" value="INACTIVE" <?php echo (($ci->getStatus()=='INACTIVE') || ($ci->getStatus()=='AUTOFEED')) ? 'checked="true"' : ''; ?> /> <?common_getStatusSpan('INACTIVE')?>
+            <input type="radio" name="status" value="INACTIVE" <?php echo (($ci->getStatus()=='INACTIVE') || ($ci->getStatus()=='AUTOFEED')) ? 'checked="true"' : ''; ?> /> <?=common_getStatusSpan('INACTIVE')?>
 <?php     if($ci->getStatus()=='AUTOFEED'): ?>
             (Added by Registrar)
 <?php     endif; ?>
