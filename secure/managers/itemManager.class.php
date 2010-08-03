@@ -220,21 +220,27 @@ class itemManager extends baseManager {
       case 'addPhysicalItem': // create/edit physical items and/or processing requests
         $page = "addReserve";
         $loc  = "add physical item";
-           
+         
         if(isset($_REQUEST['store_request'])) { //form submitted, process item          
-        
-          if(empty($_REQUEST['itemID']) && isset($_REQUEST['barcode']) && $_REQUEST['material_type'] == 'BOOK') {
+                                      
+          if(isset($_REQUEST['barcode']) && $_REQUEST['material_type'] == 'BOOK') {
             $phys_item = new physicalCopy();
-            
-            // Check to see if the item exists in the physical_copies table
-            if($phys_item->getByBarcode($_REQUEST['barcode'])) {                             
+            $item = new reserveItem();             
+            // Check to see if the barcode exists in the physical_copies table
+            if($phys_item->getByBarcode($_REQUEST['barcode'])) {
+              // Barcode does exist in the physical_copies table
               // Check to see if the foreign key item_id exists in the items table.
               $itemTest = $item->getItemByID($phys_item->getItemID());                
-              if (empty($itemTest)) { 
+              if (empty($itemTest)) {                
                 // item exists in physical_copies table, but not in items table 
-                // Create a new item
-                $item = new reserveItem();
-                $item->createNewItem();
+                if (empty($_REQUEST['itemID'])) {                  
+                  // Item does not exist
+                  $item->createNewItem();
+                }
+                else {
+                  // Item exists but barcode does not.
+                  $item->getItemByID($_REQUEST['itemID']);                  
+                }              
                 // Now update the item_id foreign key in the physical_copies table.                    
                 $phys_item->setItemID($item->itemID);
               }
