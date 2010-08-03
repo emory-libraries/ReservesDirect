@@ -138,20 +138,35 @@ class itemManager extends baseManager {
               $item->setHomeLibraryID($_REQUEST['home_library']);
                 
               //physical copy data
-              if($item->getPhysicalCopy()) {  //returns false if not a physical copy    
+              $item->getPhysicalCopy();
+              $p_item_id = $item->physicalCopy->getItemID();
+              if (!isset($p_item_id)) { 
+                // The item_id foreign key in physical_copies table does not exist.
+                $phys_item = new physicalCopy();
+                if($phys_item->getByBarcode($_REQUEST['barcode'])) {                    
+                  $itemTest = $item->getItemByID($phys_item->getItemID());
+                  // The current barcode in physical_copies table has a deleted item_id
+                  // So update the item_id with the current item_id                  
+                  if (empty($itemTest)) {
+                    $phys_item->setItemID($item->getItemID());
+                  }
+                }
+              }
+              else {
+
                 //only set these if they were part of the form
-                if(isset($_REQUEST['barcode'])) {               
+                if(isset($_REQUEST['barcode'])) {            
                   $item->physicalCopy->setBarcode($_REQUEST['barcode']);        
                 }
                 if(isset($_REQUEST['call_num'])) {         
                   $item->physicalCopy->setCallNumber($_REQUEST['call_num']);         
                 }
-              }
-     
-              if(!empty($_REQUEST['local_control_key'])) {
-                $item->setLocalControlKey($_REQUEST['local_control_key']);
-              }           
-            }             
+       
+                if(!empty($_REQUEST['local_control_key'])) {
+                  $item->setLocalControlKey($_REQUEST['local_control_key']);
+                } 
+              }          
+            }            
                         
             // store whether or not this was a new item before updating the DB
             $new_item = (! $item->itemID);
@@ -209,26 +224,31 @@ class itemManager extends baseManager {
         if(isset($_REQUEST['store_request'])) { //form submitted, process item          
         
           if(empty($_REQUEST['itemID']) && isset($_REQUEST['barcode']) && $_REQUEST['material_type'] == 'BOOK') {
-            echo "<hr>WE NEED TO GET THE ITEM ID.<br>"; 
             $phys_item = new physicalCopy();
-            if($phys_item->getByBarcode($_REQUEST['barcode'])) { 
-              echo "<br>";
-              print_r($phys_item);  
-              echo "<br>";   
-              $item = new reserveItem();
-              $item->createNewItem();
-              $item->getItemByID($phys_item->getItemID());
-              print_r($item);
-              echo "<br>item id = " . $item->itemID . "<br>"; 
+            
+            // Check to see if the item exists in the physical_copies table
+            if($phys_item->getByBarcode($_REQUEST['barcode'])) {                             
+              // Check to see if the foreign key item_id exists in the items table.
+              $itemTest = $item->getItemByID($phys_item->getItemID());                
+              if (empty($itemTest)) { 
+                // item exists in physical_copies table, but not in items table 
+                // Create a new item
+                $item = new reserveItem();
+                $item->createNewItem();
+                // Now update the item_id foreign key in the physical_copies table.                    
+                $phys_item->setItemID($item->itemID);
+              }
+              else {  // the item exists, so link to existing item
+                $item->getItemByID($phys_item->getItemID());                
+              }                           
+
               $_REQUEST['itemID'] =  $item->itemID;             
             }         
-          }
+          }         
            
-          if (isset($_REQUEST['itemID']))  echo "1 ITEM ID = " . $_REQUEST['itemID'] . "<br>"; 
-          if (isset($_REQUEST['barcode']))  echo "2 BARCODE = " . $_REQUEST['barcode'] . "<br>";  
-          if (isset($_REQUEST['material_type']))  echo "3 MATERIAL TYPE = " . $_REQUEST['material_type'] . "<br>";  ;                                            
-       
-        
+          //if (isset($_REQUEST['itemID']))  echo "1 ITEM ID = " . $_REQUEST['itemID'] . "<br>"; 
+          //if (isset($_REQUEST['barcode']))  echo "2 BARCODE = " . $_REQUEST['barcode'] . "<br>";  
+          //if (isset($_REQUEST['material_type']))  echo "3 MATERIAL TYPE = " . $_REQUEST['material_type'] . "<br>";  ;                                            
           //store item meta data
           $item_id = $this->storeItem();
 
