@@ -143,7 +143,7 @@ class itemManager extends baseManager {
               if (!isset($p_item_id)) { 
                 // The item_id foreign key in physical_copies table does not exist.
                 $phys_item = new physicalCopy();
-                if($phys_item->getByBarcode($_REQUEST['barcode'])) {                    
+                if (isset($_REQUEST['barcode']) && $phys_item->getByBarcode($_REQUEST['barcode'])) {                    
                   $itemTest = $item->getItemByID($phys_item->getItemID());
                   // The current barcode in physical_copies table has a deleted item_id
                   // So update the item_id with the current item_id                  
