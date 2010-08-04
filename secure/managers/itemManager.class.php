@@ -223,7 +223,7 @@ class itemManager extends baseManager {
          
         if(isset($_REQUEST['store_request'])) { //form submitted, process item          
                                       
-          if(isset($_REQUEST['barcode']) && $_REQUEST['material_type'] == 'BOOK') {
+          if(isset($_REQUEST['barcode'])) {
             $phys_item = new physicalCopy();
             $item = new reserveItem();             
             // Check to see if the barcode exists in the physical_copies table
@@ -469,6 +469,13 @@ class itemManager extends baseManager {
       if ($item->getOCLC() == "")   $item->OCLC   = $search_results['OCLC'];
       if ($item->getISSN() == "")   $item->ISSN   = $search_results['ISSN'];
       if ($item->getISBN() == "")   $item->ISBN   = $search_results['ISBN'];
+      
+      if (isset($_REQUEST['material_type'])  && isset($item->itemID)) {
+        switch ($item->getMaterialType()) {
+          case 'BOOK' : $item->setGroup('MONOGRAPH'); $_REQUEST['item_group'] = 'MONOGRAPH'; break;
+          default: $item->setGroup('MULTIMEDIA'); $_REQUEST['item_group'] = 'MULTIMEDIA'; break;
+        }        
+      }      
 
       // old code threw the entire publication info (including year) into
       // $item->source. now we want the pub info in $item->publisher and the

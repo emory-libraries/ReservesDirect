@@ -956,7 +956,11 @@ ITEM_SOURCE;
      <form id="item_form" name="item_form" action="index.php?cmd=<?= $_REQUEST['cmd'] ?>" method="post"
         <? if (! $item->isPhysicalItem()): ?> enctype="multipart/form-data" <? endif ?> >
 <?php if ($item->isPhysicalItem()): ?>   
-      <input type="hidden" id="item_group" name="item_group" value="MONOGRAPH" /> 
+      <?php if (isset($_REQUEST['item_group'])): ?>
+          <input type="hidden" id="item_group" name="item_group" value="<?=$_REQUEST['item_group']?>" />      
+      <?php else: ?>  
+         <input type="hidden" id="item_group" name="item_group" value="MONOGRAPH" />
+      <?php endif; ?> 
 <?php else: ?>
       <input type="hidden" id="item_group" name="item_group" value="ELECTRONIC" />  
       <input type="hidden" name="store_request" value="submit" />
