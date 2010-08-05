@@ -469,13 +469,23 @@ class itemManager extends baseManager {
       if ($item->getOCLC() == "")   $item->OCLC   = $search_results['OCLC'];
       if ($item->getISSN() == "")   $item->ISSN   = $search_results['ISSN'];
       if ($item->getISBN() == "")   $item->ISBN   = $search_results['ISBN'];
-      
-      if (isset($_REQUEST['material_type'])  && isset($item->itemID)) {
-        switch ($item->getMaterialType()) {
-          case 'BOOK' : $item->setGroup('MONOGRAPH'); $_REQUEST['item_group'] = 'MONOGRAPH'; break;
-          default: $item->setGroup('MULTIMEDIA'); $_REQUEST['item_group'] = 'MULTIMEDIA'; break;
-        }        
-      }      
+                
+      if (!empty($search_results['holdings']) && isset($item->itemID)) {
+        $holdings = $search_results['holdings'][0]; 
+        
+        switch ($holdings['type']) {
+          case 'BOOK' :         
+            $item->setGroup('MONOGRAPH');  
+            $item->setMaterialType($holdings['type']);
+            $_REQUEST['item_group'] = 'MONOGRAPH';
+            break;
+          default: // if it is not a book, then let's assume it is a disc.
+            $item->setGroup('MULTIMEDIA');
+            $item->setMaterialType($holdings['type']);            
+            $_REQUEST['item_group'] = 'MULTIMEDIA';             
+            break;                                  
+        }
+      }     
 
       // old code threw the entire publication info (including year) into
       // $item->source. now we want the pub info in $item->publisher and the

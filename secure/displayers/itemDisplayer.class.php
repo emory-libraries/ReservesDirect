@@ -647,6 +647,23 @@ ITEM_SOURCE;
              <input type="text" name="local_control_key" size="15" value="<?=$item->getLocalControlKey();?>" />
           </td>
         </tr> 
+        
+<?php if($_REQUEST['cmd'] == 'addPhysicalItem'): ?>       
+          <tr>
+            <th>Reserve Desk:</th>
+            <td>
+              <select name="home_library">
+<?php
+      foreach($u->getLibraries() as $lib):
+        $selected_lib = ($item->getHomeLibraryID() == $lib->getLibraryID()) ? 'selected="selected"' : '';
+?>
+                <option value='<?=$lib->getLibraryID()?>' <?=$lib->getLibraryID()?> > <?=$lib->getLibrary()?> </option>;
+<?php endforeach; ?>
+              </select>
+            </td>
+          </tr>        
+<?php endif; ?> 
+        
 <?php endif; ?>                
       </table>
     </div>
@@ -954,7 +971,7 @@ ITEM_SOURCE;
 <? /* NOTE: post to same command, to preserve info about action (editItem or addDigitalItem   */ ?>
       
      <form id="item_form" name="item_form" action="index.php?cmd=<?= $_REQUEST['cmd'] ?>" method="post"
-        <? if (! $item->isPhysicalItem()): ?> enctype="multipart/form-data" <? endif ?> >
+        <? if (! $item->isPhysicalItem()): ?> enctype="multipart/form-data" <? endif ?> >        
 <?php if ($item->isPhysicalItem()): ?>   
       <?php if (isset($_REQUEST['item_group'])): ?>
           <input type="hidden" id="item_group" name="item_group" value="<?=$_REQUEST['item_group']?>" />      
