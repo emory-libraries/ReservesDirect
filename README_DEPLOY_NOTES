@@ -11,7 +11,20 @@ Release 2.6.0
   2. For staging only:
      Dump the production database and load it into the stage2 database
      defined in /etc/httpd/conf/reserves_stage2_config.xml
-      
+
+Release 2.5.8
+    This version was never deployed, but included in the 2.6.0 deployment.
+    Switch the svn repository.
+    https://svn.library.emory.edu/oss/reservesdirect/tags/release_2.5.8 
+
+Release 2.5.7
+    Switch the svn repository.
+    https://svn.library.emory.edu/oss/reservesdirect/tags/release_2.5.7
+
+Release 2.5.6
+    Switch the svn repository.
+    https://svn.library.emory.edu/oss/reservesdirect/tags/release_2.5.6
+          
 Release 2.5.5
       
   1. For staging: copy production database to staging database.

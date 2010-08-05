@@ -23,9 +23,41 @@ http://www.reservesdirect.org/
 Revision 2.6.0
 
 Changes
+--  The opus feed file tranfer is validated using a new summary file that 
+    contains the row count of the import files, so that project owners can 
+    be informed about a failure.
 
--- An admin/staff/instructor can manually create a crosslisted course, and preserve that crosslisting during the import of courses from the registrar office, so that their manual settings will not be overridden with the registrar crosslisting setting. 
+--  Any reserves direct user can access their course when the course is in 
+    the current semester or in a future semester but within its start and end dates.
 
+--  An admin/staff/instructor can manually set a course to override the 
+    opus import, so that their manual settings will not be overridden 
+    with the registrar import data.
+
+--  An admin/staff/instructor can manually create a crosslisted course, 
+    and preserve that crosslisting during the import opus feed process, 
+    so that their manual settings will not be overridden with the registrar 
+    crosslisting setting.
+
+--  All users will be able to see the correct student enrollment for the 
+    current and next semester so that new students can access their reserves 
+    material for a course.
+
+Release 2.5.8
+    This version was never deployed.  It is included in the 2.6.0 deployment.
+    Bug fix: Physical items barcode search data population works for non 
+    book types (CD, DVD, etc).
+    Bug fix: Include the Reserve Desk library selection dropdown menu for 
+    physical items.
+
+Release 2.5.7
+    Bug fix: The doctype icon for physical items now updates correctly.
+    Bug fix: The copyright status dropdown menu selection appears for
+    copyright usage equal to limit.
+
+Release 2.5.6
+    Bug fix: History tab now displays in the item display after searching
+    for an item.
 
 Revision 2.5.5
 
