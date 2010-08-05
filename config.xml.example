@@ -49,7 +49,7 @@ http://www.reservesdirect.org/
         <dbname>CHANGEME</dbname>
         <ssl>true</ssl>
         <debug>true</debug>
-    </test_database>    
+    </test_database>
     
     <ils>
       <class_name>RD_Ils_EuclidTest</class_name><!-- Class returned by init ILS -->

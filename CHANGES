@@ -20,6 +20,13 @@ ReservesDirect is located at:
 http://www.reservesdirect.org/
 
 ************************************************************************
+Revision 2.6.0
+
+Changes
+
+-- An admin/staff/instructor can manually create a crosslisted course, and preserve that crosslisting during the import of courses from the registrar office, so that their manual settings will not be overridden with the registrar crosslisting setting. 
+
+
 Revision 2.5.5
 
 Changes
