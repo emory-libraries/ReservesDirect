@@ -36,7 +36,7 @@ require_once("secure/classes/itemAudit.class.php");
 require_once('secure/managers/noteManager.class.php');
 require_once('secure/managers/classManager.class.php');
 
-class reservesManager
+class reservesManager extends classManager
 {
   public $user;
   public $displayClass;
