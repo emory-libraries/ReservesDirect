@@ -1,5 +1,11 @@
 RESERVES DIRECT DEPLOYMENT NOTES
 
+Release 2.6.1
+      
+  1. Upgrade to PHP 5.2.10.
+  2. Switch the svn repository.
+        https://svn.library.emory.edu/oss/reservesdirect/tags/release_2.6.1   
+        
 Release 2.6.0
       
   1. Switch the svn repository.

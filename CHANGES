@@ -20,6 +20,23 @@ ReservesDirect is located at:
 http://www.reservesdirect.org/
 
 ************************************************************************
+Revision 2.6.1
+
+Changes
+--  PHP upgrade from 5.2.3 to 5.2.10.
+--  An admin/staff/instructor can "Copy Selected to Another Class" for an item 
+    and get properly redirected to the "Select class to copy TO:" page so that 
+    functionality may continue without a white screen using php version 5.2.10.
+--  An admin/staff/instructor can "Delete Selected" for an item and get properly 
+    redirected back to the course listing page so that functionality may continue 
+    without a white screen appearing using php version 5.2.10.
+--  An admin/staff/instructor can "Deny Use For This Class" for an item and get 
+    properly redirected back to the course listing page so that functionality may 
+    continue without a white screen appearing using php version 5.2.10.
+--  An admin/staff/instructor can "Deny Use For All Classes" for an item and get 
+    properly redirected back to the course listing page so that functionality may 
+    continue without a white screen appearing using php version 5.2.10. 
+    
 Revision 2.6.0
 
 Changes
