@@ -59,7 +59,7 @@ function openWin(mypage, w, h, title) {
 // using the meta data text fields on the form, get an open url
 function get_url(frm) {
   var alertMsg = '';
-  var sURL = "http://sfx.galib.uga.edu/sfx_emu1";
+  var sURL = "http://sfxhosted.exlibrisgroup.com/emu";
   var url_ver = "Z39.88-2004"; 
   var rft_val_fmt = "info:ofi/fmt:kev:mtx:journal";
   
