@@ -37,7 +37,7 @@ class itemDisplayer extends noteDisplayer {
    * @param reserveItem object $reserveItem
    */
   function displayEditItemSource($reserveItem) {
-    global $u, $g_permission;
+    global $u, $g_permission, $ajax_browser;
 
 
       print '<div class="headingCell1">ITEM SOURCE</div>';
@@ -852,7 +852,7 @@ ITEM_SOURCE;
       <div style="padding:8px 8px 12px 8px;text-align:center">
       
       <? /* Notes cannot be created unless the item has been saved first.   */ ?>
-      <?php if(isset($reserve)): ?>        
+      <?php if(isset($id)): ?>        
         <?php  self::displayNotesBlockAJAX($notes, $obj_type, $id, $include_addnote_button); ?>
       <?php else: ?>
         <p>If you would like to add a note, please save the item first.<p>
@@ -875,7 +875,7 @@ ITEM_SOURCE;
    * @todo figure out a way to consolidate addItem and editItem logic?
    */
   function displayEditItemMeta($item, $reserve=null, $dub_array=null) {
-    global $u, $g_permission, $g_copyrightNoticeURL, $g_notetype;
+    global $u, $g_permission, $g_copyrightNoticeURL, $g_notetype, $ajax_browser;
     
     //determine if editing a reserve
     if(!empty($reserve) && ($reserve instanceof reserve)) { //valid reserve obj
@@ -913,7 +913,10 @@ ITEM_SOURCE;
           document.getElementById('alertMsg').innerHTML = alertMsg;
           return false;
         } else {
-          return true;
+          // set store_request to true for "Save Changes" button
+          document.getElementById('store_request').value=1; 
+          // make sure that this submit to the correct (outer) form.
+          document.item_form.submit();
         }         
       }
       // do form-validation for material-type portion of add/edit form
@@ -980,7 +983,7 @@ ITEM_SOURCE;
       <?php endif; ?> 
 <?php else: ?>
       <input type="hidden" id="item_group" name="item_group" value="ELECTRONIC" />  
-      <input type="hidden" name="store_request" value="submit" />
+     
 <?php endif; ?>      
       
       <input type="hidden" id="itemID" name="itemID" value="<?=$item->getItemID()?>" />
@@ -988,6 +991,7 @@ ITEM_SOURCE;
 <?php if($edit_reserve): ?>
       <input type="hidden" name="reserveID" value="<?=$reserve->getReserveID()?>" />  
 <?php endif; ?>
+      <input type="hidden" id="store_request" name="store_request" value=0>
 
 <?php if(!empty($_REQUEST['ci'])):
   /* if course id is set (e.g., adding new digital item from a class), pass on  */ ?>
@@ -1032,21 +1036,11 @@ ITEM_SOURCE;
     <div class="headingCell1">NOTES</div>        
     <br />    
     
-    <?php if(isset($reserve)): //if editing existing item, use AJAX notes handler ?>   
-    
-      <?php  // CHECK IF THIS IS IE, when editting notes.
-      $ie = false;
-      $userAgent = strtolower($_SERVER['HTTP_USER_AGENT']); 
-      if (preg_match('/msie/', $userAgent)) {
-          $name = 'msie';
-          $ie = true;
-      } 
-      ?>
-      
-      <?php if(!$ie): // if not IE, then allow notes to be editted. ?>    
+    <?php if(isset($reserve) || (!empty($_REQUEST['search']))): //if editing existing item, use AJAX notes handler ?> 
+      <?php if($ajax_browser): // determine if the browser handles ajax ?> 
         <?php  self::displayEditItemNotesAJAX($item, $reserve);  ?>
       <?php else: // suggest a non IE browser for editting notes. ?>
-        <p>If you would like to add or edit the notes, please use a browser other than Internet Explorer.</p>
+        <?php  self::displayEditItemNotes($item, $reserve);  ?>   
       <?php endif; ?>  
         
       <?php else: //just display plain note form ?>
@@ -1074,7 +1068,7 @@ ITEM_SOURCE;
     <span class="helperText">= required fields</span>
     <p />
     <div style="padding:10px; text-align:center;">
-        <input type="submit" name="store_request" value="Save Changes" onClick="return validateForm(this.form);">
+        <input type="button" value="Save Changes" onClick="return validateForm(this.form);">
     </div>
     </form>    
 <?php   

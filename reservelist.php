@@ -96,7 +96,7 @@ foreach($walker as $leaf) {
 				}
 			}
 		foreach($resNotes as $note) {
-			$htmloutput .= $note->getText().'. ';
+          $htmloutput .= trim(str_replace("\r", "", str_replace("\n", " ", $note->getText().'. ')));
 		}
 
 	$htmloutput .= "</li>\n";

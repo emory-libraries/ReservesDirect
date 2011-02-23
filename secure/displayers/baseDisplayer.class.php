@@ -303,6 +303,11 @@ abstract class baseDisplayer {
 
           <br />
           <span class="itemMetaPre"><?=$fields['edition']['label']?>: </span><span class="itemMeta"><?=$volEdition?></span>
+<?php endif; ?>
+<?php   if($pagesTimes): ?>
+
+          <br />
+          <span class="itemMetaPre">Pages/Time:</span><span class="itemMeta"><?=$pagesTimes?></span>
           
 <?php endif; ?>
 <?php if($publisher && isset($fields['publisher'])): ?>

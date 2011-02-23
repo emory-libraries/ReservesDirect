@@ -68,6 +68,7 @@ class itemManager extends baseManager {
     global $g_permission, $g_documentURL, $page, $loc, $ci, $u, $help_article;
 
     $this->command = $cmd;
+    $this->setAjaxBrowser();
     
     switch ($cmd)
     {
@@ -107,7 +108,7 @@ class itemManager extends baseManager {
         list($item, $reserve) = $this->getReserveItem();
 
         //form submitted - edit item meta
-        if(!empty($_REQUEST['store_request'])) {      
+        if(!empty($_REQUEST['store_request']) && $_REQUEST['store_request']==1) {      
           // if editing a reserve, save reserve-specific fields?
           if ($reserve instanceof reserve) {            
             $this->saveReserve($reserve);
@@ -221,7 +222,8 @@ class itemManager extends baseManager {
         $page = "addReserve";
         $loc  = "add physical item";
          
-        if(isset($_REQUEST['store_request'])) { //form submitted, process item          
+        if (!empty($_REQUEST['store_request']) && $_REQUEST['store_request']==1) { 
+        //form submitted, process item          
                                       
           if(isset($_REQUEST['barcode'])) {
             $phys_item = new physicalCopy();
@@ -741,6 +743,23 @@ class itemManager extends baseManager {
     return $err;
   }
 
+  /**
+   * @return none
+   * @param ajax_browser $ajax_browser (optional) preset value for testing
+   * @desc Determine out if the browser supports ajax.
+   */ 
+  function setAjaxBrowser() {
+    global $ajax_browser; 
+    
+    $ajax_browser = true;
+    
+    $userAgent = strtolower($_SERVER['HTTP_USER_AGENT']); 
+    // AJAX Note functionality is not supported in IE
+    if (preg_match('/msie 6/', $userAgent)) {
+        $name = 'msie';
+        $ajax_browser = false;
+    }
+  }
 }
 
 ?>

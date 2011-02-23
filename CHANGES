@@ -20,22 +20,27 @@ ReservesDirect is located at:
 http://www.reservesdirect.org/
 
 ************************************************************************
-Revision 2.6.1
+Revision 2.6.7
 
 Changes
---  PHP upgrade from 5.2.3 to 5.2.10.
---  An admin/staff/instructor can "Copy Selected to Another Class" for an item 
-    and get properly redirected to the "Select class to copy TO:" page so that 
-    functionality may continue without a white screen using php version 5.2.10.
---  An admin/staff/instructor can "Delete Selected" for an item and get properly 
-    redirected back to the course listing page so that functionality may continue 
-    without a white screen appearing using php version 5.2.10.
---  An admin/staff/instructor can "Deny Use For This Class" for an item and get 
-    properly redirected back to the course listing page so that functionality may 
-    continue without a white screen appearing using php version 5.2.10.
---  An admin/staff/instructor can "Deny Use For All Classes" for an item and get 
-    properly redirected back to the course listing page so that functionality may 
-    continue without a white screen appearing using php version 5.2.10. 
+--  Corrections to the note section for add/edit item to work with Chrome and IE browsers.
+--  Add more terms to the terms table.
+
+Revision 2.6.6
+
+Changes
+--  Fixed the note section for add/edit item to work with Chrome and IE browsers.
+    
+Revision 2.6.5
+
+Changes
+--  Update the copyright queue query to handle null ISBN values. 
+--  Restore the pages/times metadata to the course listings page. 
+--  Remove carriage return found in the reserve notes in reserveList.php script 
+    that create an rss feed for blackboard.
+
+Note: Revisions 2.6.2 thru 2.6.4 were Emory specific migrations that are
+    defined in the rd_registrar_scripts repository.
     
 Revision 2.6.0
 

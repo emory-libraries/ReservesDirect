@@ -55,6 +55,27 @@ class TestItemDisplayer extends UnitTest {
 
   }
 
+  function test_displayEditItemNotesBrowserType() {
+    $new_reserve = new reserveItem();   
+    $new_reserve->itemGroup = 'ELECTRONIC';
 
+    global $ajax_browser;
+
+    // test browser that does support the ajax not functionality
+    $ajax_browser = false; 
+    ob_start();
+    $this->dsp->displayEditItemMeta($new_reserve, $new_reserve);
+    $output = ob_get_contents();
+    ob_end_clean();
+    $this->assertNoPattern('|Add/Edit Note|', $output, "editItemMeta does not include ajax note capability");
+    
+    // test for ajax capable browser that does support the ajax note functionality    
+    $ajax_browser = true;
+    ob_start();
+    $this->dsp->displayEditItemMeta($new_reserve, $new_reserve);
+    $output = ob_get_contents();
+    ob_end_clean();
+    $this->assertPattern('|Add/Edit Note|', $output, "editItemMeta does include ajax note capability");    
+  } 
 }
 ?>
