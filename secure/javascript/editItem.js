@@ -116,6 +116,19 @@ function unobtrusive()
       ajaxCopyrightFunction('isbn_update'); 
       return false; 
     };  
+  }; 
+  if(document.getElementById('geturl')) { // "Get URL" button onclick event
+      document.getElementById('geturl').onclick = function() {         
+        // Pass in the metadata to openurl function to retrieve the openurl 
+        document.getElementById('url').value = getopenurl(this.form);
+      return false; 
+    };  
+  };
+  if(document.getElementById('editurl')) { // "Get URL" button onclick event
+      document.getElementById('editurl').onclick = function() {         
+        edit_url(); 
+      return false; 
+    };  
   };  
 };
 

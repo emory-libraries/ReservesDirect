@@ -146,4 +146,7 @@ http://www.reservesdirect.org/
 
     $g_copyrightLimit = (string)$configure->copyright_limit;
     $g_copyrightNotice = (string)$configure->copyright_notice;
+
+    // this is used in the itemManager/itemDisplayer, for Note editing
+    $ajax_browser = true;    
 ?>

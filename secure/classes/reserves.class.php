@@ -942,7 +942,7 @@ class reserve extends Notes {
                   JOIN items i ON r.item_id = i.item_id
                   JOIN reserves r2 ON ci.course_instance_id = r2.course_instance_id
                   JOIN items i2 ON r2.item_id = i2.item_id AND
-                                   i.ISBN = i2.ISBN
+                                   (i.ISBN = i2.ISBN OR i.item_id = i2.item_id)
                 WHERE r.copyright_status NOT IN ('ACCEPTED', 'DENIED', 'HIST') AND
                       i.material_type = 'BOOK_PORTION' AND
                       ci.status='ACTIVE' AND
