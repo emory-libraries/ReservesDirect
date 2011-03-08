@@ -31,7 +31,6 @@ require_once('secure/managers/ajaxManager.class.php');
 
 class itemDisplayer extends noteDisplayer {
   
-  
   /**
    * Displays the edit-item-source block - upload file or set url
    * @param reserveItem object $reserveItem
@@ -87,6 +86,7 @@ class itemDisplayer extends noteDisplayer {
       currentItemSourceOptionID = option_id;
     }
     </script>
+    <script type="text/javascript" src="secure/javascript/openurl.js"></script>    
         
         <div style="overflow:auto;" class="strong">
 ITEM_SOURCE;
@@ -118,8 +118,10 @@ ITEM_SOURCE;
           <input type="file" name="userFile" size="50" />
         </div>
         <div id="item_source_link" style="display:none;">
-          <input name="url" type="text" size="50" />
+          <input id="url" name="url" type="text" size="50" />
           <input type="button" onclick="openNewWindow(this.form.url.value, 500);" value="Preview" />
+          <input type="button" id="geturl" value="Get URL" /> 
+          <input type="button" id="editurl" value="Edit URL" /> 
         </div>
       </div>
 ITEM_SOURCE;
@@ -801,7 +803,6 @@ ITEM_SOURCE;
       $note_ref = 'reserveID='.$reserve->getReserveID();      
     }
 ?>
-    <div class="headingCell1">NOTES A</div>
     <div id="item_notes" style="padding:8px 8px 12px 8px;">
       <?php self::displayEditNotes($notes, $note_ref); ?>
       
@@ -817,7 +818,6 @@ ITEM_SOURCE;
     </div>
 <?php
   }
-  
 
   /**
    * @return void
@@ -983,7 +983,6 @@ ITEM_SOURCE;
       <?php endif; ?> 
 <?php else: ?>
       <input type="hidden" id="item_group" name="item_group" value="ELECTRONIC" />  
-     
 <?php endif; ?>      
       
       <input type="hidden" id="itemID" name="itemID" value="<?=$item->getItemID()?>" />
@@ -1035,7 +1034,6 @@ ITEM_SOURCE;
 
     <div class="headingCell1">NOTES</div>        
     <br />    
-    
     <?php if(isset($reserve) || (!empty($_REQUEST['search']))): //if editing existing item, use AJAX notes handler ?> 
       <?php if($ajax_browser): // determine if the browser handles ajax ?> 
         <?php  self::displayEditItemNotesAJAX($item, $reserve);  ?>
