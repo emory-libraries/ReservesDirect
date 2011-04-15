@@ -92,23 +92,30 @@ http://www.reservesdirect.org/
             </table>          
             </td>
           </tr>
-      </table></td>
-  </tr>
-  <tr> 
-    <td colspan="2">
-      <p align="center" class="small">Use your Emory Network ID (netid) to login. This is the same username/password used for OPUS, PeopleSoft and Blackboard</p>
-      <p align="center" class="small">If you are having difficulty logging in, you may need to sync your passwords
-    at<br>
-
-    <a href="https://password.service.emory.edu/">https://password.service.emory.edu/</a><br>
-    Further help with passwords is available
-          from ITD (404-727-7777) during normal business hours Monday through
-        Friday and limited hours on the weekend
-    or check their web site: <a href="http://it.emory.edu/showdoc.cfm?docid=1079">http://it.emory.edu/showdoc.cfm?docid=1079</a></p>
-        <p align="center" class="small">Problems using the system? <a href="http://ereserves.library.emory.edu/emailReservesDesk.php">Email the Reserves Desk</a>  </p>
-    </td>
-  </tr>
-</table>
+      </table>
+      <p>&nbsp;<br><font color="red" face="Times New Roman" size="3"><strong><i>For more information on submitting a Course Reserves request, please contact:</strong></i></font></p>
+      <table cellpadding="5" cellspacing="0">
+      <tr><td colspan="2" cellpadding="10">
+        <strong>Woodruff Library/General: </strong>
+          <a target="_blank" href="http://web.library.emory.edu/services/course-reserves">http://web.library.emory.edu/services/course-reserves</a>
+      </tr>
+      <tr><td colspan="2" cellpadding="10">
+        <strong>Business: </strong>
+          <a target="_blank" href="http://business.library.emory.edu/communities/faculty/e-reserves">http://business.library.emory.edu/communities/faculty/e-reserves</a>
+      </tr>      
+      <tr><td colspan="2"><strong>Health: </strong>
+        <a target="_blank" href="http://health.library.emory.edu/what-we-do/books-journals-articles-etc/reserves">http://health.library.emory.edu/what-we-do/books-journals-articles-etc/reserves</a>
+      </tr>
+      <tr><td colspan="2"><strong>Law: </strong>
+        <a target="_blank" href="http://library.law.emory.edu/for-law-faculty/circulation-reserves-for-law-faculty/#c19862">http://library.law.emory.edu/for-law-faculty/circulation-reserves-for-law-faculty/#c19862</a>
+      </tr>
+      <tr><td colspan="2"><strong>Oxford College: </strong>
+        <a target="_blank" href="http://oxford.library.emory.edu/services/course-reserves">http://oxford.library.emory.edu/services/course-reserves</a>
+      </tr>
+      <tr><td colspan="2"><strong>Theology: </strong>
+        <a target="_blank" href= "http://www.pitts.emory.edu/services/facultysupport_reserves.cfm">http://www.pitts.emory.edu/services/facultysupport_reserves.cfm</a>
+        </td></tr>
+      </table>
 
   </body>
 </html>
