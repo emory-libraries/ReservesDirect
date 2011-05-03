@@ -1,5 +1,42 @@
 RESERVES DIRECT DEPLOYMENT NOTES
 
+Release 2.7.0
+      
+  1.  Disable the current production site with "upgrade in progress" message.
+  
+  2.  Copy (sagan) /home/httpd/reserves_files to new server
+  
+  3.  Copy over database to new server  
+      
+  4.  Switch the svn repository release 2.7.0.
+      
+  5.  Update the config file:
+      
+      - review database settings.
+      - update catalog section (remove tags not shown below - zhost, zport, zdb, zReflector):
+        <catalog>
+          <catalogName>EUCLID</catalogName>
+          <useCatalog>yes</useCatalog> <!-- all others may be blank if no -->
+          <reserve_script>http://libtest.cc.emory.edu:30322/uhtbin/create_reserve</reserve_script>
+          <holdings_script>http://www.library.emory.edu/uhtbin/holding_request</holdings_script>
+          <display_reserve>http://www.library.emory.edu/uhtbin/display_reserve</display_reserve>
+          <get_bibrecord_script>http://library.emory.edu/uhtbin/get_bibrecord</get_bibrecord_script>    
+          <web_search>http://libcat1.cc.emory.edu/uhtbin/cgisirsi/x/0/0/5?user_id=WEBSERVER&amp;searchdata1=</web_search>
+        </catalog>
+      - remove fax section.
+      - verify path in error_log, documentCover, siteURL; review remainding properties.
+      - looks like this file is updated with request_notifier last_run tag date.
+      
+  6.  Run the migration script : db/RD2.7.0_updates.sql
+  
+  7.  Perform the upgrade to rd_registrar_scripts
+
+  8.  Enable the production site.
+
+Release 2.6.8
+      
+  1. Switch the svn repository.
+  
 Release 2.6.7
       
   1. Switch the svn repository.

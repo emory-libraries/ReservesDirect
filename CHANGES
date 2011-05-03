@@ -20,14 +20,16 @@ ReservesDirect is located at:
 http://www.reservesdirect.org/
 
 ************************************************************************
+Revision 2.6.8
+
+Changes
+--  Bug fix - only copy selected/checked reserve items during a reactivation.
+
 Revision 2.6.7
 
 Changes
 --  Corrections to the note section for add/edit item to work with Chrome and IE browsers.
 --  Add more terms to the terms table.
---  Replace zGizmo script with (ALEPH) get_bibrecord script.
---  Retire the reserves fax option.
---  Updated login page general information text.
 
 Revision 2.6.6
 
