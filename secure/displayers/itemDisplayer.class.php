@@ -119,8 +119,8 @@ ITEM_SOURCE;
         </div>
         <div id="item_source_link" style="display:none;">
           <input id="url" name="url" type="text" size="50" />
-          <input type="button" onclick="openNewWindow(this.form.url.value, 500);" value="Preview" />
           <input type="button" id="geturl" value="Get URL" /> 
+          <input type="button" onclick="openNewWindow(this.form.url.value, 500);" value="Preview" />          
           <input type="button" id="editurl" value="Edit URL" /> 
         </div>
       </div>
@@ -177,13 +177,13 @@ ITEM_SOURCE;
           <br>
           <table>
             <tr>
-              <td><input type="button" id="preview_url" value="Preview URL" /></td>
-              <td>Open a window to test if the URL link above is valid.</td>
-            </tr>
-            <tr>
               <td><input type="button" id="get_url" value="Get URL" /></td>
               <td>Use the metadata from the ITEM DETAILS section above to locate an open url.</td>
-            </tr>   
+            </tr>           
+            <tr>
+              <td><input type="button" id="preview_url" value="Preview URL" /></td>
+              <td>Open a window to test if the URL link above is valid.</td>
+            </tr>  
             <tr>
               <td><input type="button" id="edit_url" value="Edit URL Details" /></td>
               <td>Launch the openurl generator for more options.</td>
@@ -1080,10 +1080,10 @@ ITEM_SOURCE;
    */
   function displayItemHistory($item) {
     //get dates and terms
-    $creation_date = date('F m, Y', strtotime($item->getCreationDate()));
+    $creation_date = date('F d, Y', strtotime($item->getCreationDate()));
     $creation_term = new term();
     $creation_term = $creation_term->getTermByDate($item->getCreationDate()) ? $creation_term->getTerm() : 'n/a';
-    $modification_date = date('F m, Y', strtotime($item->getLastModifiedDate()));
+    $modification_date = date('F d, Y', strtotime($item->getLastModifiedDate()));
     $modification_term = new term();
     $modification_term = $modification_term->getTermByDate($item->getLastModifiedDate()) ? $modification_term->getTerm() : 'n/a';
     

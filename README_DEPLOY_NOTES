@@ -10,7 +10,15 @@ Release 2.7.0
       
   4.  Switch the svn repository release 2.7.0.
       
-  5.  Update the config file:
+  5.  Install pear Numbers_Roman::
+      $ sudo pear install Numbers_Roman
+      
+      If you have downgraded php then you will need to do this adjustment::
+      $ sudo pear upgrade -Z PEAR
+      $ sudo pear install -Z Numbers_Roman
+      $ sudo pear install -Z DB
+      
+  6.  Update the config file:
       
       - review database settings.
       - update catalog section (remove tags not shown below - zhost, zport, zdb, zReflector):
@@ -27,11 +35,11 @@ Release 2.7.0
       - verify path in error_log, documentCover, siteURL; review remainding properties.
       - looks like this file is updated with request_notifier last_run tag date.
       
-  6.  Run the migration script : db/RD2.7.0_updates.sql
+  7.  Run the migration script : db/RD2.7.0_updates.sql
   
-  7.  Perform the upgrade to rd_registrar_scripts
+  8.  Perform the upgrade to rd_registrar_scripts
 
-  8.  Enable the production site.
+  9.  Enable the production site.
 
 Release 2.6.8
       
