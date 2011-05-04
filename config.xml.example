@@ -59,10 +59,7 @@ http://www.reservesdirect.org/
     <catalog>
         <catalogName>CHANGEME</catalogName>
         <useCatalog comment="OPTIONS: yes/no; all others may be blank if 'no'">yes</useCatalog>
-        <zhost>CHANGEME.example.edu</zhost>
-        <zport>2200</zport>
-        <zdb>Unicorn</zdb>
-        <zReflector>http://CHANGEME.example.edu/cgi-bin/zGizmo.cgi</zReflector>
+        <get_bibrecord_script>http://CHANGEME.example.edu/uhtbin/get_bibrecord</get_bibrecord_script>
         <reserve_script>https://CHANGEME.example.edu/uhtbin/create_reserve</reserve_script>
         <holdings_script>http://CHANGEME.example.edu/uhtbin/holding_request</holdings_script>
         <display_reserve>http://CHANGEME.example.edu/uhtbin/display_reserve</display_reserve>

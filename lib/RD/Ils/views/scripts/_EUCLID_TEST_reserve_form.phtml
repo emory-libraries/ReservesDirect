@@ -1,0 +1,43 @@
+<div class="formRow">
+	<label for="ils_record">ILS Record:</label>
+	<span class="static">
+		<?= $this->formCheckbox("ils[create_record]", null, array("checked" => "checked", "onClick" => "Element.toggle('ils_reserve_section')")) ?>
+		Create EUCLID TEST Reserve Record
+	</span>
+</div>
+<div id="ils_reserve_section" style="display:block;">
+	<div class="formRow">
+		<label for="loan_period">Loan Period:</label>
+		<span class="static">		
+			<select name="ils[circRule]">
+				<option value="14D0R25C45|14D0R25C45">14D0R25C45 -- 14D0R25C45</option>
+				<option value="14D1R-N|14D1R-N" selected>14D1R-N -- 14D1R-N</option>
+				<option value="14D1R25-45|14D1R25-45">14D1R25-45 -- 14D1R25-45</option>
+				<option value="180D0R0-0|180D0R0-0">180D0R0-0 -- 180D0R0-0</option>
+				<option value="28D2R0-0|28D2R0-0">28D2R0-0 -- 28D2R0-0</option>
+			</select>
+		</span>
+	</div>
+		
+	<span class="helperText">
+		Below is a list of copies available through EUCLID TEST.  
+		<u>Select copies for which you wish to create a EUCLID TEST 'on-reserve' record.</u>  
+		Your selection(s) will have no impact on the ReservesDirect reserves list.
+	</span>
+			
+	<div class="formRow">
+		<label for="copy">Select Copy:</label>
+		<span class="static">		
+			<? foreach ($this->holdings as $h) { ?>
+				<? $holding_data = base64_encode(serialize($h)); ?>
+				<?= $this->formCheckbox("ils[copy]", null, null, $holding_data) ?>
+				<?= $h['type'] ?> | <?= $h['loc'] ?> | <?= $h['callNum'] ?> | <?= $h['bar'] ?>
+				<br/>
+			<? } ?>
+		</span>
+	</div>
+	
+	<input type="text" value="1440" name="ils[borrower_user_id]" /><br/>
+	<input type="text" value="GENSPRING" name="ils[course]" /><br/>
+	
+</div>
