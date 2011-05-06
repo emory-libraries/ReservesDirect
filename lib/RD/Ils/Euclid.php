@@ -32,7 +32,6 @@ Implementing Emory University's localized ils
 require_once("lib/RD/Ils/Abstract.php");
 require_once("lib/RD/Ils/class_xml_check.php");
 require_once("lib/RD/Ils/EuclidResult.php");
-require_once("secure/config.inc.php");
 
 class RD_Ils_Euclid extends RD_Ils_Abstract
 {
