@@ -35,7 +35,7 @@ class RD_Euclid_Result extends AbstractResult
     // Load the xml string as utf8 decoded
     $sXML = simplexml_load_string(utf8_decode($string));
     
-    echo "<hr>" . utf8_decode($string) . "<br>";
+    //echo "<hr>" . utf8_decode($string) . "<br>";
     
     // ControlField Tag
     if (!empty($sXML->record->controlfield))
