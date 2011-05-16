@@ -9,7 +9,7 @@ Release 2.7.0
   3.  Copy over database to new server  
       
   4.  Switch the svn repository release 2.7.0.
-      
+  
   5.  Install pear Numbers_Roman::
       $ sudo pear install Numbers_Roman
       
@@ -25,7 +25,7 @@ Release 2.7.0
         <catalog>
           <catalogName>EUCLID</catalogName>
           <useCatalog>yes</useCatalog> <!-- all others may be blank if no -->
-          <reserve_script>http://libtest.cc.emory.edu:30322/uhtbin/create_reserve</reserve_script>
+          <reserve_script>http://www.library.emory.edu/uhtbin/create_reserve</reserve_script>
           <holdings_script>http://www.library.emory.edu/uhtbin/holding_request</holdings_script>
           <display_reserve>http://www.library.emory.edu/uhtbin/display_reserve</display_reserve>
           <get_bibrecord_script>http://library.emory.edu/uhtbin/get_bibrecord</get_bibrecord_script>    
@@ -40,7 +40,7 @@ Release 2.7.0
   8.  Perform the upgrade to rd_registrar_scripts
 
   9.  Enable the production site.
-
+  
 Release 2.6.8
       
   1. Switch the svn repository.
@@ -53,7 +53,7 @@ Release 2.6.7
      For production: (sagan) /home/httpd/html/reserves2
         https://svn.library.emory.edu/oss/reservesdirect/tags/release_2.6.7
   2. Run the migration script : db/RD2.6.7_updates.sql
-        
+  
 Release 2.6.6
       
   1. Switch the svn repository.

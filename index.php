@@ -124,15 +124,11 @@ switch ($cmd)
   case 'searchScreen': //addReserve - Search for Item
   case 'searchResults': //addReserve - Search Results Screen
   case 'storeReserve': //addReserve - Store Reserves Screen
-  case 'faxReserve': //addReserve - Fax Reserve Screen
-  case 'getFax': //addReserve - Claim Fax Screen
-  case 'addFaxMetadata': //addReserve - Fax Meta Data Screen
-  case 'storeFaxMetadata': //addReserve - Store Fax Meta Data Screen
+
   case 'editMultipleReserves':  //edit common reserve data for multiple reserves in a class
     require_once("secure/managers/reservesManager.class.php");
     $mgr = new reservesManager($cmd, $u);
   break;
-
 
   case 'myReserves':
   case 'viewCourseList':

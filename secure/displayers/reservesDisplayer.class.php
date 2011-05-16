@@ -200,7 +200,6 @@ class reservesDisplayer extends noteDisplayer {
     }
     else if ($request['ci']) {
       echo "              <li><a href=\"index.php?cmd=addPhysicalItem&ci=".$request['ci']."\">Add a Physical Item</a></li>\n";
-      echo "              <li><a href=\"index.php?cmd=faxReserve&ci=".$request['ci']."\">Fax a Document</a></li>\n";
       echo "              <li><a href=\"index.php?cmd=searchScreen&ci=".$request['ci']."\">Search for the Item</a></li>\n";
     }
     echo "              <!--<li><a href=\"index.php?cmd=physicalItemXListing\">Physical Item Cross-listings </a>--><!--Goes to staff-mngClass-phys-XList1.html --></li>\n";
@@ -277,7 +276,6 @@ class reservesDisplayer extends noteDisplayer {
  *      searchItems::searchScreen
  *      searchItems::uploadDocument
  *      searchItems::addURL
- *      searchItems::faxReserve
 */
 function displaySearchItemMenu($ci)
 {
@@ -287,7 +285,6 @@ function displaySearchItemMenu($ci)
   .  "          <p><strong>How would you like to add an item to your class?</strong></p>\n"
   .  "            <ul><li><a href=\"index.php?cmd=searchScreen&ci=$ci\">Search for the Item</a></li>\n"
   .  "                <li><a href=\"index.php?cmd=addDigitalItem&ci=$ci\">Add an electronic item</a> - upload a document or add a URL</li>\n"
-  .  "                <li><a href=\"index.php?cmd=faxReserve&ci=$ci\">Fax a Document</a></li>\n"
   .  "            </ul>\n"
   .  "</div>\n"
   .    "<div style=\"float:right; width:40%; margin-top:25px; padding:10px; text-align:center; border:1px solid #666666; background-color:#CCCCCC;\">\n"
@@ -692,7 +689,6 @@ function displayReserveAdded($user, $reserve=null, $ci)
       echo '  <td width="0%">&nbsp;</td>';
       echo '</tr>';
       echo '</table></td></tr>';
-
   }
   
   
@@ -703,245 +699,6 @@ function displayReserveAdded($user, $reserve=null, $ci)
   echo "</table>\n";
 }
 
-
-function displayFaxInfo($ci)
-{
-
-  echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-    echo "  <tr><td width=\"100%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
-    echo "  <tr>\n";
-    echo "    <td align=\"left\" valign=\"top\">\n";
-    echo "      <table width=\"100%\" border=\"0\" align=\"left\" cellpadding=\"3\" cellspacing=\"0\" class=\"borders\">\n";
-    echo "        <tr>\n";
-    echo "          <td align=\"left\" valign=\"top\">\n";
-    echo "            <blockquote>\n";
-    echo "              <p class=\"helperText\">ReservesDirect allows you to fax in a document and will automatically convert it to PDF. Please limit faxed documents to 25 clear, clean sheets to minimize downloading and printing time. To proceed, please fax each document individually (with no cover sheet!) to: </p>\n";
-    echo "              <p><span class=\"strong\">(404) 727-9089</span> (On-campus may dial <span class=\"strong\">7-9089</span> )</p>\n";
-    echo "              <p class=\"helperText\">Please note that faxes make take up to a minute per page to process during peak times. For best results, wait for a confirmation sheet to print from your fax machine before faxing another document.</p>\n";
-    echo "            </blockquote>\n";
-    echo "          </td>\n";
-    echo "        </tr>\n";
-    echo "      </table>\n";
-    echo "    </td>\n";
-    echo "  </tr>\n";
-    echo "  <tr><td>&nbsp;</td></tr>\n";
-    echo "  <tr>\n";
-    echo "    <td>\n";
-    echo "      <form method=\"post\" action=\"index.php\">\n";
-  echo "      <input type=\"hidden\" name=\"cmd\" value=\"getFax\">\n";
-  echo "      <input type=\"hidden\" name=\"ci\" value=\"$ci\">\n";
-    echo "      <p align=\"center\">\n";
-    echo "        <input type=\"submit\" name=\"Submit\" value=\"After your fax has finished transmitting, Click Here\">\n";
-    echo "      </p>\n";
-    echo "      </form>\n";
-    echo "      <p align=\"center\">Unclaimed faxes are deleted at midnight.</p>\n";
-    echo "    </td>\n";
-    echo "  </tr>\n";
-    echo "  <tr><td><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
-    echo "</table>\n";
-}
-
-function claimFax($faxReader, $ci)
-{
-  global $g_faxURL;
-
-  echo "<form method=\"post\" action=\"index.php\">\n";
-  echo "<input type=\"hidden\" name=\"cmd\" value=\"addFaxMetadata\">\n";
-  echo "<input type=\"hidden\" name=\"ci\" value=\"$ci\">\n";
-  echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-    echo "  <tr><td width=\"100%\" colspan=\"2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
-    echo "  <tr>\n";
-  echo "    <td width=\"50%\" align=\"left\" valign=\"top\" class=\"helperText\">Claim your fax.</td>\n";
-  echo "    <td width=\"50%\" align=\"left\" valign=\"top\" align=\"right\"><a href=\"index.php?cmd=faxReserve&amp;ci=".$ci."\">Return to Previous Page</a></td>\n";
-  echo "  </tr>\n";
-
-  echo "  <tr><td height=\"14\" colspan=\"2\" align=\"left\" valign=\"top\">&nbsp;</td></tr>\n";
-
-  echo "  <tr>\n";
-  echo "    <td height=\"14\" colspan=\"2\" align=\"left\" valign=\"top\">\n";
-  echo "      <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
-  echo "        <tr>\n";
-  echo "          <td width=\"35%\" align=\"left\" valign=\"top\" class=\"headingCell1\">ACTIVE FAXES</td><td width=\"65%\" align=\"right\" valign=\"top\">&nbsp;</td></tr>\n";
-  echo "      </table>\n";
-  echo "    </td>\n";
-  echo "  </tr>\n";
-
-  if (is_array($faxReader->faxes) && !empty($faxReader->faxes)){
-    echo "  <tr>\n";
-    echo "    <td colspan=\"2\" align=\"left\" valign=\"top\" class=\"borders\">\n";
-    echo "      <table width=\"100%\" border=\"0\" cellpadding=\"2\" cellspacing=\"0\" class=\"displayList\">\n";
-    echo "        <tr align=\"left\" valign=\"middle\">\n";
-    echo "          <td width=\"20%\" valign=\"top\" bgcolor=\"#FFFFFF\" class=\"headingCell1\">Fax Number</td>\n";
-    echo "          <td width=\"40%\" bgcolor=\"#FFFFFF\" class=\"headingCell1\">Time of  Fax</td>\n";
-    echo "          <td width=\"15%\" class=\"headingCell1\">Pages</td>\n";
-    echo "          <td width=\"10%\" class=\"headingCell1\">&nbsp;</td>\n";
-    echo "          <td width=\"15%\" class=\"headingCell1\">Claim Fax</td>\n";
-    echo "        </tr>\n";
-
-    for($i=0;$i<count($faxReader->faxes);$i++)
-    {
-      $fax =& $faxReader->faxes[$i];
-
-      $rowClass = ($i % 2) ? "evenRow" : "oddRow";
-
-      echo "        <tr align=\"left\" valign=\"middle\" class=\"$rowClass\">\n";
-      echo "          <td width=\"20%\" valign=\"top\" class=\"$rowClass\" align=\"center\">" . $fax['phone'] . "</td>\n";
-      echo "          <td width=\"40%\" class=\"$rowClass\" align=\"center\">" . $fax['time'] . "</td>\n";
-      echo "          <td width=\"15%\" valign=\"top\" class=\"$rowClass\" align=\"center\">" . $fax['pages'] . "</td>\n";
-      echo "          <td width=\"10%\" valign=\"top\" class=\"$rowClass\" align=\"center\"><a href=\"".$g_faxURL.$fax['file']."\" target=\"_new\">preview</a></td>\n";
-      echo "          <td width=\"15%\" valign=\"top\" class=\"$rowClass\" align=\"center\"><input type=\"checkbox\" name=\"claimFax[$i]\" value=\"" . $fax['file'] . "\" onclick=\"this.form.submit.disabled=false;\"></td>\n";
-      echo "        </tr>\n";
-
-    }
-    echo "        <tr align=\"left\" valign=\"middle\"><td width=\"20%\" valign=\"top\" class=\"headingCell1\">&nbsp;</td><td width=\"40%\" class=\"headingCell1\">&nbsp;</td><td width=\"15%\" valign=\"top\" class=\"headingCell1\">&nbsp;</td><td width=\"10%\" valign=\"top\" class=\"headingCell1\">&nbsp;</td><td width=\"15%\" valign=\"top\" class=\"headingCell1\">&nbsp;</td></tr>\n";
-    echo "      </table>\n";
-    echo "    </td>\n";
-    echo "  </tr>\n";
-
-    echo "  <tr><td colspan=\"2\">&nbsp;</td></tr>\n";
-    echo "  <tr><td colspan=\"2\" align=\"center\"><input type=\"submit\" name=\"submit\" value=\"Continue\" disabled=true></td></tr>\n";
-  } else {
-    echo "  <tr><td colspan=\"2\" align=\"center\"><b>No faxes have been received.  Remember unclaimed faxes are deleted at midnight.</td></tr>\n";
-  }
-  echo "  <tr><td colspan=\"2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
-  echo "</table>\n";
-  echo "</form>\n";
-}
-
-function displayFaxMetadataForm($user, $faxes, $ci)
-{
-  global $g_faxURL, $g_permission, $g_notetype;
-
-  echo "<FORM METHOD=POST ACTION=\"index.php\">\n";
-  echo "  <INPUT TYPE=\"HIDDEN\" NAME=\"cmd\" VALUE=\"storeFaxMetadata\">\n";
-  echo "  <INPUT TYPE=\"HIDDEN\" NAME=\"ci\" VALUE=\"$ci\">\n";
-
-  echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-  echo "  <tr><td width=\"100%\" colspan=\"2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n";
-  echo "  <tr>\n";
-  echo "    <td width=\"50%\" align=\"left\" valign=\"top\" class=\"helperText\">Add information about your fax(es).</td>\n";
-  echo "    <td width=\"50%\" align=\"left\" valign=\"top\" align=\"right\"><a href=\"index.php?cmd=getFax&amp;ci=".$ci."\">Return to previous page</a></td>\n";
-  echo "  </tr>\n";
-
-  echo "  <tr><td colspan=\"2\" align=\"left\" valign=\"top\">&nbsp;</td></tr>\n";
-
-  echo "  <tr>\n";
-  echo "    <td colspan=\"2\" align=\"left\" valign=\"top\">\n";
-  echo "      <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
-  echo "        <tr><td width=\"35%\" class=\"headingCell1\">FAX DETAILS</td><td>&nbsp;</td></tr>\n";
-  echo "      </table>\n";
-  echo "    </td>\n";
-  echo "  </tr>\n";
-
-
-  if (is_array($faxes) && !empty($faxes))
-  {
-    $i = 0;
-    foreach ($faxes as $fax)
-    {
-      $rowClass = ($i++ % 2) ? "evenRow" : "oddRow";
-      echo "  <tr>\n";
-      echo "    <td colspan=\"2\" align=\"left\" valign=\"top\" class=\"borders\">\n";
-      echo "      <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
-      echo "        <tr align=\"center\" valign=\"top\" class=\"#CCCCCC\" class=\"displayList\">\n";
-      echo "          <td width=\"25%\"><div align=\"center\">" . $fax['phone'] . "</div></td>\n";
-      echo "          <td width=\"25%\"><div align=\"center\">" . $fax['time'] . "</div></td>\n";
-      echo "          <td width=\"25%\"><div align=\"center\">" . $fax['pages'] . " page(s)</div></td>\n";
-      echo "          <td width=\"25%\"><div align=\"center\"><a href=\"" . $g_faxURL . $fax['file'] . "\" target=\"preview\">preview document</a></div></td>\n";
-      echo "        </tr>\n";
-      echo "      </table>\n";
-      echo "    </td>\n";
-      echo "  </tr>\n";
-
-      echo "  <tr>\n";
-      echo "    <td colspan=\"2\" align=\"left\" valign=\"top\">\n";
-      echo "      <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n";
-      echo "        <tr><td align=\"left\" valign=\"top\" class=\"headingCell1\">DOCUMENT INFORMATION</td></tr>\n";
-      echo "      </table>\n";
-      echo "    </td>\n";
-      echo "  </tr>\n";
-
-      echo "  <INPUT TYPE=\"HIDDEN\" NAME=\"file[" . str_replace('.', '_',$fax['file']) . "]\" value=\"" . $fax['file'] ."\" >\n";
-
-      echo "  <tr>\n";
-      echo "    <td colspan=\"2\" align=\"left\" valign=\"top\" class=\"borders\">\n";
-      echo "      <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
-      echo "        <tr valign=\"middle\">\n";
-      echo "          <td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\" class=\"strong\">Title:</td>\n";
-      echo "          <td align=\"left\"><INPUT TYPE=\"text\" NAME=\"" . $fax['file'] . "[title]\" SIZE=50></td>\n";
-      echo "        </tr>\n";
-
-      echo "        <tr valign=\"middle\">\n";
-      echo "          <td width=\"35%\" height=\"31\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\" class=\"strong\">Author</td>\n";
-      echo "          <td align=\"left\"><INPUT TYPE=\"text\" NAME=\"" . $fax['file'] . "[author]\" SIZE=50></td>\n";
-      echo "        </tr>\n";
-
-      echo "        <tr valign=\"middle\">\n";
-      echo "          <td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\" align=\"right\"><span class=\"strong\">Book/Journal/Work Title</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
-      echo "          <td align=\"left\"><INPUT TYPE=\"text\" NAME=\"" . $fax['file'] . "[volumetitle]\" SIZE=50></td>\n";
-      echo "        </tr>\n";
-
-      echo "        <tr valign=\"middle\">\n";
-      echo "          <td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Volume / Edition</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
-      echo "          <td align=\"left\"><INPUT TYPE=\"text\" NAME=\"" . $fax['file'] . "[volume]\" SIZE=50></td>\n";
-      echo "        </tr>\n";
-
-      echo "        <tr valign=\"middle\">\n";
-      echo "          <td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Pages</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
-      echo "          <td align=\"left\">From:  <INPUT TYPE=\"text\" NAME=\"" . $fax['file'] . "[pagefrom]\" SIZE=3> To: <INPUT TYPE=\"text\" NAME=\"" . $fax['file'] . "[pageto]\" SIZE=3></td>\n";
-      echo "        </tr>\n";
-/* Not implemented in database
-      echo "        <tr valign=\"middle\">\n";
-      echo "          <td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Year</span> (<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
-      echo "          <td align=\"left\"><input NAME=\"" . $fax[file] . "[year]\" type=\"text\" size=\"50\"></td>\n";
-      echo "        </tr>\n";
-*/
-      echo "        <tr valign=\"middle\">\n";
-      
-      
-      if ($user->getRole() >= $g_permission['staff']) {
-        echo "          <td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Note</span>(<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
-        echo "          <td align=\"left\"><TEXTAREA NAME=\"" . $fax['file'] . "[noteText]\" cols=50 rows=3>\n</TEXTAREA>\n<br>\n";
-  
-        echo '            <span class="small">Note Type:';
-        echo '          <label><input type="radio" name="'.$fax['file'].'[noteType]" value="'.$g_notetype['content'].'" checked>Content Note</label>';
-        echo '          <label><input type="radio" name="'.$fax['file'].'[noteType]" value="'.$g_notetype['instructor'].'">Instructor Note</label>';
-        echo '          <label><input type="radio" name="'.$fax['file'].'[noteType]" value="'.$g_notetype['staff'].'">Staff Note</label>';
-        echo '          <label><input type="radio" name="'.$fax['file'].'[noteType]" value="'.$g_notetype['copyright'].'">Copyright Note</label>';
-        echo '          </span>';
-      } else {
-        echo "          <td width=\"35%\" align=\"right\" bgcolor=\"#CCCCCC\"><div align=\"right\"><span class=\"strong\">Instructor Note</span>(<em>if applicable</em>)<span class=\"strong\">:</span></div></td>\n";
-        echo "          <td align=\"left\"><TEXTAREA NAME=\"" . $fax['file'] . "[noteText]\" cols=50 rows=3>\n</TEXTAREA>\n<br>\n";
-        echo '          <input type="hidden" name="'.$fax['file'].'[noteType]" value="'.$g_notetype['instructor'].'">';
-      }
-      
-      echo "        </td></tr>\n";
-
-      echo "        <tr valign=\"middle\">\n";
-      echo "          <td align=\"right\" bgcolor=\"#CCCCCC\">&nbsp;</td>\n";
-      echo "          <td align=\"left\" align=\"center\" class=\"strong\">\n";
-      echo "            This Document is from my Personal Collection: \n";
-      echo "            <INPUT TYPE=\"checkbox\" NAME=\"" . $fax['file'] . "[personal]\" CHECKED>\n";
-      echo "          </td>\n";
-      echo "        </tr>\n";
-      echo "      </table>\n";
-      echo "    </td>\n";
-      echo "  </tr>\n";
-    }
-  }
-  echo "  <tr>\n";
-  echo "    <td colspan=\"2\" align=\"left\" valign=\"top\">\n";
-  echo "      <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
-  echo "        <tr><td width=\"20%\" valign=\"top\" colspan=\"3\" align=\"center\">\n";
-  echo "            <div style=\"font:arial; font-weight:bold; font-size:small; padding:15px 5px 5px 5px;\">I have read the Library's <a href=\"$g_copyrightNoticeURL\" target=\"blank\">copyright notice</a> and certify that to the best of my knowledge my use of this document falls within those guidelines.</div>\n";
-  echo "            <input type=\"submit\" name=\"Submit\" value=\"Save Document\"></td></tr>\n";
-  echo "      </table>\n";
-  echo "    </td>\n";
-  echo "  </tr>\n";
-  echo "  <tr><td colspan=\"2\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
-  echo "</table>\n";
-  echo "</form>\n";
-}
 
 
 /**

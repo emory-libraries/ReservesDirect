@@ -20,10 +20,21 @@ ReservesDirect is located at:
 http://www.reservesdirect.org/
 
 ************************************************************************
+Revision 2.7.0
+
+Changes
+--  An instuctor can edit a url in an electronic item using the open url interface.
+--  PHP upgrade from 5.2.3 to 5.2.10
+--  OPUS feed update to release 2.7.0
+--  Replacement of zGizmo script with (ALEPH) get_bibrecord script.
+--  Retire the reserves fax.
+--  Updated front login page by replacing current text with 
+    links to each library for more information
+    
 Revision 2.6.8
 
 Changes
---  Bug fix - only copy selected/checked reserve items during a reactivation.
+--  Bug fix - only copy selected/checked reserves during a reactivation.    
 
 Revision 2.6.7
 

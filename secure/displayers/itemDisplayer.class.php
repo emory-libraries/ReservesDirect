@@ -117,14 +117,15 @@ ITEM_SOURCE;
         <div id="item_source_upload" style="display:none;">
           <input type="file" name="userFile" size="50" />
         </div>
-        <div id="item_source_link" style="display:none;">
-          <input id="url" name="url" type="text" size="50" />
+ITEM_SOURCE;
+
+    $output .= '<div id="item_source_link" style="display:none;">
+          <input id="url" name="url" type="text" size="50" value="' . $reserveItem->getURL() .'"/>
+          <input type="button" onclick="openNewWindow(this.form.url.value, 500);" value="Preview" />
           <input type="button" id="geturl" value="Get URL" /> 
-          <input type="button" onclick="openNewWindow(this.form.url.value, 500);" value="Preview" />          
           <input type="button" id="editurl" value="Edit URL" /> 
         </div>
-      </div>
-ITEM_SOURCE;
+      </div>';
 
     if ($u->getRole() >= $g_permission['staff']) { //only show status to staff or greater 
             $status = $reserveItem->getStatus();
@@ -146,7 +147,7 @@ ITEM_SOURCE;
    */
   function _itemsource_newElectronic($reserveItem) {
     $output = <<<ITEM_SOURCE
-    <script type="text/javascript" src="secure/javascript/openurl.js"></script>
+    <script type="text/javascript" src="secure/javascript/openurl.js"></script>  
 
     <div id="openurl_link" style="display:none" class="borders noticeBox">
       <div class="noticeImg"></div>
@@ -160,7 +161,7 @@ ITEM_SOURCE;
       </tr>
       <tr>
         <td align="left" valign="top">
-          <font color="#FF0000"><strong>*</strong></font><input type="radio" name="documentType" id="radioDOC" value="DOCUMENT" checked onClick="this.form.userFile.disabled = !this.checked; this.form.url.disabled = !this.checked;">&nbsp;<span class="strong">Upload a document &gt;&gt;</span>
+          <font color="#FF0000"><strong>*</strong></font><input type="radio" name="documentType" id="radioDOC" value="DOCUMENT" checked onClick="this.form.userFile.disabled = !this.checked; this.form.url.disabled = this.checked;this.form.selectedDocIcon.value = 'images/doc_type_icons/doctype-pdf.gif';this.form.iconImg.src = 'images/doc_type_icons/doctype-pdf.gif';">&nbsp;<span class="strong">Upload a document &gt;&gt;</span>
         </td>
         <td align="left" valign="top">
           <input type="file" id="userFile" name="userFile" size="40"> <br/>
@@ -169,7 +170,7 @@ ITEM_SOURCE;
       </tr>
       <tr>
         <td align="left" valign="top">
-          <font color="#FF0000"><strong>*</strong></font><input type="radio" name="documentType" id="radioURL" value="URL" onClick="this.form.url.disabled = !this.checked; this.form.userFile.disabled = this.checked;this.form.iconImg.src = 'images/doc_type_icons/doctype-link.gif';this.form.iconImg.src = 'images/doc_type_icons/doctype-link.gif';">
+          <font color="#FF0000"><strong>*</strong></font><input type="radio" name="documentType" id="radioURL" value="URL" onClick="this.form.url.disabled = !this.checked; this.form.userFile.disabled = this.checked;this.form.selectedDocIcon.value = 'images/doc_type_icons/doctype-link.gif';this.form.iconImg.src = 'images/doc_type_icons/doctype-link.gif';">
           <span class="strong">Add a link &gt;&gt;</span>
         </td>
         <td align="left" valign="top">
@@ -179,11 +180,11 @@ ITEM_SOURCE;
             <tr>
               <td><input type="button" id="get_url" value="Get URL" /></td>
               <td>Use the metadata from the ITEM DETAILS section above to locate an open url.</td>
-            </tr>           
+            </tr>          
             <tr>
               <td><input type="button" id="preview_url" value="Preview URL" /></td>
               <td>Open a window to test if the URL link above is valid.</td>
-            </tr>  
+            </tr>   
             <tr>
               <td><input type="button" id="edit_url" value="Edit URL Details" /></td>
               <td>Launch the openurl generator for more options.</td>

@@ -30,7 +30,6 @@ require_once("secure/common.inc.php");
 require_once("secure/displayers/reservesDisplayer.class.php");
 require_once("secure/classes/searchItems.class.php");
 require_once("secure/classes/request.class.php");
-require_once("secure/classes/faxReader.class.php");
 require_once("secure/classes/itemAudit.class.php");
 //require_once("classes/reserves.class.php");
 require_once('secure/managers/noteManager.class.php');
@@ -54,7 +53,7 @@ class reservesManager extends classManager
 
   function reservesManager($cmd, $user)
   {
-    global $g_permission, $page, $loc, $g_faxDirectory;
+    global $g_permission, $page, $loc;
     global $g_documentDirectory, $g_documentURL, $ci, $g_notetype, $u, $help_article, $g_dbConn;
 
     $this->displayClass = "reservesDisplayer";
@@ -379,107 +378,7 @@ class reservesManager extends classManager
 
       /** faculty-specific uploadDocument, addURL and storeUploaded actions removed,
           consolidated with add/edit item **/
-      
-      case 'faxReserve':
-        $page="addReserve";
-        $loc = "fax a document";
-        $help_article = "17";
-        $this->displayFunction = "displayFaxInfo";
-        $this->argList = array($_REQUEST['ci']);
-      break;
-      case 'getFax':
-        $page="addReserve";
-        $loc = "claim your fax";
-        $help_article = "17";
-        $faxReader = new faxReader();
-        $faxReader->getFaxesFromFile($g_faxDirectory);
-
-        $this->displayFunction = "claimFax";
-        $this->argList = array($faxReader, $_REQUEST['ci']);
-      break;
-      case 'addFaxMetadata':
-        $page="addReserve";
-        $loc = "add fax document information";
-        $help_article = "17";
-        $faxReader = new faxReader();
-
-        $claims =& $_REQUEST['claimFax'];
-
-        $claimedFaxes = array();
-        if (is_array($claims) && !empty($claims))
-        {
-          foreach ($claims as $claim)
-            $claimedFaxes[] = $faxReader->parseFaxName($claim);
-        }
-
-        $this->displayFunction = "displayFaxMetadataForm";
-        $this->argList = array($user, $claimedFaxes, $_REQUEST['ci']);
-      break;
-      case 'storeFaxMetadata':
-        $page="addReserve";
-        $files = array_keys($_REQUEST['file']);
-
-        $items = array();
-        foreach ($files as $file)
-        {
-          $ci = new courseInstance($_REQUEST['ci']);
-
-          $item = new reserveItem();
-          $item->createNewItem();
-
-          $item->setTitle($_REQUEST[$file]['title']);
-          $item->setAuthor($_REQUEST[$file]['author']);
-          $item->setVolumeTitle($_REQUEST[$file]['volumetitle']);
-          $item->setVolumeEdition($_REQUEST[$file]['volume']);
-          
-          //store the fax
-          $md5 = md5_file($g_faxDirectory . $_REQUEST['file'][$file]);
-                    $dst_dir = $g_documentDirectory . substr($md5,0,2);
             
-          $dst_fname = "{$md5}_{$item->getItemID()}.pdf";
-          if(!copy($g_faxDirectory . $_REQUEST['file'][$file], "$dst_dir/$dst_fname")) {
-            trigger_error('Failed to copy file '.$g_faxDirectory . $_REQUEST['file'][$file] . ' to ' . "$dst_dir/$dst_fname", E_USER_ERROR);
-          }
-  
-          $item->setURL(substr($md5,0,2) . "/" . $dst_fname);
-          $item->setMimeType('application/pdf');
-
-          $p = $_REQUEST[$file]['pagefrom'] . "-" . $_REQUEST[$file]['pageto'];
-          if ($p != "-") $item->setPagesTimes($p);
-
-          if ($_REQUEST[$file]['personal'] == "on") $item->setPrivateUserID($user->getUserID());
-
-          $item->setGroup('ELECTRONIC');
-          $item->setType('ITEM');
-
-          $reserve = new reserve();
-
-          if ($reserve->createNewReserve($ci->getCourseInstanceID(), $item->getItemID()))
-          {
-              if(!empty($_REQUEST[$file]['noteText']) && isset($_REQUEST[$file]['noteType'])) {
-              if($_REQUEST[$file]['noteType']==$g_notetype['instructor']) {
-                $reserve->setNote($_REQUEST[$file]['noteText']);
-              }
-              else {
-                $item->setNote($_REQUEST[$file]['noteText']);
-              }
-            }
-            
-            $reserve->setActivationDate($ci->getActivationDate());
-            $reserve->setExpirationDate($ci->getExpirationDate());
-            //attempt to insert this reserve into order
-            $reserve->getItem();
-            $reserve->insertIntoSortOrder($ci->getCourseInstanceID(), $reserve->item->getTitle(), $reserve->item->getAuthor());
-
-            $itemAudit = new itemAudit();
-            $itemAudit->createNewItemAudit($item->getItemID(),$user->getUserID());
-          }
-        }
-
-        $this->displayFunction = "displayReserveAdded";
-        $this->argList = array($user, null, $_REQUEST['ci']);
-      break;
-      
       case 'editMultipleReserves':
         //determine what we are trying to do with the multiple reserves
         

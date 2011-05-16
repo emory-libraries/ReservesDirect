@@ -66,7 +66,7 @@ http://www.reservesdirect.org/
             <?php if($login_error): ?>
               <font color="red">Invalid username or password</font>
             <?php endif; ?>
-            <p><strong>Username:</strong>
+            <p><strong>Net ID:</strong>
                           <input name="username" type="text" size="15"></p> 
                           
                           <p><strong>Password:
@@ -93,28 +93,27 @@ http://www.reservesdirect.org/
             </td>
           </tr>
       </table>
-      <p>&nbsp;<br><font color="red" face="Times New Roman" size="3"><strong><i>For more information on submitting a Course Reserves request, please contact:</strong></i></font></p>
-      <table cellpadding="5" cellspacing="0">
-      <tr><td colspan="2" cellpadding="10">
-        <strong>Woodruff Library/General: </strong>
-          <a target="_blank" href="http://web.library.emory.edu/services/course-reserves">http://web.library.emory.edu/services/course-reserves</a>
+      <p>&nbsp;
+      <table class="contacts" cellpadding="2">
+      <tr><th>For information on submitting a Course Reserves request, please contact:<br>&nbsp;</th></tr>      
+      <tr><td>
+        <a target="_blank" href="http://web.library.emory.edu/services/course-reserves">Woodruff Library/General</a>
+      </td></tr>
+      <tr><td>
+      <a target="_blank" href="http://business.library.emory.edu/communities/faculty/e-reserves">Business</a>
+      </td></tr>      
+      <tr><td>
+      <a target="_blank" href="http://health.library.emory.edu/what-we-do/books-journals-articles-etc/reserves">Health</a>
+      </td></tr>
+      <tr><td>
+      <a target="_blank" href="http://library.law.emory.edu/for-law-faculty/circulation-reserves-for-law-faculty/#c19862">Law</a>
       </tr>
-      <tr><td colspan="2" cellpadding="10">
-        <strong>Business: </strong>
-          <a target="_blank" href="http://business.library.emory.edu/communities/faculty/e-reserves">http://business.library.emory.edu/communities/faculty/e-reserves</a>
-      </tr>      
-      <tr><td colspan="2"><strong>Health: </strong>
-        <a target="_blank" href="http://health.library.emory.edu/what-we-do/books-journals-articles-etc/reserves">http://health.library.emory.edu/what-we-do/books-journals-articles-etc/reserves</a>
-      </tr>
-      <tr><td colspan="2"><strong>Law: </strong>
-        <a target="_blank" href="http://library.law.emory.edu/for-law-faculty/circulation-reserves-for-law-faculty/#c19862">http://library.law.emory.edu/for-law-faculty/circulation-reserves-for-law-faculty/#c19862</a>
-      </tr>
-      <tr><td colspan="2"><strong>Oxford College: </strong>
-        <a target="_blank" href="http://oxford.library.emory.edu/services/course-reserves">http://oxford.library.emory.edu/services/course-reserves</a>
-      </tr>
-      <tr><td colspan="2"><strong>Theology: </strong>
-        <a target="_blank" href= "http://www.pitts.emory.edu/services/facultysupport_reserves.cfm">http://www.pitts.emory.edu/services/facultysupport_reserves.cfm</a>
-        </td></tr>
+      <tr><td>
+      <a target="_blank" href="http://oxford.library.emory.edu/services/course-reserves">Oxford College</a>
+      </td></tr>
+      <tr><td>
+      <a target="_blank" href= "http://www.pitts.emory.edu/services/facultysupport_reserves.cfm">Theology</a>
+      </td></tr>
       </table>
 
   </body>

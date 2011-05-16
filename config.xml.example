@@ -88,16 +88,6 @@ http://www.reservesdirect.org/
     <errorEmail>developer@example.edu</errorEmail>
     <reservesEmail>reserves@example.edu</reservesEmail>
     <adminEmail>webmaster@example.edu</adminEmail>
-
-    <fax>
-        <directory comment="include trailing /">/var/www/html/CHANGEME/incoming/</directory>
-        <URL comment="include trailing /">http://CHANGEME.example.edu/CHANGEME/incoming/</URL>
-        <copyright>/var/www/CHANGEME/copyright.pdf</copyright>
-        <log>/var/spool/hylafax/log/CHANGEME.log</log>
-        <fax2pdf_bin>/CHANGEME/path/to/fax2pdf</fax2pdf_bin>
-        <faxinfo_bin>/CHANGEME/path/to/faxinfo</faxinfo_bin>
-        <gs_bin>/CHANGEME/path/to/gs</gs_bin>
-    </fax>
     
     <documentDirectory comment="include trailing /">/var/www/html/CHANGEME/uploaded/</documentDirectory>
     <documentURL comment="include trailing /">http://CHANGEME.example.edu/uploaded/</documentURL>
