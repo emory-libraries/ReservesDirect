@@ -33,6 +33,9 @@ http://www.reservesdirect.org/
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <link rel="stylesheet" href="css/standalone_login.css" type="text/css">
     <script language="JavaScript1.2" src="secure/javascript/jsFunctions.js"></script>
+
+    <!-- Google Analytics -->
+    <script type="text/javascript"src="secure/javascript/google-analytics.js"></script>
   </head>
 
   <body onload="focusOnForm();">
