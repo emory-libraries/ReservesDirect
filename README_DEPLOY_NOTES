@@ -1,5 +1,10 @@
 RESERVES DIRECT DEPLOYMENT NOTES
 
+Release 2.8.0
+
+  1. Modify config.xml in apache settings and add ALEPHLink according to example file.
+
+
 Release 2.7.0
       
   1.  Disable the current production site with "upgrade in progress" message.

@@ -132,6 +132,7 @@ Please log into ?url as username ?username , password ?password
     </registar_feed>
     <EZproxyAuthorizationKey>reallybigsecret</EZproxyAuthorizationKey>
     <BlackBoardLink>CHANGEME.edu/blackboard</BlackBoardLink>
+    <ALEPHLink>CHANGEME</ALEPHLink>
     <trusted_systems comment="trusted systems id=public key element value secret key; timeout is in minutes">
       <system id="CHANGEME" timeout="30">CHANGEME</system>
     </trusted_systems>  

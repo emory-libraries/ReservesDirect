@@ -117,6 +117,8 @@ http://www.reservesdirect.org/
   $g_EZproxyAuthorizationKey = (string)$configure->EZproxyAuthorizationKey;
   
   $g_BlackboardLink = (string)$configure->BlackBoardLink;
+
+  $g_ALEPHLink = (string)$configure->ALEPHLink;
   
   $trustedSystems = $configure->trusted_systems;
   foreach ($trustedSystems->system as $sys)
