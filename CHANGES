@@ -25,6 +25,7 @@ Revision 2.8.0
 Changes
 --  Added Google Analyitics to code
 --  Added ALEPHLink in config file for display on courses page.
+--  Replaced config_loc.inc.php with config_loc.inc.php.example
 ************************************************************************
 Revision 2.7.0
 
