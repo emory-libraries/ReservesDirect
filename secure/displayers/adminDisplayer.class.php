@@ -345,12 +345,6 @@ class adminDisplayer extends baseDisplayer
 
         <tr>
           <td>&nbsp;</td>
-          <td>Reserve Desk:</td>
-          <td><input id="desk" name="desk" value="" size="55" maxlength="50"></td>
-        </tr>       
-        
-        <tr>
-          <td>&nbsp;</td>
           <td>URL:</td>
           <td><input id="lib_url" name="lib_url" value="" size="112"></td>
         </tr>       

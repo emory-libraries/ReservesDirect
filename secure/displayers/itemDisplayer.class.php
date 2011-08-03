@@ -218,27 +218,7 @@ ITEM_SOURCE;
         <table border="0" cellpadding="2" cellspacing="0">  
 ITEM_SOURCE;
     
-    if ($u->getRole() >= $g_permission['staff']) {
-    $output .= <<<ITEM_SOURCE
-          <tr>
-            <td align="right">
-              Reserve Desk:
-            </td>
-            <td>
-              <select name="home_library">
-ITEM_SOURCE;
-      foreach($u->getLibraries() as $lib) {
-        $selected_lib = ($reserveItem->getHomeLibraryID() == $lib->getLibraryID()) ? 'selected="selected"' : '';
-        $output .= "\n\t<option value='". $lib->getLibraryID() . "'" . $selected_lib . ">" .
-        $lib->getLibrary() ."</option>";
-      }
-      
-      $output .= <<<ITEM_SOURCE
-      </select>
-            </td>
-          </tr>
-ITEM_SOURCE;
-    }   // end staff section
+   // end staff section
     
     //display details from the physical copy table (barcode/call num)
     if ($reserveItem->getPhysicalCopy()) {
@@ -640,34 +620,7 @@ ITEM_SOURCE;
          <span id="availability_option1">in print</span>
            </td>
         </tr>  
-        
-<?php if($item->isPhysicalItem()): ?>
-        <tr>
-          <th>
-            <?= $g_catalogName ?> Control Number:
-          </th>
-          <td>
-             <input type="text" name="local_control_key" size="15" value="<?=$item->getLocalControlKey();?>" />
-          </td>
-        </tr> 
-        
-<?php if($_REQUEST['cmd'] == 'addPhysicalItem'): ?>       
-          <tr>
-            <th>Reserve Desk:</th>
-            <td>
-              <select name="home_library">
-<?php
-      foreach($u->getLibraries() as $lib):
-        $selected_lib = ($item->getHomeLibraryID() == $lib->getLibraryID()) ? 'selected="selected"' : '';
-?>
-                <option value='<?=$lib->getLibraryID()?>' <?=$lib->getLibraryID()?> > <?=$lib->getLibrary()?> </option>;
-<?php endforeach; ?>
-              </select>
-            </td>
-          </tr>        
-<?php endif; ?> 
-        
-<?php endif; ?>                
+                
       </table>
     </div>
     

@@ -136,7 +136,6 @@ class itemManager extends baseManager {
             //physical item data
             if($item->isPhysicalItem()) { 
                
-              $item->setHomeLibraryID($_REQUEST['home_library']);
                 
               //physical copy data
               $item->getPhysicalCopy();
