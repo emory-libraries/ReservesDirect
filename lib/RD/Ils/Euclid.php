@@ -110,7 +110,6 @@ class RD_Ils_Euclid extends RD_Ils_Abstract
   
   public function getHoldings($key, $keyType = 'barcode')
   {
-    global $g_holdingsScript;
     
     if(empty($key) || empty($keyType)) {
       return array();

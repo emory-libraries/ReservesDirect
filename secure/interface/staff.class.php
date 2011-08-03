@@ -270,7 +270,7 @@ class staff extends instructor
 	*/
 	function createILS_record($barcode, $copy, $borrowerID, $libraryID, $term, $circRule, $altCirc, $expiration)
 	{
-		global $g_reserveScript, $g_catalogName;
+		global $g_catalogName;
 
 		$reservesDesk = new library($libraryID);
 

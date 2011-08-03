@@ -153,7 +153,7 @@ class requestManager
             $item = new reserveItem($item_id);
             if($item->isPhysicalItem()) {
               $zQry = RD_Ils::initILS();
-              $holdingInfo = $zQry->getHoldings('control', $item->getLocalControlKey());
+              $holdingInfo = null;
               $selected_barcode = $propagated_data['requested_barcode'];
             }
             else {
@@ -441,11 +441,7 @@ class requestManager
         unset($physCopy);
         
         //create ILS record
-        $ilsResult = $u->createILS_record($phys_copy_raw_data['bar'], $phys_copy_raw_data['copy'], $instructor->getILSUserID(), $item->getHomeLibraryID(), $ci->getTerm(), $circRule['circRule'], $circRule['alt_circRule'], $ci->getExpirationDate());
-        //store ilsResult for the future
-        $ils_results .= '<li>'.$ilsResult.'</li>';
       }
-      $ils_results .= '</ul>';            
     }
     
     //process ILS requests (basically delete the ones that have been satisfied)

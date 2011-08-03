@@ -101,8 +101,6 @@ http://www.reservesdirect.org/
   //Euclid/Aleph configuration
   $g_catalogName    = (string)$configure->catalog->catalogName;
   $g_getBibRecordScript  = (string)$configure->catalog->get_bibrecord_script;
-  $g_reserveScript  = (string)$configure->catalog->reserve_script;  
-  $g_holdingsScript = (string)$configure->catalog->holdings_script;
   $g_reservesViewer = (string)$configure->catalog->web_search;
 
   $g_libraryURL   = (string)$configure->library_url;

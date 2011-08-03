@@ -468,7 +468,7 @@ class requestDisplayer extends noteDisplayer {
     $item = new reserveItem($item_id);
     if($item->isPhysicalItem()) {
       $zQry = RD_Ils::initILS();
-      $holdingInfo = $zQry->getHoldings($item->getLocalControlKey(), 'control');
+      $holdingInfo = null;
       $selected_barcode = $requested_barcode;
     }
     else {
