@@ -2,13 +2,7 @@ RESERVES DIRECT DEPLOYMENT NOTES
 
 Release 2.8.0
 
-  1. Remove config_loc.inc.php from version control
-   - BEFORE you svn up, copy config_loc.inc.php to a tmp location.
-   - svn revert any changes to config_loc.inc.php
-   - After svn up, copy the temp file back to config_loc.inc.php
-
-  
-  2. Modify config.xml in apache settings and add ALEPHLink according to example file.
+  Fabric Notes Coming Soon
 
 
 Release 2.7.0
