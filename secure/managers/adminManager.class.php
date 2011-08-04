@@ -104,7 +104,7 @@ class adminManager
 						$_REQUEST['lib_name'],
 						$_REQUEST['lib_nickname'],
 						$_REQUEST['ils_prefix'],
-						$_REQUEST['desk'],
+						'', //Was Desk param
 						$_REQUEST['lib_url'],
 						$_REQUEST['contactEmail'],
 						$_REQUEST['monograph_library_id'],
