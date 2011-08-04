@@ -83,7 +83,7 @@
 							$h = array();
 							if (preg_match("/^[0-9]{1,14}$/", $v))
 							{
-								$h = $ils->getHoldings($v, 'barcode');
+								$h = NULL;
 							} 
 							if (empty($h))
 							{

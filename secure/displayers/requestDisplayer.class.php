@@ -80,11 +80,7 @@ class requestDisplayer extends noteDisplayer {
     $$filter = ' SELECTED ';  
     echo "      <select name='filter_status'>\n";
     echo "        <option {$INPROCESS} value='IN PROCESS'>IN PROCESS</option>\n";
-    echo "        <option {$COPYRIGHTREVIEW} value='COPYRIGHT REVIEW'>COPYRIGHT REVIEW</option>\n";
-    echo "        <option {$PURCHASING} value='PURCHASING'>PURCHASING</option>\n";
     echo "        <option {$RECALLED} value='RECALLED'>RECALLED</option>\n";
-    echo "        <option {$RESPONSENEEDED} value='RESPONSE NEEDED'>RESPONSE NEEDED</option>\n";
-    echo "        <option {$SCANNING} value='SCANNING'>SCANNING</option>\n";    
     echo "        <option {$SEARCHINGSTACKS} value='SEARCHING STACKS'>SEARCHING STACKS</option>\n";
     echo "        <option {$UNAVAILABLE} value='UNAVAILABLE'>UNAVAILABLE</option>\n";
     echo "        <option {$ALL} value=\"all\">All Unprocessed Requests</option>\n";    
@@ -379,15 +375,9 @@ class requestDisplayer extends noteDisplayer {
         echo "                <div id='notice_{$r->requestID}' style='display: inline;'><img width='16px' height='16px' src='images/spacer.gif' /></div>\n";
         echo "                <select name='{$r->requestID}_status' onChange='setRequestStatus(this, {$r->requestID}, \"notice_{$r->requestID}\");'>\n";        
         echo "                  <option {$INPROCESS} value='IN PROCESS'>IN PROCESS</option>\n";
-        echo "                  <option {$COPYRIGHTREVIEW} value='COPYRIGHT REVIEW'>COPYRIGHT REVIEW</option>\n";
-        echo "                  <option {$PURCHASING} value='PURCHASING'>PURCHASING</option>\n";
         echo "                  <option {$RECALLED} value='RECALLED'>RECALLED</option>\n";
-        echo "                  <option {$RESPONSENEEDED} value='RESPONSE NEEDED'>RESPONSE NEEDED</option>\n";
-        echo "                  <option {$SCANNING} value='SCANNING'>SCANNING</option>\n";    
         echo "                  <option {$SEARCHINGSTACKS} value='SEARCHING STACKS'>SEARCHING STACKS</option>\n";
         echo "                  <option {$UNAVAILABLE} value='UNAVAILABLE'>UNAVAILABLE</option>\n";       
-        echo "                  <option {$DENIED} value='DENIED' style=\"color: rgb(255, 0, 0);\">DENY COPYRIGHT</option>\n";
-        echo "                  <option {$DENIEDALL} value='DENIED_ALL' style=\"color: rgb(255, 0, 0);\">DENY COPYRIGHT FOR ALL</option>\n";
         echo "                </select>\n";       
         //echo "              </p>\n";                      
         

@@ -77,7 +77,6 @@ class requestManager
           $tmpRequest->getCourseInstance();
           $tmpRequest->courseInstance->getPrimaryCourse();
           $tmpRequest->courseInstance->getCrossListings();
-          $tmpRequest->getHoldings();
           $requestList[] = $tmpRequest;
         }         
         
