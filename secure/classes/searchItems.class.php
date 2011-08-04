@@ -227,13 +227,6 @@ class searchItems
         echo "					</tr>\n";
         echo "					<tr align=\"left\" valign=\"top\">\n";
 		echo "						<td colspan=\"2\" class=\"borders\" align=\"center\">\n";
-        echo "							<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
-        echo "								<tr>\n";
-        echo "									<td align=\"left\" valign=\"top\" align=\"center\">\n";
-        echo "										You may also search the library's collection in <a href=\"$g_libraryURL\">$g_catalogName</a>.\n";
-        echo "									</td>\n";
-        echo "								</tr>\n";
-        echo "							</table>\n";
         echo "						</td>\n";
         echo "					</tr>\n";
         echo "				</table>\n";
