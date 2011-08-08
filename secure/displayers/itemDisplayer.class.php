@@ -620,7 +620,18 @@ ITEM_SOURCE;
          <span id="availability_option1">in print</span>
            </td>
         </tr>  
-                
+        
+<?php if($item->isPhysicalItem()): ?>
+        <tr>
+          <th>
+            Control Number:
+          </th>
+          <td>
+             <input type="text" name="local_control_key" size="15" value="<?=$item->getLocalControlKey();?>" />
+          </td>
+        </tr> 
+        
+<?php endif; ?>                
       </table>
     </div>
     

@@ -78,7 +78,7 @@ class classDisplayer extends baseDisplayer {
   
   
   function displayEditClassHeader(&$ci, $next_cmd, $show_quicklinks_box=true) {
-    global $u, $g_permission, $calendar, $g_ALEPHLink;
+    global $u, $g_permission, $calendar;
 
     //grab all the necessary info
     $ci->getCourseForUser();
@@ -194,9 +194,6 @@ class classDisplayer extends baseDisplayer {
     <? $color = ($ci->reviewed() ? 'green' : 'red'); ?> 
     <div class="courseHeaders">
       <span class="label">Copyright</span>: <span style="color: <?=$color?>;"><?= $ci->getReviewed(); ?></span>
-    </div>
-    <div class="courseHeaders">
-        <a href="<?= $g_ALEPHLink ?>" target="_blank">ALEPH LIBRARY CATALOG</a>
     </div>
     <br/>
 

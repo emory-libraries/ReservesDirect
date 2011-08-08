@@ -199,7 +199,7 @@ abstract class baseDisplayer {
    * @desc outputs HTML showing information about a reserve.  For use in class/reserve lists.
    */
   public function displayReserveInfo(&$reserve, $meta_style='') {
-    global $u, $g_reservesViewer, $g_copyrightLimit;
+    global $u, $g_reservesViewer, $g_copyrightLimit, $g_ALEPHLink;
 
     if(!($reserve->item instanceof reserveItem)) {
       $reserve->getItem();  //pull in item info
@@ -278,13 +278,14 @@ abstract class baseDisplayer {
       <span class="itemAuthor"><?=$author?></span>
       <br />
       <span class="itemMeta"><?=$callNumber?></span>
-
-        <?php else: ?>
+      <br />      
+      <span class="itemMetaPre">On Reserve [<a href="<?=$g_ALEPHLink?>" target="_blank" class="strong">more info</a>] 
+<?php else: ?>
       <?php if ($reserve->getStatus() == 'ACTIVE' || $reserve->getStatus() == 'INACTIVE'): ?>
         <a href="<?=$viewReserveURL?>" target="_blank" class="itemTitle" style="margin:0px; padding:0px;"><?=$title?></a>
       <?php else: ?>
         <span class="itemTitleNoLink"><?=$title?></span>
-      <?php endif; ?>
+<?php endif; ?>
       <br />
       <span class="itemAuthor"><?=$author?></span>
       
