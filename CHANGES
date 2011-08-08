@@ -27,6 +27,7 @@ Changes
 --  Added ALEPHLink in config file for display on courses page.
 --  Replaced config_loc.inc.php with config_loc.inc.php.example
 --  Removed all interaction with EUCLID
+--  Added fabfile deployment script and deploy nots
 ************************************************************************
 Revision 2.7.0
 

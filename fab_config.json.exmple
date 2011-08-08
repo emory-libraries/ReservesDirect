@@ -1,0 +1,5 @@
+{
+     "hosts": ["myself@remoteserver.library.emory.edu"],
+     "sudo_user": "sudouser",
+     "extract_path": "/home/httpd/sites/project" 
+}
