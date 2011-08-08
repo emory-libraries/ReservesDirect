@@ -218,7 +218,27 @@ ITEM_SOURCE;
         <table border="0" cellpadding="2" cellspacing="0">  
 ITEM_SOURCE;
     
-   // end staff section
+    if ($u->getRole() >= $g_permission['staff']) {
+    $output .= <<<ITEM_SOURCE
+          <tr>
+            <td align="right">
+              Reserve Desk:
+            </td>
+            <td>
+              <select name="home_library">
+ITEM_SOURCE;
+      foreach($u->getLibraries() as $lib) {
+        $selected_lib = ($reserveItem->getHomeLibraryID() == $lib->getLibraryID()) ? 'selected="selected"' : '';
+        $output .= "\n\t<option value='". $lib->getLibraryID() . "'" . $selected_lib . ">" .
+        $lib->getLibrary() ."</option>";
+      }
+      
+      $output .= <<<ITEM_SOURCE
+      </select>
+            </td>
+          </tr>
+ITEM_SOURCE;
+    }    // end staff section
     
     //display details from the physical copy table (barcode/call num)
     if ($reserveItem->getPhysicalCopy()) {

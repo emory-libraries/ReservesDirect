@@ -342,6 +342,12 @@ class adminDisplayer extends baseDisplayer
           <td>ILS Prefix:</td>
           <td><input id="ils_prefix" name="ils_prefix" value="" size="12" maxlength="10"></td>
         </tr>
+	
+        <tr>
+          <td>&nbsp;</td>
+          <td>Reserve Desk:</td>
+          <td><input id="desk" name="desk" value="" size="55" maxlength="50"></td>
+        </tr>  	
 
         <tr>
           <td>&nbsp;</td>
