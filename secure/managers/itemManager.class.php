@@ -225,28 +225,28 @@ class itemManager extends baseManager {
         if (!empty($_REQUEST['store_request']) && $_REQUEST['store_request']==1) { 
         //form submitted, process item          
                                       
-          if(isset($_REQUEST['barcode'])) {
+          if(isset($_REQUEST['barcode'])) {	    
             $phys_item = new physicalCopy();
             $item = new reserveItem();             
             // Check to see if the barcode exists in the physical_copies table
-            if($phys_item->getByBarcode($_REQUEST['barcode'])) {
+            if($phys_item->getByBarcode($_REQUEST['barcode'])) {	      
               // Barcode does exist in the physical_copies table
               // Check to see if the foreign key item_id exists in the items table.
               $itemTest = $item->getItemByID($phys_item->getItemID());                
-              if (empty($itemTest)) {                
+              if (empty($itemTest)) {    
                 // item exists in physical_copies table, but not in items table 
-                if (empty($_REQUEST['itemID'])) {                  
+                if (empty($_REQUEST['itemID'])) { 
                   // Item does not exist
                   $item->createNewItem();
                 }
-                else {
+                else {		  
                   // Item exists but barcode does not.
                   $item->getItemByID($_REQUEST['itemID']);                  
-                }              
+                }    
                 // Now update the item_id foreign key in the physical_copies table.                    
                 $phys_item->setItemID($item->itemID);
               }
-              else {  // the item exists, so link to existing item
+              else {  // the item exists, so link to existing item	      
                 $item->getItemByID($phys_item->getItemID());                
               }                           
 
@@ -477,18 +477,37 @@ class itemManager extends baseManager {
         
         switch ($holdings['type']) {
           case 'BOOK' :         
-            $item->setGroup('MONOGRAPH');  
+            if (isset($item->itemID))	$item->setGroup('MONOGRAPH');  
             $item->setMaterialType($holdings['type']);
             $_REQUEST['item_group'] = 'MONOGRAPH';
             break;
           default: // if it is not a book, then let's assume it is a disc.
-            $item->setGroup('MULTIMEDIA');
+            if (isset($item->itemID))	$item->setGroup('MULTIMEDIA');
             $item->setMaterialType($holdings['type']);            
             $_REQUEST['item_group'] = 'MULTIMEDIA';             
             break;                                  
         }
-      }     
+      }
+      if (!empty($search_results['holdings'])) {
+        $holdings = $search_results['holdings'][0];	
+	//get an object
+	$physCopy = new physicalCopy();
 
+	//make sure the record does not already exist
+	if(!$physCopy->getByBarcode($qryValue)) {
+	  //create a new record
+	  $physCopy->createPhysicalCopy();
+	  
+	  //add data
+	  $physCopy->setBarcode($qryValue);
+	  $physCopy->setCallNumber($holdings['callNum']);
+	  $physCopy->setItemType($holdings['type']);
+	  $physCopy->setOwningLibrary($holdings['library']);
+	}
+
+	unset($physCopy);
+      }
+      
       // old code threw the entire publication info (including year) into
       // $item->source. now we want the pub info in $item->publisher and the
       // $year in $item->source. four possibilities:

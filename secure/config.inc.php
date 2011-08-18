@@ -81,7 +81,6 @@ http://www.reservesdirect.org/
 
   $g_documentDirectory  = (string)$configure->documentDirectory;
   $g_documentURL    = (string)$configure->documentURL;
-  $g_docCover       = (string)$configure->documentCover;
 
   $g_siteURL        = (string)$configure->siteURL;
   $g_serverName     = (string)$configure->serverName;

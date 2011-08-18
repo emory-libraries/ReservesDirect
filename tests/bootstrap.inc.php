@@ -84,7 +84,6 @@ createDB($dsn, $options);
 //  $g_reservesEmail    = (string)$configure->reservesEmail;
 //  $g_documentDirectory  = (string)$configure->documentDirectory;
 //  $g_documentURL      = (string)$configure->documentURL;
-//  $g_docCover       = (string)$configure->documentCover;
 //
 //  $g_siteURL        = (string)$configure->siteURL;
 //  $g_serverName           = (string)$configure->serverName;

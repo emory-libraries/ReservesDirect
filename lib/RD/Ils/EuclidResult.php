@@ -121,15 +121,20 @@ class RD_Euclid_Result extends AbstractResult
                 case 'm': $tmpResult['library'] = (string)$subfield; break;
                 case 'k': $tmpResult['loc'] = (string)$subfield; break;                    
                 case 'a': $tmpResult['callNum'] = (string)$subfield; break;              
-                case 't': switch ($subfield)
-                          {
-                            case 'VIDEOCASS': $tmpResult['type'] = 'VHS'; break;
-                            case 'CD-SOUND': $tmpResult['type'] = 'CD'; break;                            
-                            default: $tmpResult['type'] = $subfield; break;                    ;   
-                          }                
+                case 't': try {		  
+			    switch ($subfield[0])
+			    {
+			      case 'VIDEOCASS': $tmpResult['type'] = 'VHS'; break;
+			      case 'CD-SOUND': $tmpResult['type'] = 'CD'; break;
+			      case 'DVD-LEND': $tmpResult['type'] = 'DVD'; break;
+			      default: $tmpResult['type'] = $subfield[0]; break;   
+			    }
+			  } catch (Exception $e) { // if error default to book
+			    $tmpResult['type'] = 'BOOK';
+			  }        
               }
             }
-            $search_results['holdings'][] = $tmpResult;
+            $search_results['holdings'][] = $tmpResult;	    
             unset($tmpResult);
           break;
         }

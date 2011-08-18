@@ -651,6 +651,22 @@ ITEM_SOURCE;
           </td>
         </tr> 
         
+<?php if($_REQUEST['cmd'] == 'addPhysicalItem'): ?>       
+          <tr>
+            <th>Reserve Desk:</th>
+            <td>
+              <select name="home_library">
+<?php
+      foreach($u->getLibraries() as $lib):
+        $selected_lib = ($item->getHomeLibraryID() == $lib->getLibraryID()) ? 'selected="selected"' : '';
+?>
+                <option value='<?=$lib->getLibraryID()?>' <?=$lib->getLibraryID()?> > <?=$lib->getLibrary()?> </option>;
+<?php endforeach; ?>
+              </select>
+            </td>
+          </tr>        
+<?php endif; ?>	
+	
 <?php endif; ?>                
       </table>
     </div>
