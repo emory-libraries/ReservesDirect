@@ -303,21 +303,12 @@ class requestDisplayer extends noteDisplayer {
       echo "                  <td align=\"left\" valign=\"top\">". $item->getOCLC() ."</td>\n";
       echo "                </tr>\n";
 
-      if(count($r->holdings) > 0)
+      if($item->getPhysicalCopy())
       {     
         echo "                <tr>\n";
         echo "                  <td align=\"right\" valign=\"top\" class=\"strong\">Location:</td>\n";
-        //should be able to select no ILS and then display commented code
-//        echo "                  <td align=\"left\" valign=\"top\">". $pCopy->getOwningLibrary() . " " . $pCopy->getStatus() ." ". $pCopy->getCallNumber() ."</td>\n";
         echo "                  <td align=\"left\" valign=\"top\">\n";
-
-        foreach ($r->holdings as $h)
-        {
-          echo $h['library'] . " " . $h['callNum'] . " " . $h['loc'] . " " . $h['type'] . "<br>";         
-        }
-        if(count($r->holdings) > 0 && (is_null($printView) || $printView == "false")) //on printview show all 
-          echo "Additional copies are available. View details for all holdings";
-      
+	echo $item->physicalCopy->callNumber . "<br>";         
         echo "              </td>\n";
         echo "                </tr>\n";
       }
