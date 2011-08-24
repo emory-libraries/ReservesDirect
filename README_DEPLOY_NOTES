@@ -9,7 +9,10 @@ Release 2.8.0
 
   3. In your local checkout, copy fab_config.json.example to fab_config.json and configure fields
 
-  4. Run: $ fab load_config:fab_config.json deploy
+  4. Run this command the deploy the code: 
+      $ fab load_config:fab_config.json deploy
+     Or include an svn up to get the latest commit before deploying the code: 
+      $ fab load_config:fab_config.json get_latest_commit deploy
 
   5. Notify Systems to run the script db/2.8.0_loan_period_update.sql
 

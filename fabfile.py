@@ -107,7 +107,7 @@ def _update_links():
 # bring it all together
 
 def deploy():
-    """Deploy the application from source control to a remote server."""
+    """Deploy the application from source control to a remote server."""    
     _fetch_source_from_svn()
     _package_source()
     _copy_tarball()
@@ -126,3 +126,9 @@ def revert():
 def clean_local():
     """Remove local files created during deployment."""
     local('rm -rf dist build')
+    
+def get_latest_commit():
+    """Run 'svn up' to get the latest commit."""    
+    local('svn up') 
+    _svn_env()
+    _env_paths()
