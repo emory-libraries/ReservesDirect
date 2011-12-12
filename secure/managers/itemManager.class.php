@@ -627,7 +627,7 @@ class itemManager extends baseManager {
     if(isset($_REQUEST['performer'])) $item->setPerformer($_REQUEST['performer']);
     if(isset($_REQUEST['source'])) $item->setSource($_REQUEST['source']);       
     if(isset($_REQUEST['volume_edition'])) $item->setVolumeEdition($_REQUEST['volume_edition']);
-    if(isset($_REQUEST['home_library'])) $item->sethomeLibraryID($_REQUEST['home_library']);
+    if(isset($_REQUEST['home_library'])) $item->setHomeLibraryID($_REQUEST['home_library']);
     if(isset($_REQUEST['item_group'])) $item->setGroup($_REQUEST['item_group']);
     if(isset($_REQUEST['volume_title'])) $item->setVolumeTitle($_REQUEST['volume_title']);
     if(isset($_REQUEST['times_pages'])) $item->setPagesTimes($_REQUEST['times_pages']);

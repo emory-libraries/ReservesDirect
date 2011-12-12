@@ -20,6 +20,11 @@ ReservesDirect is located at:
 http://www.reservesdirect.org/
 
 ************************************************************************
+Revision 2.8.1
+
+Changes
+--  Bug Fix for instructor view on edit item, RESERVES DETAILS section css error.
+
 Revision 2.8.0
 
 Changes
@@ -29,7 +34,8 @@ Changes
 --  Removed all interaction with EUCLID
 --  Added fabfile deployment script and deploy nots
 --  Added "3 hours" as an option for loan period for Main and M&M Libraries
-************************************************************************
+
+
 Revision 2.7.0
 
 Changes

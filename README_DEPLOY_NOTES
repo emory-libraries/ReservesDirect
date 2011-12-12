@@ -1,5 +1,19 @@
 RESERVES DIRECT DEPLOYMENT NOTES
 
+Release 2.8.1
+
+  1. On the remote server, copy reserves_config.xml from current location to /home/httpd/sites/reserves
+
+  2. In your local checkout, copy fab_config.json.example to fab_config.json and configure fields
+
+  4. Run this command the deploy the code: 
+      $ fab load_config:fab_config.json deploy
+     Or include an svn up to get the latest commit before deploying the code: 
+      $ fab load_config:fab_config.json get_latest_commit deploy
+
+  5. Notify Systems to modify sym link to point to the current version of the code.
+
+  
 Release 2.8.0
 
   1. On the remote server, copy reserves_config.xml from current location to /home/httpd/sites/reserves
@@ -16,7 +30,7 @@ Release 2.8.0
 
   5. Notify Systems to run the script db/2.8.0_loan_period_update.sql
 
-  6. Notify Systems to modify sim link to point to the current version of the code.
+  6. Notify Systems to modify sym link to point to the current version of the code.
 
 
 

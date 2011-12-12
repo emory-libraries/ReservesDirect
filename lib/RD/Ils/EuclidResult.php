@@ -34,29 +34,8 @@ class RD_Euclid_Result extends AbstractResult
     
     // Load the xml string as utf8 decoded
     $sXML = simplexml_load_string(utf8_decode($string));
-    
     //echo "<hr>" . utf8_decode($string) . "<br>";
     
-    // ControlField Tag
-    if (!empty($sXML->record->controlfield))
-    {     
-      foreach ($sXML->record->controlfield as $controlfield) {
-         switch ($controlfield[@tag])
-         {
-          case '001':  // control Number
-            $search_results['controlKey'] = (string)trim($controlfield);
-            
-            //also save this as OCLC w/o the letters
-            //strip off 'ocm or ocn' if it exists            
-            $search_results['OCLC'] = ereg_replace('oc[mn]', '', (string)trim($controlfield)); 
-            //older DOBI prefix
-            $search_results['OCLC'] = ereg_replace('DOBI','o', $search_results['OCLC']);
-            //failing that, strip off 'o'
-            $search_results['OCLC'] = ereg_replace('o', '', $search_results['OCLC']);   
-          break;
-        }
-      }
-    }
     // DataField Tags
     if (!empty($sXML->record->datafield))
     {      
@@ -80,6 +59,15 @@ class RD_Euclid_Result extends AbstractResult
             }
           }
           break;
+	  
+          case '035':  // control Number location for ALEPH marc record
+            foreach ($datafield->subfield as $subfield) {
+	      if (preg_match('/^oc[mn]/', (string)trim($subfield))) {
+		$search_results['controlKey'] = (string)trim($subfield);
+	      }
+	      break;	      
+	    }
+	  break;	  
 
           case '100':
           case '110':
@@ -118,20 +106,38 @@ class RD_Euclid_Result extends AbstractResult
             {
               switch ($subfield['code'])
               {
-                case 'm': $tmpResult['library'] = (string)$subfield; break;
+                case 'm': switch ($subfield[0])
+			    {
+			      case "Robert W. Woodruff Library": $tmpResult['library'] = 'GENERAL'; break;
+			      case "Chemistry Library": $tmpResult['library'] = 'CHEMISTRY'; break;
+			      case "Goizueta Business Library": $tmpResult['library'] = 'BUS'; break;
+			      case "Marian K. Heilbrun Music Media": $tmpResult['library'] = 'MUSICMEDIA'; break;
+			      case "Woodruff Health Sciences Cntr.": $tmpResult['library'] = 'HEALTH'; break;
+			      case "Law Library": $tmpResult['library'] = 'LAW'; break;
+			      case "Oxford College Library": $tmpResult['library'] = 'OXFORD'; break;
+			      case "Pitts Theology Library": $tmpResult['library'] = 'THEOLOGY'; break;
+			      default: $tmpResult['library'] = 'GENERAL'; break;  
+			    }
+			    //echo "<br>RD library: [" . $subfield[0] . " => [" . $tmpResult['library'] . "]<hr>";
+
                 case 'k': $tmpResult['loc'] = (string)$subfield; break;                    
                 case 'a': $tmpResult['callNum'] = (string)$subfield; break;              
-                case 't': try {		  
-			    switch ($subfield[0])
-			    {
-			      case 'VIDEOCASS': $tmpResult['type'] = 'VHS'; break;
-			      case 'CD-SOUND': $tmpResult['type'] = 'CD'; break;
-			      case 'DVD-LEND': $tmpResult['type'] = 'DVD'; break;
-			      default: $tmpResult['type'] = $subfield[0]; break;   
-			    }
+                case 't': try {
+			    $cd_types = array("Audiotape", "CD", "CD ROM", "CD Sound Recording", "CD-ROM", "Sound Recording");		  
+			    $dvd_types = array("Blu-Ray Disc", "DVD", "DVD-ROM", "Videodisc");
+			    $vhs_types = array("Videotape", "Video");
+			    if (isset($subfield[0]) && in_array($subfield[0], $cd_types))
+			      $tmpResult['type'] = 'CD';
+			    elseif (isset($subfield[0]) && in_array($subfield[0], $dvd_types))
+			      $tmpResult['type'] = 'DVD';
+			    elseif (isset($subfield[0]) && in_array($subfield[0], $vhs_types))
+			      $tmpResult['type'] = 'VHS';
+			    else $tmpResult['type'] = 'BOOK';
+			    
 			  } catch (Exception $e) { // if error default to book
 			    $tmpResult['type'] = 'BOOK';
-			  }        
+			  }    
+			  echo "<br>RD type: [" . $subfield[0] . "] => [" . $tmpResult['type'] . "]<hr>";       
               }
             }
             $search_results['holdings'][] = $tmpResult;	    
@@ -140,6 +146,9 @@ class RD_Euclid_Result extends AbstractResult
         }
       }
     }
+    // debug stmts
+    //$arr_dump = print_r($search_results, true);
+    //echo "<hr>$arr_dump<hr>";    
     return $search_results;
   }  
 }

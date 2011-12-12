@@ -414,9 +414,9 @@ ITEM_SOURCE;
                     </div>
         </p>
       </div>
-      </div>      
       <?php   endif; ?>
-          </div>
+       </div>      
+         </div>
     <?php   endif; #if in process?>
 
               
@@ -1054,6 +1054,9 @@ ITEM_SOURCE;
         <label><input type="radio" name="new_note_type" value="<?=$g_notetype['content']?>" checked="true">Content Note</label>
         <label><input type="radio" name="new_note_type" value="<?=$g_notetype['staff']?>">Staff Note</label>
         <label><input type="radio" name="new_note_type" value="<?=$g_notetype['copyright']?>">Copyright Note</label>  
+      <?php elseif ($u->getRole() == $g_permission['instructor']): // role instructor?>       
+        <small>Note Type:
+        <label><input type="radio" name="new_note_type" value="<?=$g_notetype['instructor']?>" checked="true">Instructor</label> 	
       <?php endif; ?>  
       <br />       
     <?php endif; ?>  
