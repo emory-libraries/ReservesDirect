@@ -20,6 +20,18 @@ ReservesDirect is located at:
 http://www.reservesdirect.org/
 
 ************************************************************************
+Release 2.8.3
+
+Changes
+--  Update "more info" ALEPH_LINK so that it goes directly to the physical item. 
+
+Release 2.8.2
+
+Changes
+--  Update revision number computation in footer, since fabric removed svn files.
+--  Bugfix missing quote on images spacer.gif url.
+--  Add missing favicon file. 
+
 Revision 2.8.1
 
 Changes

@@ -1,5 +1,33 @@
 RESERVES DIRECT DEPLOYMENT NOTES
 
+Release 2.8.3
+
+  1. On the remote server, copy reserves_config.xml from current location to /home/httpd/sites/reserves
+
+  2. In your local checkout, copy fab_config.json.example to fab_config.json and configure fields
+
+  4. Run this command the deploy the code: 
+      $ fab load_config:fab_config.json deploy
+     Or include an svn up to get the latest commit before deploying the code: 
+      $ fab load_config:fab_config.json get_latest_commit deploy
+
+  5. Update the ALEPHLink property in the reserves_config.xml file.
+  
+  6. Notify Systems to modify sym link to point to the current version of the code.
+
+Release 2.8.2
+
+  1. On the remote server, copy reserves_config.xml from current location to /home/httpd/sites/reserves
+
+  2. In your local checkout, copy fab_config.json.example to fab_config.json and configure fields
+
+  4. Run this command the deploy the code: 
+      $ fab load_config:fab_config.json deploy
+     Or include an svn up to get the latest commit before deploying the code: 
+      $ fab load_config:fab_config.json get_latest_commit deploy
+
+  5. Notify Systems to modify sym link to point to the current version of the code.
+  
 Release 2.8.1
 
   1. On the remote server, copy reserves_config.xml from current location to /home/httpd/sites/reserves

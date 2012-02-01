@@ -355,11 +355,11 @@ class noteDisplayer extends baseDisplayer {
     echo '    </td>';
     echo '  </tr>';
 
-    echo "    <tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+    echo "    <tr><td><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
     echo "    <tr>\n";
     echo "      <td align=\"center\"><input type=\"submit\" value=\"Save Note\"></td>\n";
     echo "    </tr>\n";
-    echo "    <tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+    echo "    <tr><td><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
     echo '</table>';
 
     echo '</td>';
@@ -378,7 +378,7 @@ class noteDisplayer extends baseDisplayer {
     .  "  <tbody>\n"
     .  "  <tr><td align=\"left\" valign=\"top\"><h1>ReservesDirect</h1></td></tr>\n"
     .  "  <tr><td align=\"left\" valign=\"top\" style=\"padding-bottom:30px;\"><h2>Add Note</h2></td></tr>\n"
-    .  "    <tr><td width=\"100%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n"
+    .  "    <tr><td width=\"100%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td></tr>\n"
     .  "    <tr>\n"
     .  "      <td align=\"left\" valign=\"top\" class=\"borders\" style=\"text-align:center; padding:5px 15px 10px 15px;\">\n"
     .  "        <p><strong>You have successfully added a note.</strong></p>\n"
@@ -387,7 +387,7 @@ class noteDisplayer extends baseDisplayer {
     .  "            <p><input type=\"button\" value=\"Close Window\" onClick=\"window.close();\"></p>\n"
     .  "      </td>\n"
     .  "    </tr>\n"
-    .  "    <tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n"
+    .  "    <tr><td><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n"
     .  "  </tbody>\n"
     .  "</table>\n"
     ;

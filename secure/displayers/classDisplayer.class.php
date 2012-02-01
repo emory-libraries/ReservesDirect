@@ -39,7 +39,7 @@ class classDisplayer extends baseDisplayer {
   function displayStaffHome($user)
   {
     echo "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-    echo "  <tr><td width=\"100%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
+    echo "  <tr><td width=\"100%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
     echo "  <tr>\n";
     echo "    <td align=\"center\" valign=\"top\">\n";
     echo "      <table width=\"66%\" border=\"0\" cellspacing=\"0\" cellpadding=\"3\">\n";
@@ -569,7 +569,7 @@ class classDisplayer extends baseDisplayer {
     echo "</tr>\n";
     echo " <form action=\"index.php?cmd=editTitle&ci=".$ci->getCourseInstanceID()."\" method=\"post\">\n";    
     echo " <tr>\n";
-    echo "  <td width=\"100%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td>\n";
+    echo "  <td width=\"100%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td>\n";
     echo " </tr>\n";
     echo "  <tr><td colspan=\"3\" align=\"right\"> <a href=\"index.php?cmd=editClass&ci=".$ci->courseInstanceID."\">Return to Edit Class</a></div></td></tr>\n";
     echo " <tr>\n";
@@ -722,7 +722,7 @@ class classDisplayer extends baseDisplayer {
     ."          <td><div align=\"center\"><a href=\"index.php?cmd=editClass&ci=".$ci->courseInstanceID."\">Return to Edit Class</a></div></td>\n"
     ."        </tr>\n"
     ."        <tr>\n"
-    ."          <td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td>\n"
+    ."          <td><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td>\n"
     ."        </tr>\n"
     ." </table>\n";
     echo "</form>\n";
@@ -743,7 +743,7 @@ class classDisplayer extends baseDisplayer {
       }
     */
     echo "  <tr>";
-    echo "    <td colspan=\"3\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"> </td>";
+    echo "    <td colspan=\"3\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"> </td>";
     echo "  </tr>";
     echo "  <tr>";
     echo "    <td height=\"14\" colspan=\"3\" align=\"left\" valign=\"top\">";
@@ -792,7 +792,7 @@ class classDisplayer extends baseDisplayer {
     echo "      </tr>";
     echo "    </table>";
     echo "    </td>";
-    echo "         <td align=\"left\" valign=\"top\"><img src=\images/spacer.gif\" width=\"15\" height=\"1\"></td>";
+    echo "         <td align=\"left\" valign=\"top\"><img src=\"images/spacer.gif\" width=\"15\" height=\"1\"></td>";
     echo "         <td width=\"50%\" align=\"left\" valign=\"top\">";
     echo "         <table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"borders\">";
     echo "          <tr>";
@@ -841,7 +841,7 @@ class classDisplayer extends baseDisplayer {
     echo "      <td colspan=\"3\"><div align=\"center\"><a href=\"index.php?cmd=editClass&ci=".$ci->courseInstanceID."\">Return to Edit Class</a></div></td>";
     echo "  </tr>";
     echo "     <tr>";
-    echo "      <td colspan=\"3\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td>";
+    echo "      <td colspan=\"3\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td>";
     echo "  </tr>";
     echo " </form>";
     echo " </table>";
@@ -913,7 +913,7 @@ class classDisplayer extends baseDisplayer {
     echo "        </tr>\n";
     echo "      </table>\n";
     echo "    </td>\n";
-    echo "    <td align=\"left\" valign=\"top\"><img src=\images/spacer.gif\" width=\"15\" height=\"1\"></td>\n";
+    echo "    <td align=\"left\" valign=\"top\"><img src=\"images/spacer.gif\" width=\"15\" height=\"1\"></td>\n";
     echo "    <td width=\"50%\" align=\"left\" valign=\"top\">\n";
     echo "      <table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"borders\">\n";
     echo "        <tr>\n";
@@ -962,7 +962,7 @@ class classDisplayer extends baseDisplayer {
     echo "    </td></tr>\n";
     echo "  <tr><td colspan=\"3\">&nbsp;</td></tr>\n";
     echo "  <tr><td colspan=\"3\" align=\"center\"> <a href=\"index.php?cmd=editClass&ci=". $ci->getCourseInstanceID() ."\" class=\"strong\">Return to Class</a></div></td></tr>\n";
-    echo "  <tr><td colspan=\"3\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+    echo "  <tr><td colspan=\"3\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
     echo "</table>\n";
     echo "</form>\n";
   }

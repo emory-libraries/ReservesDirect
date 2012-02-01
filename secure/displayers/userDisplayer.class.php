@@ -39,7 +39,7 @@ class userDisplayer extends baseDisplayer {
 	{
 		echo"<table width=\"60%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">";
 		echo"	<tr> ";
-		echo"		<td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td>";
+		echo"		<td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"></td>";
 		echo"	</tr>";
 		echo"	<tr> ";
 		echo"		<td align=\"left\" valign=\"top\">";
@@ -63,7 +63,7 @@ class userDisplayer extends baseDisplayer {
 		echo"           Remove a proxy from one of your classes.</p></td>";
 		echo"	</tr>";
 		echo"	<tr> ";
-		echo"		<td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td>";
+		echo"		<td><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td>";
 		echo"	</tr>";
 		echo"</table>";
 	}
@@ -72,7 +72,7 @@ class userDisplayer extends baseDisplayer {
 	{
 		echo"<table width=\"60%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">";
 		echo"	<tr> ";
-		echo"		<td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td>";
+		echo"		<td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"></td>";
 		echo"	</tr>";
 		echo "	<tr><td align=\"center\" valign=\"top\" class=\"successText\">$msg&nbsp;</td></tr>\n";
 		echo "	<tr><td colspan=2>&nbsp;</td></tr>\n";
@@ -88,7 +88,7 @@ class userDisplayer extends baseDisplayer {
 		echo"           Deletes a user's override password so that they log in using their regular Emory NetID password or GBSNet password</p></td>";
 		echo"	</tr>";
 		echo"	<tr> ";
-		echo"		<td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td>";
+		echo"		<td><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td>";
 		echo"	</tr>";
 		echo"</table>";
 	}
@@ -466,7 +466,7 @@ class userDisplayer extends baseDisplayer {
 	function displayStaffHome($msg=null)
 	{
 		echo "<table width=\"66%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "	<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
+		echo "	<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
 		echo "	<tr><td align=\"center\" valign=\"top\" class=\"helperText\">$msg&nbsp;</td></tr>\n";
 		echo "	<tr><td colspan=2>&nbsp;</td></tr>\n";
 		echo "	<tr>\n";
@@ -504,7 +504,7 @@ class userDisplayer extends baseDisplayer {
 		echo "			</table>\n";
 		echo "		</td>\n";
 		echo "	</tr>\n";
-		echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+		echo "	<tr><td><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "</table>\n";
 	}
 

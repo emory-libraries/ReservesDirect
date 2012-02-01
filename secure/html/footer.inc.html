@@ -1,30 +1,5 @@
 <?
-$svn_data = shell_exec("grep '!svn' .svn/all-wcprops");
-
-if (preg_match("/.*\/ver\/([0-9]*)\/(tags|branches|trunk)\/(.*)/", $svn_data, $matches)) {	
-	$svn_version = $matches[1];
-	
-	switch ($matches[2])
-	{
-		case 'tags':
-			preg_match("/release_(.*)/", $matches[3], $version);
-			$revision = "v{$version[1]}";			
-		break;
-		
-		case 'branches':
-			$revision = "<font color='red'>DEV: ". ucwords(str_replace("_", " ", $matches[3])) ." r{$svn_version}</font>";
-		break;
-				
-		case 'trunk':
-		default:		
-			$revision = "{$svn_version}";
-	}
-	
-	
-	$version = "<strong><span id='revision_number'>$revision</span></strong>";
-} else {
-	$version = "";
-}
+	$version = "2.8.3";
 ?>
 
 

@@ -123,7 +123,7 @@ class requestDisplayer extends noteDisplayer {
     echo "  <tr><td>&nbsp;</td></tr>\n";
     echo "  <tr>\n";
     echo "    <td align=\"right\">\n";
-    echo "      <img src=\images/spacer.gif\" width=\"1\" height=\"15\">[ <a href=\"index.php\">EXIT &quot;PROCESS REQUESTS&quot;</a> ]</td>\n";
+    echo "      <img src=\"images/spacer.gif\" width=\"1\" height=\"15\">[ <a href=\"index.php\">EXIT &quot;PROCESS REQUESTS&quot;</a> ]</td>\n";
     echo "  </tr>\n";
     echo "</table>\n";    
   }
@@ -164,7 +164,7 @@ class requestDisplayer extends noteDisplayer {
     echo "  </tr>\n";
     
     echo "  <tr>\n";
-    echo "    <td align=\"right\"><img src=\images/spacer.gif\" width=\"1\" height=\"15\">[ <a href=\"javascript:window.close();\">Close Window</a> ]</td>\n";
+    echo "    <td align=\"right\"><img src=\"images/spacer.gif\" width=\"1\" height=\"15\">[ <a href=\"javascript:window.close();\">Close Window</a> ]</td>\n";
     echo "  </tr>\n";   
     
     echo "  <tr>\n";

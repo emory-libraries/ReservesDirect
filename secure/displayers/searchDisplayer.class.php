@@ -453,7 +453,7 @@ class searchDisplayer extends baseDisplayer {
 	function addComplete($cmd, $ci, $msg)
 	{
 		echo "<table width=\"60%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" align=\"center\">\n";
-		echo "	<tr><td width=\"140%\"><img src=\images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
+		echo "	<tr><td width=\"140%\"><img src=\"images/spacer.gif\" width=\"1\" height=\"5\"></td></tr>\n";
 		echo "	<tr>\n";
 		echo "		<td align=\"left\" valign=\"top\">\n";
 
@@ -466,7 +466,7 @@ class searchDisplayer extends baseDisplayer {
 		echo "		</td>\n";
 		echo "	</tr>\n";
 		echo "	<tr><td align=\"center\"></td></tr>\n";
-		echo "	<tr><td><img src=\images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
+		echo "	<tr><td><img src=\"images/spacer.gif\" width=\"1\" height=\"15\"></td></tr>\n";
 		echo "</table>\n";		
 	}
 }
