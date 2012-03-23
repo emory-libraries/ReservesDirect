@@ -1,0 +1,13 @@
+Reserves Direct is moving!!!
+============================
+
+We're in the process of migrating Reserves Direct from svn to GitHub.  Much
+of the documentation in the previous wiki was out of date and confusing so 
+it has not been ported here.
+
+When GitHub fixes it's svn import tool we plan on moving the repository here
+so people can more easily clone it for local use.
+
+For now please continue to use the subversion repository which continues
+to be available at https://svn.library.emory.edu/oss/reservesdirect/
+
