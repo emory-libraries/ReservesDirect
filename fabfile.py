@@ -20,24 +20,25 @@ from fabric.api import env, local, prefix, put, sudo
 def _base_env():
     """Configure basic env."""
     env.version = None
-    env.svn_rev = None
-    env.svn_rev_tag = ''
-    env.svn_url = None
+    env.git_rev = None
+    env.git_rev_tag = ''
+    env.git_url = None
 _base_env()
 
-def _svn_env():
-    """Try to infer some env from local svn checkout."""
-    svn_info = XML(local('svn info --xml', capture=True))
-    env.svn_rev = svn_info.find('entry').get('revision')
-    env.svn_rev_tag = '-r' + env.svn_rev
-    env.svn_url = svn_info.find('entry/url').text
-
-    #set version from tag name
-    url_parts = env.svn_url.split('/')
-    env.version = url_parts[-1] # last part is tag
+def _git_env():
+    """Try to infer some env from local git checkout."""
+    env.git_rev = local('git rev-parse --short HEAD')
+    env.git_branch = local('git symbolic-ref -q HEAD')
+    evn.git_branch = env.git_branch.split('/')
+    env.git_branch =  env.git_branch[-1]
+    #env.git_rev_tag = '-r' + env.git_rev
+    #env.git_url = svn_info.find('entry/url').text
+    #set version from VERSION file
+    env.version =  local('cat VERSION')
+    print env
 
 try:
-    _svn_env()
+    _git_env()
 except:
     pass
 
@@ -109,11 +110,11 @@ def _update_links():
 def deploy():
     """Deploy the application from source control to a remote server."""    
     _fetch_source_from_svn()
-    _package_source()
-    _copy_tarball()
-    _extract_tarball()
-    _remote_config()
-    _update_links()
+    #_package_source()
+    #_copy_tarball()
+    #_extract_tarball()
+    #_remote_config()
+    #_update_links()
 
 def revert():
     """Back out the current version, updating remote symlinks to point back
