@@ -420,7 +420,7 @@ class reserveItem extends item
         $sql = "UPDATE items SET mimetype = ?, last_modified = ? WHERE item_id = !";
         $d = date("Y-m-d"); //get current date
     }
-    $mimeType = (!is_null($mimeType)) ? $mimeType : "text/html";
+    $mimeType = (!is_null($mimeType)) ? $mimeType : "application/octet-stream";
     
     $mimeTypeID = $g_dbConn->getOne($sql1, array($mimeType));
     if (DB::isError($mimeTypeID)) { trigger_error($mimeTypeID->getMessage(), E_USER_ERROR); }
