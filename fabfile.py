@@ -1,6 +1,6 @@
 import json
 from xml.etree.ElementTree import XML
-from fabric.api import env, local, prefix, put, sudo, task
+from fabric.api import env, local, prefix, put, sudo, task, run
 
 # recommended distribution command:
 #   $ fab load_config:fab_config.json deploy
@@ -31,7 +31,6 @@ def _git_env():
     env.git_branch = local('git symbolic-ref -q HEAD', capture=True)
     env.git_branch = env.git_branch.split('/')
     env.git_branch =  env.git_branch[-1]
-    env.version =  local('cat VERSION', capture=True)
 
 try:
     _git_env()
@@ -41,8 +40,8 @@ except:
 
 def _env_paths():
     """Set some env paths based on previously-generated env."""
-    env.build_dir = 'reserves-%(version)s-%(git_rev)s' % env
-    env.tarball = 'reserves-%(version)s-%(git_rev)s.tar.bz2' % env
+    env.build_dir = 'reserves-%(git_branch)s-%(git_rev)s' % env
+    env.tarball = 'reserves-%(git_branch)s-%(git_rev)s.tar.bz2' % env
 _env_paths()
 
 @task
@@ -83,13 +82,14 @@ def _package_source():
 def _copy_tarball():
     """Copy the source tarball to the target server."""
     put('dist/%(tarball)s' % env,
-        '/tmp/%(tarball)s' % env)
+        '/tmp/%(tarball)s' % env,mode=0777)
 
 def _extract_tarball():
     """Extract the remote source tarball in the appropriate directory."""
-    _sudo('mv /tmp/%(tarball)s %(extract_path)s/%(tarball)s' % env)
+    _sudo('cp /tmp/%(tarball)s %(extract_path)s/%(tarball)s' % env)
     _sudo('mkdir -p  %(extract_path)s/%(build_dir)s' % env)
     _sudo('tar xjf %(extract_path)s/%(tarball)s -C %(extract_path)s/%(build_dir)s' % env)
+    run('rm /tmp/%(tarball)s' % env)
 
 
 def _remote_config():
