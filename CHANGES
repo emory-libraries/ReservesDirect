@@ -20,6 +20,13 @@ ReservesDirect is located at:
 http://www.reservesdirect.org/
 
 ************************************************************************
+Release 2.8.4
+
+Changes
+--  Made application/octet-stream the default mime type for uploaded files
+--  Updated fabfile to work with git
+--  Added VERSION file to indicate the VERSION of the sofware
+
 Release 2.8.3
 
 Changes
