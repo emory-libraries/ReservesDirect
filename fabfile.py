@@ -28,9 +28,6 @@ _base_env()
 def _git_env():
     """Try to infer some env from local git checkout."""
     env.git_rev = local('git rev-parse --short HEAD', capture=True)
-    env.git_branch = local('git symbolic-ref -q HEAD', capture=True)
-    env.git_branch = env.git_branch.split('/')
-    env.git_branch =  env.git_branch[-1]
 
 try:
     _git_env()
@@ -40,8 +37,8 @@ except:
 
 def _env_paths():
     """Set some env paths based on previously-generated env."""
-    env.build_dir = 'reserves-%(git_branch)s-%(git_rev)s' % env
-    env.tarball = 'reserves-%(git_branch)s-%(git_rev)s.tar.bz2' % env
+    env.build_dir = 'reserves-%(git_rev)s' % env
+    env.tarball = 'reserves-%(git_rev)s.tar.bz2' % env
 _env_paths()
 
 @task
@@ -69,7 +66,7 @@ def _fetch_source_from_git():
     local('rm -rf  build dist')
     local('mkdir -p build')
     local('rm -rf build/%(build_dir)s' % env)
-    local('git archive --output=build/%(build_dir)s.tar %(git_branch)s' % env)
+    local('git archive --output=build/%(build_dir)s.tar %(git_rev)s' % env)
 
 def _package_source():
     """Create a tarball of the source tree."""
