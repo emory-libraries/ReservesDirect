@@ -28,6 +28,7 @@ _base_env()
 def _git_env():
     """Try to infer some env from local git checkout."""
     env.git_rev = local('git rev-parse --short HEAD', capture=True)
+    env.version = local('cat VERSION', capture=True)
 
 try:
     _git_env()
@@ -37,8 +38,8 @@ except:
 
 def _env_paths():
     """Set some env paths based on previously-generated env."""
-    env.build_dir = 'reserves-%(git_rev)s' % env
-    env.tarball = 'reserves-%(git_rev)s.tar.bz2' % env
+    env.build_dir = 'reserves-%(version)s-%(git_rev)s' % env
+    env.tarball = 'reserves-%(version)s-%(git_rev)s.tar.bz2' % env
 _env_paths()
 
 @task
