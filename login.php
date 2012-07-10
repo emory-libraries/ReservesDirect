@@ -115,7 +115,7 @@ http://www.reservesdirect.org/
       <a target="_blank" href="http://oxford.library.emory.edu/services/course-reserves">Oxford College</a>
       </td></tr>
       <tr><td>
-      <a target="_blank" href= "http://www.pitts.emory.edu/services/facultysupport_reserves.cfm">Theology</a>
+      <a target="_blank" href= "http://www.pitts.emory.edu/research/faculty-support/facultysupport_reserves.cfm">Theology</a>
       </td></tr>
       </table>
 
