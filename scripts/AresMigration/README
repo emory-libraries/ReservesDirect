@@ -1,0 +1,11 @@
+Files in this directory are used for the Reserves to Ares migration.
+The data export is written in python.  This script requires the MySQL-python library.
+
+Data formats that are being createad are:
+Users
+Courses
+CourseUsers
+Items
+
+More info about these format can be found here: 
+https://prometheus.atlas-sys.com/display/Ares/Key+Ares+Data+Tables#KeyAresDataTables-Courses .
