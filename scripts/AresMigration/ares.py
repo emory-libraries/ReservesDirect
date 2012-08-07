@@ -6,13 +6,13 @@ from optparse import OptionParser
 from getpass import getpass
 
 
-#allowed values for -f flag
+# allowed values for -f flag
 allowed_types = ['users', 'courses', 'courseusers', 'items']
 
 
-def accounts():
-    print "IN ACCOUNT"
-
+# export user info
+def users():
+    print "IN USERS"
     headers = ['Username', 'LastName', 'FirstName', 'LibraryID', 'Address1', 'Address2', 'Address3', 'City', 'State', 'Zip', 
                'Department', 'Status', 'EMailAddress', 'Phone1', 'Phone2', 'UserType', 'Password', 'PasswordHint', 
                'LastChangedDate', 'LastLoginDate', 'Cleared', 'ExpirationDate', 'Trusted', 'AuthMethod', 
@@ -43,14 +43,44 @@ def accounts():
             
             
 
+# export course info
 def courses():
     print "IN COURSES"
+    headers = ['CourseID', 'Name', 'CourseCode', 'Description', 'URL', 'Semester', 
+               'StartDate', 'StopDate', 'Department', 'Instructor', 'CourseNumber', 
+               'CoursePassword', 'MaxCopyright', 'DefaultPickupSite', 'CourseEnrollment', 
+               'ExternalCourseId', 'RegistrarCourseId'] 
 
-def course_to_user():
-    print "IN COURSE TO USER"
+    query = ''' SELECT c.course_id, c.uniform_title name, d.abbreviation course_code, ci.activation_date start_date, 
+                    ci.expiration_date end_date,  c.course_number course_number, d.name department_name, CONCAT(u.first_name, u.last_name) instructor, ca.registrar_key registrar_key
+                FROM courses c
+                    JOIN departments d ON c.department_id = d.department_id
+                    JOIN course_aliases ca ON ca.course_id = c.course_id
+                    JOIN course_instances ci ON ci.primary_course_alias_id = ca.course_alias_id 
+                    JOIN access a ON a.alias_id = ca.course_alias_id
+                    JOIN users u ON u.user_id = a.user_id
+                WHERE u.dflt_permission_level = 3 '''
+             
+            
+    cursor = db.cursor (MySQLdb.cursors.DictCursor)
+    cursor.execute (query)
+    rows = cursor.fetchall()
 
-def documents():
-    print "IN DOCUMENTS"
+    with open('courses.csv', 'wb') as f:
+        writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL)
+        writer.writeheader()
+        for row in rows:
+            csv_row = {'CourseID': row['course_id'], 'Name': row['name'], 'CourseCode': row['course_code'], 
+                       'StartDate': row['start_date'], 'StopDate': row['end_date'], 'Department': row['department_name'], 
+                       'Instructor': row['instructor'], 'CourseNumber': row['course_number'], 
+                       'RegistrarCourseId': row['registrar_key']}
+            writer.writerow(csv_row)
+
+def course_user():
+    print "IN COURSEUSERS"
+
+def items():
+    print "IN ITEMS"
 
 
 if __name__=="__main__":
@@ -92,23 +122,13 @@ if __name__=="__main__":
         sys.exit (1) 
 
     #if not file types are specified run all else run only the ones specified
-    if not options.files or 'accounts' in options.files:
-        accounts()
+    if not options.files or 'users' in options.files:
+        users()
     if not options.files or 'courses' in options.files:
         courses()
-    if not options.files or 'coursetouser' in options.files:
-        course_to_user()
-    if not options.files or 'documents' in options.files:
-        documents()
+    if not options.files or 'courseusers' in options.files:
+        course_user()
+    if not options.files or 'items' in options.files:
+        items()
 
     db.close()
-
-
-#cursor = db.cursor (MySQLdb.cursors.DictCursor)
-#cursor.execute (query)
-#rows = cursor.fetchall()
-#
-#for row in rows:
-#    print row['registrar_key'] 
-#
-#db.close() 
