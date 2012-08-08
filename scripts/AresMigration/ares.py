@@ -41,7 +41,6 @@ def users():
                        'LibraryID': row['user_id'], 'EMailAddress': row['email'], 'UserType': row['usr_type'] }
             writer.writerow(csv_row)
             
-            
 
 # export course info
 def courses():
@@ -76,22 +75,21 @@ def courses():
                        'RegistrarCourseId': row['registrar_key']}
             writer.writerow(csv_row)
 
+# export course_user info
 def course_user():
     print "IN COURSEUSERS"
 
     headers = ['CourseID', 'Username', 'UserType']
 
-             
-            
 
     query = ''' SELECT ca.course_alias_id, u.username username
                 FROM courses c
-                JOIN course_aliases ca ON ca.course_id = c.course_id
-                JOIN course_instances ci ON ci.primary_course_alias_id = ca.course_alias_id
-                JOIN access a ON a.alias_id = ca.course_alias_id
-                JOIN users u ON u.user_id = a.user_id
-WHERE u.dflt_permission_level = 3
-AND u.username NOT LIKE '[tmp]%' '''
+                    JOIN course_aliases ca ON ca.course_id = c.course_id
+                    JOIN course_instances ci ON ci.primary_course_alias_id = ca.course_alias_id
+                    JOIN access a ON a.alias_id = ca.course_alias_id
+                    JOIN users u ON u.user_id = a.user_id
+                WHERE u.dflt_permission_level = 3
+                    AND u.username NOT LIKE '[tmp]%' '''
                
               
              
@@ -108,18 +106,34 @@ AND u.username NOT LIKE '[tmp]%' '''
 
 def items():
     print "IN ITEMS"
+    headers = []
 
+
+    query = ''' ''' 
+               
+              
+             
+    cursor = db.cursor (MySQLdb.cursors.DictCursor)
+    cursor.execute (query)
+    rows = cursor.fetchall()
+
+    with open('items.csv', 'wb') as f:
+        writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL)
+        writer.writeheader()
+        for row in rows:
+            csv_row = {}
+            writer.writerow(csv_row)
 
 if __name__=="__main__":
     #usage and options
-    usage = '%prog [options]\n Export RD data to CSV format. Specify -f for each file format. Default is all. \n Allowed values are: \n users, courses, courseusers, items' 
+    usage = '%prog [options]\n Export RD data to CSV format. Specify -f for each file format, Default is all formats. \n Allowed values for -f options are: \n users, courses, courseusers, items' 
     parser = OptionParser(usage)
     parser.add_option('--host', action='store', help='host of RD database')
     parser.add_option('--port', action='store', default=3306, help='port of RD database')
     parser.add_option('--username', action='store', help='username for RD database')
     parser.add_option('--password', action='store', help='password for RD database')
-    parser.add_option('--db', action='store', help='RD database to which to connect')
-    parser.add_option('-f', '--files', action='append', help='list of file formats to generate')
+    parser.add_option('--db', action='store', help='RD database')
+    parser.add_option('-f', '--file', action='append', help='list of file formats to generate. If none specified, all are generated')
     (options, args) = parser.parse_args()
 
 
@@ -130,6 +144,7 @@ if __name__=="__main__":
         parser.error('username must be specified')
     if not options.db:
         parser.error('db must be specified')
+    # accept password on command line or prompt if password is empty
     if options.password is None:
         parser.error('password must be specified. --password= will prompt for password')
     elif options.password=='':
@@ -137,7 +152,7 @@ if __name__=="__main__":
 
     #make sure all file types specified are vaalid
     if options.files:
-        for f in options.files:
+        for f in options.file:
             if f not in allowed_types:
                 parser.error("%s is not an allowed file type" % f)
 
@@ -148,14 +163,14 @@ if __name__=="__main__":
         print "Error %d: %s" % (e.args[0], e.args[1])  
         sys.exit (1) 
 
-    #if not file types are specified run all else run only the ones specified
-    if not options.files or 'users' in options.files:
+    #if no file types are specified run all else run only the ones specified
+    if not options.file or 'users' in options.file:
         users()
-    if not options.files or 'courses' in options.files:
+    if not options.file or 'courses' in options.file:
         courses()
-    if not options.files or 'courseusers' in options.files:
+    if not options.file or 'courseusers' in options.file:
         course_user()
-    if not options.files or 'items' in options.files:
+    if not options.file or 'items' in options.file:
         items()
 
     db.close()
