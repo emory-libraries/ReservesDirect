@@ -51,7 +51,7 @@ def courses():
                'CoursePassword', 'MaxCopyright', 'DefaultPickupSite', 'CourseEnrollment', 
                'ExternalCourseId', 'RegistrarCourseId'] 
 
-    query = ''' SELECT c.course_id, c.uniform_title name, d.abbreviation course_code, ci.activation_date start_date, 
+    query = ''' SELECT ca.course_alias_id, c.uniform_title name, d.abbreviation course_code, ci.activation_date start_date, 
                     ci.expiration_date end_date,  c.course_number course_number, d.name department_name, CONCAT(u.first_name, u.last_name) instructor, ca.registrar_key registrar_key
                 FROM courses c
                     JOIN departments d ON c.department_id = d.department_id
@@ -70,7 +70,7 @@ def courses():
         writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL)
         writer.writeheader()
         for row in rows:
-            csv_row = {'CourseID': row['course_id'], 'Name': row['name'], 'CourseCode': row['course_code'], 
+            csv_row = {'CourseID': row['course_alias_id'], 'Name': row['name'], 'CourseCode': row['course_code'], 
                        'StartDate': row['start_date'], 'StopDate': row['end_date'], 'Department': row['department_name'], 
                        'Instructor': row['instructor'], 'CourseNumber': row['course_number'], 
                        'RegistrarCourseId': row['registrar_key']}
@@ -78,6 +78,33 @@ def courses():
 
 def course_user():
     print "IN COURSEUSERS"
+
+    headers = ['CourseID', 'Username', 'UserType']
+
+             
+            
+
+    query = ''' SELECT ca.course_alias_id, u.username username
+                FROM courses c
+                JOIN course_aliases ca ON ca.course_id = c.course_id
+                JOIN course_instances ci ON ci.primary_course_alias_id = ca.course_alias_id
+                JOIN access a ON a.alias_id = ca.course_alias_id
+                JOIN users u ON u.user_id = a.user_id
+WHERE u.dflt_permission_level = 3
+AND u.username NOT LIKE '[tmp]%' '''
+               
+              
+             
+    cursor = db.cursor (MySQLdb.cursors.DictCursor)
+    cursor.execute (query)
+    rows = cursor.fetchall()
+
+    with open('course_user.csv', 'wb') as f:
+        writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL)
+        writer.writeheader()
+        for row in rows:
+            csv_row = {'CourseID': row['course_alias_id'], 'Username': row['username'], 'UserType': 'Instructor'}
+            writer.writerow(csv_row)
 
 def items():
     print "IN ITEMS"
