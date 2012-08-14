@@ -1,13 +1,24 @@
-import sys
 import csv
-import MySQLdb
-import MySQLdb.cursors
-from optparse import OptionParser
 from getpass import getpass
+import MySQLdb
+from optparse import OptionParser
+import MySQLdb.cursors
+import re
+import sys
 
 
 # allowed values for -f flag
 allowed_types = ['users', 'courses', 'courseusers', 'items']
+
+doc_types = { 'application/pdf': 'PDF',
+                'audio/x-pn-realaudio': 'RealAudio',
+                'video/quicktime': 'Quicktime Video',
+                'application/msword': 'Microsoft Word',
+                'application/vnd.ms-excel': 'Microsoft Excel',
+                'application/vnd.ms-powerpoint': 'Microsoft Powerpoint',
+                'text/html': 'WebLink',
+                'image/jpeg': 'Image'
+            }
 
 
 # export user info
@@ -104,15 +115,39 @@ def course_user():
             csv_row = {'CourseID': row['course_alias_id'], 'Username': row['username'], 'UserType': 'Instructor'}
             writer.writerow(csv_row)
 
+# export item data
 def items():
     print "IN ITEMS"
-    headers = []
+    headers = ['ItemID', 'Username', 'CourseID', 'PickupLocation', 'ProcessLocation',
+               'CurrentStatus', 'CurrentStatusDate', 'ItemType', 'DigitalItem', 'Location',
+               'AresDocument', 'InstructorProvided', 'CopyrightRequired', 'CopyrightObtained', 'VisibleToStudents',
+               'ActiveDate', 'InactiveDate', 'Callnumber', 'ReasonForCancellation', 'Proxy',
+               'Title', 'Author', 'Publisher', 'PubPlace', 'PubDate',
+               'Edition', 'ISXN', 'ESPNumber', 'CitedIn', 'DOI',
+               'ArticleTitle', 'Volume', 'Issue', 'JournalYear', 'JournalMonth',
+               'Pages', 'ShelfLocation', 'DocumentType', 'ItemFormat', 'Description',
+               'CCCNumber', 'LoanPeriod', 'Editor', 'ReferenceNumber', 'ItemBarcode',
+               'NeededBy', 'PagesEntireWork', 'PageCount', 'NatureOfWork', 'SortOrder',
+               'ItemInfo1', 'ItemInfo2', 'ItemInfo3', 'ItemInfo4', 'ItemInfo5']
 
 
-    query = ''' ''' 
+    query = ''' SELECT i.item_id, ca.course_alias_id, i.status, IF(i.item_group='ELECTRONIC', 1, 0) digital, i.url,
+                       r.activation_date, r.expiration, i.title, i.author, i.publisher, i.volume_title, i.material_type,
+                       r.requested_loan_period, i.pages_times_range, i.pages_times_total, i.pages_times_used, pc.call_number,
+                       pc.barcode, i.local_control_key, OCLC, m.mimetype, i.volume_edition, l.reserve_desk, i.issn, i.isbn, i.source
+                FROM reserves r
+                    JOIN course_instances ci ON r.course_instance_id = ci.course_instance_id
+                    JOIN course_aliases ca ON ci.primary_course_alias_id = ca.course_alias_id
+                    JOIN items i ON i.item_id = r.item_id 
+                    JOIN physical_copies pc ON pc.reserve_id = r.reserve_id  AND pc.item_id = i.item_id
+                    JOIN mimetypes m ON i.mimetype = m.mimetype_id
+                    JOIN libraries l ON i.home_library = l.library_id 
+                WHERE i.item_group IN ('MONOGRAPH', 'MULTIMEDIA', 'ELECTRONIC')
+                    AND i.status = 'ACTIVE'; ''' 
                
               
              
+    year_p = re.compile('\d{4}') # pattern of year - used to search source field
     cursor = db.cursor (MySQLdb.cursors.DictCursor)
     cursor.execute (query)
     rows = cursor.fetchall()
@@ -121,7 +156,61 @@ def items():
         writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL)
         writer.writeheader()
         for row in rows:
-            csv_row = {}
+            #grab digital value to do some specal logic with type and location
+            digital = row['digital']
+            if digital == 1:
+                item_type = ''
+                location = row['url']
+            else:
+                item_type='MON'
+                location = ''
+
+            #validate control key and skip item if it is not valid
+            control_key = row['local_control_key'] 
+            oclc = row['OCLC'] 
+            if not control_key or control_key[:3] not in ['ocm', 'ocn'] or (not oclc or not control_key.endswith(oclc) ):
+                print "WARNING: control_key: %s is not valid for item %s with OCLC: %s" % (control_key, row['item_id'], oclc)
+                continue
+             
+            # get isbn or issn field based on material_type
+            material_type = row['material_type']
+            if material_type and 'BOOK' in material_type:
+                isxn = row['isbn']
+            elif material_type and material_type == 'JOURNAL_ARTICLE':
+                isxn = row['issn']
+            else:
+                isxn = ''
+
+            mime_type = row['mimetype']
+            # AresDocument is true if pdf file
+            ares_doc = 1 if mime_type.endswith('pdf') else 0
+
+            # translate mimetype to DocumentType
+            doc_type = doc_types.get(mime_type, '')
+
+            # search source field to try to find a year
+            source = row['source']
+            result = re.search(year_p, source)
+            if result:
+                journal_year = result.group()
+            else:
+                journal_year = ''
+
+
+            csv_row = {'ItemID': row['item_id'], 'CourseID': row['course_alias_id'], 'CurrentStatus': row['status'],
+                       'ItemType': item_type, 'DigitalItem': digital, 'Location': location,  
+                       'AresDocument': ares_doc, 'InstructorProvided': '1', 'CopyrightRequired': '1', 
+                       'CopyrightObtained': '1', 'VisibleToStudents': '1', 
+                       'ActiveDate': row['activation_date'], 'InactiveDate': row['expiration'], 'Proxy': '0',
+                       'Title': row['title'], 'Author': row['author'], 'Publisher': row['publisher'],
+                       'ArticleTitle': row['title'], 'Volume': row['volume_title'], 'ItemFormat': row['material_type'],
+                       'LoanPeriod': row['requested_loan_period'], 'Pages': row['pages_times_range'], 
+                       'PagesEntireWork': row['pages_times_total'], 'PageCount': row['pages_times_used'],
+                       'Callnumber': row['call_number'], 'ItemBarcode': row['barcode'], 'ReferenceNumber': control_key,
+                       'DocumentType': doc_type, 'Issue': row['volume_edition'], 'ShelfLocation': row['reserve_desk'],
+                       'ISXN': isxn, 'JournalYear': journal_year
+                       
+                      }
             writer.writerow(csv_row)
 
 if __name__=="__main__":
@@ -151,7 +240,7 @@ if __name__=="__main__":
         setattr(parser.values, 'password', getpass())
 
     #make sure all file types specified are vaalid
-    if options.files:
+    if options.file:
         for f in options.file:
             if f not in allowed_types:
                 parser.error("%s is not an allowed file type" % f)
