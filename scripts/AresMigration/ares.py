@@ -61,7 +61,8 @@ def courses():
                'CoursePassword', 'MaxCopyright', 'DefaultPickupSite', 'CourseEnrollment', 
                'ExternalCourseId', 'RegistrarCourseId'] 
 
-    query = ''' SELECT ca.course_alias_id, c.uniform_title name, d.abbreviation course_code, ci.activation_date start_date, 
+    # only instructors from 2010-08-01 forward
+    query = ''' SELECT DISTINCT ca.course_alias_id, c.uniform_title name, d.abbreviation course_code, ci.activation_date start_date, 
                     ci.expiration_date end_date,  c.course_number course_number, d.name department_name, CONCAT(u.first_name, u.last_name) instructor, ca.registrar_key registrar_key
                 FROM courses c
                     JOIN departments d ON c.department_id = d.department_id
@@ -69,7 +70,8 @@ def courses():
                     JOIN course_instances ci ON ci.primary_course_alias_id = ca.course_alias_id 
                     JOIN access a ON a.alias_id = ca.course_alias_id
                     JOIN users u ON u.user_id = a.user_id
-                WHERE u.dflt_permission_level = 3 '''
+                WHERE u.dflt_permission_level = 3 
+                    AND ci.activation_date >= '2010-08-01' '''
              
             
     cursor = db.cursor (MySQLdb.cursors.DictCursor)
@@ -93,14 +95,16 @@ def course_user():
     headers = ['CourseID', 'Username', 'UserType']
 
 
-    query = ''' SELECT ca.course_alias_id, u.username username
+    # select courses from 2010-08-01 forward
+    query = ''' SELECT DISTINCT ca.course_alias_id, u.username username
                 FROM courses c
                     JOIN course_aliases ca ON ca.course_id = c.course_id
                     JOIN course_instances ci ON ci.primary_course_alias_id = ca.course_alias_id
                     JOIN access a ON a.alias_id = ca.course_alias_id
                     JOIN users u ON u.user_id = a.user_id
                 WHERE u.dflt_permission_level = 3
-                    AND u.username NOT LIKE '[tmp]%' '''
+                    AND u.username NOT LIKE '[tmp]%'  
+                    AND ci.activation_date >= '2010-08-01' '''
                
               
              
@@ -131,7 +135,8 @@ def items():
                'ItemInfo1', 'ItemInfo2', 'ItemInfo3', 'ItemInfo4', 'ItemInfo5']
 
 
-    query = ''' SELECT i.item_id, ca.course_alias_id, i.status, IF(i.item_group='ELECTRONIC', 1, 0) digital, i.url,
+    # select items from 2010-08-01 forward
+    query = ''' SELECT DISTINCT i.item_id, ca.course_alias_id, i.status, IF(i.item_group='ELECTRONIC', 1, 0) digital, i.url,
                        r.activation_date, r.expiration, i.title, i.author, i.publisher, i.volume_title, i.material_type,
                        r.requested_loan_period, i.pages_times_range, i.pages_times_total, i.pages_times_used, pc.call_number,
                        pc.barcode, i.local_control_key, OCLC, m.mimetype, i.volume_edition, l.reserve_desk, i.issn, i.isbn, i.source
@@ -139,11 +144,12 @@ def items():
                     JOIN course_instances ci ON r.course_instance_id = ci.course_instance_id
                     JOIN course_aliases ca ON ci.primary_course_alias_id = ca.course_alias_id
                     JOIN items i ON i.item_id = r.item_id 
-                    JOIN physical_copies pc ON pc.reserve_id = r.reserve_id  AND pc.item_id = i.item_id
-                    JOIN mimetypes m ON i.mimetype = m.mimetype_id
-                    JOIN libraries l ON i.home_library = l.library_id 
+                    LEFT JOIN physical_copies pc ON pc.reserve_id = r.reserve_id  AND pc.item_id = i.item_id
+                    LEFT JOIN mimetypes m ON i.mimetype = m.mimetype_id
+                    LEFT JOIN libraries l ON i.home_library = l.library_id 
                 WHERE i.item_group IN ('MONOGRAPH', 'MULTIMEDIA', 'ELECTRONIC')
-                    AND i.status = 'ACTIVE'; ''' 
+                    AND i.status = 'ACTIVE' 
+                    AND ci.activation_date >= '2010-08-01' ''' 
                
               
              
@@ -168,7 +174,7 @@ def items():
             #validate control key and skip item if it is not valid
             control_key = row['local_control_key'] 
             oclc = row['OCLC'] 
-            if not control_key or control_key[:3] not in ['ocm', 'ocn'] or (not oclc or not control_key.endswith(oclc) ):
+            if not digital and (not control_key or control_key[:3] not in ['ocm', 'ocn'] or (not oclc or not control_key.endswith(oclc) )):
                 print "WARNING: control_key: %s is not valid for item %s with OCLC: %s" % (control_key, row['item_id'], oclc)
                 continue
              
@@ -183,14 +189,14 @@ def items():
 
             mime_type = row['mimetype']
             # AresDocument is true if pdf file
-            ares_doc = 1 if mime_type.endswith('pdf') else 0
+            ares_doc = 1 if mime_type and mime_type.endswith('pdf') else 0
 
             # translate mimetype to DocumentType
             doc_type = doc_types.get(mime_type, '')
 
             # search source field to try to find a year
             source = row['source']
-            result = re.search(year_p, source)
+            result = re.search(year_p, source) if source else ''
             if result:
                 journal_year = result.group()
             else:
