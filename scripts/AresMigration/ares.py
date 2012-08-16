@@ -1,3 +1,4 @@
+from collections import defaultdict
 import csv
 from getpass import getpass
 import MySQLdb
@@ -6,6 +7,8 @@ import MySQLdb.cursors
 import re
 import sys
 
+# record counts
+records = defaultdict(int)
 
 # allowed values for -f flag
 allowed_types = ['users', 'courses', 'courseusers', 'items']
@@ -50,6 +53,7 @@ def users():
             csv_row = {'Username': row['username'], 'LastName': row['last_name'], 'FirstName': row['first_name'], 
                        'LibraryID': row['user_id'], 'EMailAddress': row['email'], 'UserType': row['usr_type'] }
             writer.writerow(csv_row)
+            records['users'] +=1 
             
 
 # export course info
@@ -85,6 +89,7 @@ def courses():
                        'Instructor': row['instructor'], 'CourseNumber': row['course_number'], 
                        'RegistrarCourseId': row['registrar_key']}
             writer.writerow(csv_row)
+            records['courses'] +=1 
 
 # export course_user info
 def course_user():
@@ -115,6 +120,7 @@ def course_user():
         for row in rows:
             csv_row = {'CourseID': row['course_alias_id'], 'Username': row['username'], 'UserType': 'Instructor'}
             writer.writerow(csv_row)
+            records['course_user'] +=1
 
 # export item data
 def items():
@@ -207,6 +213,7 @@ def items():
                        
                       }
             writer.writerow(csv_row)
+            records['items'] +=1
 
 if __name__=="__main__":
     #usage and options
@@ -258,3 +265,8 @@ if __name__=="__main__":
         items()
 
     db.close()
+
+
+    print "Summary:"
+    for file, count in records.iteritems():
+        print "%s: %s"  % (file, count)
