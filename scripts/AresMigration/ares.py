@@ -23,7 +23,6 @@ doc_types = { 'application/pdf': 'PDF',
 
 # export user info
 def users():
-    print "IN USERS"
     headers = ['Username', 'LastName', 'FirstName', 'LibraryID', 'Address1', 'Address2', 'Address3', 'City', 'State', 'Zip', 
                'Department', 'Status', 'EMailAddress', 'Phone1', 'Phone2', 'UserType', 'Password', 'PasswordHint', 
                'LastChangedDate', 'LastLoginDate', 'Cleared', 'ExpirationDate', 'Trusted', 'AuthMethod', 
@@ -55,7 +54,6 @@ def users():
 
 # export course info
 def courses():
-    print "IN COURSES"
     headers = ['CourseID', 'Name', 'CourseCode', 'Description', 'URL', 'Semester', 
                'StartDate', 'StopDate', 'Department', 'Instructor', 'CourseNumber', 
                'CoursePassword', 'MaxCopyright', 'DefaultPickupSite', 'CourseEnrollment', 
@@ -90,7 +88,6 @@ def courses():
 
 # export course_user info
 def course_user():
-    print "IN COURSEUSERS"
 
     headers = ['CourseID', 'Username', 'UserType']
 
@@ -121,7 +118,6 @@ def course_user():
 
 # export item data
 def items():
-    print "IN ITEMS"
     headers = ['ItemID', 'Username', 'CourseID', 'PickupLocation', 'ProcessLocation',
                'CurrentStatus', 'CurrentStatusDate', 'ItemType', 'DigitalItem', 'Location',
                'AresDocument', 'InstructorProvided', 'CopyrightRequired', 'CopyrightObtained', 'VisibleToStudents',
@@ -171,13 +167,6 @@ def items():
                 item_type='MON'
                 location = ''
 
-            #validate control key and skip item if it is not valid
-            control_key = row['local_control_key'] 
-            oclc = row['OCLC'] 
-            if not digital and (not control_key or control_key[:3] not in ['ocm', 'ocn'] or (not oclc or not control_key.endswith(oclc) )):
-                print "WARNING: control_key: %s is not valid for item %s with OCLC: %s" % (control_key, row['item_id'], oclc)
-                continue
-             
             # get isbn or issn field based on material_type
             material_type = row['material_type']
             if material_type and 'BOOK' in material_type:
@@ -212,7 +201,7 @@ def items():
                        'ArticleTitle': row['title'], 'Volume': row['volume_title'], 'ItemFormat': row['material_type'],
                        'LoanPeriod': row['requested_loan_period'], 'Pages': row['pages_times_range'], 
                        'PagesEntireWork': row['pages_times_total'], 'PageCount': row['pages_times_used'],
-                       'Callnumber': row['call_number'], 'ItemBarcode': row['barcode'], 'ReferenceNumber': control_key,
+                       'Callnumber': row['call_number'], 'ItemBarcode': row['barcode'], 'ReferenceNumber': row['local_control_key'],
                        'DocumentType': doc_type, 'Issue': row['volume_edition'], 'ShelfLocation': row['reserve_desk'],
                        'ISXN': isxn, 'JournalYear': journal_year
                        
