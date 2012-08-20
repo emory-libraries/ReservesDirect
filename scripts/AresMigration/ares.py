@@ -20,8 +20,13 @@ doc_types = { 'application/pdf': 'PDF',
                 'application/vnd.ms-excel': 'Microsoft Excel',
                 'application/vnd.ms-powerpoint': 'Microsoft Powerpoint',
                 'text/html': 'WebLink',
-                'image/jpeg': 'Image'
-            }
+                'image/jpeg': 'Image'}
+
+
+semester_codes={'0':'INTERIM', 
+                '1':'SPRING', 
+                '6':'SUMMER', 
+                '9':'FALL'}
 
 
 # export user info
@@ -84,10 +89,20 @@ def courses():
         writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL)
         writer.writeheader()
         for row in rows:
+
+            #decode register key into semester info
+            registrar_key = row['registrar_key']
+            # assume key starts with 5 which is 21st century which is year 20XX then add last two digits of year.
+            if registrar_key:
+                semester = "20%s" % registrar_key[1:3] 
+                semester = "%s %s" % (semester_codes[registrar_key[3:4]], semester)
+            else:
+                semester = ''
+
             csv_row = {'CourseID': row['course_alias_id'], 'Name': row['name'], 'CourseCode': row['course_code'], 
                        'StartDate': row['start_date'], 'StopDate': row['end_date'], 'Department': row['department_name'], 
                        'Instructor': row['instructor'], 'CourseNumber': row['course_number'], 
-                       'RegistrarCourseId': row['registrar_key']}
+                       'RegistrarCourseId': registrar_key, 'Semester': semester}
             writer.writerow(csv_row)
             records['courses'] +=1 
 
