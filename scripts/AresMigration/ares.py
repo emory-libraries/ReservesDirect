@@ -6,6 +6,7 @@ from optparse import OptionParser
 import MySQLdb.cursors
 import re
 import sys
+import time
 
 # record counts
 records = defaultdict(int)
@@ -68,7 +69,7 @@ def courses():
                'CoursePassword', 'MaxCopyright', 'DefaultPickupSite', 'CourseEnrollment', 
                'ExternalCourseId', 'RegistrarCourseId'] 
 
-    # only instructors from 2010-08-01 forward
+    # only instructors from date specified forward
     query = ''' SELECT DISTINCT ca.course_alias_id, c.uniform_title name, d.abbreviation course_code, ci.activation_date start_date, 
                     ci.expiration_date end_date,  c.course_number course_number, d.name department_name, CONCAT(u.first_name, u.last_name) instructor, ca.registrar_key registrar_key
                 FROM courses c
@@ -78,11 +79,11 @@ def courses():
                     JOIN access a ON a.alias_id = ca.course_alias_id
                     JOIN users u ON u.user_id = a.user_id
                 WHERE u.dflt_permission_level = 3 
-                    AND ci.activation_date >= '2010-08-01' '''
+                    AND ci.activation_date >= %s '''
              
             
     cursor = db.cursor (MySQLdb.cursors.DictCursor)
-    cursor.execute (query)
+    cursor.execute (query, options.date)
     rows = cursor.fetchall()
 
     with open('courses.csv', 'wb') as f:
@@ -112,7 +113,7 @@ def course_user():
     headers = ['CourseID', 'Username', 'UserType']
 
 
-    # select courses from 2010-08-01 forward
+    # select courses from specified date forward
     query = ''' SELECT DISTINCT ca.course_alias_id, u.username username
                 FROM courses c
                     JOIN course_aliases ca ON ca.course_id = c.course_id
@@ -120,13 +121,13 @@ def course_user():
                     JOIN access a ON a.alias_id = ca.course_alias_id
                     JOIN users u ON u.user_id = a.user_id
                 WHERE u.dflt_permission_level = 3
-                    AND u.username NOT LIKE '[tmp]%'  
-                    AND ci.activation_date >= '2010-08-01' '''
+                    AND u.username NOT LIKE '[tmp]%%'  
+                    AND ci.activation_date >= %s '''
                
               
              
     cursor = db.cursor (MySQLdb.cursors.DictCursor)
-    cursor.execute (query)
+    cursor.execute (query, (options.date))
     rows = cursor.fetchall()
 
     with open('course_user.csv', 'wb') as f:
@@ -152,7 +153,7 @@ def items():
                'ItemInfo1', 'ItemInfo2', 'ItemInfo3', 'ItemInfo4', 'ItemInfo5']
 
 
-    # select items from 2010-08-01 forward
+    # select items from specified forward
     query = ''' SELECT DISTINCT i.item_id, ca.course_alias_id, i.status, IF(i.item_group='ELECTRONIC', 1, 0) digital, i.url,
                        r.activation_date, r.expiration, i.title, i.author, i.publisher, i.volume_title, i.material_type,
                        r.requested_loan_period, i.pages_times_range, i.pages_times_total, i.pages_times_used, pc.call_number,
@@ -166,13 +167,13 @@ def items():
                     LEFT JOIN libraries l ON i.home_library = l.library_id 
                 WHERE i.item_group IN ('MONOGRAPH', 'MULTIMEDIA', 'ELECTRONIC')
                     AND i.status = 'ACTIVE' 
-                    AND ci.activation_date >= '2010-08-01' ''' 
+                    AND ci.activation_date >= %s '''
                
               
              
     year_p = re.compile('\d{4}') # pattern of year - used to search source field
     cursor = db.cursor (MySQLdb.cursors.DictCursor)
-    cursor.execute (query)
+    cursor.execute (query, options.date)
     rows = cursor.fetchall()
 
     with open('items.csv', 'wb') as f:
@@ -240,6 +241,7 @@ if __name__=="__main__":
     parser.add_option('--password', action='store', help='password for RD database (required) --password= will prompt for password')
     parser.add_option('--db', action='store', help='RD database (required)')
     parser.add_option('-f', '--file', action='append', help='list of file formats to generate (optional). If none specified, all formats are generated')
+    parser.add_option('-d', '--date', action='store', default='2010-08-01', help="Earliest activation date to query. Must use format 'yyyy-mm-dd'. (optional). default:'2010-08-01'")
     (options, args) = parser.parse_args()
 
 
@@ -256,11 +258,27 @@ if __name__=="__main__":
     elif options.password=='':
         setattr(parser.values, 'password', getpass())
 
-    #make sure all file types specified are vaalid
+    # make sure all file types specified are vaalid
     if options.file:
         for f in options.file:
             if f not in allowed_types:
                 parser.error("%s is not an allowed file type" % f)
+
+    # validate date if entered 
+    if options.date:
+        try:
+            time.strptime(options.date, '%Y-%m-%d')
+        except:
+            parser.error("date entered is invalid or in the wrong format use ('yyyy-mm-dd')")
+
+    # print settings specified
+    print "Connecting to database %s %s@%s:%s" % (options.db, options.username, options.host, options.port)
+    print "Using activation_date %s" % (options.date)
+    if options.file:
+        print "Generating file(s) %s" % (', '.join(options.file))
+    else:
+        print "Generating file(s) %s" % (', '.join(allowed_types))
+
 
     #connect to the Database
     try:  
