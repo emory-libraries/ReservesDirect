@@ -236,7 +236,7 @@ if __name__=="__main__":
     usage = '%prog [options]\n Export RD data to CSV format. Specify -f for each file format, Default is all formats. \n Allowed values for -f options are: ' + ', '.join(allowed_types) 
     parser = OptionParser(usage)
     parser.add_option('--host', action='store', help='host of RD database (required)')
-    parser.add_option('--port', action='store', default=3306, help='port of RD database (required)')
+    parser.add_option('--port', action='store', default=3306, help='port of RD database (optional)')
     parser.add_option('--username', action='store', help='username for RD database (required)')
     parser.add_option('--password', action='store', help='password for RD database (required) --password= will prompt for password')
     parser.add_option('--db', action='store', help='RD database (required)')
