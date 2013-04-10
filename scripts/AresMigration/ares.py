@@ -57,7 +57,7 @@ def users():
         writer.writeheader()
         for row in rows:
             csv_row = {'Username': row['username'], 'LastName': row['last_name'], 'FirstName': row['first_name'], 
-                       'LibraryID': row['user_id'], 'EMailAddress': row['email'], 'UserType': row['usr_type'] }
+                       'LibraryID': row['username'], 'EMailAddress': row['email'], 'UserType': row['usr_type'] }
             writer.writerow(csv_row)
             records['users'] +=1 
             
