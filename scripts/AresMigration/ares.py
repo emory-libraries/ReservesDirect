@@ -1,3 +1,10 @@
+# 0 - Student
+# 2 - Custodian
+# 3 - Instructor
+# 4 - Staff
+# 5 - Admin
+
+
 from collections import defaultdict
 import csv
 from getpass import getpass
@@ -39,14 +46,16 @@ def users():
                'UserInfo1', 'UserInfo2', 'UserInfo3', 'UserInfo4', 'UserInfo5']
 
 
-    # Only select Instructors
+    # Only select Instructors, Staff, Admin
     # Leave CASE clause so logic can be changed more eaisly
     query = ''' SELECT username, user_id, first_name, last_name, email,
              CASE dflt_permission_level
                   WHEN 3 THEN 'Instructor'
+                  WHEN 4 THEN 'Staff'
+                  WHEN 5 THEN 'Admin'
              END AS usr_type
              FROM users
-             WHERE dflt_permission_level = 3 AND username NOT LIKE '[tmp]%' '''
+             WHERE dflt_permission_level in (3, 4, 5) AND username NOT LIKE '[tmp]%' '''
 
     cursor = db.cursor (MySQLdb.cursors.DictCursor)
     cursor.execute (query)
@@ -69,7 +78,7 @@ def courses():
                'CoursePassword', 'MaxCopyright', 'DefaultPickupSite', 'CourseEnrollment', 
                'ExternalCourseId', 'RegistrarCourseId'] 
 
-    # only instructors from date specified forward
+    # only instructors, Staff, Admin courses from date specified forward
     query = ''' SELECT DISTINCT ca.course_alias_id, c.uniform_title name, d.abbreviation course_code, ci.activation_date start_date, 
                     ci.expiration_date end_date,  c.course_number course_number, d.name department_name, CONCAT(u.first_name, u.last_name) instructor, ca.registrar_key registrar_key
                 FROM courses c
@@ -78,7 +87,7 @@ def courses():
                     JOIN course_instances ci ON ci.primary_course_alias_id = ca.course_alias_id 
                     JOIN access a ON a.alias_id = ca.course_alias_id
                     JOIN users u ON u.user_id = a.user_id
-                WHERE u.dflt_permission_level = 3 
+                WHERE u.dflt_permission_level in (3, 4, 5) 
                     AND ci.activation_date >= %s '''
              
             
@@ -113,14 +122,19 @@ def course_user():
     headers = ['CourseID', 'Username', 'UserType']
 
 
-    # select courses from specified date forward
-    query = ''' SELECT DISTINCT ca.course_alias_id, u.username username
+    # select course_userss for Instructors, Staff, Admin from specified date forward
+    query = ''' SELECT DISTINCT ca.course_alias_id, u.username username,
+                    CASE u.dflt_permission_level
+                      WHEN 3 THEN 'Instructor'
+                      WHEN 4 THEN 'Staff'
+                      WHEN 5 THEN 'Admin'
+                    END AS usr_type
                 FROM courses c
                     JOIN course_aliases ca ON ca.course_id = c.course_id
                     JOIN course_instances ci ON ci.primary_course_alias_id = ca.course_alias_id
                     JOIN access a ON a.alias_id = ca.course_alias_id
                     JOIN users u ON u.user_id = a.user_id
-                WHERE u.dflt_permission_level = 3
+                WHERE u.dflt_permission_level in (3, 4, 5)
                     AND u.username NOT LIKE '[tmp]%%'  
                     AND ci.activation_date >= %s '''
                
@@ -134,7 +148,7 @@ def course_user():
         writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL)
         writer.writeheader()
         for row in rows:
-            csv_row = {'CourseID': row['course_alias_id'], 'Username': row['username'], 'UserType': 'Instructor'}
+            csv_row = {'CourseID': row['course_alias_id'], 'Username': row['username'], 'UserType': row['usr_type']}
             writer.writerow(csv_row)
             records['course_user'] +=1
 
@@ -153,7 +167,7 @@ def items():
                'ItemInfo1', 'ItemInfo2', 'ItemInfo3', 'ItemInfo4', 'ItemInfo5']
 
 
-    # select items from specified forward
+    # select items from specified date forward
     query = ''' SELECT DISTINCT i.item_id, ca.course_alias_id, i.status, IF(i.item_group='ELECTRONIC', 1, 0) digital, i.url,
                        r.activation_date, r.expiration, i.title, i.author, i.publisher, i.volume_title, i.material_type,
                        r.requested_loan_period, i.pages_times_range, i.pages_times_total, i.pages_times_used, pc.call_number,
