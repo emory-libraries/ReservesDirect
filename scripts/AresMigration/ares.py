@@ -55,7 +55,9 @@ def users():
                   WHEN 5 THEN 'Admin'
              END AS usr_type
              FROM users
-             WHERE dflt_permission_level in (3, 4, 5) AND username NOT LIKE '[tmp]%' '''
+             WHERE dflt_permission_level IN (3, 4, 5) 
+                 AND ((TRIM(first_name) != '' AND  first_name IS NOT NULL) OR (TRIM(last_name) != '' AND  last_name IS NOT NULL))
+                 AND username NOT LIKE '[tmp]%' ''' 
 
     cursor = db.cursor (MySQLdb.cursors.DictCursor)
     cursor.execute (query)
@@ -80,14 +82,17 @@ def courses():
 
     # only instructors, Staff, Admin courses from date specified forward
     query = ''' SELECT DISTINCT ca.course_alias_id, c.uniform_title name, d.abbreviation course_code, ci.activation_date start_date, 
-                    ci.expiration_date end_date,  c.course_number course_number, d.name department_name, CONCAT(u.first_name, u.last_name) instructor, ca.registrar_key registrar_key
+                    ci.expiration_date end_date,  c.course_number course_number, d.name department_name, 
+                    CONCAT(IFNULL(u.first_name, ''), ' ',  IFNULL(u.last_name, '')) instructor, ca.registrar_key registrar_key
                 FROM courses c
                     JOIN departments d ON c.department_id = d.department_id
                     JOIN course_aliases ca ON ca.course_id = c.course_id
                     JOIN course_instances ci ON ci.primary_course_alias_id = ca.course_alias_id 
                     JOIN access a ON a.alias_id = ca.course_alias_id
                     JOIN users u ON u.user_id = a.user_id
-                WHERE u.dflt_permission_level in (3, 4, 5) 
+                WHERE u.dflt_permission_level IN (3, 4, 5) 
+                    AND ((TRIM(u.first_name) != '' AND  u.first_name IS NOT NULL) OR (TRIM(u.last_name) != '' AND  u.last_name IS NOT NULL))
+                    AND username NOT LIKE '[tmp]%%' 
                     AND ci.activation_date >= %s '''
              
             
@@ -134,7 +139,8 @@ def course_user():
                     JOIN course_instances ci ON ci.primary_course_alias_id = ca.course_alias_id
                     JOIN access a ON a.alias_id = ca.course_alias_id
                     JOIN users u ON u.user_id = a.user_id
-                WHERE u.dflt_permission_level in (3, 4, 5)
+                WHERE u.dflt_permission_level IN (3, 4, 5)
+                    AND ((TRIM(u.first_name) != '' AND  u.first_name IS NOT NULL) OR (TRIM(u.last_name) != '' AND  u.last_name IS NOT NULL))
                     AND u.username NOT LIKE '[tmp]%%'  
                     AND ci.activation_date >= %s '''
                
