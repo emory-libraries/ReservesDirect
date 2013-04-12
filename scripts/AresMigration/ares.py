@@ -83,13 +83,24 @@ def courses():
     # only instructors, Staff, Admin courses from date specified forward
     query = ''' SELECT DISTINCT ca.course_alias_id, c.uniform_title name, d.abbreviation course_code, ci.activation_date start_date, 
                     ci.expiration_date end_date,  c.course_number course_number, d.name department_name, 
-                    CONCAT(IFNULL(u.first_name, ''), ' ',  IFNULL(u.last_name, '')) instructor, ca.registrar_key registrar_key
+                    CONCAT(IFNULL(u.first_name, ''), ' ',  IFNULL(u.last_name, '')) instructor, ca.registrar_key registrar_key,
+                    CASE l.ils_prefix
+                        WHEN 'GEN' THEN 'GEN'
+                        WHEN 'BUS' THEN 'BUS'
+                        WHEN 'MM' THEN 'MUS'
+                        WHEN 'HEALTH' THEN 'HEA'
+                        WHEN 'OXF' THEN 'OX'
+                        WHEN 'CHEM' THEN 'CHEM'
+                        WHEN 'THE' THEN 'THEO'
+                        WHEN 'LAW' THEN 'LAW'
+		    END as default_pickup
                 FROM courses c
                     JOIN departments d ON c.department_id = d.department_id
                     JOIN course_aliases ca ON ca.course_id = c.course_id
                     JOIN course_instances ci ON ci.primary_course_alias_id = ca.course_alias_id 
                     JOIN access a ON a.alias_id = ca.course_alias_id
                     JOIN users u ON u.user_id = a.user_id
+                    JOIN libraries l ON d.library_id = l.library_id
                 WHERE u.dflt_permission_level IN (3, 4, 5) 
                     AND ((TRIM(u.first_name) != '' AND  u.first_name IS NOT NULL) OR (TRIM(u.last_name) != '' AND  u.last_name IS NOT NULL))
                     AND username NOT LIKE '[tmp]%%' 
@@ -117,7 +128,7 @@ def courses():
             csv_row = {'CourseID': row['course_alias_id'], 'Name': row['name'], 'CourseCode': row['course_code'], 
                        'StartDate': row['start_date'], 'StopDate': row['end_date'], 'Department': row['department_name'], 
                        'Instructor': row['instructor'], 'CourseNumber': row['course_number'], 
-                       'RegistrarCourseId': registrar_key, 'Semester': semester}
+                       'RegistrarCourseId': registrar_key, 'Semester': semester, 'DefaultPickupSite': row['default_pickup']}
             writer.writerow(csv_row)
             records['courses'] +=1 
 
