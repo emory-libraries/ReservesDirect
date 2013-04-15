@@ -193,7 +193,7 @@ def items():
                     JOIN course_instances ci ON r.course_instance_id = ci.course_instance_id
                     JOIN course_aliases ca ON ci.primary_course_alias_id = ca.course_alias_id
                     JOIN items i ON i.item_id = r.item_id 
-                    LEFT JOIN physical_copies pc ON pc.reserve_id = r.reserve_id  AND pc.item_id = i.item_id
+                    JOIN physical_copies pc ON pc.item_id = i.item_id
                     LEFT JOIN mimetypes m ON i.mimetype = m.mimetype_id
                     LEFT JOIN libraries l ON i.home_library = l.library_id 
                 WHERE i.item_group IN ('MONOGRAPH', 'MULTIMEDIA', 'ELECTRONIC')
@@ -238,10 +238,18 @@ def items():
 
             # search source field to try to find a year
             source = row['source']
+            format = row['material_type']
             result = re.search(year_p, source) if source else ''
             if result:
-                journal_year = result.group()
+                if format == 'JOURNAL_ARTICLE':
+                    pub_year = ''
+                    journal_year = result.group()
+                else:
+                    pub_year = result.group()
+                    journal_year = ''
+
             else:
+                pub_year = ''
                 journal_year = ''
 
 
@@ -250,15 +258,13 @@ def items():
                        'AresDocument': ares_doc, 'InstructorProvided': '1', 'CopyrightRequired': '1', 
                        'CopyrightObtained': '1', 'VisibleToStudents': '1', 
                        'ActiveDate': row['activation_date'], 'InactiveDate': row['expiration'], 'Proxy': '0',
-                       'Title': row['title'], 'Author': row['author'], 'Publisher': row['publisher'],
-                       'ArticleTitle': row['title'], 'Volume': row['volume_title'], 'ItemFormat': row['material_type'],
+                       'Author': row['author'], 'Publisher': row['publisher'],
+                       'ArticleTitle': row['title'], 'Title': row['volume_title'], 'ItemFormat': row['material_type'],
                        'LoanPeriod': row['requested_loan_period'], 'Pages': row['pages_times_range'], 
                        'PagesEntireWork': row['pages_times_total'], 'PageCount': row['pages_times_used'],
-                       'Callnumber': row['call_number'], 'ItemBarcode': row['barcode'], 'ReferenceNumber': row['local_control_key'],
-                       'DocumentType': doc_type, 'Issue': row['volume_edition'], 'ShelfLocation': row['reserve_desk'],
-                       'ISXN': isxn, 'JournalYear': journal_year
-                       
-                      }
+                       'Callnumber': row['call_number'], 'ItemBarcode': row['barcode'], 'ESPNumber': row['local_control_key'],
+                       'DocumentType': doc_type, 'Issue': row['volume_edition'], 'ISXN': isxn, 'PubDate': pub_year, 'JournalYear': journal_year 
+                     }
             writer.writerow(csv_row)
             records['items'] +=1
 
