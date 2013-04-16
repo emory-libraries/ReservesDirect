@@ -14,6 +14,8 @@ import MySQLdb.cursors
 import re
 import sys
 import time
+from progressbar import ETA, Percentage, ProgressBar, Bar
+
 
 # record counts
 records = defaultdict(int)
@@ -37,7 +39,26 @@ semester_codes={'0':'INTERIM',
                 '9':'FALL'}
 
 
-# export user info
+# get notes by target_id and type
+def get_notes(target_id, type, sep='; '):
+
+    query = ''' SELECT n.target_id, group_concat(n.note separator %s) notes
+                FROM notes n
+                WHERE n.type = %s
+                AND n.target_id = %s
+                GROUP BY n.target_id '''
+
+    cursor = db.cursor (MySQLdb.cursors.DictCursor)
+    cursor.execute (query, (sep, type, target_id))
+    row = cursor.fetchone()
+    
+    if row:
+        return row['notes']
+    else:
+        return ''
+
+
+ # export user info
 def users():
     headers = ['Username', 'LastName', 'FirstName', 'LibraryID', 'Address1', 'Address2', 'Address3', 'City', 'State', 'Zip', 
                'Department', 'Status', 'EMailAddress', 'Phone1', 'Phone2', 'UserType', 'Password', 'PasswordHint', 
@@ -70,8 +91,7 @@ def users():
             csv_row = {'Username': row['username'], 'LastName': row['last_name'], 'FirstName': row['first_name'], 
                        'LibraryID': row['username'], 'EMailAddress': row['email'], 'UserType': row['usr_type'] }
             writer.writerow(csv_row)
-            records['users'] +=1 
-            
+            records['users'] +=1           
 
 # export course info
 def courses():
@@ -266,6 +286,9 @@ def items():
                 pages = ''
                 info1= ''
 
+            # get copyright notes
+            copyright_notes = get_notes(row['item_id'], 'copyright')
+
 
             csv_row = {'ItemID': row['item_id'], 'CourseID': row['course_alias_id'], 'CurrentStatus': row['status'],
                        'ItemType': item_type, 'DigitalItem': digital, 'Location': location,  
@@ -277,7 +300,7 @@ def items():
                        'LoanPeriod': row['requested_loan_period'], 'Pages': pages, 'PagesEntireWork': row['pages_times_total'], 'PageCount': row['pages_times_used'],
                        'Callnumber': row['call_number'], 'ItemBarcode': row['barcode'], 'ESPNumber': row['local_control_key'],
                        'DocumentType': doc_type, 'Volume': row['volume_edition'], 'ISXN': isxn, 'PubDate': pub_year, 'JournalYear': journal_year,
-                        'ItemInfo1': info1
+                        'ItemInfo1': info1, 'ItemInfo2': copyright_notes
                      }
             writer.writerow(csv_row)
             records['items'] +=1
