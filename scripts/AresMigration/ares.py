@@ -263,7 +263,7 @@ def items():
                        'LoanPeriod': row['requested_loan_period'], 'Pages': row['pages_times_range'], 
                        'PagesEntireWork': row['pages_times_total'], 'PageCount': row['pages_times_used'],
                        'Callnumber': row['call_number'], 'ItemBarcode': row['barcode'], 'ESPNumber': row['local_control_key'],
-                       'DocumentType': doc_type, 'Issue': row['volume_edition'], 'ISXN': isxn, 'PubDate': pub_year, 'JournalYear': journal_year 
+                       'DocumentType': doc_type, 'Volume': row['volume_edition'], 'ISXN': isxn, 'PubDate': pub_year, 'JournalYear': journal_year 
                      }
             writer.writerow(csv_row)
             records['items'] +=1
