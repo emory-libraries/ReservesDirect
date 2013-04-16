@@ -247,10 +247,24 @@ def items():
                 else:
                     pub_year = result.group()
                     journal_year = ''
-
             else:
                 pub_year = ''
                 journal_year = ''
+
+
+            # put lenght of portion info in pages unless it has a ':' which means it represents time. 
+            # In that case put it in ItemInfo1
+            range = row['pages_times_range']
+            if range:
+                if ':' in range:
+                    pages = ''
+                    info1= range
+                else:
+                    pages = range
+                    info1= ''
+            else:
+                pages = ''
+                info1= ''
 
 
             csv_row = {'ItemID': row['item_id'], 'CourseID': row['course_alias_id'], 'CurrentStatus': row['status'],
@@ -260,10 +274,10 @@ def items():
                        'ActiveDate': row['activation_date'], 'InactiveDate': row['expiration'], 'Proxy': '0',
                        'Author': row['author'], 'Publisher': row['publisher'],
                        'ArticleTitle': row['title'], 'Title': row['volume_title'], 'ItemFormat': row['material_type'],
-                       'LoanPeriod': row['requested_loan_period'], 'Pages': row['pages_times_range'], 
-                       'PagesEntireWork': row['pages_times_total'], 'PageCount': row['pages_times_used'],
+                       'LoanPeriod': row['requested_loan_period'], 'Pages': pages, 'PagesEntireWork': row['pages_times_total'], 'PageCount': row['pages_times_used'],
                        'Callnumber': row['call_number'], 'ItemBarcode': row['barcode'], 'ESPNumber': row['local_control_key'],
-                       'DocumentType': doc_type, 'Volume': row['volume_edition'], 'ISXN': isxn, 'PubDate': pub_year, 'JournalYear': journal_year 
+                       'DocumentType': doc_type, 'Volume': row['volume_edition'], 'ISXN': isxn, 'PubDate': pub_year, 'JournalYear': journal_year,
+                        'ItemInfo1': info1
                      }
             writer.writerow(csv_row)
             records['items'] +=1
