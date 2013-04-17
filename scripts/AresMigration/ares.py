@@ -39,6 +39,7 @@ semester_codes={'0':'INTERIM',
                 '9':'FALL'}
 
 
+pbar_widget = [Percentage(), ETA(),  Bar()]
 # get notes by target_id and type
 def get_notes(target_id, type, sep='; '):
 
@@ -52,6 +53,7 @@ def get_notes(target_id, type, sep='; '):
     cursor.execute (query, (sep, type, target_id))
     row = cursor.fetchone()
     
+    cursor.close()
     if row:
         return row['notes']
     else:
@@ -87,11 +89,16 @@ def users():
     with open('users.csv', 'wb') as f:
         writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL)
         writer.writeheader()
+       
+        print "USERS"
+        pbar = ProgressBar(widgets=pbar_widget, maxval=len(rows)).start()
         for row in rows:
             csv_row = {'Username': row['username'], 'LastName': row['last_name'], 'FirstName': row['first_name'], 
                        'LibraryID': row['username'], 'EMailAddress': row['email'], 'UserType': row['usr_type'] }
             writer.writerow(csv_row)
             records['users'] +=1           
+            pbar.update(records['users'])
+        pbar.finish()
 
 # export course info
 def courses():
@@ -134,6 +141,9 @@ def courses():
     with open('courses.csv', 'wb') as f:
         writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL)
         writer.writeheader()
+
+        print "COURSES"
+        pbar = ProgressBar(widgets=pbar_widget, maxval=len(rows)).start()
         for row in rows:
 
             #decode register key into semester info
@@ -151,6 +161,9 @@ def courses():
                        'RegistrarCourseId': registrar_key, 'Semester': semester, 'DefaultPickupSite': row['default_pickup']}
             writer.writerow(csv_row)
             records['courses'] +=1 
+            pbar.update(records['courses'])
+        pbar.finish()
+        cursor.close()
 
 # export course_user info
 def course_user():
@@ -184,10 +197,15 @@ def course_user():
     with open('course_user.csv', 'wb') as f:
         writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL)
         writer.writeheader()
+        print "COURSE_USER"
+        pbar = ProgressBar(widgets=pbar_widget, maxval=len(rows)).start()
         for row in rows:
             csv_row = {'CourseID': row['course_alias_id'], 'Username': row['username'], 'UserType': row['usr_type']}
             writer.writerow(csv_row)
             records['course_user'] +=1
+            pbar.update(records['course_user'])
+        pbar.finish()
+        cursor.close()
 
 # export item data
 def items():
@@ -230,6 +248,8 @@ def items():
     with open('items.csv', 'wb') as f:
         writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL)
         writer.writeheader()
+        print "ITEMS"
+        pbar = ProgressBar(widgets=pbar_widget, maxval=len(rows)).start()
         for row in rows:
             #grab digital value to do some specal logic with type and location
             digital = row['digital']
@@ -304,6 +324,9 @@ def items():
                      }
             writer.writerow(csv_row)
             records['items'] +=1
+            pbar.update(records['items'])
+        pbar.finish()
+        cursor.close()
 
 if __name__=="__main__":
     #usage and options

@@ -1,7 +1,11 @@
 Files in this directory are used for the Reserves to Ares migration.
-The data export is written in python.  This script requires the MySQL-python library.
+The data export is written in python.
 
-Data formats that are being createad are:
+REQUIRED PACKAGES:
+MySQL-python
+progressbar
+
+Data formats that are createad are:
 Users
 Courses
 CourseUsers
