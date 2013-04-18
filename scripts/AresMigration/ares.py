@@ -43,24 +43,30 @@ semester_codes={'0':'INTERIM',
 pbar_widget = [Percentage(), ' ', ETA(),  Bar()]
 
 
-# get notes by target_id and type
-def get_notes(target_id, type, sep='; '):
+# get notes by  type for later reference so it will not take 2 hours to run 82,000 seperate queries
+def get_notes(type, sep='; '):
 
-    query = ''' SELECT n.target_id, group_concat(n.note separator %s) notes
+    query = ''' SELECT n.target_id id, IFNULL(group_concat(n.note separator %s), '') notes
                 FROM notes n
                 WHERE n.type = %s
-                AND n.target_id = %s
                 GROUP BY n.target_id '''
 
     cursor = db.cursor (MySQLdb.cursors.DictCursor)
-    cursor.execute (query, (sep, type, target_id))
-    row = cursor.fetchone()
-    
+    cursor.execute (query, (sep, type))
+    rows = cursor.fetchall()
     cursor.close()
-    if row:
-        return row['notes']
-    else:
-        return ''
+    
+    print "GETTING %s notes" % type
+    notes = {}
+    pbar = ProgressBar(widgets=pbar_widget, maxval=len(rows)).start()
+    i=0
+    for i, row in enumerate(rows):
+        notes[row['id']] = row['notes']
+        pbar.update(i)
+    pbar.finish()
+
+    return notes
+    
 
 
  # export user info
@@ -225,6 +231,9 @@ def items():
                'ItemInfo1', 'ItemInfo2', 'ItemInfo3', 'ItemInfo4', 'ItemInfo5']
 
 
+    # get copyright notes
+    copyright_notes = get_notes('copyright')
+
     # select items from specified date forward
     query = ''' SELECT DISTINCT i.item_id, ca.course_alias_id, i.status, IF(i.item_group='ELECTRONIC', 1, 0) digital, i.url,
                        r.activation_date, r.expiration, i.title, i.author, i.publisher, i.volume_title, i.material_type,
@@ -309,9 +318,6 @@ def items():
                 pages = ''
                 info1= ''
 
-            # get copyright notes
-            copyright_notes = get_notes(row['item_id'], 'copyright')
-
 
             csv_row = {'ItemID': row['item_id'], 'CourseID': row['course_alias_id'], 'CurrentStatus': row['status'],
                        'ItemType': item_type, 'DigitalItem': digital, 'Location': location,  
@@ -323,7 +329,7 @@ def items():
                        'LoanPeriod': row['requested_loan_period'], 'Pages': pages, 'PagesEntireWork': row['pages_times_total'], 'PageCount': row['pages_times_used'],
                        'Callnumber': row['call_number'], 'ItemBarcode': row['barcode'], 'ESPNumber': row['local_control_key'],
                        'DocumentType': doc_type, 'Volume': row['volume_edition'], 'ISXN': isxn, 'PubDate': pub_year, 'JournalYear': journal_year,
-                        'ItemInfo1': info1, 'ItemInfo2': copyright_notes
+                        'ItemInfo1': info1, 'ItemInfo2': copyright_notes.get(row['item_id'], '')
                      }
             writer.writerow(csv_row)
             records['items'] +=1
