@@ -231,7 +231,7 @@ def items():
                     JOIN course_instances ci ON r.course_instance_id = ci.course_instance_id
                     JOIN course_aliases ca ON ci.primary_course_alias_id = ca.course_alias_id
                     JOIN items i ON i.item_id = r.item_id 
-                    JOIN physical_copies pc ON pc.item_id = i.item_id
+                    LEFT JOIN physical_copies pc ON pc.item_id = i.item_id
                     LEFT JOIN mimetypes m ON i.mimetype = m.mimetype_id
                     LEFT JOIN libraries l ON i.home_library = l.library_id 
                 WHERE i.item_group IN ('MONOGRAPH', 'MULTIMEDIA', 'ELECTRONIC')
