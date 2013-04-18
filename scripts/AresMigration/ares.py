@@ -103,7 +103,8 @@ def users():
         pbar = ProgressBar(widgets=pbar_widget, maxval=len(rows)).start()
         for row in rows:
             csv_row = {'Username': row['username'], 'LastName': row['last_name'], 'FirstName': row['first_name'], 
-                       'LibraryID': row['username'], 'EMailAddress': row['email'], 'UserType': row['usr_type'] }
+                       'LibraryID': row['username'], 'EMailAddress': row['email'], 'UserType': row['usr_type'], 'Trusted': 1
+            }
             writer.writerow(csv_row)
             records['users'] +=1           
             pbar.update(records['users'])
@@ -167,7 +168,9 @@ def courses():
             csv_row = {'CourseID': row['course_alias_id'], 'Name': row['name'], 'CourseCode': row['course_code'], 
                        'StartDate': row['start_date'], 'StopDate': row['end_date'], 'Department': row['department_name'], 
                        'Instructor': row['instructor'], 'CourseNumber': row['course_number'], 
-                       'RegistrarCourseId': registrar_key, 'Semester': semester, 'DefaultPickupSite': row['default_pickup']}
+                       'RegistrarCourseId': registrar_key, 'Semester': semester, 'DefaultPickupSite': row['default_pickup'],
+                       'ExternalCourseId': row['course_alias_id'] 
+            }
             writer.writerow(csv_row)
             records['courses'] +=1 
             pbar.update(records['courses'])
@@ -238,7 +241,7 @@ def items():
     query = ''' SELECT DISTINCT i.item_id, ca.course_alias_id, i.status, IF(i.item_group='ELECTRONIC', 1, 0) digital, i.url,
                        r.activation_date, r.expiration, i.title, i.author, i.publisher, i.volume_title, i.material_type,
                        r.requested_loan_period, i.pages_times_range, i.pages_times_total, i.pages_times_used, pc.call_number,
-                       pc.barcode, i.local_control_key, OCLC, m.mimetype, i.volume_edition, l.reserve_desk, i.issn, i.isbn, i.source
+                       lpad(pc.barcode, 12, '0') barcode, i.local_control_key, OCLC, m.mimetype, i.volume_edition, l.reserve_desk, i.issn, i.isbn, i.source
                 FROM reserves r
                     JOIN course_instances ci ON r.course_instance_id = ci.course_instance_id
                     JOIN course_aliases ca ON ci.primary_course_alias_id = ca.course_alias_id
@@ -258,7 +261,8 @@ def items():
     rows = cursor.fetchall()
 
     with open('items.csv', 'wb') as f:
-        writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL)
+        writer = csv.DictWriter(f, fieldnames=headers)
+        #writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL)
         writer.writeheader()
         print "ITEMS"
         pbar = ProgressBar(widgets=pbar_widget, maxval=len(rows)).start()
@@ -287,6 +291,8 @@ def items():
 
             # translate mimetype to DocumentType
             doc_type = doc_types.get(mime_type, '')
+            if row['material_type'] in ['BOOK', 'DVD', 'VHS', 'CD']:
+                doc_type = 'Hard Copy Reserve Item'
 
             # search source field to try to find a year
             source = row['source']
@@ -326,7 +332,7 @@ def items():
                        'ActiveDate': row['activation_date'], 'InactiveDate': row['expiration'], 'Proxy': '0',
                        'Author': row['author'], 'Publisher': row['publisher'],
                        'ArticleTitle': row['title'], 'Title': row['volume_title'], 'ItemFormat': row['material_type'],
-                       'LoanPeriod': row['requested_loan_period'], 'Pages': pages, 'PagesEntireWork': row['pages_times_total'], 'PageCount': row['pages_times_used'],
+                       'Pages': pages, 'PagesEntireWork': row['pages_times_total'], 'PageCount': row['pages_times_used'],
                        'Callnumber': row['call_number'], 'ItemBarcode': row['barcode'], 'ESPNumber': row['local_control_key'],
                        'DocumentType': doc_type, 'Volume': row['volume_edition'], 'ISXN': isxn, 'PubDate': pub_year, 'JournalYear': journal_year,
                         'ItemInfo1': info1, 'ItemInfo2': copyright_notes.get(row['item_id'], '')
