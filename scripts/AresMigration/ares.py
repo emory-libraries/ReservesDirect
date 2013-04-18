@@ -39,7 +39,10 @@ semester_codes={'0':'INTERIM',
                 '9':'FALL'}
 
 
-pbar_widget = [Percentage(), ETA(),  Bar()]
+# widget for progress bar
+pbar_widget = [Percentage(), ' ', ETA(),  Bar()]
+
+
 # get notes by target_id and type
 def get_notes(target_id, type, sep='; '):
 
