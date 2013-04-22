@@ -38,11 +38,11 @@ semester_codes={'0':'INTERIM',
                 '6':'SUMMER', 
                 '9':'FALL'}
 
-default_pickup = {'GEN' : 'GEN',
+default_pickup = {'GEN' : 'MUSME',
                   'BUS' :'BUS',
                   'MM' : 'MUS',
-                  'HEALTH' : 'HEA',
-                  'OXF' :'OX',
+                  'HEALTH' : 'HLTH',
+                  'OXF' :'OXFD',
                   'CHEM' : 'CHEM',
                   'THE' : 'THEO',
                   'LAW' : 'LAW'}
