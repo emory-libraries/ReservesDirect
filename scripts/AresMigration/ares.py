@@ -38,6 +38,14 @@ semester_codes={'0':'INTERIM',
                 '6':'SUMMER', 
                 '9':'FALL'}
 
+default_pickup = {'GEN' : 'GEN',
+                  'BUS' :'BUS',
+                  'MM' : 'MUS',
+                  'HEALTH' : 'HEA',
+                  'OXF' :'OX',
+                  'CHEM' : 'CHEM',
+                  'THE' : 'THEO',
+                  'LAW' : 'LAW'}
 
 # widget for progress bar
 pbar_widget = [Percentage(), ' ', ETA(),  Bar()]
@@ -121,16 +129,7 @@ def courses():
     query = ''' SELECT DISTINCT ca.course_alias_id, c.uniform_title name, d.abbreviation course_code, ci.activation_date start_date, 
                     ci.expiration_date end_date,  c.course_number course_number, d.name department_name, 
                     CONCAT(IFNULL(u.first_name, ''), ' ',  IFNULL(u.last_name, '')) instructor, ca.registrar_key registrar_key,
-                    CASE l.ils_prefix
-                        WHEN 'GEN' THEN 'GEN'
-                        WHEN 'BUS' THEN 'BUS'
-                        WHEN 'MM' THEN 'MUS'
-                        WHEN 'HEALTH' THEN 'HEA'
-                        WHEN 'OXF' THEN 'OX'
-                        WHEN 'CHEM' THEN 'CHEM'
-                        WHEN 'THE' THEN 'THEO'
-                        WHEN 'LAW' THEN 'LAW'
-		    END as default_pickup
+                    l.ils_prefix default_pickup
                 FROM courses c
                     JOIN departments d ON c.department_id = d.department_id
                     JOIN course_aliases ca ON ca.course_id = c.course_id
@@ -168,7 +167,7 @@ def courses():
             csv_row = {'CourseID': row['course_alias_id'], 'Name': row['name'], 'CourseCode': row['course_code'], 
                        'StartDate': row['start_date'], 'StopDate': row['end_date'], 'Department': row['department_name'], 
                        'Instructor': row['instructor'], 'CourseNumber': row['course_number'], 
-                       'RegistrarCourseId': registrar_key, 'Semester': semester, 'DefaultPickupSite': row['default_pickup'],
+                       'RegistrarCourseId': registrar_key, 'Semester': semester, 'DefaultPickupSite': default_pickup.get(row['default_pickup'], ''),
                        'ExternalCourseId': row['course_alias_id'] 
             }
             writer.writerow(csv_row)
@@ -234,14 +233,16 @@ def items():
                'ItemInfo1', 'ItemInfo2', 'ItemInfo3', 'ItemInfo4', 'ItemInfo5']
 
 
-    # get copyright notes
+    # get copyright and instructor notes
     copyright_notes = get_notes('copyright')
+    instructor_notes = get_notes('instructor')
 
     # select items from specified date forward
     query = ''' SELECT DISTINCT i.item_id, ca.course_alias_id, i.status, IF(i.item_group='ELECTRONIC', 1, 0) digital, i.url,
                        r.activation_date, r.expiration, i.title, i.author, i.publisher, i.volume_title, i.material_type,
                        r.requested_loan_period, i.pages_times_range, i.pages_times_total, i.pages_times_used, pc.call_number,
-                       lpad(pc.barcode, 12, '0') barcode, i.local_control_key, OCLC, m.mimetype, i.volume_edition, l.reserve_desk, i.issn, i.isbn, i.source
+                       lpad(pc.barcode, 12, '0') barcode, i.local_control_key, OCLC, m.mimetype, i.volume_edition, l.reserve_desk, i.issn, i.isbn, i.source,
+                       l.ils_prefix default_pickup 
                 FROM reserves r
                     JOIN course_instances ci ON r.course_instance_id = ci.course_instance_id
                     JOIN course_aliases ca ON ci.primary_course_alias_id = ca.course_alias_id
@@ -323,6 +324,9 @@ def items():
             else:
                 pages = ''
                 info1= ''
+   
+            # if Title blank then use Article Title
+            title = row['volume_title'] if row['volume_title'] else row['title']
 
 
             csv_row = {'ItemID': row['item_id'], 'CourseID': row['course_alias_id'], 'CurrentStatus': row['status'],
@@ -331,11 +335,12 @@ def items():
                        'CopyrightObtained': '1', 'VisibleToStudents': '1', 
                        'ActiveDate': row['activation_date'], 'InactiveDate': row['expiration'], 'Proxy': '0',
                        'Author': row['author'], 'Publisher': row['publisher'],
-                       'ArticleTitle': row['title'], 'Title': row['volume_title'], 'ItemFormat': row['material_type'],
+                       'ArticleTitle': row['title'], 'Title': title, 'ItemFormat': row['material_type'],
                        'Pages': pages, 'PagesEntireWork': row['pages_times_total'], 'PageCount': row['pages_times_used'],
                        'Callnumber': row['call_number'], 'ItemBarcode': row['barcode'], 'ESPNumber': row['local_control_key'],
                        'DocumentType': doc_type, 'Volume': row['volume_edition'], 'ISXN': isxn, 'PubDate': pub_year, 'JournalYear': journal_year,
-                        'ItemInfo1': info1, 'ItemInfo2': copyright_notes.get(row['item_id'], '')
+                        'ItemInfo1': info1, 'ItemInfo2': copyright_notes.get(row['item_id'], ''), 'PickupLocation': default_pickup.get(row['default_pickup'], ''),
+                        'ProcessLocation': default_pickup.get(row['default_pickup'], ''), 'ItemInfo3': instructor_notes.get(row['item_id'], ''),
                      }
             writer.writerow(csv_row)
             records['items'] +=1
