@@ -334,12 +334,21 @@ def items():
                 article_title = row['title']
 
 
+            #Publisher and PubPlace
+            pub = row['publisher'] if row['publisher'] else ''
+            if ':' in pub:
+                pub_place, publisher = pub.split(':', 1)
+            else:
+                publisher = pub
+                pub_place= ''
+
+
             csv_row = {'ItemID': row['item_id'], 'CourseID': row['course_alias_id'], 'CurrentStatus': row['status'],
                        'ItemType': item_type, 'DigitalItem': digital, 'Location': location,  
                        'AresDocument': ares_doc, 'InstructorProvided': '1', 'CopyrightRequired': '1', 
                        'CopyrightObtained': '1', 'VisibleToStudents': '1', 
                        'ActiveDate': row['activation_date'], 'InactiveDate': row['expiration'], 'Proxy': '0',
-                       'Author': row['author'], 'Publisher': row['publisher'],
+                       'Author': row['author'], 'Publisher': publisher, 'PubPlace': pub_place,
                        'ArticleTitle': article_title, 'Title': title, 'ItemFormat': row['material_type'],
                        'Pages': pages, 'PagesEntireWork': row['pages_times_total'], 'PageCount': row['pages_times_used'],
                        'Callnumber': row['call_number'], 'ItemBarcode': row['barcode'], 'ESPNumber': row['local_control_key'],
