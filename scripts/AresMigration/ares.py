@@ -326,7 +326,12 @@ def items():
                 info1= ''
    
             # if Title blank then use Article Title
-            title = row['volume_title'] if row['volume_title'] else row['title']
+            if not row['volume_title']:
+                title = row['title'] 
+                article_title = ''
+            else:
+                title = row['volume_title'] 
+                article_title = row['title']
 
 
             csv_row = {'ItemID': row['item_id'], 'CourseID': row['course_alias_id'], 'CurrentStatus': row['status'],
@@ -335,7 +340,7 @@ def items():
                        'CopyrightObtained': '1', 'VisibleToStudents': '1', 
                        'ActiveDate': row['activation_date'], 'InactiveDate': row['expiration'], 'Proxy': '0',
                        'Author': row['author'], 'Publisher': row['publisher'],
-                       'ArticleTitle': row['title'], 'Title': title, 'ItemFormat': row['material_type'],
+                       'ArticleTitle': article_title, 'Title': title, 'ItemFormat': row['material_type'],
                        'Pages': pages, 'PagesEntireWork': row['pages_times_total'], 'PageCount': row['pages_times_used'],
                        'Callnumber': row['call_number'], 'ItemBarcode': row['barcode'], 'ESPNumber': row['local_control_key'],
                        'DocumentType': doc_type, 'Volume': row['volume_edition'], 'ISXN': isxn, 'PubDate': pub_year, 'JournalYear': journal_year,
