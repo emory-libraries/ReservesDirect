@@ -1,5 +1,6 @@
 # 0 - Student
-# 2 - Custodian
+# 1 - Custodian
+# 2 - Proxy
 # 3 - Instructor
 # 4 - Staff
 # 5 - Admin
