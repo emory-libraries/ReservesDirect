@@ -112,7 +112,8 @@ def users():
         pbar = ProgressBar(widgets=pbar_widget, maxval=len(rows)).start()
         for row in rows:
             csv_row = {'Username': row['username'], 'LastName': row['last_name'], 'FirstName': row['first_name'], 
-                       'LibraryID': row['username'], 'EMailAddress': row['email'], 'UserType': row['usr_type'], 'Trusted': 1
+                       'LibraryID': row['username'], 'EMailAddress': row['email'], 'UserType': row['usr_type'], 'Cleared':'Yes', 
+                       'Trusted': 1
             }
             writer.writerow(csv_row)
             records['users'] +=1           
