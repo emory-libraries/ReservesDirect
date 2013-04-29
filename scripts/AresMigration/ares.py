@@ -138,10 +138,16 @@ def courses():
                     JOIN course_instances ci ON ci.primary_course_alias_id = ca.course_alias_id 
                     JOIN access a ON a.alias_id = ca.course_alias_id
                     JOIN users u ON u.user_id = a.user_id
-                    JOIN libraries l ON d.library_id = l.library_id
+                    JOIN reserves r ON r.course_instance_id = ci.course_instance_id
+                    JOIN items i ON i.item_id = r.item_id 
+                    LEFT JOIN physical_copies pc ON pc.item_id = i.item_id
+                    LEFT JOIN mimetypes m ON i.mimetype = m.mimetype_id
+                    LEFT JOIN libraries l ON i.home_library = l.library_id AND d.library_id = l.library_id  
                 WHERE u.dflt_permission_level IN (3, 4, 5) 
-                    AND ((TRIM(u.first_name) != '' AND  u.first_name IS NOT NULL) OR (TRIM(u.last_name) != '' AND  u.last_name IS NOT NULL))
                     AND username NOT LIKE '[tmp]%%' 
+                    AND ((TRIM(u.first_name) != '' AND  u.first_name IS NOT NULL) OR (TRIM(u.last_name) != '' AND  u.last_name IS NOT NULL))
+                    AND i.item_group IN ('MONOGRAPH', 'MULTIMEDIA', 'ELECTRONIC')
+                    AND i.status = 'ACTIVE'
                     AND ci.activation_date >= %s '''
              
             
@@ -196,9 +202,16 @@ def course_user():
                     JOIN course_instances ci ON ci.primary_course_alias_id = ca.course_alias_id
                     JOIN access a ON a.alias_id = ca.course_alias_id
                     JOIN users u ON u.user_id = a.user_id
+                    JOIN reserves r ON r.course_instance_id = ci.course_instance_id
+                    JOIN items i ON i.item_id = r.item_id 
+                    LEFT JOIN physical_copies pc ON pc.item_id = i.item_id
+                    LEFT JOIN mimetypes m ON i.mimetype = m.mimetype_id
+                    LEFT JOIN libraries l ON i.home_library = l.library_id 
                 WHERE u.dflt_permission_level IN (3, 4, 5)
                     AND ((TRIM(u.first_name) != '' AND  u.first_name IS NOT NULL) OR (TRIM(u.last_name) != '' AND  u.last_name IS NOT NULL))
                     AND u.username NOT LIKE '[tmp]%%'  
+                    AND i.item_group IN ('MONOGRAPH', 'MULTIMEDIA', 'ELECTRONIC')
+                    AND i.status = 'ACTIVE'
                     AND ci.activation_date >= %s '''
                
               
