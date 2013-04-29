@@ -273,7 +273,7 @@ def items():
             #grab digital value to do some specal logic with type and location
             digital = row['digital']
             if digital == 1:
-                item_type = ''
+                item_type = 'SER'
                 location = row['url']
             else:
                 item_type='MON'
