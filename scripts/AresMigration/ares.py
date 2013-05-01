@@ -41,7 +41,7 @@ semester_codes={'0':'INTERIM',
 
 default_pickup = {'GEN' : 'MUSME',
                   'BUS' :'BUS',
-                  'MM' : 'MUS',
+                  'MM' : 'MUSME',
                   'HEALTH' : 'HLTH',
                   'OXF' :'OXFD',
                   'CHEM' : 'CHEM',
