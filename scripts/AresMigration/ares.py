@@ -288,6 +288,8 @@ def items():
             if digital == 1:
                 item_type = 'SER'
                 location = row['url']
+                if location and (not location.startswith('http')):
+                    location = location.replace('/', '_')
             else:
                 item_type='MON'
                 location = ''
