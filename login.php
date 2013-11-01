@@ -100,7 +100,7 @@ http://www.reservesdirect.org/
       <table class="contacts" cellpadding="2">
       <tr><th>For information on submitting a Course Reserves request, please contact:<br>&nbsp;</th></tr>      
       <tr><td>
-        <a target="_blank" href="http://web.library.emory.edu/services/course-reserves">Woodruff Library/General</a>
+        <a target="_blank" href="http://web.library.emory.edu/using-the-library/services/course-reserves/index.html">Woodruff Library/General</a>
       </td></tr>
       <tr><td>
       <a target="_blank" href="http://business.library.emory.edu/communities/faculty/e-reserves">Business</a>
