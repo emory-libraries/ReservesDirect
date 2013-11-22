@@ -105,7 +105,7 @@ def users():
     rows = cursor.fetchall()
 
     with open('users.csv', 'wb') as f:
-        writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL, delimiter='\t')
+        writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL)
         writer.writeheader()
        
         print "USERS"
@@ -113,7 +113,7 @@ def users():
         for row in rows:
             csv_row = {'Username': row['username'], 'LastName': row['last_name'], 'FirstName': row['first_name'], 
                        'LibraryID': row['username'], 'EMailAddress': row['email'], 'UserType': row['usr_type'], 'Cleared':'Yes', 
-                       'Trusted': 1, 'Status': row['usr_type']
+                       'Trusted': 1
             }
             writer.writerow(csv_row)
             records['users'] +=1           
@@ -148,15 +148,16 @@ def courses():
                     AND ((TRIM(u.first_name) != '' AND  u.first_name IS NOT NULL) OR (TRIM(u.last_name) != '' AND  u.last_name IS NOT NULL))
                     AND i.item_group IN ('MONOGRAPH', 'MULTIMEDIA', 'ELECTRONIC')
                     AND i.status = 'ACTIVE'
-                    AND ci.activation_date >= %s '''
+                    AND ci.activation_date >= '2008-08-01' 
+                    AND ci.activation_date <= '2010-09-01' '''
              
             
     cursor = db.cursor (MySQLdb.cursors.DictCursor)
-    cursor.execute (query, options.date)
+    cursor.execute (query)
     rows = cursor.fetchall()
 
     with open('courses.csv', 'wb') as f:
-        writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL, delimiter='\t')
+        writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL)
         writer.writeheader()
 
         print "COURSES"
@@ -212,16 +213,17 @@ def course_user():
                     AND u.username NOT LIKE '[tmp]%%'  
                     AND i.item_group IN ('MONOGRAPH', 'MULTIMEDIA', 'ELECTRONIC')
                     AND i.status = 'ACTIVE'
-                    AND ci.activation_date >= %s '''
+                    AND ci.activation_date >= '2008-08-01'
+                    AND ci.activation_date <= '2010-09-01' '''
                
               
              
     cursor = db.cursor (MySQLdb.cursors.DictCursor)
-    cursor.execute (query, (options.date))
+    cursor.execute (query)
     rows = cursor.fetchall()
 
     with open('course_user.csv', 'wb') as f:
-        writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL, delimiter='\t')
+        writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL)
         writer.writeheader()
         print "COURSE_USER"
         pbar = ProgressBar(widgets=pbar_widget, maxval=len(rows)).start()
@@ -267,17 +269,19 @@ def items():
                     LEFT JOIN libraries l ON i.home_library = l.library_id 
                 WHERE i.item_group IN ('MONOGRAPH', 'MULTIMEDIA', 'ELECTRONIC')
                     AND i.status = 'ACTIVE' 
-                    AND ci.activation_date >= %s '''
+                    AND ci.activation_date >= '2008-08-01'
+                    AND ci.activation_date <= '2010-09-01'  '''
                
               
              
     year_p = re.compile('\d{4}') # pattern of year - used to search source field
     cursor = db.cursor (MySQLdb.cursors.DictCursor)
-    cursor.execute (query, options.date)
+    cursor.execute (query)
     rows = cursor.fetchall()
 
     with open('items.csv', 'wb') as f:
-        writer = csv.DictWriter(f, fieldnames=headers,  quoting=csv.QUOTE_ALL, delimiter='\t')
+        writer = csv.DictWriter(f, fieldnames=headers)
+        #writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL)
         writer.writeheader()
         print "ITEMS"
         pbar = ProgressBar(widgets=pbar_widget, maxval=len(rows)).start()
@@ -292,10 +296,6 @@ def items():
             else:
                 item_type='MON'
                 location = ''
-                if default_pickup.get(row['default_pickup'], '') == 'OXFD':
-                    loan_period = 2
-                else:
-                    loan_period = 3
 
             # get isbn or issn field based on material_type
             material_type = row['material_type']
@@ -353,12 +353,6 @@ def items():
                 title = row['volume_title'] 
                 article_title = row['title']
 
-            try:
-                volume, issue = row['volume_edition'].split('/')
-            except:
-                volume = row['volume_edition']
-                issue = ''
-                
 
             #Publisher and PubPlace
             pub = row['publisher'] if row['publisher'] else ''
@@ -369,7 +363,7 @@ def items():
                 pub_place= ''
 
 
-            csv_row = {'ItemID': row['item_id'], 'CourseID': row['course_alias_id'], 'CurrentStatus': 'Item Removed From Reserves',
+            csv_row = {'ItemID': row['item_id'], 'CourseID': row['course_alias_id'], 'CurrentStatus': row['status'],
                        'ItemType': item_type, 'DigitalItem': digital, 'Location': location,  
                        'AresDocument': ares_doc, 'InstructorProvided': '1', 'CopyrightRequired': '1', 
                        'CopyrightObtained': '1', 'VisibleToStudents': '1', 
@@ -378,11 +372,10 @@ def items():
                        'ArticleTitle': article_title, 'Title': title, 'ItemFormat': row['material_type'],
                        'Pages': pages, 'PagesEntireWork': row['pages_times_total'], 'PageCount': row['pages_times_used'],
                        'Callnumber': row['call_number'], 'ItemBarcode': row['barcode'], 'ESPNumber': row['local_control_key'],
-                       'DocumentType': doc_type, 'Volume': volume, 'Issue': issue, 'ISXN': isxn, 'PubDate': pub_year,
-                       'JournalYear': journal_year, 'ItemInfo1': info1, 'ItemInfo2': copyright_notes.get(row['item_id'], ''),
-                       'PickupLocation': default_pickup.get(row['default_pickup'], ''), 'ProcessLocation': default_pickup.get(row['default_pickup'], ''),
-                       'ItemInfo3': instructor_notes.get(row['item_id'], ''), 'LoanPeriod': loan_period
-            }
+                       'DocumentType': doc_type, 'Volume': row['volume_edition'], 'ISXN': isxn, 'PubDate': pub_year, 'JournalYear': journal_year,
+                        'ItemInfo1': info1, 'ItemInfo2': copyright_notes.get(row['item_id'], ''), 'PickupLocation': default_pickup.get(row['default_pickup'], ''),
+                        'ProcessLocation': default_pickup.get(row['default_pickup'], ''), 'ItemInfo3': instructor_notes.get(row['item_id'], ''),
+                     }
             writer.writerow(csv_row)
             records['items'] +=1
             pbar.update(records['items'])
@@ -399,7 +392,7 @@ if __name__=="__main__":
     parser.add_option('--password', action='store', help='password for RD database (required) --password= will prompt for password')
     parser.add_option('--db', action='store', help='RD database (required)')
     parser.add_option('-f', '--file', action='append', help='list of file formats to generate (optional). If none specified, all formats are generated')
-    parser.add_option('-d', '--date', action='store', default='2011-08-01', help="Earliest activation date to query. Must use format 'yyyy-mm-dd'. (optional). default:'2011-08-01'")
+    parser.add_option('-d', '--date', action='store', default='2010-08-01', help="Earliest activation date to query. Must use format 'yyyy-mm-dd'. (optional). default:'2010-08-01'")
     (options, args) = parser.parse_args()
 
 
