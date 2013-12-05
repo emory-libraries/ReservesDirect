@@ -364,6 +364,8 @@ def items():
             except:
                 volume = row['volume_edition']
                 issue = ''
+            volume = volume.strip()
+            issue = issue.strip()
                 
 
             #Publisher and PubPlace
