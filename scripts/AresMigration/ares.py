@@ -104,7 +104,7 @@ def users():
     cursor.execute (query)
     rows = cursor.fetchall()
 
-    with open('users.csv', 'wb') as f:
+    with open('users.txt', 'wb') as f:
         writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL, delimiter='\t')
         writer.writeheader()
        
@@ -155,7 +155,7 @@ def courses():
     cursor.execute (query, options.date)
     rows = cursor.fetchall()
 
-    with open('courses.csv', 'wb') as f:
+    with open('courses.txt', 'wb') as f:
         writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL, delimiter='\t')
         writer.writeheader()
 
@@ -220,7 +220,7 @@ def course_user():
     cursor.execute (query, (options.date))
     rows = cursor.fetchall()
 
-    with open('course_user.csv', 'wb') as f:
+    with open('course_user.txt', 'wb') as f:
         writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL, delimiter='\t')
         writer.writeheader()
         print "COURSE_USER"
@@ -276,7 +276,7 @@ def items():
     cursor.execute (query, options.date)
     rows = cursor.fetchall()
 
-    with open('items.csv', 'wb') as f:
+    with open('items.txt', 'wb') as f:
         writer = csv.DictWriter(f, fieldnames=headers,  quoting=csv.QUOTE_ALL, delimiter='\t')
         writer.writeheader()
         print "ITEMS"
@@ -292,10 +292,13 @@ def items():
             else:
                 item_type='MON'
                 location = ''
-                if default_pickup.get(row['default_pickup'], '') == 'OXFD':
-                    loan_period = 2
+                if doc_types == 'Hard Copy Reserve Item':
+                    if default_pickup.get(row['default_pickup'], '') == 'OXFD':
+                        loan_period = 2
+                    else:
+                        loan_period = 3
                 else:
-                    loan_period = 3
+                    loan_period = ''
 
             # get isbn or issn field based on material_type
             material_type = row['material_type']
@@ -308,7 +311,10 @@ def items():
 
             mime_type = row['mimetype']
             # AresDocument is true if pdf file
-            ares_doc = 1 if mime_type and mime_type.endswith('pdf') else 0
+            if location !=None:
+                ares_doc = 0 if location.startswith('h') or location=='' else 1
+            else:
+                ares_doc = 0
 
             # translate mimetype to DocumentType
             doc_type = doc_types.get(mime_type, '')
@@ -354,7 +360,7 @@ def items():
                 article_title = row['title']
 
             try:
-                volume, issue = row['volume_edition'].split('/')
+                volume, issue = row['volume_edition'].split(',')
             except:
                 volume = row['volume_edition']
                 issue = ''
@@ -367,6 +373,8 @@ def items():
             else:
                 publisher = pub
                 pub_place= ''
+            publisher = publisher.strip()
+            pub_place = pub_place.strip()
 
 
             csv_row = {'ItemID': row['item_id'], 'CourseID': row['course_alias_id'], 'CurrentStatus': 'Item Removed From Reserves',
