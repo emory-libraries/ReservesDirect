@@ -256,8 +256,8 @@ def items():
     query = ''' SELECT DISTINCT i.item_id, ca.course_alias_id, i.status, IF(i.item_group='ELECTRONIC', 1, 0) digital, i.url,
                        r.activation_date, r.expiration, i.title, i.author, i.publisher, i.volume_title, i.material_type,
                        r.requested_loan_period, i.pages_times_range, i.pages_times_total, i.pages_times_used, pc.call_number,
-                       lpad(pc.barcode, 12, '0') barcode, i.local_control_key, OCLC, m.mimetype, i.volume_edition, l.reserve_desk, i.issn, i.isbn, i.source,
-                       l.ils_prefix default_pickup 
+                       lpad(pc.barcode, 12, '0') barcode, i.local_control_key, OCLC, m.mimetype, IFNULL(i.volume_edition, '') volume_edition, l.reserve_desk, i.issn, i.isbn, i.source,
+                       l.ils_prefix default_pickup
                 FROM reserves r
                     JOIN course_instances ci ON r.course_instance_id = ci.course_instance_id
                     JOIN course_aliases ca ON ci.primary_course_alias_id = ca.course_alias_id
@@ -293,7 +293,7 @@ def items():
                 item_type='MON'
                 location = ''
                 if doc_types == 'Hard Copy Reserve Item':
-                    if default_pickup.get(row['default_pickup'], '') == 'OXFD':
+                    if default_pickup.get(row['default_pickup'], 'THEO') == 'OXFD':
                         loan_period = 2
                     else:
                         loan_period = 3
@@ -390,7 +390,7 @@ def items():
                        'Callnumber': row['call_number'], 'ItemBarcode': row['barcode'], 'ESPNumber': row['local_control_key'],
                        'DocumentType': doc_type, 'Volume': volume, 'Issue': issue, 'ISXN': isxn, 'PubDate': pub_year,
                        'JournalYear': journal_year, 'ItemInfo1': info1, 'ItemInfo2': copyright_notes.get(row['item_id'], ''),
-                       'PickupLocation': default_pickup.get(row['default_pickup'], ''), 'ProcessLocation': default_pickup.get(row['default_pickup'], ''),
+                       'PickupLocation': default_pickup.get(row['default_pickup'], 'THEO'), 'ProcessLocation': default_pickup.get(row['default_pickup'], 'THEO'),
                        'ItemInfo3': instructor_notes.get(row['item_id'], ''), 'LoanPeriod': loan_period
             }
             writer.writerow(csv_row)
