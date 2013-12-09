@@ -282,6 +282,12 @@ def items():
         print "ITEMS"
         pbar = ProgressBar(widgets=pbar_widget, maxval=len(rows)).start()
         for row in rows:
+            # translate mimetype to DocumentType
+            mime_type = row['mimetype']
+            doc_type = doc_types.get(mime_type, '')
+            if row['material_type'] in ['BOOK', 'DVD', 'VHS', 'CD']:
+                doc_type = 'Hard Copy Reserve Item'
+
             #grab digital value to do some specal logic with type and location
             digital = row['digital']
             if digital == 1:
@@ -292,8 +298,8 @@ def items():
             else:
                 item_type='MON'
                 location = ''
-                if doc_types == 'Hard Copy Reserve Item':
-                    if default_pickup.get(row['default_pickup'], 'THEO') == 'OXFD':
+                if doc_type == 'Hard Copy Reserve Item':
+                    if default_pickup.get(row['default_pickup'], '') == 'OXFD':
                         loan_period = 2
                     else:
                         loan_period = 3
@@ -309,17 +315,12 @@ def items():
             else:
                 isxn = ''
 
-            mime_type = row['mimetype']
             # AresDocument is true if pdf file
             if location !=None:
                 ares_doc = 0 if location.startswith('h') or location=='' else 1
             else:
                 ares_doc = 0
 
-            # translate mimetype to DocumentType
-            doc_type = doc_types.get(mime_type, '')
-            if row['material_type'] in ['BOOK', 'DVD', 'VHS', 'CD']:
-                doc_type = 'Hard Copy Reserve Item'
 
             # search source field to try to find a year
             source = row['source']
