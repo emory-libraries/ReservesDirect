@@ -292,6 +292,7 @@ def items():
             digital = row['digital']
             if digital == 1:
                 item_type = 'SER'
+                loan_period = ''
                 location = row['url']
                 if location and (not location.startswith('http')):
                     location = location.replace('/', '_')
