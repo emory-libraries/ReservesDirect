@@ -24,14 +24,26 @@ records = defaultdict(int)
 # allowed values for -f flag
 allowed_types = ['users', 'courses', 'courseusers', 'items']
 
-doc_types = { 'application/pdf': 'PDF',
-                'audio/x-pn-realaudio': 'RealAudio',
-                'video/quicktime': 'Quicktime Video',
-                'application/msword': 'Microsoft Word',
-                'application/vnd.ms-excel': 'Microsoft Excel',
-                'application/vnd.ms-powerpoint': 'Microsoft Powerpoint',
-                'text/html': 'WebLink',
-                'image/jpeg': 'Image'}
+doc_types = {
+    'jpg' : 'Image-jpg',
+    'jpeg' : 'Image-jpg',
+    'xls' : 'Excel97-03',
+    'xlsx' : 'Excel',
+    'ppt' : 'Powerpoint97-03',
+    'pptx' : 'Powerpoint',
+    'doc' : 'Word97-03',
+    'docx' : 'Word',
+    'pdf' : 'PDF',
+    'rtf' : 'RichText',
+    'mp3' : 'MP3',
+    'm4v' : 'Multimedia',
+    'png' : 'Image-png',
+    'rm' : 'Real Media-rm',
+    'ram' : 'Real Media-rm',
+    'html' : 'HTML',
+    'htm' : 'HTML',
+    'zip' : 'ZIP',
+}
 
 
 semester_codes={'0':'INTERIM', 
@@ -50,6 +62,11 @@ default_pickup = {'GEN' : 'MUSME',
 
 # widget for progress bar
 pbar_widget = [Percentage(), ' ', ETA(),  Bar()]
+
+
+def unnone(str):
+    return str if str is not None else ''
+
 
 
 # get notes by  type for later reference so it will not take 2 hours to run 82,000 seperate queries
@@ -253,7 +270,7 @@ def items():
     instructor_notes = get_notes('instructor')
 
     # select items from specified date forward
-    query = ''' SELECT DISTINCT i.item_id, ca.course_alias_id, i.status, IF(i.item_group='ELECTRONIC', 1, 0) digital, i.url,
+    query = ''' SELECT DISTINCT i.item_id, ca.course_alias_id, i.status, IF(i.item_group='ELECTRONIC', 1, 0) digital, IFNULL(i.url, '') as url,
                        r.activation_date, r.expiration, i.title, i.author, i.publisher, i.volume_title, i.material_type,
                        r.requested_loan_period, i.pages_times_range, i.pages_times_total, i.pages_times_used, pc.call_number,
                        lpad(pc.barcode, 12, '0') barcode, i.local_control_key, OCLC, m.mimetype, IFNULL(i.volume_edition, '') volume_edition, l.reserve_desk, i.issn, i.isbn, i.source,
@@ -283,8 +300,7 @@ def items():
         pbar = ProgressBar(widgets=pbar_widget, maxval=len(rows)).start()
         for row in rows:
             # translate mimetype to DocumentType
-            mime_type = row['mimetype']
-            doc_type = doc_types.get(mime_type, '')
+            doc_type = doc_types.get(row['url'].split('.')[-1].lower(), '')
             if row['material_type'] in ['BOOK', 'DVD', 'VHS', 'CD']:
                 doc_type = 'Hard Copy Reserve Item'
 
@@ -294,8 +310,10 @@ def items():
                 item_type = 'SER'
                 loan_period = ''
                 location = row['url']
-                if location and (not location.startswith('http')):
+                if not location.startswith('http'):
                     location = location.replace('/', '_')
+                else:
+                    doc_type = "WebLink"
             else:
                 item_type='MON'
                 location = ''
@@ -382,18 +400,18 @@ def items():
 
 
             csv_row = {'ItemID': row['item_id'], 'CourseID': row['course_alias_id'], 'CurrentStatus': 'Item Removed From Reserves',
-                       'ItemType': item_type, 'DigitalItem': digital, 'Location': location,  
+                       'ItemType': item_type[:50], 'DigitalItem': digital, 'Location': location,
                        'AresDocument': ares_doc, 'InstructorProvided': '1', 'CopyrightRequired': '1', 
                        'CopyrightObtained': '1', 'VisibleToStudents': '1', 
                        'ActiveDate': row['activation_date'], 'InactiveDate': row['expiration'], 'Proxy': '0',
                        'Author': row['author'], 'Publisher': publisher, 'PubPlace': pub_place,
-                       'ArticleTitle': article_title, 'Title': title, 'ItemFormat': row['material_type'],
-                       'Pages': pages, 'PagesEntireWork': row['pages_times_total'], 'PageCount': row['pages_times_used'],
-                       'Callnumber': row['call_number'], 'ItemBarcode': row['barcode'], 'ESPNumber': row['local_control_key'],
-                       'DocumentType': doc_type, 'Volume': volume, 'Issue': issue, 'ISXN': isxn, 'PubDate': pub_year,
-                       'JournalYear': journal_year, 'ItemInfo1': info1, 'ItemInfo2': copyright_notes.get(row['item_id'], ''),
-                       'PickupLocation': default_pickup.get(row['default_pickup'], 'THEO'), 'ProcessLocation': default_pickup.get(row['default_pickup'], 'THEO'),
-                       'ItemInfo3': instructor_notes.get(row['item_id'], ''), 'LoanPeriod': loan_period
+                       'ArticleTitle': unnone(article_title)[:255], 'Title': unnone(title)[:255], 'ItemFormat': unnone(row['material_type'])[:50],
+                       'Pages': pages[:30], 'PagesEntireWork': row['pages_times_total'], 'PageCount': row['pages_times_used'],
+                       'Callnumber': unnone(row['call_number'])[:100], 'ItemBarcode': unnone(row['barcode'])[:50], 'ESPNumber': unnone(row['local_control_key'])[:32],
+                       'DocumentType': unnone(doc_type)[:50], 'Volume': unnone(volume)[:30], 'Issue': unnone(issue)[:30], 'ISXN': unnone(isxn)[:20], 'PubDate': unnone(pub_year)[:30],
+                       'JournalYear': journal_year[:30], 'ItemInfo1': info1[:255], 'ItemInfo2': copyright_notes.get(row['item_id'], '')[:255],
+                       'PickupLocation': default_pickup.get(row['default_pickup'], 'THEO')[:10], 'ProcessLocation': default_pickup.get(row['default_pickup'], 'THEO')[:10],
+                       'ItemInfo3': instructor_notes.get(row['item_id'], '')[:255], 'LoanPeriod': loan_period
             }
             writer.writerow(csv_row)
             records['items'] +=1
