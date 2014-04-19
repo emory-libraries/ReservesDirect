@@ -148,7 +148,7 @@ def courses():
     query = ''' SELECT DISTINCT ca.course_alias_id, c.uniform_title name, d.abbreviation course_code, ci.activation_date start_date, 
                     ci.expiration_date end_date,  c.course_number course_number, d.name department_name, d.abbreviation,
                     u.username, ca.registrar_key registrar_key,
-                    l.ils_prefix default_pickup
+                    l.ils_prefix default_pickup, ca.section
                 FROM courses c
                     JOIN departments d ON c.department_id = d.department_id
                     JOIN course_aliases ca ON ca.course_id = c.course_id
@@ -191,7 +191,7 @@ def courses():
 
             course_number = "%s %s" % (row['abbreviation'], row['course_number'])
 
-            csv_row = {'CourseID': row['course_alias_id'], 'Name': row['name'], 'CourseCode': row['course_code'], 
+            csv_row = {'CourseID': row['course_alias_id'], 'Name': row['name'], 'CourseCode': row['section'],
                        'StartDate': row['start_date'], 'StopDate': row['end_date'], 'Department': row['abbreviation'],
                        'Instructor': '', 'CourseNumber': course_number,
                        'RegistrarCourseId': registrar_key, 'Semester': semester, 'DefaultPickupSite': default_pickup.get(row['default_pickup'], ''),
