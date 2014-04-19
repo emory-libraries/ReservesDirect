@@ -191,7 +191,7 @@ def courses():
 
             csv_row = {'CourseID': row['course_alias_id'], 'Name': row['name'], 'CourseCode': row['course_code'], 
                        'StartDate': row['start_date'], 'StopDate': row['end_date'], 'Department': row['department_name'], 
-                       'Instructor': row['username'], 'CourseNumber': row['course_number'], 
+                       'Instructor': '', 'CourseNumber': row['course_number'],
                        'RegistrarCourseId': registrar_key, 'Semester': semester, 'DefaultPickupSite': default_pickup.get(row['default_pickup'], ''),
                        'ExternalCourseId': row['course_alias_id'] 
             }
