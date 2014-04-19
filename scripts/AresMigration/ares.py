@@ -146,7 +146,7 @@ def courses():
 
     # only instructors, Staff, Admin courses from date specified forward
     query = ''' SELECT DISTINCT ca.course_alias_id, c.uniform_title name, d.abbreviation course_code, ci.activation_date start_date, 
-                    ci.expiration_date end_date,  c.course_number course_number, d.name department_name, 
+                    ci.expiration_date end_date,  c.course_number course_number, d.name department_name, d.abbreviation,
                     u.username, ca.registrar_key registrar_key,
                     l.ils_prefix default_pickup
                 FROM courses c
@@ -189,9 +189,11 @@ def courses():
             else:
                 semester = ''
 
+            course_number = "%s %s" % (row['abbreviation'], row['course_number'])
+
             csv_row = {'CourseID': row['course_alias_id'], 'Name': row['name'], 'CourseCode': row['course_code'], 
                        'StartDate': row['start_date'], 'StopDate': row['end_date'], 'Department': row['department_name'], 
-                       'Instructor': '', 'CourseNumber': row['course_number'],
+                       'Instructor': '', 'CourseNumber': course_number,
                        'RegistrarCourseId': registrar_key, 'Semester': semester, 'DefaultPickupSite': default_pickup.get(row['default_pickup'], ''),
                        'ExternalCourseId': row['course_alias_id'] 
             }
