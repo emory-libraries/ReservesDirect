@@ -192,7 +192,7 @@ def courses():
             course_number = "%s %s" % (row['abbreviation'], row['course_number'])
 
             csv_row = {'CourseID': row['course_alias_id'], 'Name': row['name'], 'CourseCode': row['course_code'], 
-                       'StartDate': row['start_date'], 'StopDate': row['end_date'], 'Department': row['department_name'], 
+                       'StartDate': row['start_date'], 'StopDate': row['end_date'], 'Department': row['abbreviation'],
                        'Instructor': '', 'CourseNumber': course_number,
                        'RegistrarCourseId': registrar_key, 'Semester': semester, 'DefaultPickupSite': default_pickup.get(row['default_pickup'], ''),
                        'ExternalCourseId': row['course_alias_id'] 
