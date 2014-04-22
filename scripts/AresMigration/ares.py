@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 # 0 - Student
 # 1 - Custodian
 # 2 - Proxy
