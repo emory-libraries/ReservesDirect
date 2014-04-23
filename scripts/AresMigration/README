@@ -11,5 +11,13 @@ Courses
 CourseUsers
 Items
 
-More info about these format can be found here: 
-https://prometheus.atlas-sys.com/display/Ares/Key+Ares+Data+Tables#KeyAresDataTables-Courses .
+
+ares.py
+-------
+This is the main script that covers 2011-08-01 - to the present with the standard criterea and formatting.
+
+aresAll.py
+-------
+Mostly the same as above but with a few tweaks. 
+- Add *all* Summer 2014 and Fall 2014 courses, even if they don't contain any items.
+- For Fall 2014, populate using the new Blackboard format: TermCode.OPUSCode (xxxx.xxxx)  Example: 5119.4642 = Fall 2009 OT501
