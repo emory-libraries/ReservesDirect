@@ -24,7 +24,7 @@ from progressbar import ETA, Percentage, ProgressBar, Bar
 records = defaultdict(int)
 
 # allowed values for -f flag
-allowed_types = ['users', 'courses', 'courseusers', 'items']
+allowed_types = ['users', 'courses', 'courseusers']
 
 doc_types = {
     'jpg' : 'Image-jpg',
@@ -123,7 +123,7 @@ def users():
     cursor.execute (query)
     rows = cursor.fetchall()
 
-    with open('users.txt', 'wb') as f:
+    with open('usersAll.txt', 'wb') as f:
         writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL, delimiter='\t')
         writer.writeheader()
        
@@ -149,32 +149,22 @@ def courses():
     # only instructors, Staff, Admin courses from date specified forward
     query = ''' SELECT DISTINCT ca.course_alias_id, c.uniform_title name, d.abbreviation course_code, ci.activation_date start_date, 
                     ci.expiration_date end_date,  c.course_number course_number, d.name department_name, d.abbreviation,
-                    u.username, ca.registrar_key registrar_key,
+                    ca.registrar_key registrar_key,
                     l.ils_prefix default_pickup, ca.section
                 FROM courses c
                     JOIN departments d ON c.department_id = d.department_id
                     JOIN course_aliases ca ON ca.course_id = c.course_id
-                    JOIN course_instances ci ON ci.primary_course_alias_id = ca.course_alias_id 
+                    JOIN course_instances ci ON ci.primary_course_alias_id = ca.course_alias_id
                     JOIN access a ON a.alias_id = ca.course_alias_id
-                    JOIN users u ON u.user_id = a.user_id
-                    JOIN reserves r ON r.course_instance_id = ci.course_instance_id
-                    JOIN items i ON i.item_id = r.item_id 
-                    LEFT JOIN physical_copies pc ON pc.item_id = i.item_id
-                    LEFT JOIN mimetypes m ON i.mimetype = m.mimetype_id
                     JOIN libraries l ON d.library_id = l.library_id
-                WHERE u.dflt_permission_level IN (3, 4, 5) 
-                    AND username NOT LIKE '[tmp]%%' 
-                    AND ((TRIM(u.first_name) != '' AND  u.first_name IS NOT NULL) OR (TRIM(u.last_name) != '' AND  u.last_name IS NOT NULL))
-                    AND i.item_group IN ('MONOGRAPH', 'MULTIMEDIA', 'ELECTRONIC')
-                    AND i.status = 'ACTIVE'
-                    AND ci.activation_date >= %s '''
+                WHERE ci.activation_date >=  %s '''
              
             
     cursor = db.cursor (MySQLdb.cursors.DictCursor)
     cursor.execute (query, options.date)
     rows = cursor.fetchall()
 
-    with open('courses.txt', 'wb') as f:
+    with open('coursesAll.txt', 'wb') as f:
         writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL, delimiter='\t')
         writer.writeheader()
 
@@ -244,7 +234,7 @@ def course_user():
     cursor.execute (query, (options.date))
     rows = cursor.fetchall()
 
-    with open('course_user.txt', 'wb') as f:
+    with open('course_userAll.txt', 'wb') as f:
         writer = csv.DictWriter(f, fieldnames=headers, quoting=csv.QUOTE_ALL, delimiter='\t')
         writer.writeheader()
         print "COURSE_USER"
@@ -254,175 +244,6 @@ def course_user():
             writer.writerow(csv_row)
             records['course_user'] +=1
             pbar.update(records['course_user'])
-        pbar.finish()
-        cursor.close()
-
-# export item data
-def items():
-    headers = ['ItemID', 'Username', 'CourseID', 'PickupLocation', 'ProcessLocation',
-               'CurrentStatus', 'CurrentStatusDate', 'ItemType', 'DigitalItem', 'Location',
-               'AresDocument', 'InstructorProvided', 'CopyrightRequired', 'CopyrightObtained', 'VisibleToStudents',
-               'ActiveDate', 'InactiveDate', 'Callnumber', 'ReasonForCancellation', 'Proxy',
-               'Title', 'Author', 'Publisher', 'PubPlace', 'PubDate',
-               'Edition', 'ISXN', 'ESPNumber', 'CitedIn', 'DOI',
-               'ArticleTitle', 'Volume', 'Issue', 'JournalYear', 'JournalMonth',
-               'Pages', 'ShelfLocation', 'DocumentType', 'ItemFormat', 'Description',
-               'CCCNumber', 'LoanPeriod', 'Editor', 'ReferenceNumber', 'ItemBarcode',
-               'NeededBy', 'PagesEntireWork', 'PageCount', 'NatureOfWork', 'SortOrder',
-               'ItemInfo1', 'ItemInfo2', 'ItemInfo3', 'ItemInfo4', 'ItemInfo5']
-
-
-    # get copyright and instructor notes
-    copyright_notes = get_notes('copyright')
-    instructor_notes = get_notes('instructor')
-
-    # select items from specified date forward
-    query = ''' SELECT DISTINCT i.item_id, ca.course_alias_id, i.status, IF(i.item_group='ELECTRONIC', 1, 0) digital, IFNULL(i.url, '') as url,
-                       r.activation_date, r.expiration, i.title, i.author, i.publisher, i.volume_title, i.material_type,
-                       r.requested_loan_period, i.pages_times_range, i.pages_times_total, i.pages_times_used, pc.call_number,
-                       lpad(pc.barcode, 12, '0') barcode, i.local_control_key, OCLC, m.mimetype, IFNULL(i.volume_edition, '') volume_edition, l.reserve_desk, i.issn, i.isbn, i.source,
-                       l.ils_prefix default_pickup
-                FROM reserves r
-                    JOIN course_instances ci ON r.course_instance_id = ci.course_instance_id
-                    JOIN course_aliases ca ON ci.primary_course_alias_id = ca.course_alias_id
-                    JOIN items i ON i.item_id = r.item_id 
-                    LEFT JOIN physical_copies pc ON pc.item_id = i.item_id
-                    LEFT JOIN mimetypes m ON i.mimetype = m.mimetype_id
-                    LEFT JOIN libraries l ON i.home_library = l.library_id 
-                WHERE i.item_group IN ('MONOGRAPH', 'MULTIMEDIA', 'ELECTRONIC')
-                    AND i.status = 'ACTIVE' 
-                    AND ci.activation_date >= %s '''
-               
-              
-             
-    year_p = re.compile('\d{4}') # pattern of year - used to search source field
-    cursor = db.cursor (MySQLdb.cursors.DictCursor)
-    cursor.execute (query, options.date)
-    rows = cursor.fetchall()
-
-    with open('items.txt', 'wb') as f:
-        writer = csv.DictWriter(f, fieldnames=headers,  quoting=csv.QUOTE_ALL, delimiter='\t')
-        writer.writeheader()
-        print "ITEMS"
-        pbar = ProgressBar(widgets=pbar_widget, maxval=len(rows)).start()
-        for row in rows:
-            # translate mimetype to DocumentType
-            doc_type = doc_types.get(row['url'].split('.')[-1].lower(), '')
-            if row['material_type'] in ['BOOK', 'DVD', 'VHS', 'CD']:
-                doc_type = 'Hard Copy Reserve Item'
-
-            #grab digital value to do some specal logic with type and location
-            digital = row['digital']
-            if digital == 1:
-                item_type = 'SER'
-                loan_period = ''
-                location = row['url']
-                if not location.startswith('http'):
-                    location = location.replace('/', '_')
-                else:
-                    doc_type = "WebLink"
-            else:
-                item_type='MON'
-                location = ''
-                if doc_type == 'Hard Copy Reserve Item':
-                    if default_pickup.get(row['default_pickup'], '') == 'OXFD':
-                        loan_period = 2
-                    else:
-                        loan_period = 3
-                else:
-                    loan_period = ''
-
-            # get isbn or issn field based on material_type
-            material_type = row['material_type']
-            if material_type and 'BOOK' in material_type:
-                isxn = row['isbn']
-            elif material_type and material_type == 'JOURNAL_ARTICLE':
-                isxn = row['issn']
-            else:
-                isxn = ''
-
-            # AresDocument is true if pdf file
-            if location !=None:
-                ares_doc = 0 if location.startswith('h') or location=='' else 1
-            else:
-                ares_doc = 0
-
-
-            # search source field to try to find a year
-            source = row['source']
-            format = row['material_type']
-            result = re.search(year_p, source) if source else ''
-            if result:
-                if format == 'JOURNAL_ARTICLE':
-                    pub_year = ''
-                    journal_year = result.group()
-                else:
-                    pub_year = result.group()
-                    journal_year = ''
-            else:
-                pub_year = ''
-                journal_year = ''
-
-
-            # put lenght of portion info in pages unless it has a ':' which means it represents time. 
-            # In that case put it in ItemInfo1
-            range = row['pages_times_range']
-            if range:
-                if ':' in range:
-                    pages = ''
-                    info1= range
-                else:
-                    pages = range
-                    info1= ''
-            else:
-                pages = ''
-                info1= ''
-   
-            # if Title blank then use Article Title
-            if not row['volume_title']:
-                title = row['title'] 
-                article_title = ''
-            else:
-                title = row['volume_title'] 
-                article_title = row['title']
-
-            try:
-                volume, issue = row['volume_edition'].split(',')
-            except:
-                volume = row['volume_edition']
-                issue = ''
-            volume = volume.strip()
-            issue = issue.strip()
-                
-
-            #Publisher and PubPlace
-            pub = row['publisher'] if row['publisher'] else ''
-            if ':' in pub:
-                pub_place, publisher = pub.split(':', 1)
-            else:
-                publisher = pub
-                pub_place= ''
-            publisher = publisher.strip()
-            pub_place = pub_place.strip()
-
-
-            csv_row = {'ItemID': row['item_id'], 'CourseID': row['course_alias_id'], 'CurrentStatus': 'Item Removed From Reserves',
-                       'ItemType': item_type[:50], 'DigitalItem': digital, 'Location': location,
-                       'AresDocument': ares_doc, 'InstructorProvided': '1', 'CopyrightRequired': '1', 
-                       'CopyrightObtained': '1', 'VisibleToStudents': '1', 
-                       'ActiveDate': row['activation_date'], 'InactiveDate': row['expiration'], 'Proxy': '0',
-                       'Author': row['author'], 'Publisher': publisher, 'PubPlace': pub_place,
-                       'ArticleTitle': unnone(article_title)[:255], 'Title': unnone(title)[:255], 'ItemFormat': unnone(row['material_type'])[:50],
-                       'Pages': pages[:30], 'PagesEntireWork': row['pages_times_total'], 'PageCount': row['pages_times_used'],
-                       'Callnumber': unnone(row['call_number'])[:100], 'ItemBarcode': unnone(row['barcode'])[:50], 'ESPNumber': unnone(row['local_control_key'])[:32],
-                       'DocumentType': unnone(doc_type)[:50], 'Volume': unnone(volume)[:30], 'Issue': unnone(issue)[:30], 'ISXN': unnone(isxn)[:20], 'PubDate': unnone(pub_year)[:30],
-                       'JournalYear': journal_year[:30], 'ItemInfo1': info1[:255], 'ItemInfo2': copyright_notes.get(row['item_id'], '')[:255],
-                       'PickupLocation': default_pickup.get(row['course_alias_id'], 'THEO')[:10], 'ProcessLocation': default_pickup.get(row['course_alias_id'], 'THEO')[:10],
-                       'ItemInfo3': instructor_notes.get(row['item_id'], '')[:255], 'LoanPeriod': loan_period
-            }
-            writer.writerow(csv_row)
-            records['items'] +=1
-            pbar.update(records['items'])
         pbar.finish()
         cursor.close()
 
@@ -436,7 +257,7 @@ if __name__=="__main__":
     parser.add_option('--password', action='store', help='password for RD database (required) --password= will prompt for password')
     parser.add_option('--db', action='store', help='RD database (required)')
     parser.add_option('-f', '--file', action='append', help='list of file formats to generate (optional). If none specified, all formats are generated')
-    parser.add_option('-d', '--date', action='store', default='2011-08-01', help="Earliest activation date to query. Must use format 'yyyy-mm-dd'. (optional). default:'2011-08-01'")
+    parser.add_option('-d', '--date', action='store', default='2014-05-01', help="Earliest activation date to query. Must use format 'yyyy-mm-dd'. (optional). default:'2011-08-01'")
     (options, args) = parser.parse_args()
 
 
@@ -458,11 +279,7 @@ if __name__=="__main__":
         for f in options.file:
             if f not in allowed_types:
                 parser.error("%s is not an allowed file type" % f)
-    # make sure courses are always specified with items
-    if options.file and 'items' in options.file and (not 'courses' in options.file):
-        parser.error("items file depends on courses file please add -f courses")
-
-    # validate date if entered 
+    # validate date if entered
     if options.date:
         try:
             time.strptime(options.date, '%Y-%m-%d')
@@ -492,8 +309,6 @@ if __name__=="__main__":
         courses()
     if not options.file or 'courseusers' in options.file:
         course_user()
-    if not options.file or 'items' in options.file:
-        items()
 
     db.close()
 
