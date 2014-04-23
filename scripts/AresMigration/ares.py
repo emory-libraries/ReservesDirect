@@ -193,6 +193,9 @@ def courses():
 
             course_number = "%s %s" % (row['abbreviation'], row['course_number'])
 
+            # add additional lookup for default_pickup
+            default_pickup[row['course_alias_id']] = default_pickup.get(row['default_pickup'], '')
+
             csv_row = {'CourseID': row['course_alias_id'], 'Name': row['name'], 'CourseCode': row['section'],
                        'StartDate': row['start_date'], 'StopDate': row['end_date'], 'Department': row['abbreviation'],
                        'Instructor': '', 'CourseNumber': course_number,
@@ -414,7 +417,7 @@ def items():
                        'Callnumber': unnone(row['call_number'])[:100], 'ItemBarcode': unnone(row['barcode'])[:50], 'ESPNumber': unnone(row['local_control_key'])[:32],
                        'DocumentType': unnone(doc_type)[:50], 'Volume': unnone(volume)[:30], 'Issue': unnone(issue)[:30], 'ISXN': unnone(isxn)[:20], 'PubDate': unnone(pub_year)[:30],
                        'JournalYear': journal_year[:30], 'ItemInfo1': info1[:255], 'ItemInfo2': copyright_notes.get(row['item_id'], '')[:255],
-                       'PickupLocation': default_pickup.get(row['default_pickup'], 'THEO')[:10], 'ProcessLocation': default_pickup.get(row['default_pickup'], 'THEO')[:10],
+                       'PickupLocation': default_pickup.get(row['course_alias_id'], 'THEO')[:10], 'ProcessLocation': default_pickup.get(row['course_alias_id'], 'THEO')[:10],
                        'ItemInfo3': instructor_notes.get(row['item_id'], '')[:255], 'LoanPeriod': loan_period
             }
             writer.writerow(csv_row)
@@ -455,6 +458,9 @@ if __name__=="__main__":
         for f in options.file:
             if f not in allowed_types:
                 parser.error("%s is not an allowed file type" % f)
+    # make sure courses are always specified with items
+    if options.file and 'items' in options.file and (not 'courses' in options.file):
+        parser.error("items file depends on courses file please add -f courses")
 
     # validate date if entered 
     if options.date:
