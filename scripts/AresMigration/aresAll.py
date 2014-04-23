@@ -183,6 +183,8 @@ def courses():
 
             course_number = "%s %s" % (row['abbreviation'], row['course_number'])
 
+            external_id = '%s.%s' % (registrar_key[:4], row['course_number'])
+
             # add additional lookup for default_pickup
             default_pickup[row['course_alias_id']] = default_pickup.get(row['default_pickup'], '')
 
@@ -190,7 +192,7 @@ def courses():
                        'StartDate': row['start_date'], 'StopDate': row['end_date'], 'Department': row['abbreviation'],
                        'Instructor': '', 'CourseNumber': course_number,
                        'RegistrarCourseId': registrar_key, 'Semester': semester, 'DefaultPickupSite': default_pickup.get(row['default_pickup'], ''),
-                       'ExternalCourseId': row['course_alias_id'] 
+                       'ExternalCourseId': external_id
             }
             writer.writerow(csv_row)
             records['courses'] +=1 
