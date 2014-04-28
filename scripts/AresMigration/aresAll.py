@@ -149,7 +149,7 @@ def courses():
     # only instructors, Staff, Admin courses from date specified forward
     query = ''' SELECT DISTINCT ca.course_alias_id, c.uniform_title name, d.abbreviation course_code, ci.activation_date start_date, 
                     ci.expiration_date end_date,  c.course_number course_number, d.name department_name, d.abbreviation,
-                    ca.registrar_key registrar_key,
+                    ca.registrar_key registrar_key, ca.classnbr,
                     l.ils_prefix default_pickup, ca.section
                 FROM courses c
                     JOIN departments d ON c.department_id = d.department_id
@@ -183,7 +183,7 @@ def courses():
 
             course_number = "%s %s" % (row['abbreviation'], row['course_number'])
 
-            external_id = '%s.%s' % (registrar_key[:4], row['course_number'])
+            external_id = '%s.%s' % (registrar_key[:4], row['classnbr'])
 
             # add additional lookup for default_pickup
             default_pickup[row['course_alias_id']] = default_pickup.get(row['default_pickup'], '')
