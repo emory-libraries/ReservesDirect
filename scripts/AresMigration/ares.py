@@ -162,8 +162,7 @@ def courses():
                     LEFT JOIN physical_copies pc ON pc.item_id = i.item_id
                     LEFT JOIN mimetypes m ON i.mimetype = m.mimetype_id
                     JOIN libraries l ON d.library_id = l.library_id
-                WHERE u.dflt_permission_level IN (3, 4, 5) 
-                    AND username NOT LIKE '[tmp]%%' 
+                WHERE  username NOT LIKE '[tmp]%%'
                     AND ((TRIM(u.first_name) != '' AND  u.first_name IS NOT NULL) OR (TRIM(u.last_name) != '' AND  u.last_name IS NOT NULL))
                     AND i.item_group IN ('MONOGRAPH', 'MULTIMEDIA', 'ELECTRONIC')
                     AND i.status = 'ACTIVE'
