@@ -127,7 +127,7 @@ function authByNTDom($username, $password) {
  	NOTE: requires array of ldap info as $g_ldap;
  */
 function authByLDAP($username, $password) {
-	global $g_ldap;
+	global $g_lda, $g_permission;
 	$ldap = new ldapAuthN();
 	$user = new user();
 	
@@ -141,6 +141,12 @@ function authByLDAP($username, $password) {
 			//(LDAP returns username in caps, so strtolower() it)
 			$user->createUser(strtolower($user_info[$g_ldap['canonicalName']][0]), $user_info[$g_ldap['firstname']][0], $user_info[$g_ldap['lastname']][0], $user_info[$g_ldap['email']][0], 0);
 		}
+
+                //Turn off student access
+		if($user->getRole() == $g_permission['student']){
+                    setAuthSession(false);
+                    return false;
+                }
 				
 		//user is now authenticated, set the session vars
 		setAuthSession(true, $user);
