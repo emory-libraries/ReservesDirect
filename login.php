@@ -67,7 +67,7 @@ http://www.reservesdirect.org/
                     <td width="75%">
                       <div id="loginText">
             <?php if($login_error): ?>
-              <font color="red">Invalid username or password</font>
+             <font color="red">Course Reserves have moved. Log in to the new system at <a href='http://reserves.library.emory.edu'>http://reserves.library.emory.edu/</a></font> 
             <?php endif; ?>
             <p><strong>Net ID:</strong>
                           <input name="username" type="text" size="15"></p> 
@@ -100,7 +100,7 @@ http://www.reservesdirect.org/
       <table class="contacts" cellpadding="2">
       <tr><th>For information on submitting a Course Reserves request, please contact:<br>&nbsp;</th></tr>      
       <tr><td>
-        <a target="_blank" href="http://web.library.emory.edu/using-the-library/services/course-reserves/index.html">Woodruff Library/General</a>
+        <a target="_blank" href="http://web.library.emory.edu/using-the-library/course-reserves/index.html">Woodruff Library/General</a>
       </td></tr>
       <tr><td>
       <a target="_blank" href="http://business.library.emory.edu/communities/faculty/e-reserves">Business</a>
