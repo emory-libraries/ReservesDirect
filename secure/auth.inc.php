@@ -143,7 +143,7 @@ function authByLDAP($username, $password) {
 		}
 
                 //Turn off student access
-		if($user->getRole() == $g_permission['student']){
+                if($user->getRole() != $g_permission['admin']){
                     setAuthSession(false);
                     return false;
                 }
